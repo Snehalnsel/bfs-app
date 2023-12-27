@@ -1,0 +1,145 @@
+<%- include('../../public/assets/include/header'); %>
+
+<section class="bids-wrapper">
+    <div class="container">     
+       <div class="bids-lists cart-wrapper">     
+       <div class="cart-list">
+           
+         <form action="/api/checkout-web" method="POST">  
+            <% console.log('ADD TO CART VIEW PAGE LIST'); console.log(respdata); %>
+            <input type="hidden" name="user_id" value="<%=user%>">
+            <input type="hidden" name="cart_id" value="<%=respdata.cart_id%>">
+            <input type="hidden" name="product_id" value="<%=respdata.product_id%>">
+            <input type="hidden" name="total_amt" value="<%=respdata1%>">
+            <input type="hidden" name="gst" value="28">
+            <input type="hidden" name="payment_method" value="0">
+          <div class="bids-row cart-row">             
+             <div class="br-details">
+                <div class="bid-images">
+                    <img src="<%=respdata.images%>" alt="images" class="img-fluid"> 
+                </div>
+                <div class="bid-info">
+                   <div class="bd-title"><%=respdata.product_name%></div>
+                   <div class="bd-price">
+                      <span><i class="fa fa-inr" aria-hidden="true"></i></span>
+                      <%=respdata.product_price%>
+                   </div>
+                   <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i><%=respdata.product_est_price%> </div>                
+                </div>
+             </div>
+            
+             <div class="br-results cart-right-box">
+                <div class="cart-price">
+                   <p>Final Bid Price</p>
+                   <div class="highlight-title "><span><i class="fa fa-inr" aria-hidden="true"></i></span><%=respdata.product_price%></div>
+                </div>
+                <div class="cart-action">
+                   <div class="remove-cart">
+                      <a href="/api/delete-cart/<%=respdata._id%>"><i class="fa fa-times" aria-hidden="true"></i></a>
+                   </div>
+                </div>
+             </div>
+          </div>
+ 
+          <!-- <div class="bids-row cart-row">             
+             <div class="br-details">
+                <div class="bid-images"><img src="assets/images/cart2.png" alt="images" class="img-fluid"></div>
+                <div class="bid-info">
+                   <div class="bd-title">Lorem ipsum dolor sit amet</div>
+                   <div class="bd-price">
+                      <span><i class="fa fa-inr" aria-hidden="true"></i></span>
+                      10,000
+                   </div>
+                   <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i> 110000</div>                
+                </div>
+             </div>
+            
+             <div class="br-results cart-right-box">
+                <div class="cart-price">
+                   <p>Final Bid Price</p>
+                   <div class="highlight-title "><span><i class="fa fa-inr" aria-hidden="true"></i></span>8,000</div>
+                </div>
+                <div class="cart-action">
+                   <div class="remove-cart">
+                      <a href="#"><i class="fa fa-times" aria-hidden="true"></i></a>
+                   </div>
+                </div>
+             </div>
+          </div>
+ 
+          <div class="bids-row cart-row">             
+             <div class="br-details">
+                <div class="bid-images"><img src="assets/images/product4.jpg" alt="images" class="img-fluid"></div>
+                <div class="bid-info">
+                   <div class="bd-title">Lorem ipsum dolor sit amet</div>
+                   <div class="bd-price">
+                      <span><i class="fa fa-inr" aria-hidden="true"></i></span>
+                      10,000
+                   </div>
+                   <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i> 110000</div>                
+                </div>
+             </div>
+            
+             <div class="br-results cart-right-box">
+                <div class="cart-price">
+                   <p>Final Bid Price</p>
+                   <div class="highlight-title "><span><i class="fa fa-inr" aria-hidden="true"></i></span>8,000</div>
+                </div>
+                <div class="cart-action">
+                   <div class="remove-cart">
+                      <a href="#"><i class="fa fa-times" aria-hidden="true"></i></a>
+                   </div>
+                </div>
+             </div>
+          </div> -->
+ 
+       </div> 
+
+
+      
+       <div class="cart-summery">
+          <div class="summery-title">
+             <h4>Price details</h4>
+          </div>
+          <div class="c-summery-table">
+             <table class="table table-borderless">  
+                 <tbody>
+                   <tr> 
+                       <td>Price <small>(1 item)</small></td>
+                       <th><i class="fa fa-inr" aria-hidden="true"></i><%=respdata.product_price%></th> 
+                     </tr>
+                     <tr>
+                       <td>Packing & Handling Charges</td>
+                       <th><i class="fa fa-inr" aria-hidden="true"></i> 250</th> 
+                     </tr>
+                     <tr>
+                        
+                       <td>GST<small>(18% Packing & Handling Charges)</small></td>
+                        <th><i class="fa fa-inr" aria-hidden="true"></i> <%=(respdata.product_price*28)/100;%></th> 
+                     </tr>
+                     <tr class="border-top total-table">
+                       <td><strong>Total Amount</strong></td>
+                       <th><i class="fa fa-inr" aria-hidden="true"></i><%=respdata1%></th> 
+                     </tr>
+                 </tbody>
+              </table> 
+          </div>
+        
+          <div class="summery-button">
+          <!-- <a class="btn check-out">Place Order</a>-->
+          <button class="btn check-out">Place Order</button>
+         </div> 
+          
+
+       </div> 
+          
+      </form>
+ 
+       </div>
+ 
+        
+    </div>
+ </section>
+
+<%- include('../../public/assets/include/newsletter'); %>
+<%- include('../../public/assets/include/footer'); %>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../../partials/head', {pageTitle: pageTitle}); %>
+    <style>
+        .table th {
+            text-align: center;   
+        }
+    </style>
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <%- include('../../partials/sidebar', {siteName: siteName}); %>
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <%- include('../../partials/header', {siteName: siteName, userFullName: userFullName, userImage: userImage}); %>
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                      <!-- Page Heading -->
+                      <a type="button" href="/add-cms" class="btn btn-primary" style="float: right;">Create CMS</a>
+                      <h1 class="h3 mb-2 text-gray-800"><%-pageName%></h1>
+                      <p class="mb-4">Add / View / Edit / Delete <%-pageName%> Details</p>
+                        
+                      <!-- DataTales Example -->
+                      <div class="card shadow mb-4">
+                          <div class="card-header py-3">
+                              <h6 class="m-0 font-weight-bold text-primary"><%-pageName%> Details</h6>
+                          </div>
+                          <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl No</th>
+                                            <th><%-pageName%> Type</th>
+                                            <th>Content</th>
+                                            <th>Image</th>
+                                            <th>Created On</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>Contact US</td>
+                                            <td>Test Contect</td>
+                                            <td><img src="https://images.pexels.com/photos/33044/sunflower-sun-summer-yellow.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"></td>
+                                            <td>22-10-2022 11:59 AM</td>
+                                            <td>Active</th>
+                                            <td>
+                                                <a href="#" class="btn btn-info btn-circle btn-sm"  title="Edit">
+                                                    <i class="fas fa-pencil-alt"></i>
+                                                </a>
+                                                <a href="#" class="btn btn-danger btn-circle btn-sm"  title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <hr>
+                          </div>
+                      </div>
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <%- include('../../partials/footer', {year: year, siteName: siteName}); %>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    
+    <%- include('../../partials/logoutModal'); %>
+
+    <%- include('../../partials/footerJs'); %>
+
+</body>
+
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../../partials/head', {pageTitle: pageTitle}); %>
+</head>
+
+<style>
+    .newbtn{
+        padding: 5px !important;
+        margin: 5px 0 !important;
+        min-width: 120px;
+        font-size: 14px !important;
+        text-align: center;
+        line-height: 1.2;
+    }
+    .btn-warning.newbtn {
+        color: #111111 !important;
+    }
+</style>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <%- include('../../partials/sidebar', {siteName: siteName}); %>
+            <!-- End of Sidebar -->
+
+            <!-- Content Wrapper -->
+            <div id="content-wrapper" class="d-flex flex-column">
+
+                <!-- Main Content -->
+                <div id="content">
+
+                    <!-- Topbar -->
+                    <%- include('../../partials/header', {siteName: siteName, userFullName: userFullName, userImage:
+                        userImage}); %>
+                        <!-- End of Topbar -->
+
+                        <!-- Begin Page Content -->
+                        <div class="container-fluid">
+
+                            <!-- Page Heading -->
+                            <h1 class="h3 mb-2 text-gray-800"><%-pageName%></h1>
+                            <p class="mb-4">View / edit <%-pageName%> details</p>
+
+                            
+                            <!-- DataTales Example -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary"><%-pageName%> Details</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sl No</th>
+                                                    <th>Shipment Kit Order Id</th>
+                                                    <th>Product Image</th>
+                                                    <th>Product name</th>
+                                                    <th>Seller Details</th>
+                                                    <th>Buyer Details</th>
+                                                    <th>Product Sold Price</th>
+                                                    <th>Payment Method</th>
+                                                    <th>Order Date</th>
+                                                    <th>Hub to Seller</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if(respdata.list){ %>
+                                                    <% respdata.list.forEach(function(value, index) { %>
+                                                       <tr>
+                                                        <td>
+                                                            <%= (index+1) %>
+                                                        </td>
+                                                        <td>
+                                                            <% if (value.track_code) { %>
+                                                                <%= value.track_code %>
+                                                            <% } else { %>
+                                                                <span style="color: red;">No Order Code is Found</span>
+                                                            <% } %>
+                                                        </td>
+                                                        <td>
+                                                            <% if (value.product && value.product[0] && value.product[0].name) { %>
+                                                                <%= value.product[0].name %>
+                                                            <% } else { %>
+                                                                <span style="color: red;">Product name not available</span>
+                                                            <% } %>
+                                                        </td>
+                                                        
+                                                        <td>
+                                                            <% if (value.productImage && value.productImage.image) { %>
+                                                                <img src="<%= value.productImage.image %>" alt="Product Image" style="max-width: 100px; max-height: 100px;">
+                                                            <% } else { %>
+                                                                <span style="color: red;">No Image Available</span>
+                                                            <% } %>
+                                                        </td>
+                                                        <td>
+                                                            <% if (value.buyer && value.buyer[0] && value.buyer[0].name) { %>
+                                                                <%= value.buyer[0].name %>,
+                                                                <%= value.buyer[0].phone_no %> 
+                                                            <% } else { %>
+                                                                <span style="color: red;">Name and other details are not available</span>
+                                                            <% } %>
+                                                            <% if (value.shipping_address && value.shipping_address[0]) { %>
+                                                                <%= value.shipping_address[0].street_name %>,
+                                                                <%= value.shipping_address[0].address1 %>,
+                                                                <%= value.shipping_address[0].landmark %>,
+                                                                <%= value.shipping_address[0].city_name %>,
+                                                                <%= value.shipping_address[0].state_name %>
+                                                            <% } else { %>
+                                                                <span style="color: red;">Address details are not available</span>
+                                                            <% } %>    
+                                                        </td>
+                                                        <td>
+                                                            <% if (value.hub_address && value.hub_address[0] && value.hub_address[0].name) { %>
+                                                                <%= value.hub_address[0].name %>,
+                                                                <%= value.hub_address[0].phone_no %>
+                                                                <br>
+                                                                <%= value.hub_address[0].street_name %>,
+                                                                <%= value.hub_address[0].address1 %>,
+                                                                <%= value.hub_address[0].landmark %>,
+                                                                <%= value.hub_address[0].city_name %>,
+                                                                <%= value.hub_address[0].state_name %> 
+                                                            <% } else { %>
+                                                                <span style="color: red;">Name and other details are not available</span>
+                                                            <% } %>
+                                                        </td>
+                                                        <td> <%= value.total_price %></td>
+                                                        <td>
+                                                            <% if (value.payment_method === 0) { %>
+                                                                <span style="color: #3CB371;">COD</span>
+                                                            <% } else { %>
+                                                                <span style="color: #98FB98;">Online</span>
+                                                            <% } %>
+                                                        </td>
+                                                        <td>
+                                                            <%= value.added_dtime %>
+                                                        </td>
+                                                        <td>
+                                                            <% if (value.hub_address[0]) { %>
+                                                                <% if (value.hub_address[0] && value.pickup_awb == 0) { %>
+                                                                    <a href="/shipmentplace/<%= value._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                                                                        Generate Shipment Kit Pickup
+                                                                    </a>
+                                                                <% } else if (value.shiprocket_shipment_id && value.pickup_awb == 0) { %>
+                                                                    <a href="/couriresserviceability/<%= value._id %>" class="btn btn-warning newbtn" title="Order Placed" target="_blank">
+                                                                        Check Courier Serviceability
+                                                                    </a>
+                                                                    
+                                                                <% }else{ %>
+                                                                    <a href="/generatelabelforkit/<%= value._id %>" class="btn btn-secondary newbtn" title="Order Placed">
+                                                                        Generate Label
+                                                                    </a>
+                                                                    <a href="/generateinvoiceforkit/<%= value._id %>" class="btn btn-info newbtn"  style="margin-top: 16px;" title="Order Placed">
+                                                                        Generate Invoice
+                                                                    </a>
+                                                                    <a href="/schedule-pickupforkit/<%= value._id %>" class="btn btn-success newbtn" target="_blank" title="Schedule Pickup">
+                                                                        Schedule Pickup
+                                                                     </a>
+                                                                <% } %>
+                                                            <% } 
+                                                             else  { %>
+                                                                <a href="/hubselect/<%= value._id %>" class="btn btn-info btn-circle btn-sm" title="Edit">
+                                                                    <i class="fas fa-pencil-alt"></i>
+                                                                </a>
+                                                            <% }
+                                                            %>
+                                                        </td>
+                                                        
+                                                       </tr>
+                                                        <% }); %>
+                                                            <% } %>
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.container-fluid -->
+
+                </div>
+                <!-- End of Main Content -->
+
+                <!-- Footer -->
+                <%- include('../../partials/footer', {year: year, siteName: siteName}); %>
+                    <!-- End of Footer -->
+
+            </div>
+            <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+
+    <%- include('../../partials/logoutModal'); %>
+
+        <%- include('../../partials/footerJs'); %>
+
+</body>
+
+</html>
+
+<script>
+    $(document).ready(function () {
+        $('#dataTable').DataTable({
+            "paging": true,
+            "ordering": true,
+            "searching": true
+        });
+    });
+</script>

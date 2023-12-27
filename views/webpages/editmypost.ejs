@@ -1,0 +1,175 @@
+<%- include('../../public/assets/include/header'); %>
+
+<section class="dashboard-wrapper">
+    <div class="dashboard-container">
+       <div class="dashboard-sidbar">
+        <div class="sidbar-box user-profile">
+            <div class="user-icon">
+               <img src="<%=userData.image%>" alt="user-image" id="output">
+            </div>
+            <div class="user-info">
+               <div class="sht-ui">Hello</div>
+               <div class="user-name"><%=userData.title%> <%=userData.name%> </div>
+            </div>
+             <div class="userimage-edit">
+              <!--  <a href="javascript:void(0)" data-toggle="modal" data-target="#profile-change-modal"><i class="fa fa-pencil" aria-hidden="true"></i></a> -->
+                <label for="file"><i class="fa fa-pencil" aria-hidden="true"></i></label>
+                <input id="file" class="file-line" type="file" onchange="loadFile(event)"/>
+             </div>
+         </div>
+         <div class="sidbar-box sidbar-nav">
+            <ul class="nav d-flex flex-column mb-2 ">
+                <li class="nav-item">
+                  <a class="nav-link" href="/api/my-account"><i class="fa fa-user" aria-hidden="true"></i> <span>Profile</span></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#"><i class="fa fa-list-ul" aria-hidden="true"></i> <span>My Orders</span></a>
+                </li>
+  
+                <li class="nav-item">
+                  <a class="nav-link" href="/api/my-post/<%=userData.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Posts</span></a>
+                </li>
+  
+                <li class="nav-item">
+                  <a class="nav-link" href="#"><i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> <span>My Bids</span></a>
+                </li>
+                
+              </ul>
+              <div class="bottom-link">
+               <ul class="nav d-flex flex-column mb-2 ">
+                  <li><a class="nav-link" href="/api/sign-out"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li>
+               </ul>
+
+                       
+                    </div>
+
+         </div>        
+       </div>
+
+       <div class="dashboard-content">
+          <div class="dashboard-infobox">
+             <div class="dashboard-title-arrow mb-25">
+                <h4 class="di-title mr-25">Edit Your Product</h4>
+                <div class="edit-link"><a href="/api/my-account">Back </a></div>
+             </div>
+             
+             <div class="dsh-shortbox">
+                 <%  console.log(respdata); %>
+                <form action="/api/updatepostdata" method="post" enctype="multipart/form-data">
+                    
+                   <div class="div-row">
+                   <div class="div-12">
+                      <div class="post-imagebox">
+                          <% respdata.images.forEach(function(img){%>
+                            <% console.log('Hello'); console.log(img.length); %>
+                         <div class="upload-post full-post-image">
+                            <h6>+Add Image</h6>
+                            <img src="<%=img.image%>">
+                            <input type="file" name="image" />
+                         </div>
+                         <!-- <div class="upload-post full-post-image">
+                            <h6>+Add Image</h6>
+                             <input type="file" name="image" />
+                             <img src="<%=img.image%>">
+                         </div>
+                         <div class="upload-post full-post-image">
+                             <h6>+Add Image</h6>
+                             <input type="file" name="image" />
+                         </div> 
+                          <div class="upload-post full-post-image">
+                             <h6>+Add Image</h6>
+                             <input type="file" name="image" />
+                         </div> 
+                          <div class="upload-post full-post-image">
+                             <h6>+Add Image</h6>
+                             <input type="file" name="image" />
+                         </div> -->
+                         <% });%>                      
+                      </div>
+                   </div> 
+                      <div class="div-12">
+                         <label>Product Name</label>                        
+                          <input type="type" name="name" value="<%=respdata.name%>" class="ds-form-control" placeholder="Product Name">
+                      </div>
+ 
+                      <div class="div-12">
+                         <label>Product Description</label>                        
+                         <!-- <textarea class="ds-form-control" value="<%=respdata.description%>" name="description" placeholder="Enter Message"></textarea> -->
+                         <input type="type" name="description" value="<%=respdata.description%>" class="ds-form-control" placeholder="Product description">
+                        </div>
+ 
+                      <div class="div-6">
+                         <label>Product Category</label>
+                         <select class="ds-form-control" name="product_cate">
+                         <option >Select Category</option>
+                         <% subcate.forEach(function(subcatitems){%> 
+                          <option value="<%=subcatitems._id%>"><%=subcatitems.name%></option>
+                           <% }); %>
+                        </select>
+                      </div>
+ 
+                      <div class="div-6">
+                         <label>Product Brand</label>
+                         <input type="type" name="brand" value="<%=respdata.brand%>" class="ds-form-control" placeholder="Enter Brand">
+                      </div>
+ 
+                      <div class="div-6">
+                         <label>Product Condition</label>
+                         <select class="ds-form-control" name="product_condition">
+                         <option >Select Condition</option>
+                         <% productcondition.forEach(function(item){%>
+                          <option value="<%=item._id%>"><%=item.name%></option>
+                         <% }); %>
+                        </select>
+                      </div>
+ 
+                      <div class="div-6">
+                         <label>Product Size</label>
+                         <input type="type" name="size" value="<%=respdata.size%>" class="ds-form-control" placeholder="Product Size">
+                      </div>
+ 
+                      <div class="div-6">
+                         <label>Original Invoice</label>
+                         <label class="switch ">
+                           <input type="checkbox" name="original_invoice" value="<%=respdata.original_invoice%>" >
+                             <span class="tg-slider round"></span>
+                         </label>
+                         
+                      </div>
+ 
+                      <div class="div-6">
+                         <label>Original Packaging</label>
+                        <label class="switch ">
+                           <input type="checkbox" name="original_package" value="<%=respdata.original_package%>">
+                             <span class="tg-slider round"></span>
+                         </label>
+                      </div>
+ 
+                      <div class="div-6">
+                         <label>Price</label>
+                        <input type="type" name="price" value="<%=respdata.price%>" class="ds-form-control" placeholder="Price">
+                      </div>
+ 
+                      <div class="div-6">
+                         <label>Offer Price</label>
+                        <input type="type" name="offer_price" value="<%=respdata.offer_price%>" class="ds-form-control" placeholder="Offer Price">
+                      </div>
+                      
+                     
+                      <div class="div-12">
+                         <input type="submit" name="" class="ds-form-control userpost-btn" value="Post Your Product">
+                      </div>
+                   </div>
+                   
+                </form>
+                
+             </div>
+             
+          </div>
+       </div>
+    </div>
+ </section>
+
+<!-- <%- include('../../public/assets/include/newsletter'); %> -->
+<%- include('../../public/assets/include/footer'); %>
+</body>

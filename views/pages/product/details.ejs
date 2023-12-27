@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../../partials/head', {pageTitle: pageTitle}); %>
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <%- include('../../partials/sidebar', {siteName: siteName}); %>
+
+            <div id="content-wrapper" class="d-flex flex-column">
+
+
+                <div id="content">
+
+
+                    <%- include('../../partials/header', {siteName: siteName, userFullName: userFullName, userImage:
+                        userImage}); %>
+
+                        <div class="container-fluid">
+
+                            <h1 class="h3 mb-2 text-gray-800"><%-pageName%></h1>
+                            <p class="mb-4"> <%-pageName%></p>
+
+
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary"><%-pageName%></h6>
+                                </div>
+                                <div class="card-body">
+                                    <form class="user" action="/updateproductdetails" method="post"
+                                        enctype="multipart/form-data">
+
+                                        <div class="form-group row">
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <input type="hidden" name="product_id" value="<%- respdata._id %>">
+                                                <input type="hidden" name="user_id" value="<%- respdata.user_id._id %>">
+                                                <input type="text" class="form-control form-control-user"
+                                                    id="product_name" name="product_name" placeholder="Name"
+                                                    value="<%-respdata.name%>" required>
+                                            </div>
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <textarea type="text" class="form-control form-control-user"
+                                                    id="description" name="description" placeholder="Description"
+                                                    required><%-respdata.description%></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <select class="form-control" name="category_id" id="category_id"
+                                                    required>
+                                                    <option value="0" selected>Select Category</option>
+                                                    <% if(category){ %>
+                                                        <% category.forEach(function(value, index) { %>
+                                                            <option value="<%= value._id %>" <%=(parentCategory &&
+                                                                parentCategory._id.equals(value._id)) ? 'selected' : ''
+                                                                %>><%= value.name %>
+                                                            </option>
+                                                            <% }); %>
+                                                                <% } %>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <select class="form-control" name="subcategory_id" id="subcategory_id"
+                                                    required>
+                                                    <option value="0" selected>Select Subcategory</option>
+                                                    <% if(subcategory){ %>
+                                                        <% subcategory.forEach(function(value, index) { %>
+                                                            <option value="<%= value._id %>" <%=(respdata.category_id &&
+                                                                respdata.category_id._id.equals(value._id)) ? 'selected'
+                                                                : '' %>><%= value.name %>
+                                                            </option>
+                                                            <% }); %>
+                                                                <% } %>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-sm-6 mb-3 mb-sm-0" id="brandNameField"
+                                                style="<%- respdata.brand_id ? 'display: none;' : 'display: block;' %>">
+                                                <input type="text" class="form-control form-control-user"
+                                                    id="brand_name" name="brand_name" placeholder="Name"
+                                                    value="<%-respdata.brand%>">
+                                            </div>
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <select class="form-control" name="brand_id" id="brand_id" required
+                                                    onchange="handleBrandSelection(event)">
+                                                    <option value="" disabled selected>Select Brand</option>
+                                                    <% if(brand){ %>
+                                                        <% brand.forEach(function(value, index) { %>
+                                                            <option value="<%= value._id %>" " <%= (respdata.brand_id && respdata.brand_id._id.equals(value._id)) ? 'selected' : '' %>><%= value.name %></option>
+                                                        <% });  %>
+                                                    <% } %> 
+                                                </select>
+                                            </div>
+
+                                        </div>
+
+                                        <div class=" form-group row">
+                                                                <div class="col-sm-6 mb-3 mb-sm-0" id="sizeNameField"
+                                                                    style="<%- respdata.size_id ? 'display: none;' : 'display: block;' %>">
+                                                                    <input type="text"
+                                                                        class="form-control form-control-user"
+                                                                        id="size_name" name="size_name"
+                                                                        placeholder="Name" value="<%-respdata.size%>">
+                                                                </div>
+                                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                                    <select class="form-control" name="size_id"
+                                                                        id="size_id" required
+                                                                        onchange="handleSizeSelection(event)">
+                                                                        <option value="" disabled selected>Select Size</option>
+                                                                        <% if(size){ %>
+                                                                            <% size.forEach(function(value, index) { %>
+                                                                                <option value="<%= value._id %>"
+                                                                                    <%=(respdata.size_id &&
+                                                                                    respdata.size_id._id.equals(value._id))
+                                                                                    ? 'selected' : '' %>><%= value.name
+                                                                                        %>
+                                                                                </option>
+                                                                                <% }); %>
+                                                                                    <% } %>
+                                                                    </select>
+                                                                </div>
+                                            </div>
+
+
+                                            <div class=" form-group row">
+
+
+                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                    <select class="form-control" name="status" id="status" required>
+                                                        <option value="" selected>Select Condition</option>
+                                                        <% if (productCondition) { %>
+                                                            <% productCondition.forEach(function(value, index) { %>
+                                                                <option value="<%= value._id %>" <%=(respdata.status &&
+                                                                    respdata.status._id.equals(value._id)) ? 'selected'
+                                                                    : '' %>><%= value.name%>
+                                                                </option>
+                                                                <% }); %>
+                                                                    <% } %>
+                                                    </select>
+                                                </div>
+
+
+
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                    <select class="form-control" name="flag" id="flag" required>
+                                                        <option value="" selected>Select One</option>
+                                                        <option value="0" <%=(respdata && respdata.flag===0)
+                                                            ? 'selected' : '' %>>Active</option>
+                                                        <option value="1" <%=(respdata && respdata.flag===1)
+                                                            ? 'selected' : '' %>>Inactive</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                    <select class="form-control" name="approval_status"
+                                                        id="approval_status" required>
+                                                        <option value="" selected>Select Approval Status</option>
+                                                        <option value="0" <%=(respdata && respdata.approval_status===0)
+                                                            ? 'selected' : '' %>>Pending</option>
+                                                        <option value="1" <%=(respdata && respdata.approval_status===1)
+                                                            ? 'selected' : '' %>>Approved</option>
+                                                        <option value="2" <%=(respdata && respdata.approval_status===2)
+                                                            ? 'selected' : '' %>>Rejected</option>
+                                                    </select>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                    <input type="text" class="form-control form-control-user" id="price"
+                                                        name="price" placeholder="Price" value="<%-respdata.price%>"
+                                                        required>
+                                                </div>
+                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                    <input type="text" class="form-control form-control-user"
+                                                        id="offer_price" name="offer_price" placeholder="Offer Price"
+                                                        value="<%-respdata.offer_price%>" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                    <input type="text" class="form-control form-control-user" id="height"
+                                                        name="height" placeholder="The height of the item in cms." value="<%-respdata.height%>"
+                                                        required>
+                                                </div>
+                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                    <input type="text" class="form-control form-control-user"
+                                                        id="weight" name="weight" placeholder="The weight of the item in kgs."
+                                                        value="<%-respdata.weight%>" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                    <input type="text" class="form-control form-control-user" id="length"
+                                                        name="length" placeholder="The length of the item in cms." value="<%-respdata.length%>"
+                                                        required>
+                                                </div>
+                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                    <input type="text" class="form-control form-control-user"
+                                                        id="breath" name="breath" placeholder="The breadth of the item in cms"
+                                                        value="<%-respdata.breath%>" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                    <input type="text" class="form-control form-control-user" id="shipping_charges"
+                                                        name="shipping_charges" placeholder="Please enter Shipping Charges value here" value="<%-respdata.shipping_charges%>"
+                                                        required>
+                                                </div>
+                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                    <input type="text" class="form-control form-control-user"
+                                                        id="hsn_code" name="hsn_code" placeholder="Please enter product HSN Code here"
+                                                        value="<%-respdata.hsn_code%>" >
+                                                </div>
+                                               
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <div class="col-sm-12">
+                                                    <h4>Product Images</h4>
+                                                    <div style="font-size: 12px;color: orangered;">(Only 5 images you
+                                                        can upload)</div>
+                                                    <div class="image-gallery d-flex">
+                                                        <% if(productImages && productImages.length> 0) { %>
+                                                            <% productImages.forEach(function(image, index) { %>
+                                                                <div class="image-item" style="margin: 15px;"
+                                                                    id="image-item" data-id="<%= image._id %>">
+                                                                    <% if (/^(ftp|http|https):\/\/[^ "]+$/.test(image.image)) { %>
+                                                                        <!-- Valid URL: Render the image -->
+                                                                        <img src="<%= image.image %>"
+                                                                        alt="<%= respdata.name %>" class="product-image"
+                                                                        style="padding:10px; height:100px; width:100;">
+                                                                      <% } else { %>
+                                                                        <!-- Invalid URL or empty URL -->
+                                                                        <img src="<%= requrl %>/public/images/<%= image.image %>"
+                                                                        alt="<%= respdata.name %>" class="product-image"
+                                                                        style="padding:10px; height:100px; width:100;">
+                                                                      <% } %>
+                                                                    
+                                                                    <a href="<%= image.image %>"
+                                                                        download="<%= respdata.name %>_<%= index + 1 %>.jpg"
+                                                                        class="btn btn-success btn-sm mt-2"
+                                                                        title="Download">
+                                                                        <i class="fas fa-download"></i> Download <%=
+                                                                            respdata.name %>_<%= index + 1 %>.jpg
+                                                                    </a>
+                                                                    <button class="close-button" id="close-button"
+                                                                        type="button" style="float: right;"
+                                                                        data-index="<%= index %>"
+                                                                        onclick='handleCloseButtonClick("<%= image._id %>")'>&times;close</button>
+                                                                </div>
+                                                                <% }); %>
+                                                                    <% } %>
+                                                    </div>
+                                                    <hr>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group" id="upload-button">
+                                                <h5>Upload New Images</h5>
+                                                <input type="file" id="images" name="images[]" multiple>
+                                                <input type="hidden" id="displayedImageLinks" name="displayedImageLinks"
+                                                    value="">
+                                            </div>
+
+                                            <input type="hidden" id="remainingImages" name="remainingImages"
+                                                value="<%- productImages %>">
+                                            <input type="submit" class="btn btn-primary btn-user btn-block"
+                                                id="btn_sub_filter" name="btn_sub_filter" value="Submit">
+                                    </form>
+                                    <hr>
+
+                                    <% if(!status){ %>
+                                        <h6 style="background-color: aquamarine; align-content: center;">Message: <%=
+                                                message %>
+                                        </h6>
+                                        <p>
+                                            <%# respdata %>
+                                        </p>
+                                        <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                </div>
+
+                <%- include('../../partials/footer', {year: year, siteName: siteName}); %>
+
+            </div>
+
+
+    </div>
+
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <%- include('../../partials/logoutModal'); %>
+
+        <%- include('../../partials/footerJs'); %>
+
+</body>
+
+<script>
+    var productImages = JSON.parse('<%- JSON.stringify(productImages) %>');
+    console.log(productImages);
+    const remainingImagesField = document.getElementById('remainingImages');
+        remainingImagesField.value =[];
+    uploadbuttonShowhide();
+
+    function handleCloseButtonClick(id) {
+        console.log('Close button clicked for index:', id);
+        let filteredImageIndex = -1;
+        productImages.forEach((image, index) => {
+            if (image._id === id) {
+                filteredImageIndex = index;
+            }
+        });
+        if (filteredImageIndex !== -1) {
+            const removedImage = productImages.splice(filteredImageIndex, 1)[0];
+            console.log('Removed Image:', removedImage);
+        }
+
+        const imageContainer = document.querySelector(`[data-id="${id}"]`);
+
+        if (imageContainer) {
+            imageContainer.remove();
+
+        }
+
+        uploadbuttonShowhide();
+
+        console.log('Remaining Images:', productImages);
+        const remainingImagesField = document.getElementById('remainingImages');
+        remainingImagesField.value =JSON.stringify(productImages);
+        console.log(remainingImagesField.value)
+    }
+
+
+    function uploadbuttonShowhide() {
+        // Update button show/hide logic
+        const imageCount = productImages.length;
+        const uploadButton = document.getElementById('upload-button');
+
+        if (imageCount < 5) {
+            uploadButton.style.display = 'block';
+        } else {
+            uploadButton.style.display = 'none';
+        }
+    }
+
+    function handleBrandSelection(event) {
+        const selectedValue = event.target.value;
+        const brandNameField = document.getElementById('brandNameField');
+        if (selectedValue !== '0') {
+            brandNameField.style.display = 'none';
+        } else {
+            brandNameField.style.display = 'block';
+        }
+    }
+
+    function handleSizeSelection(event) {
+        const selectedValue = event.target.value;
+        const sizeNameField = document.getElementById('sizeNameField');
+        if (selectedValue !== '0') {
+            sizeNameField.style.display = 'none';
+        } else {
+            sizeNameField.style.display = 'block';
+        }
+    }
+
+
+    const form = document.querySelector('form');
+    // Add a submit event listener to the form
+    form.addEventListener('submit', handleFormSubmit);
+
+</script>
+
+
+</html>

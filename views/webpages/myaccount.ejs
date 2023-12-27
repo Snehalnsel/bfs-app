@@ -1,0 +1,195 @@
+<%- include('../../public/assets/include/header'); %>
+
+<section class="dashboard-wrapper">
+    <div class="dashboard-container">
+       <div class="dashboard-sidbar">        
+         <div class="sidbar-box user-profile">
+            <div class="user-icon">
+               <img src="<%=respdata.image%>" alt="user-image">
+            </div>
+            <div class="user-info">
+               <div class="sht-ui">Hello</div>
+               
+               <div class="user-name"><%=respdata.title%> <%=respdata.name%></div>
+            </div>
+   <!-- Profile Image Modal Start -->   
+   
+            <div class="userimage-edit">
+              <!--  <a href="javascript:void(0)" data-toggle="modal" data-target="#profile-change-modal"><i class="fa fa-pencil" aria-hidden="true"></i></a> -->
+                <!--<label for="file"><i class="fa fa-pencil" aria-hidden="true"></i></label>-->
+                <!--<input id="file" class="file-line" type="file" onchange="loadFile(event)">-->
+                <label>
+                    <a href="javascript:void(0)" data-toggle="modal" data-target="#upload-profile-modal" class="edit_link">
+                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                    </a>
+                </label>
+             </div>
+
+            <div class="modal theme_modal short-modal change-profile-update" id="upload-profile-modal">
+               <div class="modal-dialog">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <div class="modal-content">
+                     <div class="loginform-box short-box">
+                        <h5 class="box-title">Change Profile Picture</h5>
+                        <form action="/api/change-profile-image-web" method="POST" enctype="multipart/form-data">
+                             <div class="inner-formbox">
+                                <div class="profile-chnage-box">
+                                   <div class="user-icon">
+                                      <img src="<%=respdata.image%>" alt="user-image" id="output">                            
+                                   </div>
+                                   <input id="file" class="" name="image" type="file"/>
+                                   <input id="user_id" class="" name="user_id" type="hidden" value="<%=respdata.userId%>"/>
+                                   <input class="update-btn" type="submit" value="Update Profile" />
+                                </div>
+                             </div>
+                        </form>
+                     </div>
+                  </div>
+               </div>
+            </div>
+ <!-- Profile Image Modal End -->   
+ 
+         </div>
+         <div class="sidbar-box sidbar-nav">
+            <ul class="nav d-flex flex-column mb-2 ">
+                      <li class="nav-item">
+                        <a class="nav-link" href="/api/my-account"><i class="fa fa-user" aria-hidden="true"></i> <span>Profile</span></a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="/api/web-my-order"><i class="fa fa-list-ul" aria-hidden="true"></i> <span>My Orders</span></a>
+                      </li>
+        
+                      <li class="nav-item">
+                        <a class="nav-link" href="/api/my-post/<%=respdata.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Posts</span></a>
+                      </li>
+        
+                      <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> <span>My Bids</span></a>
+                      </li>
+                      
+                    </ul>
+                    <div class="bottom-link">
+                     <ul class="nav d-flex flex-column mb-2 ">
+                        <!--<li><a class="nav-link" href="/api/sign-out"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li>-->
+                        <li><a class="nav-link" href="/api/sign-out"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li>
+                     </ul>
+        
+                       
+                    </div>
+        
+         </div>         
+       </div>
+       <div class="dashboard-content">
+          <div class="dashboard-infobox">
+             <div class="dashboard-title-arrow mb-25">
+                <h4 class="di-title mr-25">Account Setting </h4>
+                <div class="edit-link"><a href="/api/edit-profile">Edit</a></div>
+             </div>
+             
+             <div class="dsh-shortbox">
+                <form>
+                   <div class="div-row">
+                      <div class="div-12">
+                         <label>Name:</label>
+                         <input type="type" name="name" class="ds-form-control" value="<%=respdata.name%>" disabled>
+                      </div>
+ 
+                      <div class="div-6">
+                         <label>Email:</label>
+                         <input type="email" name="email" class="ds-form-control" value="<%=respdata.email%>" disabled>
+                      </div>
+ 
+                      <div class="div-6">
+                         <label>Phone Number:</label>
+                         <input type="type" name="phone_no" class="ds-form-control" value="<%=respdata.phone_no%>" disabled>
+                      </div>
+                   </div>
+                </form>
+                
+             </div>
+             
+          </div>
+ 
+ 
+          <div class="dashboard-infobox mt-50">
+             <div class="dashboard-title-arrow mb-25">
+                <h4 class="di-title mr-25">Address </h4>
+                <div class="edit-link"><a href="/api/add-address">Add Address</a></div>
+             </div>
+             
+ 
+             <div class="dsh-shortbox">
+                <form >
+                   
+                   <div class="div-row">
+                     <% respdata1.forEach(function(item) { %>
+                        
+                      <% if(item.address_name == 'Home' && item.default_status == '0') {%>
+                      <div class="div-12">
+                         <label>Home: <div class="edit-link"><a href="/api/delete-address/<%=item._id%>">Delete Address</a></div></label>                        
+                         <textarea class="ds-form-control" value="" disabled><%=item.address1%>, <%=item.street_name%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>
+                         <input type="hidden" name="address_home" value="">
+                        </div>
+                      <% } %>
+                      <%if(item.address_name == 'Office' && item.default_status == '0') {%>
+                        <div class="div-12">
+                           <label>Office:</label> <div class="edit-link"><a href="/api/delete-address/<%=item._id%>">Delete Address</a></div>                       
+                           <textarea class="ds-form-control" value="" disabled><%=item.address1%>, <%=item.street_name%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>
+                           <input type="hidden" name="address_office" value="">
+                        </div>
+                        <% } %>
+                        <%if(item.address_name == 'Others' && item.default_status == '0'){%>
+                           <div class="div-12">
+                              <label>Others:</label> <div class="edit-link"><a href="/api/delete-address/<%=item._id%>">Delete Address</a></div>                       
+                              <textarea class="ds-form-control" value="" disabled><%=item.address1%>, <%=item.street_name%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>
+                              <input type="hidden" name="address_others" value="">
+                           </div>
+                           <% } %>
+                           <% }); %>
+                   </div>
+                  
+                </form>
+                
+             </div>
+             
+          </div> 
+ 
+          <div class="dashboard-infobox mt-50">
+             <div class="dashboard-title-arrow mb-25">
+                <h4 class="di-title mr-25">Change Password</h4>              
+             </div>
+             
+ 
+             <div class="dsh-shortbox">
+                 <form>
+                   <div class="div-row">
+                      <div class="div-12">
+                         <label>Enter Old Password:</label>
+                         <input type="Password" name="" class="ds-form-control">
+                      </div>
+ 
+                      <div class="div-12">
+                         <label>Enter New Password:</label>
+                         <input type="Password" name="" class="ds-form-control">
+                      </div>
+ 
+                      <div class="div-12">
+                         <label>Confirm New Password:</label>
+                         <input type="Password" name="" class="ds-form-control">
+                      </div>
+                      <div class="div-12">
+                         <input type="submit" name="" class="ds-form-control" value="Save">
+                      </div>
+                   </div>
+                </form>
+                
+             </div>
+             
+          </div> 
+ 
+       </div>
+    </div>
+ </section>
+   <%- include('../../public/assets/include/newsletter'); %>
+      <%- include('../../public/assets/include/footer'); %>
+</body>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../../partials/head', {pageTitle: pageTitle}); %>
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <%- include('../../partials/sidebar', {siteName: siteName}); %>
+            <!-- End of Sidebar -->
+
+            <!-- Content Wrapper -->
+            <div id="content-wrapper" class="d-flex flex-column">
+
+                <!-- Main Content -->
+                <div id="content">
+
+                    <!-- Topbar -->
+                    <%- include('../../partials/header', {siteName: siteName, userFullName: userFullName, userImage:
+                        userImage}); %>
+                        <!-- End of Topbar -->
+
+                        <!-- Begin Page Content -->
+                        <div class="container-fluid">
+
+                            <!-- Page Heading -->
+                            <h1 class="h3 mb-2 text-gray-800"><%-pageName%></h1>
+                            <p class="mb-4">Create <%-pageName%></p>
+
+                            <!-- DataTales Example -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary"><%-pageName%> Create</h6>
+                                </div>
+                                <div class="card-body">
+                                    <form class="user" action="/create-hubdata" method="post">
+                                        <div class="form-group row">
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <input type="text" class="form-control form-control-user" id="name" name="name" placeholder="Recevier name" value="<%- respdata.hub.name %>" required>
+                                            </div>
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <input type="text" class="form-control form-control-user" id="phone_no" name="phone_no" placeholder="Recevier Phone No" value="<%- respdata.hub.phone_no %>" required>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <input type="text" class="form-control form-control-user" id="email" name="email" placeholder="Recevier email" value="<%- respdata.hub.email %>" required>
+                                            </div>
+        
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <input type="hidden" name="hub_id" value="<%- respdata._id %>">
+                                                <input type="text" class="form-control form-control-user" id="hub_name"
+                                                    name="hub_name" placeholder="Hub name"
+                                                    value="<%- respdata.hub.hub_name %>" required>
+                                            </div>
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <input type="text" class="form-control form-control-user" id="address1"
+                                                    name="address1" placeholder="Address"
+                                                    value="<%- respdata.hub.address1 %>" required>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <input type="text" class="form-control form-control-user"
+                                                    id="street_name" name="street_name" placeholder="Street name"
+                                                    value="<%- respdata.hub.street_name %>" required>
+                                            </div>
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <input type="text" class="form-control form-control-user" id="landmark"
+                                                    name="landmark" placeholder="Landmark" value="<%- respdata.hub.landmark %>" required>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <input type="text" class="form-control form-control-user" id="pincode"
+                                                    name="pincode" placeholder="Pincode" value="<%- respdata.hub.pin_code %>" required>
+                                            </div>
+                                            <!--<div class="col-sm-6 mb-3 mb-sm-0">-->
+                                            <!--    <input type="text" class="form-control form-control-user" id="gst_name"-->
+                                            <!--        name="gst_name" placeholder="Gst Number" value="<%- respdata.hub.gst_no%>" required>-->
+                                            <!--</div>-->
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <input type="text" class="form-control form-control-user" id="city"
+                                                    name="city" placeholder="City name" value="<%- respdata.hub.city_name %>" required>
+                                            </div>
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <input type="text" class="form-control form-control-user" id="state"
+                                                    name="state" placeholder="State name" value="<%- respdata.hub.state_name %>" required>
+                                            </div>
+                                        </div>
+                                        <input type="submit" class="btn btn-primary btn-user btn-block" id="btn_profile"
+                                            name="btn_profile" value="Submit">
+                                    </form>
+                                    <hr>
+                                    <% if(!status){ %>
+                                        <h6 style="background-color:aquamarine; align-content: center;">Message: <%=
+                                                message %>
+                                        </h6>
+                                        <p>
+                                            <%# respdata %>
+                                        </p>
+                                        <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                </div>
+
+                <%- include('../../partials/footer', {year: year, siteName: siteName}); %>
+                    <!-- End of Footer -->
+
+            </div>
+    </div>
+
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+
+    <%- include('../../partials/logoutModal'); %>
+
+        <%- include('../../partials/footerJs'); %>
+
+</body>
+
+</html>

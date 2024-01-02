@@ -1,0 +1,323 @@
+<%- include('../../public/assets/include/header'); %>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<section class="home-banner-slider">
+    <div class="container">
+       <div class="slider banner-slider">
+          <div class="slider-item">
+             <img src="/public/assets/images/banner1.jpg" alt="images" class="img-fluid">
+          </div>
+          <div class="slider-item">
+             <img src="/public/assets/images/banner1.jpg" alt="images" class="img-fluid">
+          </div>
+       </div>
+    </div>
+ </section>
+ <section class="product-wrapper pd-40" id="best-deals-section">
+   <div class="container">
+      <div class="top-title">
+         <div class="title-box">
+            <h3>Best Deals</h3>
+         </div>
+         <div class="short-box">
+            <a href="javascript:void(0)">See All</a>
+         </div>
+      </div>
+      <div class="slider product_Slider product_Slider1" id="best-deals-slider">
+         
+      </div>
+   </div>
+</section>
+
+ <section class="poster-wrapper">
+    <div class="container">
+       <div class="row">
+          <div class="col-md-6">
+             <div class="poster-box">
+                <a href="javascript:void(0)">
+                <img src="/public/assets/images/poster1.jpg" alt="images" class="img-fluid">
+                </a>
+             </div>
+          </div>
+          <div class="col-md-6">
+             <div class="poster-box">
+                <a href="javascript:void(0)">
+                <img src="/public/assets/images/poster2.jpg" alt="images" class="img-fluid">
+                </a>
+             </div>
+          </div>
+       </div>
+    </div>
+ </section>
+ <section class="product-wrapper pd-40">
+    <div class="container">
+       <div class="top-title">
+          <div class="title-box">
+             <h3>New Arrivals</h3>
+          </div>
+          <div class="short-box">
+             <a href="javascript:void(0)">See All</a>
+          </div>
+       </div>
+       <div class="slider product_Slider product_Slider2">
+          <div class="slider-item">
+             <div class="product-box">
+                <div class="product-image">
+                   <a href="javascript;void(0)"><img src="/public/assets/images/product5.jpg" alt="images" class="img-fluid"></a>
+                </div>
+                <div class="prd-short-info">
+                   <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>
+                   <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>
+                   <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>
+                </div>
+                <div class="prd-button-group">
+                   <a href="javascript:void(0)" class="prd-btn">Buy Now</a>
+                   <a href="bids.php" class="prd-btn orng-btn">Bid Now</a>
+                </div>
+                <div class="prd-batch">Like New</div>
+             </div>
+          </div>
+          <div class="slider-item">
+             <div class="product-box">
+                <div class="product-image">
+                   <a href="javascript;void(0)"><img src="/public/assets/images/product6.jpg" alt="images" class="img-fluid"></a>
+                </div>
+                <div class="prd-short-info">
+                   <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>
+                   <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>
+                   <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>
+                </div>
+                <div class="prd-button-group">
+                   <a href="javascript:void(0)" class="prd-btn">Buy Now</a>
+                   <a href="bids.php" class="prd-btn orng-btn">Bid Now</a>
+                </div>
+                <div class="prd-batch">Like New</div>
+             </div>
+          </div>
+          <div class="slider-item">
+             <div class="product-box">
+                <div class="product-image">
+                   <a href="javascript;void(0)"><img src="/public/assets/images/product3.jpg" alt="images" class="img-fluid"></a>
+                </div>
+                <div class="prd-short-info">
+                   <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>
+                   <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>
+                   <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>
+                </div>
+                <div class="prd-button-group">
+                   <a href="javascript:void(0)" class="prd-btn">Buy Now</a>
+                   <a href="bids.php" class="prd-btn orng-btn">Bid Now</a>
+                </div>
+                <div class="prd-batch">Like New</div>
+             </div>
+          </div>
+          <div class="slider-item">
+             <div class="product-box">
+                <div class="product-image">
+                   <a href="javascript;void(0)"><img src="/public/assets/images/product4.jpg" alt="images" class="img-fluid"></a>
+                </div>
+                <div class="prd-short-info">
+                   <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>
+                   <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>
+                   <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>
+                </div>
+                <div class="prd-button-group">
+                   <a href="javascript:void(0)" class="prd-btn">Buy Now</a>
+                   <a href="bids.php" class="prd-btn orng-btn">Bid Now</a>
+                </div>
+                <div class="prd-batch">Like New</div>
+             </div>
+          </div>
+          <div class="slider-item">
+             <div class="product-box">
+                <div class="product-image">
+                   <a href="javascript;void(0)"><img src="/public/assets/images/product2.jpg" alt="images" class="img-fluid"></a>
+                </div>
+                <div class="prd-short-info">
+                   <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>
+                   <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>
+                   <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>
+                </div>
+                <div class="prd-button-group">
+                   <a href="javascript:void(0)" class="prd-btn">Buy Now</a>
+                   <a href="bids.php" class="prd-btn orng-btn">Bid Now</a>
+                </div>
+                <div class="prd-batch">Like New</div>
+             </div>
+          </div>
+          <div class="slider-item">
+             <div class="product-box">
+                <div class="product-image">
+                   <a href="javascript;void(0)"><img src="/public/assets/images/product1.jpg" alt="images" class="img-fluid"></a>
+                </div>
+                <div class="prd-short-info">
+                   <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>
+                   <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>
+                   <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>
+                </div>
+                <div class="prd-button-group">
+                   <a href="javascript:void(0)" class="prd-btn">Buy Now</a>
+                   <a href="bids.php" class="prd-btn orng-btn">Bid Now</a>
+                </div>
+                <div class="prd-batch">Like New</div>
+             </div>
+          </div>
+       </div>
+    </div>
+ </section>
+ <section class="product-wrapper pd-40">
+    <div class="container">
+       <div class="top-title">
+          <div class="title-box">
+             <h3>Just Sold</h3>
+          </div>
+          <div class="short-box">
+             <a href="javascript:void(0)">See All</a>
+          </div>
+       </div>
+       <div class="slider product_Slider slider-basic">
+          <div class="slider-item">
+             <div class="product-box">
+                <div class="product-image">
+                   <a href="javascript;void(0)"><img src="/public/assets/images/product8.jpg" alt="images" class="img-fluid"></a>
+                </div>
+                <div class="prd-short-info">
+                   <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>
+                   <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>
+                   <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>
+                </div>
+             </div>
+          </div>
+          <div class="slider-item">
+             <div class="product-box">
+                <div class="product-image">
+                   <a href="javascript;void(0)"><img src="/public/assets/images/product7.jpg" alt="images" class="img-fluid"></a>
+                </div>
+                <div class="prd-short-info">
+                   <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>
+                   <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>
+                   <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>
+                </div>
+             </div>
+          </div>
+          <div class="slider-item">
+             <div class="product-box">
+                <div class="product-image">
+                   <a href="javascript;void(0)"><img src="/public/assets/images/product3.jpg" alt="images" class="img-fluid"></a>
+                </div>
+                <div class="prd-short-info">
+                   <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>
+                   <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>
+                   <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>
+                </div>
+             </div>
+          </div>
+          <div class="slider-item">
+             <div class="product-box">
+                <div class="product-image">
+                   <a href="javascript;void(0)"><img src="/public/assets/images/product2.jpg" alt="images" class="img-fluid"></a>
+                </div>
+                <div class="prd-short-info">
+                   <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>
+                   <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>
+                   <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>
+                </div>
+             </div>
+          </div>
+          <div class="slider-item">
+             <div class="product-box">
+                <div class="product-image">
+                   <a href="javascript;void(0)"><img src="/public/assets/images/product5.jpg" alt="images" class="img-fluid"></a>
+                </div>
+                <div class="prd-short-info">
+                   <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>
+                   <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>
+                   <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+ </section>
+ <section class="policy_box">
+    <div class="container">
+       <div class="row">
+          <div class="col-md-4">
+             <div class="icon-sidebox">
+                <div class="side-icon"><img src="/public/assets/images/check-icon.png" alt="images"></div>
+                <div class="sidebox-info">
+                   <h6>Internal quality check</h6>
+                   <p>Lorem Ipsum is simply dummy text</p>
+                </div>
+             </div>
+          </div>
+          <div class="col-md-4">
+             <div class="icon-sidebox">
+                <div class="side-icon"><img src="/public/assets/images/return-icon.png" alt="images"></div>
+                <div class="sidebox-info">
+                   <h6>Return within 24 hrs*</h6>
+                   <p>No questions asked returns refunds</p>
+                </div>
+             </div>
+          </div>
+          <div class="col-md-4">
+             <div class="icon-sidebox">
+                <div class="side-icon"><img src="/public/assets/images/payment-icon.png" alt="images"></div>
+                <div class="sidebox-info">
+                   <h6>Secure Payment</h6>
+                   <p>Safe and hassle-free shopping with secure payment gateways</p>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+ </section>
+  <%- include('../../public/assets/include/newsletter'); %>
+  <%- include('../../public/assets/include/footer'); %>
+</body>
+
+<script>
+   async function fetchData() {
+     try {
+       const response = await fetch('/api/app-home');
+       const data = await response.json();
+       // Process the data here
+       const bestDeals = data.respdata.best_deal;
+
+       const bestDealsSlider = document.getElementById('best-deals-slider');
+
+       bestDeals.forEach(deal => {
+           const sliderItem = document.createElement('div');
+           sliderItem.classList.add('slider-item');
+           sliderItem.innerHTML = `
+             <div class="product-box">
+                <div class="product-image">
+                   <a href="javascript:void(0)"><img src="${deal.image}" alt="images" class="img-fluid"></a>
+                </div>
+                <div class="prd-short-info">
+                   <div class="prd-name"><a href="javascript:void(0)">${deal.name}</a></div>
+                   <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>${deal.offer_price}</div>
+                   <div class="rtl-price"><span>Est. Retail:</span>₹${deal.price}</div>
+                </div>
+                <div class="prd-button-group">
+                   <a href="javascript:void(0)" class="prd-btn">Buy Now</a>
+                   <a href="bids.php" class="prd-btn orng-btn">Bid Now</a>
+                </div>
+                <div class="prd-batch">${deal.status_name}</div>
+             </div>
+           `;
+           bestDealsSlider.appendChild(sliderItem);
+       });
+
+     } catch (error) {
+       console.error('Error fetching data:', error);
+     }
+   }
+
+
+   window.onload = fetchData;
+
+</script>
+

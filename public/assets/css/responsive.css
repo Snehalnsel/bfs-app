@@ -1,0 +1,406 @@
+@media screen and (max-width: 1299px) {
+.search-block .search-box{
+    width: 300px 
+}
+nav.nav-link ul li a {
+    font-size: 14px;   
+    padding: 5px 6px;   
+}
+.buy-sell-link ul li a {   
+    font-size: 14px;   
+    padding: 5px 12px;  
+}
+.pib-box {
+    padding: 5px 6px;   
+}
+.pib-box i {   
+    font-size: 15px;
+}
+
+}
+
+
+@media screen and (max-width: 1199px) {
+.buy-sell-link ul li a {
+    font-size: 13px;
+    padding: 5px 10px;
+}
+nav.nav-link ul li a {
+    font-size: 13px;
+    padding: 5px;
+}
+.header-info {
+    width: calc(100% - 100px);
+    padding-left: 10px;
+}
+.theme-logo {
+    width: 100px;
+}
+div#navbarSupportedContent {
+    justify-content: flex-end;
+}
+}
+
+@media screen and (max-width: 1024px) {
+.header-top {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+}
+
+
+@media screen and (max-width: 991px) {
+    a.prd-btn {
+    display: block;
+    margin-bottom: 5px !important;
+}
+.header-top {    
+    flex-wrap: wrap;
+}
+.product-icon-box {
+    display: flex;
+    grid-gap: 5px;
+    margin-top: 10px;
+}
+.latest-updates-inner .updates-info p {
+    font-size: 16px;    
+}
+img.ft-logo {
+    max-width: 85px;
+}
+.prd-name a {
+    font-size: 15px;    
+}
+.prd-price {
+    font-size: 16px;    
+}
+.sidebox-info h6 {    
+    font-size: 14px;   
+    line-height: 20px;
+    margin-bottom: 5px;
+}
+
+}
+
+
+@media screen and (max-width: 768px) {
+
+    .header-group {
+    display: flex;
+    flex-wrap: wrap;
+}
+.header-info {
+    width: 100%;
+    padding-left: 0px;
+}
+
+.header-top {
+    flex-wrap: wrap;
+}
+
+.theme-logo {
+    width: 80px;
+}
+.hide-dekstop{
+    display: block;
+}
+
+.hide-mobile{
+  display: none;
+}
+img.mobile-logo {
+    max-width: 70px;
+}
+
+.buy-sell-link ul li a {
+    font-weight: bold;
+    font-size: 13px;
+    color: #000;
+    line-height: 22px;
+    text-decoration: none;
+    padding: 3px 10px;
+    display: inline-block;
+    background: transparent;
+    transition: 0.5s;
+}
+
+.buy-sell-link ul {
+    display: inline-flex;    
+    justify-content: center;
+    align-items: center;
+}
+.product-icon-box {   
+    justify-content: end;
+}
+
+.ctg-icon {
+    height: 40px;    
+}
+.ctg-icon img {
+    max-height: 85%;
+}
+.sld-iconbox h6 {
+    font-size: 12px;
+}
+
+.title-box h3 {
+    font-size: 20px;    
+}
+.product-box {
+    padding: 8px;    
+}
+
+.product-image {
+    height: 150px;
+    overflow: hidden;
+}
+.product-image img {
+    max-width: 70%;
+    margin: 0 auto;
+    max-height: 150px!important;
+}
+
+.prd-name a {
+    font-size: 14px;    
+}
+.prd-price {
+    font-size: 14px;   
+}
+.rtl-price {
+    font-size: 12px;    
+}
+.search-block .search-box{
+    width: 100%;
+}
+
+.prd-button-group a.prd-btn {  
+    padding: 6px 10px;   
+    font-size: 11px;
+    line-height: 18px;    
+    margin: 0px;   
+}
+.icon-sidebox .side-icon {
+    width: 40px;
+}
+.side-icon img {
+    max-width: 98%;
+}
+.sidebox-info {
+    padding-left: 10px;
+}
+
+.sidebox-info h6 {   
+    font-size: 14px;   
+    line-height: 20px;
+    margin-bottom: 0px;
+}
+.icon-sidebox {   
+    margin-bottom: 10px;
+}
+.sidebox-info p {
+    font-size: 12px;   
+    line-height: 22px;    
+}
+.latest-updates-inner {   
+    flex-wrap: wrap;
+}
+.latest-updates-inner .updates-info {
+    width: 100%;
+}
+.latest-updates-inner .updates-info p {
+    font-size: 14px;
+    text-align: left;    
+}
+.latest-updates-inner .input-group {   
+    padding-left: 0px;   
+    margin-top: 10px;
+    width: 100%;
+}
+
+.footer-wrapper h4.footer-title {
+    font-size: 16px;
+    margin-bottom: 10px;   
+    margin-top: 15px;
+}
+
+.footer-list ul li {
+    margin-bottom: 4px;
+}
+.search-block {
+    margin-right: 0px;
+}
+
+.left-boxpart{
+    width: 100%;
+}
+.right-formpart {
+    width: 100%;
+    padding: 25px 15px;
+}
+.theme_modal button.close {    
+    top: -3px;
+    right: -3px;    
+}
+
+.bids-row{
+    flex-wrap: wrap;
+}
+.br-details{
+    width: 100%;
+    border-right: 0px;
+    align-items: flex-start;
+    padding: 10px;
+}
+.br-status{
+        text-align: left;
+    width: 100%;
+    justify-content: start;
+    padding: 0px 10px;
+}
+.br-status h6{
+    font-size: 14px;
+}
+.br-results{
+    width: 100%;
+    border-left: 0px;
+    justify-content: start;
+    padding: 10px;
+}
+.bid-images{
+    height: 85px;
+    width: 70px;
+}
+
+.success-title {    
+    font-size: 13px;
+}
+.bd-title{
+    font-size: 14px;
+}
+
+.cart-wrapper {   
+    flex-wrap: wrap;
+}
+
+.cart-list {
+    width: 100%;
+    padding: 0px;
+}
+.cart-summery {
+    width: 100%;
+}
+.slick-next {
+    right: 0;
+}
+
+.single-product-box {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.product-gallery {
+    width: 100%;
+}
+.product-content {
+    width: 100%;
+    padding-left: 0;
+}
+
+.product-content .prd-button-group a.prd-btn {    
+    width: auto !important;
+    display: inline-block;
+}
+.product-description, .related-products {
+    padding: 30px 0px;    
+}
+
+.main_product-wrapper {
+    width: 100%;
+    padding: 5px;
+}
+.shorting-row {
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+.shorting-box {    
+    margin-top: 8px;
+}
+.product-listrow .product-box {
+    width: 49%;
+    padding-bottom: 15px;
+    border: solid 1px #eee;
+    margin-bottom: 15px;
+}
+.white-inner-wrapper{
+        padding:30px 0px;
+    }
+    .short-sidebar{
+        width: 100%;
+    }
+    .single-title{
+        margin-top: 20px;
+    }
+    .cart-row .br-results {   
+    width: 100%;
+    justify-content: space-between;
+}
+.loginform-box .form-control {   
+    height: 38px;   
+    font-size: 12px;   
+    padding: 5px 8px;
+}
+.liginbtn {
+    height: 35px;
+    font-size: 12px;
+    min-width: 130px;
+}
+
+.checkout-tab .form-box .liginbtn {
+    min-width: 120px;   
+    font-size: 12px;  
+    height: 35px;  
+    padding: 5px 10px;
+    line-height: 22px;
+}
+
+.signpart {
+    padding: 10px;
+}
+
+.dashboard-container {
+    width: 96%;   
+    flex-wrap: wrap;
+}
+
+.dashboard-sidbar {
+    width: 100%;
+
+}
+
+.dashboard-content {
+    width: 100%;   
+    margin: 0px !important;
+    padding: 10px;
+}
+.div-6, .div-12 {
+    width: 100%;
+    padding: 0;
+} 
+.div-row{
+    margin: 0px;
+}
+
+.user-postbox {
+    width: 50%;
+    padding: 5px;
+}
+
+
+}
+
+
+
+

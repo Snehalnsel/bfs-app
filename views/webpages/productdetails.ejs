@@ -264,9 +264,21 @@ text ever since the 1500s, when an unknown printer took a galley of type and scr
                  success: function(data) 
                   {
                       if (data.is_added) {
-                          alert(data.message);
+                          Swal.fire({
+                                    //title: "<i>Bid For Sale</i>", 
+                                    html: data.message,  
+                                    confirmButtonText: "OK",
+                                    customClass: { confirmButton: 'alert-box-button' }
+                                    
+                                 });
+                        getHeaderData();
                       } else {
-                          alert("No Data Found");
+                          Swal.fire({
+                                    //title: "<i>Bid For Sale</i>", 
+                                    html: "You can add one item at a time",  
+                                    confirmButtonText: "OK",
+                                    customClass: { confirmButton: 'alert-box-button', popup: 'swal2-popup' }
+                                 });
                       }
                   },
                  error: function(err) 

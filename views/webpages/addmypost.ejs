@@ -123,12 +123,13 @@
  
                       <div class="div-6">
                          <label>Product Category</label>
-                         <select class="ds-form-control" name="product_cate">
-                         <option >Select Category</option>
-                         <% subcate.forEach(function(subcatitems){%>
-                          <option value="<%=subcatitems._id%>"><%=subcatitems.name%></option>
-                          <% }); %>
-                        </select>
+                        <!-- <select class="ds-form-control" name="product_cate">-->
+                        <!-- <option >Select Category</option>-->
+                        <!-- <% //subcate.forEach(function(subcatitems){%>-->
+                        <!--  <option value="<%//=subcatitems._id%>"><%//=subcatitems.name%></option>-->
+                        <!--  <% //}); %>-->
+                        <!--</select>-->
+                        <input type="type" name="product_cate" class="ds-form-control" placeholder="Enter Category">
                       </div>
  
                       <div class="div-6">
@@ -167,7 +168,27 @@
                              <span class="tg-slider round"></span>
                          </label>
                       </div>
- 
+                      
+                      <div class="div-6">
+                         <label>Height</label>
+                        <input type="type" name="height" class="ds-form-control" placeholder="Height">
+                      </div>
+                      
+                      <div class="div-6">
+                         <label>Weight</label>
+                        <input type="type" name="weight" class="ds-form-control" placeholder="Weight">
+                      </div>
+                      
+                      <div class="div-6">
+                         <label>Length</label>
+                        <input type="type" name="length" class="ds-form-control" placeholder="Length">
+                      </div>
+                      
+                      <div class="div-6">
+                         <label>Breadth</label>
+                        <input type="type" name="breath" class="ds-form-control" placeholder="Breadth">
+                      </div>
+                      
                       <div class="div-6">
                          <label>Price</label>
                         <input type="type" name="price" class="ds-form-control" placeholder="Price">

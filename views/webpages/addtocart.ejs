@@ -5,14 +5,16 @@
        <div class="bids-lists cart-wrapper">     
        <div class="cart-list">
            
-         <form action="/api/checkout-web" method="POST">  
+         <!--<form action="/api/checkout-web" method="POST">  -->
+         <form id="orderPlace"> 
             <% console.log('ADD TO CART VIEW PAGE LIST'); console.log(respdata); %>
-            <input type="hidden" name="user_id" value="<%=user%>">
-            <input type="hidden" name="cart_id" value="<%=respdata.cart_id%>">
-            <input type="hidden" name="product_id" value="<%=respdata.product_id%>">
-            <input type="hidden" name="total_amt" value="<%=respdata1%>">
-            <input type="hidden" name="gst" value="28">
-            <input type="hidden" name="payment_method" value="0">
+            <input type="hidden" id="user_id" name="user_id" value="<%=user%>">
+             <input type="hidden" id="seller_id" name="seller_id" value="<%=respdata.seller_id%>">
+            <input type="hidden" id="cart_id" name="cart_id" value="<%=respdata.cart_id%>">
+            <input type="hidden" id="product_id" name="product_id" value="<%=respdata.product_id%>">
+            <input type="hidden" id="total_amt" name="total_amt" value="<%=respdata1%>">
+            <input type="hidden" id="gst" name="gst" value="28">
+            <input type="hidden" id="payment_method" name="payment_method" value="0">
           <div class="bids-row cart-row">             
              <div class="br-details">
                 <div class="bid-images">
@@ -127,7 +129,7 @@
         
           <div class="summery-button">
           <!-- <a class="btn check-out">Place Order</a>-->
-          <button class="btn check-out">Place Order</button>
+          <input type="button" class="btn check-out" value="Place Order">
          </div> 
           
 
@@ -143,3 +145,45 @@
 
 <%- include('../../public/assets/include/newsletter'); %>
 <%- include('../../public/assets/include/footer'); %>
+
+<script>
+$(document).on("click", ".check-out", function(e) {
+    e.preventDefault();
+    
+    let formData = {
+        cart_id: $('#cart_id').val(),
+        user_id: $('#user_id').val(),
+        product_id: $('#product_id').val(),
+        total_amt: $('#total_amt').val(),
+        gst: $('#gst').val(),
+        seller_id: $('#seller_id').val(),
+        payment_method: $('#payment_method').val()
+    };
+
+console.log(formData);
+    $.ajax({
+        type: 'POST',
+        url: '/api/checkout-web', // URL to submit the form data to (process.php in this case)
+        data: { data: formData },
+        dataType: "json",
+        success: function(response) {
+           if(response.is_orderPlaced == 1)
+           {
+              Swal.fire({
+                 html: response.message,  
+                 confirmButtonText: "OK",
+                 customClass: { confirmButton: 'alert-box-button' }
+              });
+              setTimeout(() => {
+                 window.location.href = '/api/home';
+              }, 3000);
+           }
+        },
+        error: function(xhr, status, error) {
+            // Handle errors
+            console.error(xhr.responseText);
+        }
+    });
+});
+
+</script>

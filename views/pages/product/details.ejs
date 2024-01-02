@@ -50,7 +50,7 @@
                                                     required><%-respdata.description%></textarea>
                                             </div>
                                         </div>
-                                        <div class="form-group row">
+                                        <!-- <div class="form-group row">
                                             <div class="col-sm-6 mb-3 mb-sm-0">
                                                 <select class="form-control" name="category_id" id="category_id"
                                                     required>
@@ -70,6 +70,29 @@
                                                 <select class="form-control" name="subcategory_id" id="subcategory_id"
                                                     required>
                                                     <option value="0" selected>Select Subcategory</option>
+                                                    <% if(subcategory){ %>
+                                                        <% subcategory.forEach(function(value, index) { %>
+                                                            <option value="<%= value._id %>" <%=(respdata.category_id &&
+                                                                respdata.category_id._id.equals(value._id)) ? 'selected'
+                                                                : '' %>><%= value.name %>
+                                                            </option>
+                                                            <% }); %>
+                                                                <% } %>
+                                                </select>
+                                            </div>
+                                        </div> -->
+
+                                        <div class="form-group row">
+                                            <div class="col-sm-6 mb-3 mb-sm-0" id="categoryNameField"
+                                                style="<%- respdata.category_id ? 'display: none;' : 'display: block;' %>">
+                                                <input type="text" class="form-control form-control-user"
+                                                    id="brand_name" name="brand_name" placeholder="Name"
+                                                    value="<%-respdata.category%>">
+                                            </div>
+                                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <select class="form-control" name="subcategory_id" id="subcategory_id"
+                                                    required onchange="handleCategorySelection(event)">
+                                                    <option value="0" selected>Select Category</option>
                                                     <% if(subcategory){ %>
                                                         <% subcategory.forEach(function(value, index) { %>
                                                             <option value="<%= value._id %>" <%=(respdata.category_id &&
@@ -217,16 +240,16 @@
                                             </div>
 
                                             <div class="form-group row">
-                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <!-- <div class="col-sm-6 mb-3 mb-sm-0">
                                                     <input type="text" class="form-control form-control-user" id="shipping_charges"
                                                         name="shipping_charges" placeholder="Please enter Shipping Charges value here" value="<%-respdata.shipping_charges%>"
                                                         required>
-                                                </div>
-                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                </div> -->
+                                                <!-- <div class="col-sm-6 mb-3 mb-sm-0">
                                                     <input type="text" class="form-control form-control-user"
                                                         id="hsn_code" name="hsn_code" placeholder="Please enter product HSN Code here"
                                                         value="<%-respdata.hsn_code%>" >
-                                                </div>
+                                                </div> -->
                                                
                                             </div>
 
@@ -381,6 +404,16 @@
             sizeNameField.style.display = 'none';
         } else {
             sizeNameField.style.display = 'block';
+        }
+    }
+
+    function handleCategorySelection(event) {
+        const selectedValue = event.target.value;
+        const categoryNameField = document.getElementById('categoryNameField');
+        if (selectedValue !== '0') {
+            categoryNameField.style.display = 'none';
+        } else {
+            categoryNameField.style.display = 'block';
         }
     }
 

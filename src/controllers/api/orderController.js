@@ -897,9 +897,12 @@ exports.updateOrderById = async function (req, res, next) {
 
 exports.getOrderListByUser = async (req, res) => {
   try {
-    const { user_id } = req.body;
+    let  user_id  = req.body.length > 0 ? req.body : req.session.user.userId;
+    
+    console.log('Heloo################');
+    
 
-    const orders = await Order.find({ user_id }).populate('seller_id', 'name').populate('user_id', 'name');
+    const orders = await Order.find({ user_id: user_id }).populate('seller_id', 'name').populate('user_id', 'name');
 
     if (!orders || orders.length === 0) {
       return res.status(404).json({ message: 'No orders found for this seller' });
@@ -946,7 +949,9 @@ exports.getOrderListByUser = async (req, res) => {
 
 exports.getOrdersBySeller = async (req, res) => {
   try {
-    const { seller_id } = req.body;
+    //const { seller_id } = req.body;
+    
+    let  seller_id  = req.body.length > 0 ? req.body : req.session.user.userId;
 
     const orders = await Order.find({ seller_id }).populate('seller_id', 'name').populate('user_id', 'name');
 
@@ -1058,6 +1063,8 @@ exports.getOrderDetails = async (req, res) => {
     const sellerAddress = await AddressBook.findOne({ user_id: order.seller_id });
     const buyerAddress = await AddressBook.findOne({ user_id: order.user_id });
 
+    const shippingKitData = await Shippingkit.findOne({ order_id: order._id });
+
     const orderDetails = {
       _id: order._id,
       total_price: order.total_price,
@@ -1081,13 +1088,7 @@ exports.getOrderDetails = async (req, res) => {
       },
     };
 
-    console.log("shiprocketResponse:", shiprocketResponse);
-console.log("shiprocketResponsefortracking:", shiprocketResponsefortracking);
-console.log("shiprocketResponselabel:", shiprocketResponselabel);
-console.log("shiprocketResponseinvoice:", shiprocketResponseinvoice);
-
-
-
+ 
     res.status(200).json({
       message: 'Order details retrieved successfully',
       order: orderDetails,
@@ -1095,6 +1096,7 @@ console.log("shiprocketResponseinvoice:", shiprocketResponseinvoice);
       shiprocketResponsetrack: shiprocketResponsefortracking.length > 0 ? shiprocketResponsefortracking : null,
       shiprocketlabel: shiprocketResponselabel.length > 0 ? shiprocketResponselabel : null,
       shiprocketinvoice: shiprocketResponseinvoice.length > 0 ? shiprocketResponseinvoice : null,
+      shippingKit: shippingKitData || null, 
     });
 
   } catch (error) {

@@ -154,11 +154,14 @@ exports.createData = async function (req, res, next) {
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
 
   try {
-    console.log(req.body.hub_name);
+    console.log(req.body);
     const hub = await Hub.findOne({ hub_name : req.body.hub_name });
 
-
+    console.log('HUB');
     console.log(hub);
+    
+    
+    
     if (hub) {
       res.render("pages/hublist/create", {
         status: 0,
@@ -187,7 +190,7 @@ exports.createData = async function (req, res, next) {
         city_name: req.body.city,
         state_name: req.body.state,
         pin_code: req.body.pincode,
-        gst_no: req.body.gst_name,
+        //gst_no: req.body.gst_name,
         hub_name: req.body.hub_name,
         created_dtime: dateTime,
       });

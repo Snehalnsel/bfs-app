@@ -138,7 +138,7 @@
                            <input type="hidden" name="address_office" value="">
                         </div>
                         <% } %>
-                        <%if(item.address_name == 'Others' && item.default_status == '0'){%>
+                        <%if(item.address_name == 'Other' && item.default_status == '0'){%>
                            <div class="div-12">
                               <label>Others:</label> <div class="edit-link"><a href="/api/delete-address/<%=item._id%>">Delete Address</a></div>                       
                               <textarea class="ds-form-control" value="" disabled><%=item.address1%>, <%=item.street_name%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>

@@ -4,7 +4,6 @@ const model = mongoose.Schema({
   category_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'mt_categories', 
-    required: true,
   },
   product_id: {
     type: mongoose.Schema.Types.ObjectId,

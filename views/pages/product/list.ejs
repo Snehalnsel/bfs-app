@@ -67,6 +67,7 @@
                       <tbody>
                         <% if (respdata.list) { %>
                           <% respdata.list.forEach(function (value, index) { %>
+                          <% console.log('Heloo123'); console.log(value.user.name);%>
                             <!-- ... -->
                             <tr>
                               <td>
@@ -107,8 +108,9 @@
                               <td>
                                 <%= value.size && value.size.length> 0 ? value.size[0].name : 'Size not found' %>
                               </td>
+                              
                               <td>
-                                <%= value.user && value.user.length> 0 ? value.user[0].name : 'User not found' %>
+                                <%= value.user.name !='' ? value.user.name : 'User not found' %>
                               </td>
                               <td>
                                 <%= value.productCondition && value.productCondition.length> 0 ? value.productCondition[0].name : 'Condition not found' %>

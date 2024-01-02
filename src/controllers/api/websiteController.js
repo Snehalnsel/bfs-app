@@ -2,6 +2,7 @@ var express = require("express");
 const session = require('express-session');
 var router = express.Router();
 var moment = require("moment");
+var moment = require('moment-timezone');
 const mongoose = require("mongoose");
 const db = mongoose.connection;
 const http = require("http");
@@ -390,7 +391,6 @@ exports.signin = async function (req, res, next) {
 
 
 exports.getUserLogin = async function (req, res, next) {
-  //console.log(req.body);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -811,8 +811,6 @@ try {
   console.log('..#### Sub categories Product ####..');
   const  id  = req.params.id;
  
-
-
   const userproducts = await Userproduct.find({category_id: id})
     .populate('brand_id', 'name') 
     .populate('category_id', 'name') 
@@ -820,8 +818,6 @@ try {
     .populate('size_id', 'name')
     .exec();
 
- console.log('USer Products');
- console.log(userproducts);
 
   if (!userproducts || userproducts.length === 0) {
     return res.status(404).json({
@@ -844,14 +840,11 @@ try {
 
   }
 
-
   const formattedUserProducts = [];
  
-
   for (const userproduct of userproducts) {
     
     const productImages = await Productimage.find({ product_id: userproduct._id });
-
 
     const formattedUserProduct = {
       _id: userproduct._id,
@@ -877,9 +870,6 @@ try {
   }
 
 
-
-
-
   if (!formattedUserProducts || formattedUserProducts.length === 0) {
     return res.status(404).json({
       status: '0',
@@ -893,6 +883,7 @@ try {
     title: "Product Sub Categories",
     message: "Welcome to the Product Sub Categories!",
     respdata: formattedUserProducts,
+    product_category_id: id,
     
   });
 
@@ -990,9 +981,9 @@ exports.userAddressAdd = async function (req, res, next) {
 try {
  console.log('Add Address ....');
  console.log(req.body);
- var addr_name = req.body.addrType;
-  console.log(addr_name);
-
+ const addr_name = req.body.addrType;
+  console.log(req.session.user);
+  
 //  if(req.body.addr_home == 'on')
 //  {
 //     var addr_name = 'Home';
@@ -1052,12 +1043,7 @@ try {
       pin_code: savedAddress.pin_code
     };
 
-    // return res.status(200).json({
-    //       status: "1",
-    //       message: "Address added successfully! Seller Pickup also created.",
-    //       respdata: savedAddress,
-    //       //shiprocketdata : shiprocketResponse
-    //     });
+   
     
       const shiprocketResponse = await generateSellerPickup(PickupData);
 
@@ -1069,20 +1055,9 @@ try {
         await savedAddress.save();
 
         res.redirect('/api/my-account');
-        // return res.status(200).json({
-        //   status: "1",
-        //   message: "Address added successfully! Seller Pickup also created.",
-        //   respdata: savedAddress,
-        //   shiprocketdata : shiprocketResponse
-        // });
+        
       }
-      // } else {
-      //   return res.status(200).json({
-      //     status: "1",
-      //     message: "Address added successfully! Seller Pickup creation failed.",
-      //     respdata: savedAddress,
-      //   });
-      // }
+      
 
 } catch (error) {
     console.error(error);
@@ -1162,7 +1137,7 @@ var userData = req.session.user;
     .exec();
 
     console.log('Productsssssssssssssssssss');
-    console.log(userproducts);
+    
 
     // if (!userproducts || userproducts.length === 0) {
     //   return res.status(404).json({
@@ -1185,7 +1160,7 @@ var userData = req.session.user;
         _id: userproduct._id,
         name: userproduct.name,
         description: userproduct.description,
-        category: userproduct.category_id.name, 
+        //category: userproduct.category_id.name, 
         brand: userproduct.brand_id ? userproduct.brand_id.name : '',
         //brand_id: userproduct.brand_id._id, 
         user_id: userproduct.user_id._id,
@@ -1280,27 +1255,23 @@ var userData = req.session.user;
 exports.addPostView = async function (req, res, next) {
 try{
  console.log('Add User Post');
- console.log(req.session.user);
-
+ 
  if (!req.session.user) {
   res.redirect("/api/registration");
 }
  const productConditions = await Productcondition.find();
 
-
  const parentCategoryId = "650444488501422c8bf24bdb";
  const categoriesWithoutParentId = await Category.find({ parent_id: { $ne: parentCategoryId } });
 
-
  res.render("webpages/addmypost", {
-  title: "My Account",
-  message: "Welcome to the Add Post page!",
-  respdata: req.session.user,
-  productcondition: productConditions,
-  subcate: categoriesWithoutParentId,
+            title: "My Account",
+            message: "Welcome to the Add Post page!",
+            respdata: req.session.user,
+            productcondition: productConditions,
+            subcate: categoriesWithoutParentId,
   
-});
-
+    });
 
 } catch (error) {
   console.error(error);
@@ -1312,8 +1283,8 @@ try{
 } 
 
 };
-// New Post Add
 
+// New Post Add
 exports.addNewPost = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -1326,10 +1297,6 @@ exports.addNewPost = async function (req, res, next) {
 
   try{
 
-  // console.log('****************New product Details*************');
-  // console.log(req.body);
-  console.log('****************New product Details*************');
-  console.log(req.files);
   const existingProduct = await Userproduct.findOne({ name: req.body.name });
 
   if (existingProduct) {
@@ -1342,6 +1309,7 @@ exports.addNewPost = async function (req, res, next) {
 
   let invoice;
   let packaging;
+  
   if(req.body.original_invoice == 'on' || req.body.original_invoice !='')
   {
     invoice = '1';
@@ -1359,9 +1327,13 @@ exports.addNewPost = async function (req, res, next) {
   }
 
   const newProduct = new Userproduct({
-    category_id: req.body.product_cate,
+    category: req.body.product_cate,
     user_id: req.session.user.userId,
     brand: req.body.brand,
+    height: req.body.height,
+    weight: req.body.weight,
+    length: req.body.length,
+    breath: req.body.breath,
     size: req.body.size,
     name: req.body.name,
     description: req.body.description,
@@ -1372,12 +1344,10 @@ exports.addNewPost = async function (req, res, next) {
     percentage:  req.body.percentage,
     original_invoice:  invoice,
     original_packaging:  packaging,
-    added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"), 
+    added_dtime: moment().tz('Asia/Kolkata').format("YYYY-MM-DD HH:mm:ss"), 
   });
-  const savedProductdata = await newProduct.save();
-
-  console.log('Save Product');
-    console.log(savedProductdata);
+  
+   const savedProductdata = await newProduct.save();
 
     const requrl = url.format({
       protocol: req.protocol,
@@ -1390,10 +1360,10 @@ exports.addNewPost = async function (req, res, next) {
 
       req.files.forEach(async (file) => {
         const imageUrl = requrl + "/public/images/" + file.filename;
-       // imageDetails.push(imageUrl);
+       
         const productimageDetail = new Productimage({
           product_id: savedProductdata._id,
-          category_id: req.body.product_cate,
+          //category_id: req.body.product_cate,
           user_id: req.session.user.userId,
           //brand: brand,
           image: imageUrl,
@@ -1419,7 +1389,7 @@ exports.addNewPost = async function (req, res, next) {
   console.error(error);
   res.status(500).json({
     status: "0",
-    message: "An error occurred while rendering the Edit Profile.",
+    message: "An error occurred while rendering the Add Post.",
     error: error.message,
   });
 } 
@@ -1849,7 +1819,7 @@ try{
       }, 2 * 60 * 1000);
 
       return res.status(200).json({
-        message: 'Item added to existing cart successfully ',
+        message: 'Item Added to Cart',
         cart: cartResponse,
       });
 
@@ -1864,7 +1834,7 @@ try{
   }
   else {
 
-    console.log("NEW..");
+    console.log("NEW..###############");
     const newCart = new Cart({
       user_id,
       status: 0,
@@ -1872,7 +1842,7 @@ try{
     });
 
     const savedCart = await newCart.save();
-
+    
     const cartDetail = new CartDetail({
       cart_id: savedCart._id,
       product_id,
@@ -1883,7 +1853,9 @@ try{
     });
 
     const savedata = await cartDetail.save();
-    console.log(savedata);
+    
+    // Cart Count
+    var cartCount = await Cart.countDocuments({user_id: savedCart.user_id});
 
     const user = await Users.findById(user_id);
     const product = await Userproduct.findById(product_id);
@@ -1896,9 +1868,13 @@ try{
       qty: cartDetail.qty,
       user_name: user.name,
       product_name: product.name,
+      product_user_id: product.user_id,
       added_dtime: savedCart.added_dtime,
       __v: savedCart.__v,
     };
+    
+    console.log('Cart Response ###############');
+    console.log(cartResponse);
 
     // res.render("webpages/addtocart", {
     //     title: "Dashboard",
@@ -1931,9 +1907,10 @@ try{
       // render after success 
       
     res.status(200).json({
-      message: 'Item added to cart successfully',
-      //cart: cartResponse,
-      is_added: true,
+        cart_count: cartCount,
+        message: 'Item Added to Cart',
+        cart: cartResponse,
+        is_added: true
     });
     
     
@@ -2062,7 +2039,6 @@ try{
   if (!req.session.user || !req.session.user.userId) {
     return res.redirect("/api/registration");
   }
-  console.log('.........View Cart Details By Users........');
   
   const  user_id  = req.session.user.userId;
   const existingCart = await Cart.findOne({ user_id, status: 0 });
@@ -2094,26 +2070,28 @@ try{
             const product = await Userproduct.findOne({ _id: cartItem.product_id._id }).populate('category_id', 'name');
             const productImages = await Productimage.find({ product_id: cartItem.product_id._id }).limit(1);
       
+      
+      
+      
               const finalData = {
                 _id: cartItem._id,
+                cart_id:existingCart._id,
                 quantity: cartItem.qty,
                 product_id: cartItem.product_id._id,
                 product_name: cartItem.product_id.name,
                 product_price : product.offer_price,
                 product_est_price: product.price,
+                seller_id: product.user_id,
                 category_name: product.category_id.name,
                 images: productImages.length > 0 ? productImages[0].image : null,
                 user_name: user.name,
                 added_dtime: cartItem.added_dtime,
                 status: cartItem.status,
               };
-
+              
               const product_price = finalData.product_price;              
               const gst = (product_price*18)/100;
               const finalPrice = parseInt(product_price)+250+parseInt(gst);
-
-              console.log('FINAL PRICE');
-              console.log(finalPrice);
 
               res.render("webpages/addtocart", {
                 title: "Cart List Page",
@@ -2243,8 +2221,6 @@ exports.changeProfileImgWeb = async function (req, res, next) {
       // });
     }
     
-    
-        
     }
     catch (error) {
     console.error(error);
@@ -2259,15 +2235,17 @@ exports.changeProfileImgWeb = async function (req, res, next) {
 
 exports.checkoutWeb = async function (req, res, next) {
   try{
+   
     console.log('Hi Checkout');
+    console.log(req.body.data.user_id);
     // Declear All Values
-    const seller_id = req.body.user_id;
-    const cart_id = req.body.cart_id;
-    const product_id = req.body.product_id;
-    const user_id = req.body.user_id;
-    const total_price = req.body.total_amt;
-    const payment_method = req.body.payment_method;
-    const gst = req.body.gst;
+    const seller_id = req.body.data.seller_id;
+    const cart_id = req.body.data.cart_id;
+    const product_id = req.body.data.product_id;
+    const user_id = req.body.data.user_id;
+    const total_price = req.body.data.total_amt;
+    const payment_method = req.body.data.payment_method;
+    const gst = req.body.data.gst;
     const order_status = '0';
     const delivery_charges = '0';
     const discount = '0';
@@ -2346,7 +2324,8 @@ exports.checkoutWeb = async function (req, res, next) {
         { new: true }
       );
           res.status(200).json({
-              status: "1",
+            status: "1",
+            is_orderPlaced: 1,
             message: 'Order placed successfully',
             order: savedOrder
           });

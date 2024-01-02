@@ -30,11 +30,116 @@ var randId = crypto.randomBytes(20).toString("hex");
 const multer = require("multer");
 const upload = multer({ dest: 'public/images/' });
 
+// exports.getData = function (req, res, next) {
+//   var pageName = "Product List";
+//   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+
+
+//   Userproduct.aggregate([
+//     {
+//       $lookup: {
+//         from: 'mt_categories',
+//         localField: 'category_id',
+//         foreignField: '_id',
+//         as: 'category',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'mt_brands',
+//         localField: 'brand_id',
+//         foreignField: '_id',
+//         as: 'brand',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'mt_sizes',
+//         localField: 'size_id',
+//         foreignField: '_id',
+//         as: 'size',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'users',
+//         localField: 'user_id',
+//         foreignField: '_id',
+//         as: 'user',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'mt_product_images', 
+//         let: { productId: '$_id' },
+//         pipeline: [
+//           {
+//             $match: {
+//               $expr: { $eq: ['$product_id', '$$productId'] },
+//             },
+//           },
+//           {
+//             $limit: 1, 
+//           },
+//         ],
+//         as: 'productImages',
+//       },
+//     },    
+//     {
+//       $lookup: {
+//         from: 'mt_productconditions',
+//         localField: 'status',
+//         foreignField: '_id',
+//         as: 'productCondition',
+//       },
+//     },
+//     {
+//       $unwind: '$category',
+//     },
+//     {
+//       $lookup: {
+//         from: 'mt_categories',
+//         localField: 'category.parent_id',
+//         foreignField: '_id',
+//         as: 'category.parent'
+//       }
+//     }
+//   ]).exec(function (error, productList) {
+//     if (error) {
+//       return res.status(500).json({ error: 'An error occurred' });
+//     }
+
+//     console.log(productList);
+    
+
+//     res.render("pages/product/list", {
+//       siteName: req.app.locals.siteName,
+//       pageName: pageName,
+//       pageTitle: pageTitle,
+//       userFullName: req.session.user.name,
+//       userImage: req.session.user.image_url,
+//       userEmail: req.session.user.email,
+//       year: moment().format("YYYY"),
+//       requrl: req.app.locals.requrl,
+//       status: 0,
+//       message: "found!",
+//       respdata: {
+//         list: productList
+//       },
+//     });
+//   });
+
+// };
+
+
+
 exports.getData = function (req, res, next) {
   var pageName = "Product List";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-
-
+  
+  console.log('Hii User');
+  console.log(req.session.user);
+//return false;
   Userproduct.aggregate([
     {
       $lookup: {
@@ -70,7 +175,7 @@ exports.getData = function (req, res, next) {
     },
     {
       $lookup: {
-        from: 'mt_product_images', 
+        from: 'mt_product_images',
         let: { productId: '$_id' },
         pipeline: [
           {
@@ -79,12 +184,12 @@ exports.getData = function (req, res, next) {
             },
           },
           {
-            $limit: 1, 
+            $limit: 1,
           },
         ],
         as: 'productImages',
       },
-    },    
+    },
     {
       $lookup: {
         from: 'mt_productconditions',
@@ -94,16 +199,39 @@ exports.getData = function (req, res, next) {
       },
     },
     {
-      $unwind: '$category'
+      $unwind: {
+        path: '$category',
+        preserveNullAndEmptyArrays: true,
+      },
     },
     {
       $lookup: {
         from: 'mt_categories',
         localField: 'category.parent_id',
         foreignField: '_id',
-        as: 'category.parent'
-      }
-    }
+        as: 'category.parent',
+      },
+    },
+    {
+      $project: {
+        product: {
+          $cond: {
+            if: { $ne: ['$category', null] },
+            then: '$$ROOT',
+            else: '$$REMOVE',
+          },
+        },
+      },
+    },
+    {
+      $replaceRoot: { newRoot: '$product' },
+    },
+    {
+      $unwind: {
+        path: '$user',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
   ]).exec(function (error, productList) {
     if (error) {
       return res.status(500).json({ error: 'An error occurred' });
@@ -127,11 +255,7 @@ exports.getData = function (req, res, next) {
       },
     });
   });
-
 };
-
-
-
 
 
 exports.detailsData = async function (req, res, next) {
@@ -155,10 +279,15 @@ exports.detailsData = async function (req, res, next) {
       return res.status(404).json({ error: 'Product not found' });
     }
 
+    console.log(productdetails);
     // Fetch the parent category
-    const CategoryDetails = await Category.findById(productdetails.category_id);
+    if(productdetails.hasOwnProperty("category_id"))
+    {
+      const CategoryDetails = await Category.findById(productdetails.category_id);
 
-    const parentCategory = await Category.findById(CategoryDetails.parent_id);
+      const parentCategory = await Category.findById(CategoryDetails.parent_id);
+    }
+   
 
 
     const productImages = await Productimage.find({ product_id: productId });
@@ -192,7 +321,7 @@ exports.detailsData = async function (req, res, next) {
       size: sizeList,
       productCondition: productcondition,
       productImages: productImages,
-      parentCategory: parentCategory,
+      parentCategory: productdetails.hasOwnProperty("category_id") ? parentCategory : null,
     });
   } catch (error) {
     console.error(error);
@@ -235,8 +364,6 @@ exports.updatedetailsData = async function (req, res, next) {
       if (req.body.weight) updData.weight = req.body.weight;
       if (req.body.length) updData.length = req.body.length;
       if (req.body.breath) updData.breath = req.body.breath;
-      if (req.body.shipping_charges) updData.shipping_charges = req.body.shipping_charges;
-      if (req.body.hsn_code) updData.hsn_code = req.body.hsn_code;
 
       await Userproduct.findOneAndUpdate({ _id: req.body.product_id }, { $set: updData }, { upsert: true });
 

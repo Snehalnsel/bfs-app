@@ -52,12 +52,6 @@ const model = mongoose.Schema({
   breath: {
     type: Number,
   },
-  shipping_charges: {
-    type: Number,
-  },
-  hsn_code: {
-    type: Number,
-  },
   offer_price: {
     type: Number,
     required: true,

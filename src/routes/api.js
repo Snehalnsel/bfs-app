@@ -953,14 +953,14 @@ router.post(
 
 router.post(
   "/orderlist",
-  auth.isAuthorized, 
+  //auth.isAuthorized, 
   [],
   OrderController.getOrderListByUser
 );
 
 router.post(
   "/selllist",
-  auth.isAuthorized, 
+  //auth.isAuthorized, 
   [],
   OrderController.getOrdersBySeller
 );
@@ -1124,6 +1124,8 @@ router.get("/privacy-policy",[],WebsiteController.privacypolicyData);
 router.get("/trems",[],WebsiteController.tremsandconditionData);
 router.get("/registration",[],WebsiteController.registration);
 
+router.get("/headerData",[],DashboardController.getHeaderData);
+
 router.post(
   "/signin",
   [
@@ -1212,7 +1214,6 @@ router.get("/show-cart-details",[],WebsiteController.viewCartListByUserId);
 router.get("/delete-cart/:id",[],WebsiteController.deleteCart); //auth.isAuthorized
 
 // Wishlist Web Start
-
 router.get("/add-to-wishlist-web/:id",[],WebsiteController.addToWishlistWeb);
 
 router.get("/show-wishlist-details",[],WebsiteController.viewWishListByUserId);
@@ -1233,10 +1234,22 @@ router.get("/bannerlist",[],DashboardController.bannerlist);
 
 router.post("/change-profile-image-web",[],upload.array('image', 1),WebsiteController.changeProfileImgWeb);
 
-router.post(
-  "/checkout-web",
-  [],
-  WebsiteController.checkoutWeb
-);
+router.post("/checkout-web",WebsiteController.checkoutWeb);
+//Routes Added By Palash
 
+router.get(
+  "/bid-for-product/:bid_id",
+  [],
+  BidController.bidListProduct
+);
+router.get(
+  "/bid-for-product",
+  [],
+  BidController.bidListProduct
+);
+router.post(
+  "/bid-check-exist-reccord",
+  [],
+  BidController.bidExistReccord
+);
 module.exports = router;

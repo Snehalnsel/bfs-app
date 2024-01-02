@@ -15,22 +15,22 @@
           <div class="main_product-wrapper fullwidth-productlist">
               <div class="top-title shorting-row">
           <div class="product-result d-flex aling-center">
-             <h5>Showing 186 results for Mix of Everything</h5>
+             <h5>Showing all results for Mix of Everything</h5>
           </div>
           <div class="shorting-box">
             <div class="short-label">Sort by:</div>
             <div class="short-dropdown">
-               <select class="form-control" id="sel2" name="sellist2">
-                  <option selected>Highest Price</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>5</option>
+               <select class="form-control sortBy" id="sortBy" name="sortBy">
+                  <option>Choose</option>
+                  <option value="0">Low - High</option>
+                  <option value="1">High - Low</option>
+                  <!--<option>4</option>-->
+                  <!--<option>5</option>-->
              </select>
             </div>
           </div>
        </div>
-       <div class="product-listrow column4-box">
+       <div class="product-listrow column4-box" >
           <!-- <div class="product-box">
                 <div class="product-image">
                    <a href="product.php"><img src="assets/images/product1.jpg" alt="images" class="img-fluid"></a>
@@ -105,10 +105,9 @@
  
        </div>
           </div> -->
+          <%console.log(product_category_id);%>
           <% respdata.forEach(function(item) { %>
-            <% console.log('********Products 123*******');     %> 
             
-               <%  console.log(item);  %>
           <div class="product-box">
             
             <div class="product-image">
@@ -136,6 +135,27 @@
 <%- include('../../public/assets/include/newsletter'); %>
 <%- include('../../public/assets/include/footer'); %>
 
+
 <script>
-   
+  $(document).on('change', ".sortBy", function(e){
+    //   console.log('Sort by');
+    //   alert($(this).val());
+      let optionId = $(this).val(); // (optionId = 0 means low - high) and (optionId 1 means high - low)
+      alert(optionId);
+       
+//         $.ajax({
+//                  url: '/api/productSortBy/'+optionId.trim(), // Route on the server to handle the request
+//                  method: 'POST',
+//                  success: function(data) 
+//                   {
+                      
+//                   },
+//                  error: function(err) 
+//                   {
+//                       console.error('Error:', err);
+//                   } 
+//         });
+       
+   });
 </script>
+

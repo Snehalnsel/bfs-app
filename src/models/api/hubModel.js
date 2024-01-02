@@ -34,7 +34,7 @@ const model = mongoose.Schema({
   },
   gst_no: {
     type: String,
-    required: true,
+    //required: true,
   },
   phone_no: {
     type: String,

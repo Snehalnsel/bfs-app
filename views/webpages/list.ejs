@@ -2,7 +2,9 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
+<script>
+   let isLoggedIn = "";
+</script>
 <section class="home-banner-slider">
     <!-- <div class="container"> -->
        <div class="slider banner-slider">
@@ -31,6 +33,13 @@
       </div>
    </div>
 </section>
+
+
+
+
+
+
+
 
  <section class="poster-wrapper">
     <div class="container">
@@ -114,18 +123,78 @@
           </div>
        </div>
     </div>
- </section>
- 
+   </section>
+   <div class="modal theme_modal bid_modal show" id="bid_modal" aria-modal="true" role="dialog" style="padding-right: 17px; display: none;">
+      <div class="modal-dialog">
+         <button type="button" class="close" data-dismiss="modal">×</button>
+         <div class="modal-content login-box">
+            <div class="left-boxpart hide-mobile">
+               <div class="box-inner">
+                  <img src="/public/assets/images/white_logo.png" alt="image" class="lg-logo">
+                  <p>BFS ( Bid for Sale )</p>
+               </div>
+            </div>
+            <div class="right-formpart loginform-box">
+               <h5 class="box-title">Bid Amount</h5>
+               <div class="inner-formbox">
+                  <div class="tab-content">
+                     <div class="tab-pane active" id="login-password" role="tabpanel">
+                        <!--<form action="" method="POST">-->
+                           <div class="mb-3">   
+                              <input type="text" class="form-control" id="bid_amount" placeholder="Enter Amount" name="bid_amount" required="required">
+                           </div>
+                           <div class="button-row">
+                              <button type="submit" class="btn liginbtn bidNowAmountBtn">Submit</button>
+                           </div>
+                        <!--</form>-->
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
   <%- include('../../public/assets/include/newsletter'); %>
   <%- include('../../public/assets/include/footer'); %>
 </body>
-
+<script>
+   let productId = "";
+   $(document).on("click",".bidNowAmountBtn",function() {
+      let bidAmount = $("#bid_amount").val();
+      if(productId !== "" && bidAmount != "") {
+         $.ajax({
+            url: '/api/bid-check-exist-reccord', // Request to bid for first time or update the bid amount
+            data: {productId:productId,bidAmount:bidAmount},
+            method: 'POST',
+            success: function(data) {
+               window.location.href = "/api/bid-for-product/"+data.bidId;
+               //console.log('Danger Alert');
+            },
+            error: function(err) {
+                  console.error('Error:', err);
+            } 
+        });
+      }
+   });
+   $(document).on("click",".bidButton",function() {
+      if(isLoggedIn != "") {
+         productId = $(this).siblings('a').data("id");
+         $('#bid_modal').modal('show'); 
+         //window.location.href = "/api/bid-for-product";
+      } else {
+         //$('.loginModal').trigger('click');
+         $('#login_modal').modal('show'); 
+      }
+   });
+   
+</script>
 <script>
    async function fetchData() {
      try {
        const response = await fetch('/api/app-home');
        const data = await response.json();
-     
+
+         isLoggedIn = data.isLoggedIn;
      // Best deal populate
        const bestDeals = data.respdata.best_deal;
        //console.log(bestDeals);
@@ -179,12 +248,12 @@
      }
    }
 
-   function populateSlider(sliderElement, data) {
-      console.log(data);
-            data.forEach(item => {
+   function populateSlider(sliderElement, data, isLoggedIn = "") {
+         data.forEach(item => {
          const sliderItem = document.createElement('div');
          sliderItem.classList.add('slider-item');
-         sliderItem.innerHTML = `
+         let html = ``;
+         html += `
          <div class="product-box">
             <div class="product-image">
                <a href="<%= requrl %>/api/productdeatils/${item._id}"><img src="${item.image}" alt="images" class="img-fluid"></a>
@@ -195,12 +264,15 @@
                <div class="rtl-price"><span>Est. Retail:</span>₹${item.price}</div>
             </div>
             <div class="prd-button-group">
-               <a href="javascript:void(0)" class="prd-btn buy-btn" data-id="${item._id}">Buy Now</a>
-               <a href="bids.php" class="prd-btn orng-btn">Bid Now</a>
-            </div>
+               <a href="javascript:void(0)" class="prd-btn buy-btn" data-id="${item._id}">Buy Now</a>`;
+            //if(isLoggedIn != "") {
+               html += `<a href="javascript:void(0)" class="prd-btn orng-btn bidButton">Bid Now</a>`;
+            //}
+            html += `</div>
             <div class="prd-batch">${item.status}</div>
          </div>
          `;
+         sliderItem.innerHTML = html;
          sliderElement.appendChild(sliderItem);
       });
 
@@ -238,21 +310,9 @@
                  success: function(data) 
                   {
                       if (data.is_added) {
-                         // alert(data.message);
-                         Swal.fire({
-                                    //title: "<i>Bid For Sale</i>", 
-                                    html: data.message,  
-                                    confirmButtonText: "OK",
-                                    customClass: { confirmButton: 'alert-box-button' }
-                                    
-                                 });
+                          alert(data.message);
                       } else {
-                          Swal.fire({
-                                    //title: "<i>Bid For Sale</i>", 
-                                    html: "You can add one item at a time",  
-                                    confirmButtonText: "OK",
-                                    customClass: { confirmButton: 'alert-box-button' }
-                                 });
+                          alert("Item Already Added to the cart.");
                       }
                   },
                  error: function(err) 

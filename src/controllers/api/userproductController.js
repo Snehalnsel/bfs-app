@@ -275,9 +275,9 @@ exports.addData = async function (req, res, next) {
     // }
 
     const newProduct = new Userproduct({
-      category_id: req.body.category_id,
+      //category_id: req.body.category_id,
       user_id: req.body.user_id,
-      //category: req.body.category,
+      category: req.body.category,
       brand: req.body.brand,
       size: req.body.size,
       name: req.body.name,
@@ -305,6 +305,7 @@ exports.addData = async function (req, res, next) {
       host: req.get("host"),
     });
 
+    console.log(req.files);
     const imageUrls = [];
     if (req.files && req.files.length > 0) {
       const imageDetails = [];
@@ -315,7 +316,7 @@ exports.addData = async function (req, res, next) {
 
         const productimageDetail = new Productimage({
           product_id: savedProductdata._id,
-          category_id: req.body.category_id,
+          //category_id: req.body.category_id,
           user_id: req.body.user_id,
           // brand_id: brand_id,
           image: imageUrl,
@@ -400,7 +401,8 @@ exports.getProductData = async function (req, res, next) {
         _id: userproduct._id,
         name: userproduct.name,
         description: userproduct.description,
-        category: userproduct.category_id.name, 
+        category_id: userproduct.category_id ? userproduct.category_id._id: '', 
+        category: userproduct.category_id ? userproduct.category : userproduct.category || '', 
         brand: userproduct.brand_id ? userproduct.brand_id.name : userproduct.brand || '',
         brand_id: userproduct.brand_id ? userproduct.brand_id._id : '',
         user_id: userproduct.user_id._id,
@@ -411,6 +413,10 @@ exports.getProductData = async function (req, res, next) {
         offer_price: userproduct.offer_price,
         percentage: userproduct.percentage,
         status: userproduct.status,
+        height: userproduct.height,
+        weight: userproduct.weight,
+        length: userproduct.length,
+        breath: userproduct.breath,
         flag: userproduct.flag,
         approval_status: userproduct.approval_status,
         original_invoice: userproduct.original_invoice,
@@ -420,7 +426,7 @@ exports.getProductData = async function (req, res, next) {
         product_images: productImages, 
       };
       
-
+    
       formattedUserProducts.push(formattedUserProduct);
     }
 
@@ -516,7 +522,8 @@ exports.getProductDataById = async function (req, res, next) {
         _id: userproduct._id,
         name: userproduct.name,
         description: userproduct.description,
-        category: userproduct.category_id ? userproduct.category_id.name : '', // Check if category_id exists before accessing 'name'
+        category: userproduct.category_id ? userproduct.category_id.name : '',
+        category_id: userproduct.category ? userproduct.category : '', // Check if category_id exists before accessing 'name'
         brand: userproduct.brand_id ? userproduct.brand_id.name : '', // Check if brand_id exists before accessing 'name'
         user_id: userproduct.user_id ? userproduct.user_id._id : '',
         user_name: userproduct.user_id ? userproduct.user_id.name : '',
@@ -526,6 +533,10 @@ exports.getProductDataById = async function (req, res, next) {
         percentage: userproduct.percentage,
         status: userproduct.status,
         original_invoice: userproduct.original_invoice,
+        height: userproduct.height,
+        weight: userproduct.weight,
+        length: userproduct.length,
+        breath: userproduct.breath,
         flag: userproduct.flag,
         original_packaging: userproduct.original_packaging,
         approval_status: userproduct.approval_status,
@@ -584,8 +595,7 @@ exports.getDetailsById = async function (req, res, next) {
       .populate('size_id', 'name')
       .exec();
 
-    // console.log(userproducts);
-
+    
     if (!userproducts) {
       return res.status(404).json({
         status: "0",
@@ -626,22 +636,29 @@ exports.getDetailsById = async function (req, res, next) {
       _id: userproducts._id,
       name: userproducts.name,
       description: userproducts.description,
-      category: userproducts.category_id ? userproducts.category_id.name : '', // Check if category_id exists before accessing 'name'
-      brand: userproducts.brand_id ? userproducts.brand_id.name : '', // Check if brand_id exists before accessing 'name'
+      category_id: userproducts.category_id ? userproducts.category_id._id: '', 
+      category: userproducts.category_id ? userproducts.category : userproducts.category || '', 
+      brand: userproducts.brand_id ? userproducts.brand_id.name : userproducts.brand || '',
+      brand_id: userproducts.brand_id ? userproducts.brand_id._id : '',
       user_id: userproducts.user_id ? userproducts.user_id._id : '',
       user_name: userproducts.user_id ? userproducts.user_id.name : '',
-      size_id: userproducts.size_id ? userproducts.size_id.name : '', // Check if size_id exists before accessing 'name'
+      size: userproducts.size_id ? userproducts.size_id.name : userproducts.size || '',
+      size_id: userproducts.size_id ? userproducts.size_id._id : '',
       price: userproducts.price,
       offer_price: userproducts.offer_price,
       percentage: userproducts.percentage,
       status: userproducts.status,
       original_invoice: userproducts.original_invoice,
+      height: userproducts.height,
+      weight: userproducts.weight,
+      length: userproducts.length,
+      breath: userproducts.breath,
       flag: userproducts.flag,
       original_packaging: userproducts.original_packaging,
       approval_status: userproducts.approval_status,
       satus_name : productCondition ? productCondition.name : '',
       added_dtime: userproducts.added_dtime,
-      hitCount: userproducts.hitCount || 0, // Provide a default value if hitCount is undefined
+      hitCount: userproducts.hitCount || 0, 
       __v: userproducts.__v,
       product_images: productImages,
     };

@@ -1252,4 +1252,9 @@ router.post(
   [],
   BidController.bidExistReccord
 );
+router.post(
+  "/search-by-keyword",
+  [],
+  SearchController.searchByKeyword
+);
 module.exports = router;

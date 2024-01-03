@@ -130,8 +130,8 @@ async function generateSellerPickup(data) {
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = JSON.parse(body);
-       console.log(responseBody);
-       console.log("hi");
+       //console.log(responseBody);
+       //console.log("hi");
        const token = responseBody;
        resolve(token);
      } else {
@@ -512,14 +512,7 @@ exports.getUserLogin = async function (req, res, next) {
                 goal: user.goal,
                 hear_from: user.hear_from,
               }; 
-
-            //   console.log(' User:',user);
               var userData = req.session.user;
-            //   console.log('Session User:', userData);
-
-              // console.log('Hiiiiiiiiiiiiiiii');
-              // console.log(req.session.user);
-
               Users.findOneAndUpdate(
                 { _id: user._id },
                 { $set: { token: generateToken(userToken), last_login: dateTime } },

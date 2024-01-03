@@ -636,5 +636,57 @@ exports.filterByOfferPrice = async function (req, res, next) {
   }
 };
 
-
-
+exports.searchByKeyword = async function (req, res, next) {
+  try {
+    let reqBody = req.body;
+    let searchBy = reqBody.searchBy;
+    let allProductName = await Userproduct.find({ name: { $regex: new RegExp(`${searchBy}`, 'i') } }).limit(10);
+    let allBrandName = await Brand.find({ name: { $regex: new RegExp(`${searchBy}`, 'i') } }).limit(10);
+    let allData = [];
+    let siteUrl = process.env.SITE_URL;
+    //if(allProductName.length >= 5) {
+      let i = 0;
+      for(let element of allProductName) {
+        if(i < 5) {
+          let name = element.name;
+          let link = "/api/productdeatils/" + element._id.toString();
+          let newElement = {
+            name: name,
+            link: link,
+            siteUrl: siteUrl
+          };
+          allData.push(newElement);
+          i++;
+        }
+      }
+    //}
+    for(let element of allBrandName) {
+      if(allData.length < 10) {
+        let name = element.name;
+        let link = "/api/websubcategoriesproducts/"+element._id.toString();
+        let newElement = {
+          name: name,
+          link: link
+        };
+        allData.push(newElement);
+      } else {
+        break;
+      }
+    }
+    res.status(200).json({
+      status: "1",
+      message: "successfully search your result!",
+      siteUrl: process.env.SITE_URL,
+      respdata: {
+        allData: allData
+      },
+    });
+  } catch (error) {
+    //console.log(error);
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while searching the result.",
+      error: error.message,
+    });
+  }
+};

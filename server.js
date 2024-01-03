@@ -11,6 +11,7 @@ const morgan = require("morgan");
 const nodemailer = require("nodemailer");
 var path = require("path");
 app.use("/public", express.static(path.join(__dirname, "public")));
+require('dotenv').config();
 
 app.locals.siteName = "BFS - Bid For Sale";
 

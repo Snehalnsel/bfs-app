@@ -10,6 +10,8 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const nodemailer = require("nodemailer");
 var path = require("path");
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
 app.use("/public", express.static(path.join(__dirname, "public")));
 require('dotenv').config();
 
@@ -52,8 +54,10 @@ db.once("open", () => {
 // app.set('views', path.join(__dirname, 'views'));
 app.set("view engine", "ejs");
 
+app.use(cookieParser());
 // adding Helmet to enhance your API's security
 // app.use(helmet());
+
 app.use(
   helmet.contentSecurityPolicy({
     directives: {

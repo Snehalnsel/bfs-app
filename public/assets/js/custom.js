@@ -1,4 +1,3 @@
-
 // Stick the header at top on scroll
   $(window).scroll(function(){
     if ($(window).scrollTop() >= 90) {

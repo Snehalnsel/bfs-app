@@ -1145,6 +1145,15 @@ router.post(
   WebsiteController.signin
 );
 
+router.post("/ajax-userlogin",cors(),[check("email", "Email length should be 10 to 30 characters")
+.isEmail(),
+check("password", "Password length should be 8 to 10 characters").isLength({
+min: 8,
+max: 10,
+}),
+  ],
+  WebsiteController.ajaxGetUserLogin
+);
 
 router.post("/userlogin",cors(),[check("email", "Email length should be 10 to 30 characters")
 .isEmail(),

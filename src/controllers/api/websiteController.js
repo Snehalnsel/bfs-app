@@ -40,6 +40,9 @@ const Order = require("../../models/api/orderModel");
 const smtpUser = "sneha.lnsel@gmail.com";
 const nodemailer = require("nodemailer");
 const app = express();
+const generateTokens = require("../../utils/generateTokens");
+const verifyRefreshToken = require("../../utils/verifyRefreshToken");
+const tokenDecode = require("../../utils/tokenDecode");
 // const yourSecretKey = crypto.randomBytes(64).toString('hex');
 
 // console.log('Generated Secret Key:', yourSecretKey);
@@ -66,12 +69,14 @@ const accountSid = 'ACa1b71e8226f3a243196beeee233311a9';
 const authToken = 'ea9a24bf2a9ca43a95b991c9c471ba93';
 const twilioClient = new twilio(accountSid, authToken);
 
-function generateToken(user) {
+async function generateToken(user) {
   //console.log('Token......');
   //console.log(user);
-  return jwt.sign({ data: user }, tokenSecret, { expiresIn: "24h" });
+  return jwt.sign({ data: user }, tokenSecret, { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN });
 }
-
+const refreshToken = (user) => {
+  return jwt.sign({ data: user },tokenSecret,{ expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN });
+};
 const email = 'sneha.lnsel@gmail.com';
 // const shipPassword = 'Sweetu@2501';
 const shipPassword = 'Jalan@2451';
@@ -389,23 +394,105 @@ exports.signin = async function (req, res, next) {
   });
 };
 
-
-exports.getUserLogin = async function (req, res, next) {
+exports.ajaxGetUserLogin = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      status: "0",
+      status: "error",
       message: "Validation error!",
       respdata: errors.array(),
     });
   }
 
-  const { email, password } = req.body;
-
-  Users.findOne({ email }).then((user) => {
+  const { email, password, cookieAccessToken, cookieRefreshToken } = req.body;
+  //Token generate
+  /*let accessTokenGlobal = "";
+  let refreshTokenGlobal = "";
+  await Users.findOne({ email }).then(async (user) => {
+    const userToken = {
+      userId: user._id,
+      email: user.email,
+      password: user.password,
+      title: user.title,
+      name: user.name,
+      age: user.age,
+      //usertoken:user.token,
+      phone_no:user.phone_no,
+      weight: user.weight,
+      height: user.height,
+      country: user.country,
+      country_code: user.country_code,
+      country: user.country,
+      goal: user.goal,
+      hear_from: user.hear_from,
+    };
+    if(cookieRefreshToken != "") {
+      //Access token validate
+      let getAccessTokenData = await tokenDecode(cookieAccessToken, process.env.ACCESS_TOKEN_PRIVATE_KEY);
+      if(!getAccessTokenData.error) {
+        if((typeof req.session.user != "undefined") && (req.session.user.userId.toString() == getAccessTokenData.tokenDetails.userId.toString())) {
+          //Do Nothing....
+          //console.log("session matched with current data");
+          res.status(200).json({
+            status: "success",
+            refreshReset:false,
+            message:"Already logged In!!"
+          });
+        } else {
+          let getRefreshTokenData = await tokenDecode(cookieRefreshToken, process.env.REFRESH_TOKEN_PRIVATE_KEY);
+          if(!getRefreshTokenData.error) {
+            if(getRefreshTokenData.tokenDetails.exp > (Date.now() / 1000)){
+              //generate access token only
+              const { accessToken, refreshToken } = await generateTokens(userToken, cookieRefreshToken);
+              accessTokenGlobal = accessToken;
+              refreshTokenGlobal = refreshToken;
+            } else {
+              //generate refresh token
+              const { accessToken, refreshToken } = await generateTokens(userToken, "");
+              accessTokenGlobal = accessToken;
+              refreshTokenGlobal = refreshToken;
+            }
+            //user data stored in session
+            req.session.user = userToken;
+            res.status(200).json({
+              status: "success",
+              refreshReset:true,
+              accessToken: accessTokenGlobal,
+              refreshToken:refreshTokenGlobal
+            });
+          } else {
+            //Do something while you will get error in refresh token
+            res.status(200).json({
+              status: "error",
+              refreshReset:false,
+              message: "Error while generating your token!"
+            });
+          }
+        }
+      } else {
+        //Do something while you will get error in access token
+        res.status(200).json({
+          status: "error",
+          refreshReset:false,
+          message: "Error while generating your token!"
+        });
+      }
+    } else {
+      //User is logging for the first time
+      const { accessToken, refreshToken } = await generateTokens(userToken, "");
+      res.status(200).json({
+        status: "success",
+        refreshReset:true,
+        accessToken: accessToken,
+        refreshToken:refreshToken
+      });
+    }
+  });
+  return false;*/
+  Users.findOne({ email }).then(async (user) => {
     if (!user)
       res.status(404).json({
-        status: "0",
+        status: "error",
         message: "User not found!",
         respdata: {},
       });
@@ -416,20 +503,19 @@ exports.getUserLogin = async function (req, res, next) {
       });
       req.app.locals.requrl = requrl;
 
-      bcrypt.compare(password, user.password, (error, match) => {
+      bcrypt.compare(password, user.password, async (error, match) => {
         if (error) {
           res.status(400).json({
-            status: "0",
+            status: "error",
             message: "Error!",
             respdata: error,
           });
         } else if (match) {
-         
           // user.deviceid = deviceid;
           // user.devicename = devicename;
           // user.fcm_token = fcm_token;
 
-          user.save((err) => {
+          user.save(async (err) => {
             if (err) {
               res.status(400).json({
                 status: "0",
@@ -471,9 +557,6 @@ exports.getUserLogin = async function (req, res, next) {
               .catch((error) => {
                 console.error(`Error sending WhatsApp message: ${error.message}`);
               });
-              
-              
-
               const userToken = {
                 userId: user._id,
                 email: user.email,
@@ -481,7 +564,166 @@ exports.getUserLogin = async function (req, res, next) {
                 title: user.title,
                 name: user.name,
                 age: user.age,
-                usertoken:user.token,
+                //usertoken:user.token,
+                phone_no:user.phone_no,
+                weight: user.weight,
+                height: user.height,
+                country: user.country,
+                country_code: user.country_code,
+                country: user.country,
+                goal: user.goal,
+                hear_from: user.hear_from,
+              };
+
+              //delete req.session.user;
+
+              req.session.user = {
+                userId: user._id,
+                email: user.email,
+                password: user.password,
+                title: user.title,
+                name: user.name,
+                age: user.age,
+                image:user.image,
+                //usertoken:user.token,
+                phone_no:user.phone_no,
+                weight: user.weight,
+                height: user.height,
+                country: user.country,
+                country_code: user.country_code,
+                country: user.country,
+                goal: user.goal,
+                hear_from: user.hear_from,
+              }; 
+              //let userData = req.session.user;
+              const { accessToken, refreshToken } = await generateTokens(userToken, cookieRefreshToken);
+              let myquery = { _id: user._id };
+              let newvalues = { $set: { token: await generateToken(userToken), last_login: dateTime } };
+              Users.updateOne(myquery, newvalues, function(err, response) {
+                if (err) {
+                  res.status(400).json({
+                    status: "error",
+                    message: "can not updated your token",
+                    respdata: {},
+                  });
+                } else {
+                  res.status(200).json({
+                    status: "success",
+                    message: "Successfully logged in!",
+                    respdata: {
+                      accessToken: accessToken,
+                      accessTokenExpires:process.env.COOCKIE_ACCESS_TOKEN_EXPIRES_IN,
+                      refreshToken:refreshToken,
+                      refreshTokenExpires:process.env.COOCKIE_REFRESH_TOKEN_EXPIRES_IN,
+                    },
+                  });
+                }
+              });
+              //res.redirect('/api/my-account');
+            }
+          });
+          //res.redirect('/api/my-account');
+        } else {
+          res.status(400).json({
+            status: "error",
+            message: "Password does not match!",
+            respdata: {},
+          });
+        }
+      });
+    }
+  });
+};
+
+exports.getUserLogin = async function (req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: "0",
+      message: "Validation error!",
+      respdata: errors.array(),
+    });
+  }
+
+  const { email, password } = req.body;
+
+  Users.findOne({ email }).then(async (user) => {
+    if (!user)
+      res.status(404).json({
+        status: "0",
+        message: "User not found!",
+        respdata: {},
+      });
+    else {
+      const requrl = url.format({
+        protocol: req.protocol,
+        host: req.get("host"),
+      });
+      req.app.locals.requrl = requrl;
+
+      bcrypt.compare(password, user.password, async (error, match) => {
+        if (error) {
+          res.status(400).json({
+            status: "0",
+            message: "Error!",
+            respdata: error,
+          });
+        } else if (match) {
+         
+          // user.deviceid = deviceid;
+          // user.devicename = devicename;
+          // user.fcm_token = fcm_token;
+
+          user.save(async (err) => {
+            if (err) {
+              res.status(400).json({
+                status: "0",
+                message: "Error updating user device information!",
+                respdata: err,
+              });
+            } else {
+              const mailData = {
+                from: smtpUser,
+                to: user.email,
+                subject: "BFS - Bid For Sale  - Welcome Email",
+                text: "Server Email!",
+                html:
+                  "Hey " +
+                  user.name +
+                  ", <br> <p>Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items </p>",
+              };
+
+              transporter.sendMail(mailData, function (err, info) {
+                if (err) console.log(err);
+                else console.log(info);
+              });
+
+             // const msg = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
+
+              const whatsappMessage = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
+              const userPhoneNo = "+917044289770";
+
+              twilioClient.messages.create({
+                body: whatsappMessage,
+                // From: 'whatsapp:+12565734549',
+                // to: 'whatsapp:+918116730275'
+                from: 'whatsapp:+14155238886',
+                to: 'whatsapp:+917044289770'
+              })
+              .then((message) => {
+                console.log(`WhatsApp message sent with SID: ${message.sid}`);
+              })
+              .catch((error) => {
+                console.error(`Error sending WhatsApp message: ${error.message}`);
+              });
+              const userToken = {
+                userId: user._id,
+                email: user.email,
+                password: user.password,
+                title: user.title,
+                name: user.name,
+                age: user.age,
+                //usertoken:user.token,
                 phone_no:user.phone_no,
                 weight: user.weight,
                 height: user.height,
@@ -515,10 +757,10 @@ exports.getUserLogin = async function (req, res, next) {
               var userData = req.session.user;
               Users.findOneAndUpdate(
                 { _id: user._id },
-                { $set: { token: generateToken(userToken), last_login: dateTime } },
+                { $set: { token: await generateToken(userToken), last_login: dateTime } },
                 { upsert: true },
                 function (err, doc) {
-                  console.log(err);
+                  console.log("err",err);
                   if (err) {
                     throw err;
                   } else {
@@ -531,7 +773,7 @@ exports.getUserLogin = async function (req, res, next) {
                       
                     });
                    // res.redirect('/api/home');
-                   res.redirect('/api/my-account');
+                    res.redirect('/api/my-account');
                   }
                 }              
               );

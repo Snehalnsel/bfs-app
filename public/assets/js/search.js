@@ -11,7 +11,7 @@ $(document).ready(function(){
                     if(allData.length > 0) {
                         let html = ``;
                         for(let i = 0;i<allData.length;i++) {
-                            html += `<li><a href="`+data.siteUrl+allData[i].link+`"></a>`+allData[i].name+`</li>`;
+                            html += `<li><a href="`+data.siteUrl+allData[i].link+`">`+allData[i].name+`</a></li>`;
                             //console.log("html", allData[i].link);
                         }
                         $(".allSearchResult").html(html);

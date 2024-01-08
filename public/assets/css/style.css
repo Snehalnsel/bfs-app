@@ -235,14 +235,14 @@
   }
   
   .ctg-icon {
-      height: 40px;
+      height: 50px;
       display: flex;
       align-items: center;
       justify-content: center;
   }
   .ctg-icon img {
-    max-height: 90%;
-    max-width: 35px;
+    max-height: 75%;
+    max-width: 30px;
 }
   .sld-iconbox h6{
     font-size: 13px;
@@ -634,7 +634,7 @@
   }
   
   .navbar-collapse {
-      position: relative;
+      position: absolute;
       top: 100%;
       background: #fff;
       z-index: 1;
@@ -1381,19 +1381,19 @@
       font-size: 30px;
       font-weight: 500;
       text-transform: capitalize;
-      margin-bottom: 7px;
+      margin-bottom: 10px;
   }
   .short-descrition p {
       font-size: 14px;
       color: #010101;
-      margin-bottom: 7px;
+      margin-bottom: 10px;
   }
   
   .product-price {
       font-size: 36px;
       color: #e2673d;
       font-weight: 6;
-      padding-bottom: 0px;
+      padding-bottom: 5px;
       display: flex;
       align-items: center;
   }
@@ -1409,7 +1409,7 @@
       color: #3c3c3c;
       font-size: 14px;
       line-height: 22px;
-      margin-bottom: 5px;
+      margin-bottom: 10px;
   }
   
   .reguler-price {
@@ -1996,10 +1996,9 @@
   }
   
   .dashboard-title-arrow {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
+      display: flex;
+      align-items: center;   
+  }
   
   .edit-link a {
       color: #e96a3f;
@@ -2697,7 +2696,7 @@ a.acb-btn {
 
 .header-bottom .ctg_Slider {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
 }
 
 .header-bottom .ctg_Slider .slick-track {
@@ -2775,12 +2774,10 @@ a.edit_link {
 .alert-box-button {
     background-color: #e3683d!important; /* Replace with your desired color */
     color: white!important; /* Text color */
-    padding: 5px 30px!important;
-    border:  1px #e3683d!important;
-    border-radius:10px!important;
+    /* Other styles you want to apply */
 }
 
-.swal2-popup{
+.your-custom-container-class{
     width: 20em!important;
 }
 

@@ -684,7 +684,7 @@ exports.getData = async function (req, res, next) {
 
     
 
-    
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
 
     res.render("webpages/list", {
 
@@ -695,6 +695,7 @@ exports.getData = async function (req, res, next) {
       message: "Welcome to the Dashboard page!",
 
       cart: cartCount,
+      isLoggedIn: isLoggedIn,
 
     });
 

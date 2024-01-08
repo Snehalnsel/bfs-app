@@ -406,9 +406,9 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
 
   const { email, password, cookieAccessToken, cookieRefreshToken } = req.body;
   //Token generate
-  /*let accessTokenGlobal = "";
+  let accessTokenGlobal = "";
   let refreshTokenGlobal = "";
-  await Users.findOne({ email }).then(async (user) => {
+  /*await Users.findOne({ email }).then(async (user) => {
     const userToken = {
       userId: user._id,
       email: user.email,
@@ -487,8 +487,7 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
         refreshToken:refreshToken
       });
     }
-  });
-  return false;*/
+  });*/
   Users.findOne({ email }).then(async (user) => {
     if (!user)
       res.status(404).json({
@@ -574,31 +573,61 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
                 goal: user.goal,
                 hear_from: user.hear_from,
               };
-
-              //delete req.session.user;
-
-              req.session.user = {
-                userId: user._id,
-                email: user.email,
-                password: user.password,
-                title: user.title,
-                name: user.name,
-                age: user.age,
-                image:user.image,
-                //usertoken:user.token,
-                phone_no:user.phone_no,
-                weight: user.weight,
-                height: user.height,
-                country: user.country,
-                country_code: user.country_code,
-                country: user.country,
-                goal: user.goal,
-                hear_from: user.hear_from,
-              }; 
               //let userData = req.session.user;
-              const { accessToken, refreshToken } = await generateTokens(userToken, cookieRefreshToken);
+              //const { accessToken, refreshToken } = await generateTokens(userToken, cookieRefreshToken);
+              //Generate Token Required By Condition
+                if(cookieRefreshToken != "") {
+                  //Access token validate
+                  let getAccessTokenData = await tokenDecode(cookieAccessToken, process.env.ACCESS_TOKEN_PRIVATE_KEY);
+                  if(!getAccessTokenData.error) {
+                    if((typeof req.session.user != "undefined") && (req.session.user.userId.toString() == getAccessTokenData.tokenDetails.userId.toString())) {
+                      //Do Nothing....
+                      //console.log("session matched with current data");
+                      res.status(200).json({
+                        status: "success",
+                        refreshReset:false,
+                        message:"Already logged In!!"
+                      });
+                    } else {
+                      let getRefreshTokenData = await tokenDecode(cookieRefreshToken, process.env.REFRESH_TOKEN_PRIVATE_KEY);
+                      if(!getRefreshTokenData.error) {
+                        if(getRefreshTokenData.tokenDetails.exp > (Date.now() / 1000)){
+                          //generate access token only
+                          const { accessToken, refreshToken } = await generateTokens(userToken, cookieRefreshToken);
+                          accessTokenGlobal = accessToken;
+                          refreshTokenGlobal = refreshToken;
+                        } else {
+                          //generate refresh token
+                          const { accessToken, refreshToken } = await generateTokens(userToken, "");
+                          accessTokenGlobal = accessToken;
+                          refreshTokenGlobal = refreshToken;
+                        }
+                      } else {
+                        //Do something while you will get error in refresh token
+                        res.status(200).json({
+                          status: "error",
+                          refreshReset:false,
+                          message: "Error while generating your token!"
+                        });
+                      }
+                    }
+                  } else {
+                    //Do something while you will get error in access token
+                    res.status(200).json({
+                      status: "error",
+                      refreshReset:false,
+                      message: "Error while generating your token!"
+                    });
+                  }
+                } else {
+                  //User is logging for the first time
+                  const { accessToken, refreshToken } = await generateTokens(userToken, "");
+                  accessTokenGlobal = accessToken;
+                  refreshTokenGlobal = refreshToken;
+                }
+              //Generate Token Required By Condition
               let myquery = { _id: user._id };
-              let newvalues = { $set: { token: await generateToken(userToken), last_login: dateTime } };
+              let newvalues = { $set: { token: accessTokenGlobal, last_login: dateTime } };
               Users.updateOne(myquery, newvalues, function(err, response) {
                 if (err) {
                   res.status(400).json({
@@ -607,22 +636,24 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
                     respdata: {},
                   });
                 } else {
+                  //Store user data into the session
+                  req.session.user = userToken; 
+
                   res.status(200).json({
                     status: "success",
                     message: "Successfully logged in!",
                     respdata: {
-                      accessToken: accessToken,
+                      accessToken: accessTokenGlobal,
                       accessTokenExpires:process.env.COOCKIE_ACCESS_TOKEN_EXPIRES_IN,
-                      refreshToken:refreshToken,
+                      refreshToken:refreshTokenGlobal,
                       refreshTokenExpires:process.env.COOCKIE_REFRESH_TOKEN_EXPIRES_IN,
+                      refreshReset:true,
                     },
                   });
                 }
               });
-              //res.redirect('/api/my-account');
             }
           });
-          //res.redirect('/api/my-account');
         } else {
           res.status(400).json({
             status: "error",
@@ -633,6 +664,98 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
       });
     }
   });
+};
+
+exports.userRelogin = async function (req, res, next) {
+  const { cookieRefreshToken } = req.body;
+  let accessTokenGlobal = "";
+  let refreshTokenGlobal = "";
+  if(cookieRefreshToken != "") {
+    let tokenDetailsData = await tokenDecode(cookieRefreshToken, process.env.REFRESH_TOKEN_PRIVATE_KEY);
+      if(!tokenDetailsData.error) {
+        const email = tokenDetailsData.tokenDetails.email;
+        if((typeof req.session.user != "undefined") && (req.session.user.userId.toString() == tokenDetailsData.tokenDetails.userId.toString())) {
+          //Do Nothing....
+          //console.log("session matched with current data");
+          res.status(200).json({
+            status: "error",
+            message:"Already logged In!!"
+          });
+        } else {
+          Users.findOne({ email }).then(async (user) => {
+            //user.save(async (err) => {
+              /*if (err) {
+                res.status(400).json({
+                  status: "error",
+                  message: "Error updating user device information!",
+                  respdata: err,
+                });
+              } else {*/
+                const userToken = {
+                  userId: user._id,
+                  email: user.email,
+                  password: user.password,
+                  title: user.title,
+                  name: user.name,
+                  age: user.age,
+                  phone_no:user.phone_no,
+                  weight: user.weight,
+                  height: user.height,
+                  country: user.country,
+                  country_code: user.country_code,
+                  country: user.country,
+                  goal: user.goal,
+                  hear_from: user.hear_from,
+                };
+                //user data stored in session
+                req.session.user = userToken;
+                if(tokenDetailsData.tokenDetails.exp > (Date.now() / 1000)){
+                  //generate access token only
+                  const { accessToken, refreshToken } = await generateTokens(userToken, cookieRefreshToken);
+                  accessTokenGlobal = accessToken;
+                  refreshTokenGlobal = refreshToken;
+                } else {
+                  //generate refresh token
+                  const { accessToken, refreshToken } = await generateTokens(userToken, "");
+                  accessTokenGlobal = accessToken;
+                  refreshTokenGlobal = refreshToken;
+                }
+                Users.findOneAndUpdate(
+                  { _id: user._id },
+                  { $set: { token: accessTokenGlobal, last_login: dateTime } },
+                  { upsert: true },
+                  function (err, doc) {
+                    if (err) {
+                      res.status(500).json({
+                        status: "error",
+                        message: "Token update error!",
+                      });
+                    } else {
+                      Users.findOne({ _id: user._id }).then((updatedUser) => {
+                        res.status(200).json({
+                          status: "error",
+                          message: "Successful!",
+                          accessToken: accessTokenGlobal,
+                          refreshToken:refreshTokenGlobal,
+                          accessTokenExpires:process.env.COOCKIE_ACCESS_TOKEN_EXPIRES_IN,
+                          refreshTokenExpires:process.env.COOCKIE_REFRESH_TOKEN_EXPIRES_IN,
+                        });
+                      });
+                    }
+                  }              
+                );
+              //}
+            //});
+          });
+        }
+      } else {
+        res.status(200).json({
+          status: "error",
+          message: "Invalid Token!!",
+        });
+      }
+  }
+  
 };
 
 exports.getUserLogin = async function (req, res, next) {

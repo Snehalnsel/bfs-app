@@ -5,9 +5,7 @@ let cookieAccessToken = "";
 let cookieRefreshToken = "";
 $(document).ready(async function(){
     cookieAccessToken = await getCookieFunc(accessTokenVar);
-    console.log("cookieAccessToken", cookieAccessToken);
     cookieRefreshToken = await getCookieFunc(refreshTokenVar);
-    console.log("cookieRefreshToken", cookieRefreshToken);
     $('#loginForm').validate({
         debug:false,
         errorElement:"p",
@@ -59,7 +57,10 @@ $(document).ready(async function(){
                         setTimeout(function(){
                             $('#success-msg').fadeOut();
                             $('#loginForm')[0].reset();
-                        }, 5000);
+                        }, 500);
+                        if((typeof obj.respdata.refreshReset != "undefined") && (obj.respdata.refreshReset)) {
+                            location.reload();
+                        }
                     } else {
                         $('#error-msg').html(obj.message);
                         $('#error-msg').show();

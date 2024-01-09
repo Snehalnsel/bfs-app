@@ -1248,6 +1248,7 @@ async function getProductDataWithSort(id,sortid)
 exports.getSubCategoriesProducts = async function (req, res, next) {
   try {
    
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const id = req.params.id;
 
     const sortid = req.params.sortid || 0; 
@@ -1262,6 +1263,7 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
         message: "Welcome to the Product Sub Categories!",
         respdata: formattedUserProducts,
         product_category_id: id,
+        isLoggedIn:isLoggedIn
       });
 
 
@@ -1279,6 +1281,7 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
 
 exports.getSubCategoriesProductswithSort = async function (req, res, next) {
 
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   const id = req.params.id;
 
   const sortid = req.params.sortid || 0; 
@@ -1292,6 +1295,7 @@ exports.getSubCategoriesProductswithSort = async function (req, res, next) {
     status: '1',
     message: 'Success',
     respdata: formattedUserProducts,
+    isLoggedIn:isLoggedIn
   });
 
 };
@@ -1300,11 +1304,6 @@ exports.getSubCategoriesProductswithSort = async function (req, res, next) {
 exports.userUpdate = async function (req, res, next) {
   try {
     
-    // res.render("webpages/edit-address", {
-    //   title: "Edit profile",
-    //   message: "Welcome to the Edit Profile page!"
-    // });
-
     const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({

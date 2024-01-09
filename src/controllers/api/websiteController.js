@@ -320,10 +320,12 @@ exports.tremsandconditionData = async function (req, res, next) {
 
 exports.registration = async function (req, res, next) {
   try {
-    console.log("Registration");
+    // console.log("Registration");
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     res.render("webpages/registration", {
       title: "Registration",
-      message: "Welcome to the privacy policy page!"
+      message: "Welcome to the privacy policy page!",
+      isLoggedIn: isLoggedIn,
     });
   } catch (error) {
     console.error(error);
@@ -966,6 +968,8 @@ exports.myAccount = async function (req, res, next) {
    var userData = req.session.user;
 
   const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId) });
+
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   
   console.log('************** ADDRESS 123 ************');
   console.log(address);
@@ -980,6 +984,7 @@ exports.myAccount = async function (req, res, next) {
       message: "Welcome to the privacy policy page!",
       respdata: req.session.user,
       respdata1:address,
+      isLoggedIn: isLoggedIn,
     });
   }
 

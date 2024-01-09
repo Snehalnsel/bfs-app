@@ -391,6 +391,12 @@ exports.signin = async function (req, res, next) {
 
 
 exports.getUserLogin = async function (req, res, next) {
+  console.log("first", req.session.user1);
+  req.session.user1 = {
+    userId: "user._id"
+  };
+  console.log("set",req.session.user1);
+  return false;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({

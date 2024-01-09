@@ -1167,108 +1167,133 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
   }
 };
 
-exports.getSubCategoriesProducts = async function (req, res, next) {
-try {
-  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-  //console.log('..#### Sub categories Product ####..');
-  const  id  = req.params.id;
- 
-  const userproducts = await Userproduct.find({category_id: id})
-    .populate('brand_id', 'name') 
-    .populate('category_id', 'name') 
-    .populate('user_id', 'name')
-    .populate('size_id', 'name')
-    .exec();
+async function getProductDataWithSort(id,sortid) 
+{
+  try {
+  
+    let sortCriteria = {};
 
-
-  if (!userproducts || userproducts.length === 0) {
-    return res.status(404).json({
-      status: "0",
-      message: "Not found!",
-      respdata: [],
-    }).then(data => {
-        if (data.status === '0') {
-      alert(data.message);
-      // Optionally handle the respdata if needed
+    if (sortid == 0) {
+      sortCriteria = { offer_price: 1 }; // Ascending order
+    } else if (sortid == 1) {
+      sortCriteria = { offer_price: -1 }; // Descending order
+    } else {
+      sortCriteria = { offer_price: 1 }; 
     }
-    });
-//     res.render("webpages/nosubcategories", 
-//   {
-//     title: "Product Sub Categories",
-//     message: "No Product Found",
-//     showAlert: true,
-    
-//   });
 
-  }
 
-  const formattedUserProducts = [];
- 
-  for (const userproduct of userproducts) {
-    
-    const productImages = await Productimage.find({ product_id: userproduct._id });
+    const userproducts = await Userproduct.find({ category_id: id })
+      .populate('brand_id', 'name')
+      .populate('category_id', 'name')
+      .populate('user_id', 'name')
+      .populate('size_id', 'name')
+      .sort(sortCriteria)
+      .exec();
 
-    const formattedUserProduct = {
-      _id: userproduct._id,
-      name: userproduct.name,
-      description: userproduct.description,
-      category: userproduct.category_id.name, 
-      brand: userproduct.brand_id.name, 
-      user_id: userproduct.user_id._id,
-      user_name: userproduct.user_id.name,
-      size_id: userproduct.size_id.name,
-      price: userproduct.price,
-      offer_price: userproduct.offer_price,
-      percentage: userproduct.percentage,
-      status: userproduct.status,
-      flag: userproduct.flag,
-      approval_status: userproduct.approval_status,
-      added_dtime: userproduct.added_dtime,
-      __v: userproduct.__v,
-      product_images: productImages, 
+
+    if (!userproducts || userproducts.length === 0) {
+      return {
+        status: '0',
+        message: 'Not Found',
+      };
+     
+    }
+
+    const formattedUserProducts = [];
+
+    for (const userproduct of userproducts) {
+
+      const productImages = await Productimage.find({ product_id: userproduct._id });
+
+      const formattedUserProduct = {
+        _id: userproduct._id,
+        name: userproduct.name,
+        description: userproduct.description,
+        category: userproduct.category_id.name,
+        brand: userproduct.brand_id.name,
+        user_id: userproduct.user_id._id,
+        user_name: userproduct.user_id.name,
+        size_id: userproduct.size_id.name,
+        price: userproduct.price,
+        offer_price: userproduct.offer_price,
+        percentage: userproduct.percentage,
+        status: userproduct.status,
+        flag: userproduct.flag,
+        approval_status: userproduct.approval_status,
+        added_dtime: userproduct.added_dtime,
+        __v: userproduct.__v,
+        product_images: productImages,
+      };
+
+      formattedUserProducts.push(formattedUserProduct);
+    }
+
+    return {
+      status: '1',
+      message: 'Success',
+      respdata: formattedUserProducts,
     };
-
-    formattedUserProducts.push(formattedUserProduct);
+  
   }
-
-
-  if (!formattedUserProducts || formattedUserProducts.length === 0) {
-    return res.status(404).json({
+  catch (error) {
+    console.error('Error fetching products with matching parent_id:', error);
+    return {
       status: '0',
-      message: 'No sub categories found matching the criteria.',
-      respdata: {},
+      message: 'An error occurred while fetching products with matching parent_id.',
+      error: error.message,
+    };
+  }
+}
+
+exports.getSubCategoriesProducts = async function (req, res, next) {
+  try {
+   
+    const id = req.params.id;
+
+    const sortid = req.params.sortid || 0; 
+
+    const data = await getProductDataWithSort(id,sortid); 
+    const formattedUserProducts = data.respdata;
+    
+
+    res.render("webpages/subcategoryproduct",
+      {
+        title: "Product Sub Categories",
+        message: "Welcome to the Product Sub Categories!",
+        respdata: formattedUserProducts,
+        product_category_id: id,
+      });
+
+
+  }
+  catch (error) {
+    console.error('Error fetching products with matching parent_id:', error);
+    return res.status(500).json({
+      status: '0',
+      message: 'An error occurred while fetching products with matching parent_id.',
+      error: error.message,
     });
   }
-  //Get All Filter Data
-  //Brand List
-  const brandList = await brandModel.find({});
-  const sizeList = await sizeModel.find({});
-  const conditionList = await productconditionModel.find({});
-  //console.log("brand",conditionList);
+};
 
-  res.render("webpages/subcategoryproduct", 
-  {
-    title: "Product Sub Categories",
-    message: "Welcome to the Product Sub Categories!",
+
+exports.getSubCategoriesProductswithSort = async function (req, res, next) {
+
+  const id = req.params.id;
+
+  const sortid = req.params.sortid || 0; 
+
+ 
+  const data = await getProductDataWithSort(id,sortid); 
+  const formattedUserProducts = data.respdata;
+  
+
+  return res.json({
+    status: '1',
+    message: 'Success',
     respdata: formattedUserProducts,
-    product_category_id: id,
-    brandList:brandList,
-    sizeList:sizeList,
-    conditionList:conditionList,
-    isLoggedIn:isLoggedIn
-    
   });
 
-
-}
-catch (error) {
-  console.error('Error fetching products with matching parent_id:', error);
-    return res.status(500).json({
-          status: '0',
-          message: 'An error occurred while fetching products with matching parent_id.',
-          error: error.message,
-     });
-   }
 };
 
 

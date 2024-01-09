@@ -410,6 +410,8 @@ exports.addData = async (req, res) => {
 
 exports.addShipmentData = async (req, res) => {
   try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+
     const {
       order_id,
       total_price,
@@ -485,7 +487,8 @@ exports.addShipmentData = async (req, res) => {
           res.status(200).json({
               status: "1",
             message: 'Order placed successfully',
-            order: savedOrder
+            order: savedOrder,
+            isLoggedIn: isLoggedIn,
           });
           
     }

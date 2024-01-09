@@ -11,151 +11,165 @@
              </ul>
           </div>        
          </div>
-       <div class="product-wrapper">         
-          <div class="main_product-wrapper fullwidth-productlist">
-              <div class="top-title shorting-row">
-          <div class="product-result d-flex aling-center">
-             <h5>Showing all results for Mix of Everything</h5>
-          </div>
-          <div class="shorting-box">
-            <div class="short-label">Sort by:</div>
-            <div class="short-dropdown">
-               <select class="form-control sortBy" id="sortBy" name="sortBy">
-                  <option>Choose</option>
-                  <option value="0">Low - High</option>
-                  <option value="1">High - Low</option>
-                  <!--<option>4</option>-->
-                  <!--<option>5</option>-->
-             </select>
+         <div class="product-wrapper">    
+            <div class="short-sidebar">                   
+               <div class="filter-header">
+                  <div class="flt-title">All Filters</div>
+                  <div class="flt-clear"><a href="javascript:void(0)">Clear All</a></div>
+               </div>
+               <div class="accordion theme-accordion" id="theme-accordion">
+                  <div class="card">
+                     <div class="card-header">                           
+                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#card1" aria-expanded="false" aria-controls="card1">Brand</button>
+                     </div>
+                     <div id="card1" class="collapse" data-parent="#theme-accordion" style="">
+                        <div class="card-body">
+                           <div class="filter-list">
+                              <%if(brandList.length > 0) {%>
+                                 <ul class="list-group">
+                                    <% brandList.forEach(function(item) { %>
+                                       <li class="single-list filterByChecked searchByBrand">                  
+                                          <input type="checkbox" id="" class="chkfield" value="">
+                                          <label class="label-check" for="incbox1"><%=item.name%></label>                  
+                                       </li>
+                                    <% }) %>                               
+                                 </ul>   
+                              <% } %>                         
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="card">
+                     <div class="card-header">                           
+                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#card2" aria-expanded="false" aria-controls="card2">Size</button>
+                     </div>
+                     <div id="card2" class="collapse" data-parent="#theme-accordion" style="">
+                        <div class="card-body">
+                           <div class="filter-list">
+                              <%if(sizeList.length > 0) {%>
+                                 <ul class="list-group">
+                                    <% sizeList.forEach(function(item) { %>
+                                       <li class="single-list filterByChecked searchBySize">                  
+                                          <input type="checkbox" id="incboxx1" class="chkfield" value="">
+                                          <label class="label-check" for="incboxx1"><%=item.name%></label>                  
+                                       </li>
+                                    <% }) %>  
+                                 </ul>
+                              <% } %>                             
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="card">
+                     <div class="card-header">                           
+                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#card4" aria-expanded="false" aria-controls="card4">Condition</button>
+                     </div>
+
+                     <div id="card4" class="collapse" data-parent="#theme-accordion" style="">
+                        <div class="card-body">
+                           <div class="filter-list">
+                              <%if(conditionList.length > 0) {%>
+                                 <ul class="list-group">
+                                    <% conditionList.forEach(function(item) { %>
+                                       <li class="single-list filterByChecked searchByCondition">                  
+                                          <input type="checkbox" id="incboxx1" class="chkfield" value="">
+                                          <label class="label-check" for="incboxx1"><%=item.name%></label>                  
+                                       </li>
+                                    <% }) %>  
+                                 </ul>
+                              <% } %>                    
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="card">
+                     <div class="card-header">                           
+                        <button class="accordion-button " type="button" data-toggle="collapse" data-target="#card3" aria-expanded="true" aria-controls="card2">Price Range</button>
+                     </div>
+
+                     <div id="card3" class="collapse " data-parent="#theme-accordion">
+                        <div class="card-body">
+                           <div class="filter-list">
+                              <ul class="list-group">
+                                 <li class="single-list filterByChecked searchByPrice">                  
+                                    <input type="checkbox" id="prc2" class="chkfield" value="">
+                                    <label class="label-check" for="prc2">₹0 - ₹1,000</label>                  
+                                 </li>
+                                 <li class="single-list filterByChecked searchByPrice">                  
+                                    <input type="checkbox" id="prc3" class="chkfield" value="">
+                                    <label class="label-check" for="prc3">₹1,000 - ₹5,000</label>                  
+                                 </li>
+                                 <li class="single-list filterByChecked searchByPrice">                  
+                                    <input type="checkbox" id="prc4" class="chkfield" value="">
+                                    <label class="label-check" for="prc4">₹5,000 - ₹10,000</label>                  
+                                 </li>
+                                 <li class="single-list filterByChecked searchByPrice">                  
+                                    <input type="checkbox" id="prc5" class="chkfield" value="">
+                                    <label class="label-check" for="prc5">₹10,000 - ₹20,000</label>                  
+                                 </li>
+                                 <li class="single-list filterByChecked searchByPrice">                  
+                                    <input type="checkbox" id="prc6" class="chkfield" value="">
+                                    <label class="label-check" for="prc5">₹20,000 - ₹50,000</label>                  
+                                 </li>
+                                 <li class="single-list filterByChecked searchByPrice">                  
+                                    <input type="checkbox" id="prc7" class="chkfield" value="">
+                                    <label class="label-check" for="prc5">₹50,000 - ₹100,000</label>                  
+                                 </li>
+                                 <li class="single-list filterByChecked searchByPrice">                  
+                                    <input type="checkbox" id="prc8" class="chkfield" value="">
+                                    <label class="label-check" for="prc5">₹100,000 - ₹200,000</label>                  
+                                 </li>
+                                 <li class="single-list filterByChecked searchByPrice">                  
+                                    <input type="checkbox" id="prc9" class="chkfield" value="">
+                                    <label class="label-check" for="prc5">₹200,000 - ₹500,000</label>                  
+                                 </li>
+                              </ul>                             
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>                             
             </div>
-          </div>
-       </div>
-       <div class="product-listrow column4-box" >
-          <!-- <div class="product-box">
-                <div class="product-image">
-                   <a href="product.php"><img src="assets/images/product1.jpg" alt="images" class="img-fluid"></a>
-                </div>
-                <div class="prd-short-info">
-                   <div class="prd-name"><a href="product.php">Watches</a></div>                 
-                </div> 
-             </div>
- 
-             <div class="product-box">
-                <div class="product-image">
-                   <a href="product.php"><img src="assets/images/product2.jpg" alt="images" class="img-fluid"></a>
-                </div>
-                <div class="prd-short-info">
-                   <div class="prd-name"><a href="product.php">Sunglass</a></div>                 
-                </div> 
-             </div>
- 
-             <div class="product-box">
-                <div class="product-image">
-                   <a href="product.php"><img src="assets/images/product3.jpg" alt="images" class="img-fluid"></a>
-                </div>
-                <div class="prd-short-info">
-                   <div class="prd-name"><a href="product.php">Ipad</a></div>                  
-                </div>               
-             </div>
-             
-             <div class="product-box">
-                <div class="product-image">
-                   <a href="product.php"><img src="assets/images/product4.jpg" alt="images" class="img-fluid"></a>
-                </div>
-                <div class="prd-short-info">
-                   <div class="prd-name"><a href="product.php">Mobiles</a></div>                  
-                </div>               
-             </div>
- 
-             <div class="product-box">
-                <div class="product-image">
-                   <a href="product.php"><img src="assets/images/product5.jpg" alt="images" class="img-fluid"></a>
-                </div>
-                <div class="prd-short-info">
-                   <div class="prd-name"><a href="product.php">Bags</a></div>                  
-                </div>               
-             </div>
- 
-             <div class="product-box">
-                <div class="product-image">
-                   <a href="product.php"><img src="assets/images/kids-product.jpg" alt="images" class="img-fluid"></a>
-                </div>
-                <div class="prd-short-info">
-                   <div class="prd-name"><a href="product.php">Kids Fashion</a></div>                  
-                </div>               
-             </div>
- 
-             <div class="product-box">
-                <div class="product-image">
-                   <a href="product.php"><img src="assets/images/women-dress.jpg" alt="images" class="img-fluid"></a>
-                </div>
-                <div class="prd-short-info">
-                   <div class="prd-name"><a href="product.php">Women Fashion</a></div>                  
-                </div>               
-             </div>
- 
-             <div class="product-box">
-                <div class="product-image">
-                   <a href="product.php"><img src="assets/images/shoo-product.jpg" alt="images" class="img-fluid"></a>
-                </div>
-                <div class="prd-short-info">
-                   <div class="prd-name"><a href="product.php">Mens Shoes</a></div>                  
-                </div>               
-             </div>
- 
-       </div>
-          </div> -->
-          <%console.log(product_category_id);%>
-          <% respdata.forEach(function(item) { %>
-            
-          <div class="product-box">
-            
-            <div class="product-image">
-                
-               
-                    <a href="/api/productdeatils/<%=item._id%>"><img src="<%=item.product_images[0].image%>" alt="images" class="img-fluid"></a>
-               
-            </div>
-            
-            <div class="prd-short-info">
-               <div class="prd-name"><a href="/api/productdeatils/<%=item._id%>"><%=item.name%></a></div>
-               <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%=item.price%></div>
-               <div class="rtl-price"><span>Est. Retail:</span><%=item.offer_price%></div>                 
-            </div> 
-         </div>
          
-         <% }); %>
-       
-        </div>
-       
-          
-    </div>
+            <!------------------------------------>
+            <div class="main_product-wrapper fullwidth-productlist">
+               <div class="top-title shorting-row">
+                  <div class="product-result d-flex aling-center">
+                     <h5>Showing all results for Mix of Everything</h5>
+                  </div>
+                  <div class="shorting-box">
+                     <div class="short-label">Sort by:</div>
+                     <div class="short-dropdown">
+                        <select class="form-control sortBy" id="sortBy" name="sortBy">
+                           <option>Choose</option>
+                           <option value="0">Low - High</option>
+                           <option value="1">High - Low</option>
+                           <!--<option>4</option>-->
+                           <!--<option>5</option>-->
+                        </select>
+                     </div>
+                  </div>
+               </div>
+               <div class="product-listrow column4-box" >
+                  <%console.log(product_category_id);%>
+                  <% respdata.forEach(function(item) { %>
+                     <div class="product-box">
+                        <div class="product-image">
+                           <a href="/api/productdeatils/<%=item._id%>"><img src="<%=item.product_images[0].image%>" alt="images" class="img-fluid"></a>
+                        </div>
+                        <div class="prd-short-info">
+                           <div class="prd-name"><a href="/api/productdeatils/<%=item._id%>"><%=item.name%></a></div>
+                           <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%=item.price%></div>
+                           <div class="rtl-price"><span>Est. Retail:</span><%=item.offer_price%></div>                 
+                        </div> 
+                     </div>
+                  <% }); %>
+         
+               </div>
+            </div>
  </section>
 
 <%- include('../../public/assets/include/newsletter'); %>
 <%- include('../../public/assets/include/footer'); %>
 
-
-<script>
-  $(document).on('change', ".sortBy", function(e){
-    //   console.log('Sort by');
-    //   alert($(this).val());
-      let optionId = $(this).val(); // (optionId = 0 means low - high) and (optionId 1 means high - low)
-      alert(optionId);
-       
-//         $.ajax({
-//                  url: '/api/productSortBy/'+optionId.trim(), // Route on the server to handle the request
-//                  method: 'POST',
-//                  success: function(data) 
-//                   {
-                      
-//                   },
-//                  error: function(err) 
-//                   {
-//                       console.error('Error:', err);
-//                   } 
-//         });
-       
-   });
-</script>
 

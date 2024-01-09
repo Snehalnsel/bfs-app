@@ -43,6 +43,9 @@ const app = express();
 const generateTokens = require("../../utils/generateTokens");
 const verifyRefreshToken = require("../../utils/verifyRefreshToken");
 const tokenDecode = require("../../utils/tokenDecode");
+const brandModel = require("../../models/api/brandModel");
+const sizeModel = require("../../models/api/sizeModel");
+const productconditionModel = require("../../models/api/productconditionModel");
 // const yourSecretKey = crypto.randomBytes(64).toString('hex');
 
 // console.log('Generated Secret Key:', yourSecretKey);
@@ -1166,7 +1169,8 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
 
 exports.getSubCategoriesProducts = async function (req, res, next) {
 try {
-  console.log('..#### Sub categories Product ####..');
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+  //console.log('..#### Sub categories Product ####..');
   const  id  = req.params.id;
  
   const userproducts = await Userproduct.find({category_id: id})
@@ -1235,6 +1239,12 @@ try {
       respdata: {},
     });
   }
+  //Get All Filter Data
+  //Brand List
+  const brandList = await brandModel.find({});
+  const sizeList = await sizeModel.find({});
+  const conditionList = await productconditionModel.find({});
+  //console.log("brand",conditionList);
 
   res.render("webpages/subcategoryproduct", 
   {
@@ -1242,6 +1252,10 @@ try {
     message: "Welcome to the Product Sub Categories!",
     respdata: formattedUserProducts,
     product_category_id: id,
+    brandList:brandList,
+    sizeList:sizeList,
+    conditionList:conditionList,
+    isLoggedIn:isLoggedIn
     
   });
 

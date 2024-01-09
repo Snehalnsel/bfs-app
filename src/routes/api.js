@@ -45,8 +45,6 @@ router.get("/", function (req, res) {
   });
 });
 
-
-
 router.post(
   "/signup",
   [
@@ -83,7 +81,6 @@ router.post(
 //   ],
 //   UserController.getLogin
 // );
-
 
 router.post(
   "/login",
@@ -151,8 +148,6 @@ router.post(
   ],
   UserController.uploadImage
 );
-
-
 
 router.post(
   "/logout",
@@ -233,7 +228,6 @@ router.post(
 );
 
 //category
-
 router.get("/categories", CategoryController.getParentCategories);
 router.post("/subcategories", CategoryController.getCategoriesWithMatchingParentId);
 router.post("/subcategory", CategoryController.getAllSubcategoriesWithProducts);
@@ -262,7 +256,6 @@ router.post(
   ],
   CategoryController.getSubcatData
 );
-
 
 router.post(
   "/view-subcategory",
@@ -317,7 +310,6 @@ router.post(
 );
 
 //sub category
-
 router.get("/sub-categories", SubCategoryController.getData);
 
 router.post(
@@ -328,7 +320,6 @@ router.post(
   ],
   SubCategoryController.viewData
 );
-
 
 router.post(
   "/get-sub-category",
@@ -342,16 +333,12 @@ router.post(
   SubCategoryController.getSubCatData
 );
 
-
-
-
 router.post(
   "/add-sub-category",
   auth.isAuthorized,
   upload.single('image'), 
   SubCategoryController.addData
 );
-
 
 router.post(
   "/edit-sub-category",
@@ -393,7 +380,6 @@ router.post(
   ],
   SubCategoryController.deleteData
 );
-
 
 router.post("/add-users", (req, res) => {
 
@@ -503,7 +489,6 @@ router.post(
   CartController.addToCart
 );
 
-
 router.post(
   "/cart-list",
   auth.isAuthorized,
@@ -516,7 +501,6 @@ router.post(
   ],
   CartController.getCartListByUserId
 );
-
 
 router.post(
   "/cart-productstatus",
@@ -531,7 +515,6 @@ router.post(
   CartController.getCartProductChange
 );
 
-
 router.post(
   "/remove-cart-product",
   auth.isAuthorized,
@@ -544,7 +527,6 @@ router.post(
   ],
   CartController.removeProductItem
 );
-
 
 router.post(
   "/delete-cart-product",
@@ -595,7 +577,6 @@ router.post(
   WishlistController.addToWishlist
 );
 
-
 router.post(
   "/wish-list",
   auth.isAuthorized,
@@ -608,7 +589,6 @@ router.post(
   ],
   WishlistController.getWishlistByUserId
 );
-
 
 router.post(
   "/delete-wishlist-product",
@@ -635,7 +615,6 @@ router.post(
   upload.single('image'),
   BrandController.addData
 );
-
 
 router.post(
   "/delete-brand",

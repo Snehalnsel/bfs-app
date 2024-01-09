@@ -1066,9 +1066,11 @@ exports.addAddress = async function (req, res, next) {
 
 exports.getParentCategories = async function (req, res, next) {
   try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     res.render("webpages/productcategories", {
       title: "Product Categories",
       message: "Welcome to the Product Categories!",
+      isLoggedIn: isLoggedIn,
       //respdata: parentCategories,
      
     });
@@ -1193,7 +1195,7 @@ try {
       respdata: [],
     }).then(data => {
         if (data.status === '0') {
-      alert(data.message);
+        alert(data.message);
       // Optionally handle the respdata if needed
     }
     });
@@ -1260,7 +1262,7 @@ try {
     brandList:brandList,
     sizeList:sizeList,
     conditionList:conditionList,
-    isLoggedIn:isLoggedIn
+    isLoggedIn: isLoggedIn,
     
   });
 
@@ -2048,6 +2050,7 @@ exports.addToWishlistWeb = async function (req, res, next) {
 
 exports.viewWishListByUserId = async function (req, res, next) {
   try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     if (!req.session.user) {
       return res.redirect("/api/registration");
     }
@@ -2081,14 +2084,12 @@ exports.viewWishListByUserId = async function (req, res, next) {
           __v: item.__v,
         };
       }));
-
-      console.log('Formatted List:');
-      console.log(formattedList);
       
       res.render("webpages/wishlist", {
         title: "Wish List Page",
         message: "Welcome to the Wish List page!",
         respdata: formattedList,
+        isLoggedIn: isLoggedIn,
       });
     }
   } catch (error) {
@@ -2413,6 +2414,8 @@ const removeItemAfterTime = async (cartId) => {
 exports.viewCartListByUserId = async function (req, res, next){
 try{
 
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+
   if (!req.session.user || !req.session.user.userId) {
     return res.redirect("/api/registration");
   }
@@ -2476,6 +2479,7 @@ try{
                 respdata: finalData,
                 respdata1: finalPrice,
                 user: user_id,
+                isLoggedIn: isLoggedIn,
                
               });
       
@@ -2723,10 +2727,13 @@ exports.checkoutWeb = async function (req, res, next) {
 
 exports.myOrderWeb = async (req, res) => {
   try{
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+
     res.render("webpages/myorder",{
       title: "Wish List Page",
       message: "Welcome to the Wish List page!",
       respdata: req.session.user,
+      isLoggedIn: isLoggedIn,
     });
 
   }
@@ -2744,13 +2751,14 @@ exports.myOrderWeb = async (req, res) => {
 exports.myOrderDetailsWeb = async (req, res) => {
   try {
     const orderlistId = req.params.id;
-    console.log(orderlistId);
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     
     res.render("webpages/myorderdetails",{
       title: "Wish List Page",
       message: "Welcome to the Wish List page!",
       respdata: req.session.user,
       respdata1: orderlistId,
+      isLoggedIn: isLoggedIn,
     });
 
   }

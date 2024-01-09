@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const model = mongoose.Schema({
   token: {
     type: String,
-    required: true,
+    //required: true,
   },
   email: {
     type: String,

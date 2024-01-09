@@ -1176,7 +1176,7 @@ router.get("/subcategory",CategoryController.getAllSubcategoriesWithProducts);
 // router.get("/websubcategories/:id",[],WebsiteController.getSubCategoriesWithMatchingParentId);
 
 router.get("/websubcategoriesproducts/:id",[],WebsiteController.getSubCategoriesProducts);
-
+router.get("/websubcategoriesproductswithsort/:id/:sortid",[],WebsiteController.getSubCategoriesProductswithSort);
 
 // Profile Edit API's
 

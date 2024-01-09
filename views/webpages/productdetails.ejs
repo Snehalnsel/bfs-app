@@ -1,7 +1,10 @@
 <%- include('../../public/assets/include/header'); %>
-<section class="inner-wrapper white-inner-wrapper bb-none">
-   <div class="container">
-      <div class="breadcum-product">
+   <script>
+      let isLoggedIn = "";
+   </script>
+   <section class="inner-wrapper white-inner-wrapper bb-none">
+      <div class="container">
+         <div class="breadcum-product">
             <ul>
                <li><a href="javascript:void(0)">Home</a></li>
                <li><a href="javascript:void(0)">Clothing</a></li>
@@ -12,25 +15,27 @@
             <div class="product-gallery">
                <!-- <img src="assets/images/test-product.jpg" alt="images" class="img-fluid"> -->
                <div class="exzoom hidden" id="exzoom">
-    <div class="exzoom_img_box">
-        <ul class='exzoom_img_ul'>
-      
-         <% respdata.product_images.forEach(function(item) { %>  
-         
-            <li><img src="<%= item.image %>"/></li>
-            <% }); %>
-        </ul>
-    </div>
-    <div class="exzoom_nav"></div>
-    <p class="exzoom_btn">
-        <a href="javascript:void(0);" class="exzoom_prev_btn"><i class="fa fa-angle-left" aria-hidden="true"></i></a>
-        <a href="javascript:void(0);" class="exzoom_next_btn"><i class="fa fa-angle-right" aria-hidden="true"></i></a>
-    </p>
-</div>
-               
+                  <div class="exzoom_img_box">
+                     <ul class='exzoom_img_ul'>
+
+                        <% respdata.product_images.forEach(function(item) { %>
+
+                           <li><img src="<%= item.image %>" /></li>
+                           <% }); %>
+                     </ul>
+                  </div>
+                  <div class="exzoom_nav"></div>
+                  <p class="exzoom_btn">
+                     <a href="javascript:void(0);" class="exzoom_prev_btn"><i class="fa fa-angle-left"
+                           aria-hidden="true"></i></a>
+                     <a href="javascript:void(0);" class="exzoom_next_btn"><i class="fa fa-angle-right"
+                           aria-hidden="true"></i></a>
+                  </p>
+               </div>
+
             </div>
             <div class="product-content">
-                <% console.log('SiZE============'); console.log(respdata);%>
+               <% console.log('SiZE============'); console.log(respdata);%>
                <h1 class="single-title"><%= respdata.name %></h1>
                <div class="short-descrition"><p><%= respdata.description %></p></div>
                <!-- <div class="catagorey-label">Category &nbsp;&nbsp;&nbsp;<%= respdata.category %></div>
@@ -50,244 +55,278 @@
                <div class="product-size">
                   <label>  Size: </label>
                    <% 
-                      const sizesArray = respdata.size_id.split(','); 
-                      for (let i = 0; i < sizesArray.length; i++) {
-                    %>
-               <div class="content-size"><%= sizesArray[i] %></div>
-                   <% } %>
-               </div>
-               
-               <div class="prd-button-group spb-button-row">
-                  <!--<a href="/api/addtocart/<%=respdata._id%>" class="prd-btn">Buy Now</a>-->
-                  <a href="javascript:void(0)" class="prd-btn buy-btn" data-id="<%=respdata._id%>">Buy Now</a>
-                  <a href="bids.php" class="prd-btn orng-btn">Bid Now</a>
-                  <a href="/api/add-to-wishlist-web/<%=respdata._id%>" class="prd-btn"><i class="fa fa-heart-o" aria-hidden="true"></i></a>
-                  <a href="single-product.php" class="prd-btn"><i class="fa fa-share-alt" aria-hidden="true"></i></a>
-               </div>
-               <br>
-               <h6>Product Details</h6>
-               <h6>Specifications:</h6>             
-               <div class="featured-list">
-                  <ul>                     
-                     <!-- <li><span>Category:</span><%= respdata.category %></li> -->
-                     <li><span>Brand: </span><%= respdata.brand %></li>
-                     <% if( respdata.original_invoice == '0') 
-                          { 
-                     %>
-                        <li><span>Original Invoice: </span>No</li>
-                        <% } else { %>
-                           <li><span>Original Invoice: </span>Yes</li>
-                           <% } %>
-            
-                           <% if( respdata.original_packaging == '0') { %>
+                      const sizesArray = respdata.size_id.split(' ,'); for (let i=0; i < sizesArray.length; i++) { %>
+                  <div class="content-size">
+                     <%= sizesArray[i] %>
+                  </div>
+                  <% } %>
+            </div>
+
+            <div class="prd-button-group spb-button-row">
+               <!--<a href="/api/addtocart/<%=respdata._id%>" class="prd-btn">Buy Now</a>-->
+               <a href="javascript:void(0)" class="prd-btn buy-btn buyButton" data-id="<%=respdata._id%>">Buy Now</a>
+               <a href="javascript:void(0)" class="prd-btn orng-btn bidButton">Bid Now</a>
+               <a href="/api/add-to-wishlist-web/<%=respdata._id%>" class="prd-btn"><i class="fa fa-heart-o"
+                     aria-hidden="true"></i></a>
+               <a href="single-product.php" class="prd-btn"><i class="fa fa-share-alt" aria-hidden="true"></i></a>
+            </div>
+            <br>
+            <h6>Product Details</h6>
+            <h6>Specifications:</h6>
+            <div class="featured-list">
+               <ul>
+                  <!-- <li><span>Category:</span><%= respdata.category %></li> -->
+                  <li><span>Brand: </span>
+                     <%= respdata.brand %>
+                  </li>
+                  <% if( respdata.original_invoice=='0' ) { %>
+                     <li><span>Original Invoice: </span>No</li>
+                     <% } else { %>
+                        <li><span>Original Invoice: </span>Yes</li>
+                        <% } %>
+
+                           <% if( respdata.original_packaging=='0' ) { %>
                               <li><span>Original Packaging:</span>No</li>
                               <% } else { %>
                                  <li><span>Original Packaging:</span>Yes</li>
                                  <% } %>
-                     <!-- <li><span>Sku:</span>LPA-MJ3408</li> 
+                                    <!-- <li><span>Sku:</span>LPA-MJ3408</li> 
                      <li><span>Type:</span>Saree With Blouse</li>
                      <li><span>Fabric:</span>Polyester woven</li>
                      <li><span>Sleeves:</span>Sleeveless</li>
                      <li><span>Neck:</span>Round Neck</li>         -->
-                  </ul>
-               </div>
-
-
-               <!--<div class="delivery-checkbox">-->
-               <!--   <h4>Tentative Delivery</h4>-->
-               <!--   <div class="pincode-searchbox">-->
-               <!--      <input type="text" class="searchTerm" placeholder="Enter Pincode">-->
-               <!--      <input type="submit" value="Check Pincode">-->
-               <!--   </div>-->
-               <!--   <div class="delevery-time">Get it by Tomorrow 10 PM </div>-->
-               <!--</div>-->
+               </ul>
             </div>
-         </div> 
-         
-   </div>
 
-</section >
 
-<section class="product-description">
-   <div class="container">
-      <div class="description-tab">
-         <ul class="nav nav-tabs">
-    <li class="active"><a data-toggle="tab" href="#tab1" class="active">Description</a></li>
-    <li><a data-toggle="tab" href="#tab2" class="">Shipping & Returns</a></li>    
-  </ul>
+            <!--<div class="delivery-checkbox">-->
+            <!--   <h4>Tentative Delivery</h4>-->
+            <!--   <div class="pincode-searchbox">-->
+            <!--      <input type="text" class="searchTerm" placeholder="Enter Pincode">-->
+            <!--      <input type="submit" value="Check Pincode">-->
+            <!--   </div>-->
+            <!--   <div class="delevery-time">Get it by Tomorrow 10 PM </div>-->
+            <!--</div>-->
+         </div>
+      </div>
 
-   <div class="tab-content">
-    <div id="tab1" class="tab-pane fade in active show">
-      <h4><%= respdata.name %></h4>
-      <p><%= respdata.description %></p>
-   <h6>Specifications:</h6>
-   <div class="featured-list">
-      <ul>
-         
-         <li><span>Brand:</span><%=respdata.category %></li>
-         <li><span>Brand:</span><%=respdata.brand %></li>
-         <% if( respdata.original_invoice == '0') 
-              { 
-         %>
-            <li><span>Original Invoice:</span>No</li>
-            <% } else { %>
-               <li><span>Original Invoice:</span>Yes</li>
-               <% } %>
+      </div>
 
-               <% if( respdata.original_packaging == '0') { %>
-                  <li><span>Original Packaging:</span>No</li>
-                  <% } else { %>
-                     <li><span>Original Packaging:</span>Yes</li>
-                     <% } %>
-         <!-- <li><span>Sku:</span>LPA-MJ3408</li> -->
-         <!-- <li><span>Type:</span>Saree With Blouse</li>
+   </section>
+
+   <section class="product-description">
+      <div class="container">
+         <div class="description-tab">
+            <ul class="nav nav-tabs">
+               <li class="active"><a data-toggle="tab" href="#tab1" class="active">Description</a></li>
+               <li><a data-toggle="tab" href="#tab2" class="">Shipping & Returns</a></li>
+            </ul>
+
+            <div class="tab-content">
+               <div id="tab1" class="tab-pane fade in active show">
+                  <h4>
+                     <%= respdata.name %>
+                  </h4>
+                  <p>
+                     <%= respdata.description %>
+                  </p>
+                  <h6>Specifications:</h6>
+                  <div class="featured-list">
+                     <ul>
+
+                        <li><span>Brand:</span>
+                           <%=respdata.category %>
+                        </li>
+                        <li><span>Brand:</span>
+                           <%=respdata.brand %>
+                        </li>
+                        <% if( respdata.original_invoice=='0' ) { %>
+                           <li><span>Original Invoice:</span>No</li>
+                           <% } else { %>
+                              <li><span>Original Invoice:</span>Yes</li>
+                              <% } %>
+
+                                 <% if( respdata.original_packaging=='0' ) { %>
+                                    <li><span>Original Packaging:</span>No</li>
+                                    <% } else { %>
+                                       <li><span>Original Packaging:</span>Yes</li>
+                                       <% } %>
+                                          <!-- <li><span>Sku:</span>LPA-MJ3408</li> -->
+                                          <!-- <li><span>Type:</span>Saree With Blouse</li>
          <li><span>Fabric:</span>Polyester woven</li>
          <li><span>Sleeves:</span>Sleeveless</li>
          <li><span>Neck:</span>Round Neck</li>         -->
-      </ul>
-   </div>
-    </div>
+                     </ul>
+                  </div>
+               </div>
 
-    <div id="tab2" class="tab-pane fade">
-     <h4>Shipping & Returns</h4>
-      <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy 
-text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
-    </div>    
-  </div>
+               <div id="tab2" class="tab-pane fade">
+                  <h4>Shipping & Returns</h4>
+                  <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
+                     industry's standard dummy
+                     text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a
+                     type specimen book. It has survived not only five centuries, but also the leap into electronic
+                     typesetting, remaining essentially unchanged.</p>
+               </div>
+            </div>
 
-      </div>
-   </div>
-</section>
-
-<section class="product-wrapper related-products">
-   <div class="container">
-      <div class="top-title">
-         <div class="title-box">
-            <h3>Related Products</h3>
          </div>
-         <!-- <div class="short-box">
+      </div>
+   </section>
+
+   <section class="product-wrapper related-products">
+      <div class="container">
+         <div class="top-title">
+            <div class="title-box">
+               <h3>Related Products</h3>
+            </div>
+            <!-- <div class="short-box">
             <a href="javascript:void(0)">See All</a>
          </div> -->
+         </div>
+         <div class="slider product_Slider slider-basic">
+            <!--<div class="slider-item">-->
+            <!--   <div class="product-box">-->
+            <!--      <div class="product-image">-->
+            <!--         <a href="javascript;void(0)"><img src="/public/assets/images/product8.jpg" alt="images" class="img-fluid"></a>-->
+            <!--      </div>-->
+            <!--      <div class="prd-short-info">-->
+            <!--         <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>-->
+            <!--         <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>-->
+            <!--         <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>-->
+            <!--      </div>-->
+            <!--   </div>-->
+            <!--</div>-->
+            <!--<div class="slider-item">-->
+            <!--   <div class="product-box">-->
+            <!--      <div class="product-image">-->
+            <!--         <a href="javascript;void(0)"><img src="/public/assets/images/product7.jpg" alt="images" class="img-fluid"></a>-->
+            <!--      </div>-->
+            <!--      <div class="prd-short-info">-->
+            <!--         <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>-->
+            <!--         <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>-->
+            <!--         <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>-->
+            <!--      </div>-->
+            <!--   </div>-->
+            <!--</div>-->
+            <!--<div class="slider-item">-->
+            <!--   <div class="product-box">-->
+            <!--      <div class="product-image">-->
+            <!--         <a href="javascript;void(0)"><img src="/public/assets/images/product3.jpg" alt="images" class="img-fluid"></a>-->
+            <!--      </div>-->
+            <!--      <div class="prd-short-info">-->
+            <!--         <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>-->
+            <!--         <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>-->
+            <!--         <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>-->
+            <!--      </div>-->
+            <!--   </div>-->
+            <!--</div>-->
+            <!--<div class="slider-item">-->
+            <!--   <div class="product-box">-->
+            <!--      <div class="product-image">-->
+            <!--         <a href="javascript;void(0)"><img src="/public/assets/images/product2.jpg" alt="images" class="img-fluid"></a>-->
+            <!--      </div>-->
+            <!--      <div class="prd-short-info">-->
+            <!--         <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>-->
+            <!--         <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>-->
+            <!--         <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>-->
+            <!--      </div>-->
+            <!--   </div>-->
+            <!--</div>-->
+            <!--<div class="slider-item">-->
+            <!--   <div class="product-box">-->
+            <!--      <div class="product-image">-->
+            <!--         <a href="javascript;void(0)"><img src="/public/assets/images/product5.jpg" alt="images" class="img-fluid"></a>-->
+            <!--      </div>-->
+            <!--      <div class="prd-short-info">-->
+            <!--         <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>-->
+            <!--         <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>-->
+            <!--         <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>-->
+            <!--      </div>-->
+            <!--   </div>-->
+            <!--</div>-->
+
+            <% relatedProducts.forEach(function(item) {%>
+               <div class="slider-item">
+                  <div class="product-box">
+                     <div class="product-image">
+                        <a href="<%=item._id%>"><img src="<%=item.product_images[0].image%>" alt="images"
+                              class="img-fluid"></a>
+                     </div>
+                     <div class="prd-short-info">
+                        <div class="prd-name"><a href="<%=item._id%>">
+                              <%=item.name%>
+                           </a></div>
+                        <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>
+                           <%=item.offer_price%>
+                        </div>
+                        <div class="rtl-price"><span>Est. Retail:</span>
+                           <%=item.price%>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <% });%>
+         </div>
       </div>
-      <div class="slider product_Slider slider-basic">
-         <!--<div class="slider-item">-->
-         <!--   <div class="product-box">-->
-         <!--      <div class="product-image">-->
-         <!--         <a href="javascript;void(0)"><img src="/public/assets/images/product8.jpg" alt="images" class="img-fluid"></a>-->
-         <!--      </div>-->
-         <!--      <div class="prd-short-info">-->
-         <!--         <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>-->
-         <!--         <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>-->
-         <!--         <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>-->
-         <!--      </div>-->
-         <!--   </div>-->
-         <!--</div>-->
-         <!--<div class="slider-item">-->
-         <!--   <div class="product-box">-->
-         <!--      <div class="product-image">-->
-         <!--         <a href="javascript;void(0)"><img src="/public/assets/images/product7.jpg" alt="images" class="img-fluid"></a>-->
-         <!--      </div>-->
-         <!--      <div class="prd-short-info">-->
-         <!--         <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>-->
-         <!--         <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>-->
-         <!--         <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>-->
-         <!--      </div>-->
-         <!--   </div>-->
-         <!--</div>-->
-         <!--<div class="slider-item">-->
-         <!--   <div class="product-box">-->
-         <!--      <div class="product-image">-->
-         <!--         <a href="javascript;void(0)"><img src="/public/assets/images/product3.jpg" alt="images" class="img-fluid"></a>-->
-         <!--      </div>-->
-         <!--      <div class="prd-short-info">-->
-         <!--         <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>-->
-         <!--         <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>-->
-         <!--         <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>-->
-         <!--      </div>-->
-         <!--   </div>-->
-         <!--</div>-->
-         <!--<div class="slider-item">-->
-         <!--   <div class="product-box">-->
-         <!--      <div class="product-image">-->
-         <!--         <a href="javascript;void(0)"><img src="/public/assets/images/product2.jpg" alt="images" class="img-fluid"></a>-->
-         <!--      </div>-->
-         <!--      <div class="prd-short-info">-->
-         <!--         <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>-->
-         <!--         <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>-->
-         <!--         <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>-->
-         <!--      </div>-->
-         <!--   </div>-->
-         <!--</div>-->
-         <!--<div class="slider-item">-->
-         <!--   <div class="product-box">-->
-         <!--      <div class="product-image">-->
-         <!--         <a href="javascript;void(0)"><img src="/public/assets/images/product5.jpg" alt="images" class="img-fluid"></a>-->
-         <!--      </div>-->
-         <!--      <div class="prd-short-info">-->
-         <!--         <div class="prd-name"><a href="javascript:void(0)">Lorem ipsum dolor sit amet</a></div>-->
-         <!--         <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>10,000</div>-->
-         <!--         <div class="rtl-price"><span>Est. Retail:</span>₹110000</div>-->
-         <!--      </div>-->
-         <!--   </div>-->
-         <!--</div>-->
-         
-         <%  relatedProducts.forEach(function(item) {%>
-              <div class="slider-item">
-                <div class="product-box">
-                   <div class="product-image">  
-                      <a href="<%=item._id%>"><img src="<%=item.product_images[0].image%>" alt="images" class="img-fluid"></a>   
-                   </div>
-                   <div class="prd-short-info">
-                      <div class="prd-name"><a href="<%=item._id%>"><%=item.name%></a></div>
-                      <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%=item.offer_price%></div>
-                      <div class="rtl-price"><span>Est. Retail:</span><%=item.price%></div>
-                   </div>
-                </div>
-              </div>
-       <% });%>
-      </div>
-   </div>
-</section>
+   </section>
 
-<%- include('../../public/assets/include/newsletter'); %>
-<%- include('../../public/assets/include/footer'); %>
+   <%- include('../../public/assets/include/newsletter'); %>
+      <%- include('../../public/assets/include/footer'); %>
 
-<script>
-   $(document).ready(function(){
-        $(document).on('click', ".buy-btn", function(e){
+         <script>
+            $(document).ready(function () {
+               $(document).on('click', ".buyButton", function (e) {
 
-          var id = $(this).data('id');
-          console.log(id);
-          $.ajax({
-                 url: '/api/addtocart/'+id.trim(), // Route on the server to handle the request
-                 method: 'POST',
-                 success: function(data) 
-                  {
-                      if (data.is_added) {
-                          Swal.fire({
-                                    //title: "<i>Bid For Sale</i>", 
-                                    html: data.message,  
-                                    confirmButtonText: "OK",
-                                    customClass: { confirmButton: 'alert-box-button' }
-                                    
-                                 });
-                        getHeaderData();
-                      } else {
-                          Swal.fire({
-                                    //title: "<i>Bid For Sale</i>", 
-                                    html: "You can add one item at a time",  
-                                    confirmButtonText: "OK",
-                                    customClass: { confirmButton: 'alert-box-button', popup: 'swal2-popup' }
-                                 });
-                      }
-                  },
-                 error: function(err) 
-                  {
-                      console.error('Error:', err);
-                  } 
-              }); 
-          
+                  const isLoggedIn = "<%= isLoggedIn %>";
+
+
+                  if (isLoggedIn != "") {
+                     var id = $(this).data('id');
+                     console.log(id);
+                     $.ajax({
+                        url: '/api/addtocart/' + id.trim(), // Route on the server to handle the request
+                        method: 'POST',
+                        success: function (data) {
+                           if (data.is_added) {
+                              Swal.fire({
+                                 //title: "<i>Bid For Sale</i>", 
+                                 html: data.message,
+                                 confirmButtonText: "OK",
+                                 customClass: { confirmButton: 'alert-box-button' }
+
+                              });
+                              getHeaderData();
+                           } else {
+                              Swal.fire({
+                                 //title: "<i>Bid For Sale</i>", 
+                                 html: "You can add one item at a time",
+                                 confirmButtonText: "OK",
+                                 customClass: { confirmButton: 'alert-box-button', popup: 'swal2-popup' }
+                              });
+                           }
+                        },
+                        error: function (err) {
+                           console.error('Error:', err);
+                        }
+                     });
+                  } else {
+                     //$('.loginModal').trigger('click');
+                     $('#login_modal').modal('show');
+                  }
+
+               });
+
+               $(document).on("click",".bidButton",function() {
+                  if(isLoggedIn != "") {
+                     productId = $(this).siblings('a').data("id");
+                     $('#bid_modal').modal('show'); 
+                     //window.location.href = "/api/bid-for-product";
+                  } else {
+                     //$('.loginModal').trigger('click');
+                     $('#login_modal').modal('show'); 
+                  }
+               });
             });
-         });
 
-</script>
+         </script>

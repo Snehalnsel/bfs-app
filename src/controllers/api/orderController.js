@@ -897,9 +897,9 @@ exports.updateOrderById = async function (req, res, next) {
 
 exports.getOrderListByUser = async (req, res) => {
   try {
-    let  user_id  = req.body.length > 0 ? req.body : req.session.user.userId;
+    let  user_id  = typeof req.session.user != "undefined" ? req.session.user.userId : req.body.user_id;
     
-    console.log('Heloo################');
+    // console.log('Heloo################');
     
 
     const orders = await Order.find({ user_id: user_id }).populate('seller_id', 'name').populate('user_id', 'name');
@@ -911,6 +911,7 @@ exports.getOrderListByUser = async (req, res) => {
     const ordersWithProductDetails = [];
 
     for (const order of orders) {
+      
       const productDetails = await Userproduct.find({ _id: order.product_id });
       const productId = order.product_id.toString();
       const productImage = await Productimage.find({ product_id: productId }).limit(1);
@@ -1031,12 +1032,8 @@ exports.getOrderDetails = async (req, res) => {
     const orderTrackStatusOne = await Ordertracking.find({ order_id, status: 1 });
 
     let shiprocketResponse = [];
-
-
     let shiprocketResponselabel = [];
-
     let shiprocketResponseinvoice = [];
-
     let shiprocketResponsefortracking = [];
 
     if (orderTrackStatusOne && orderTrackStatusOne.length > 0)  {

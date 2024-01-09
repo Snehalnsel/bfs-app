@@ -186,6 +186,18 @@
          $('#login_modal').modal('show'); 
       }
    });
+
+   $(document).on("click",".buyButton",function() {
+      console.log("13872047");
+      if(isLoggedIn != "") {
+         productId = $(this).siblings('a').data("id");
+         $('#bid_modal').modal('show'); 
+         //window.location.href = "/api/bid-for-product";
+      } else {
+         //$('.loginModal').trigger('click');
+         $('#login_modal').modal('show'); 
+      }
+   });
    
 </script>
 <script>
@@ -194,16 +206,15 @@
        const response = await fetch('/api/app-home');
        const data = await response.json();
 
-         isLoggedIn = data.isLoggedIn;
+      isLoggedIn = data.isLoggedIn;
      // Best deal populate
        const bestDeals = data.respdata.best_deal;
        //console.log(bestDeals);
        const bestDealsSlider = document.getElementById('best-deals-slider');
        populateSlider(bestDealsSlider, bestDeals);
 
-        // whats hot populate
         const whatshot = data.respdata.whats_hot;
-        //console.log(whatshot);
+
         const whatshotSlider = document.getElementById('whats-hot-slider');
         populateSlider(whatshotSlider, whatshot);
         
@@ -264,7 +275,7 @@
                <div class="rtl-price"><span>Est. Retail:</span>₹${item.price}</div>
             </div>
             <div class="prd-button-group">
-               <a href="javascript:void(0)" class="prd-btn buy-btn" data-id="${item._id}">Buy Now</a>`;
+               <a href="javascript:void(0)" class="prd-btn buy-btn buyButton" data-id="${item._id}" >Buy Now</a>`;
             //if(isLoggedIn != "") {
                html += `<a href="javascript:void(0)" class="prd-btn orng-btn bidButton">Bid Now</a>`;
             //}
@@ -278,10 +289,8 @@
 
    }
 
-
    window.onload = fetchData;
    
-  
     $(document).ready(function(){
         var id1 = $(this).data('id');
         $.ajax({
@@ -298,8 +307,7 @@
                   } 
         });
         
-        
-        
+      
         $(document).on('click', ".buy-btn", function(e){
 
           var id = $(this).data('id');

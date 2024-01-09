@@ -1257,14 +1257,25 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
     const formattedUserProducts = data.respdata;
     
 
-    res.render("webpages/subcategoryproduct",
-      {
-        title: "Product Sub Categories",
-        message: "Welcome to the Product Sub Categories!",
-        respdata: formattedUserProducts,
-        product_category_id: id,
-        isLoggedIn:isLoggedIn
-      });
+    //Get All Filter Data
+    //Brand List
+    const brandList = await brandModel.find({});
+    const sizeList = await sizeModel.find({});
+    const conditionList = await productconditionModel.find({});
+    //console.log("brand",conditionList);
+
+    res.render("webpages/subcategoryproduct", 
+    {
+      title: "Product Sub Categories",
+      message: "Welcome to the Product Sub Categories!",
+      respdata: formattedUserProducts,
+      product_category_id: id,
+      brandList:brandList,
+      sizeList:sizeList,
+      conditionList:conditionList,
+      isLoggedIn:isLoggedIn
+      
+    });
 
 
   }

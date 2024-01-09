@@ -157,6 +157,8 @@ async function generateSellerPickup(data) {
 exports.productData = async function (req, res, next) {
   try {
     console.log("Antu....################################################");
+
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const productId = req.params.id;
     let query = {}; 
     //if (req.body.product_id) {
@@ -270,6 +272,7 @@ const userproducts1 = await Userproduct.find({category_id: formattedUserProduct.
       message: "Welcome to the Dashboard page!",
       respdata: formattedUserProduct,
       relatedProducts: formattedUserProducts1,
+      isLoggedIn: isLoggedIn,
      
     });
   } catch (error) {

@@ -749,44 +749,25 @@ exports.bannerlist = async function (req, res) {
 
 };
 
-
-
-
-
 exports.getHeaderData = async function (req, res, next) {
 
   try {
-
-        //const requrl = req.protocol + '://' + req.get('host');
-
+       //const requrl = req.protocol + '://' + req.get('host');
+        let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
         const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : ""
-
         var cartCount = (userId != "") ? await Cart.countDocuments({user_id: mongoose.Types.ObjectId(userId)}) : 0;
-
-      
-
          res.status(200).json({
-
              status: 1,
-
              message: "Count Increase",
-
              cart: cartCount,
-
+             isLoggedIn: isLoggedIn,
          });
-
-    
-
   } catch (error) {
 
     console.error(error);
-
     res.status(500).json({
-
       status: "0",
-
       message: "An error occurred while rendering the dashboard.",
-
       error: error.message,
 
     });

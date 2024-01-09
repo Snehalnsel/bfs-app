@@ -1004,6 +1004,7 @@ exports.myAccount = async function (req, res, next) {
 
 exports.editProfile = async function (req, res, next) {
   try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
         console.log('**************** HI EDIT PROFILE**************');
         console.log(userData);
@@ -1012,6 +1013,7 @@ exports.editProfile = async function (req, res, next) {
       title: "Edit profile",
       message: "Welcome to the Edit Profile page!",
       respdata: req.session.user,
+      isLoggedIn: isLoggedIn,
     });
   } catch (error) {
     console.error(error);
@@ -1025,7 +1027,7 @@ exports.editProfile = async function (req, res, next) {
 
 exports.addAddress = async function (req, res, next) {
   try {
-    
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
         console.log('**************** HI EDIT Address**************');
         console.log(userData);
@@ -1052,6 +1054,7 @@ exports.addAddress = async function (req, res, next) {
       message: "Welcome to the Edit Profile page!",
       respdata: add,
       respdata1: userData,
+      isLoggedIn: isLoggedIn,
     });
   } catch (error) {
     console.error(error);
@@ -1180,6 +1183,8 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
 async function getProductDataWithSort(id,sortid) 
 {
   try {
+
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   
     let sortCriteria = {};
 
@@ -1242,6 +1247,7 @@ async function getProductDataWithSort(id,sortid)
       status: '1',
       message: 'Success',
       respdata: formattedUserProducts,
+      isLoggedIn: isLoggedIn,
     };
   
   }
@@ -1531,21 +1537,9 @@ exports.userWisePost = async function (req, res, next) {
     });
   }
 try{
-
-console.log('My Post');
-//console.log(req.params.id);
-
-var userData = req.session.user;
-
-//console.log('Posttttttttttttttttttttttttttttt');
-//console.log(userData);
-//let a = '654f368443db200178350161';
-// let user_id = req.params.id
-// let query = {};
-// if (req.params.id) {
-//       query.user_id = user_id;
-//     }
-//     console.log(query);
+    
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    var userData = req.session.user;
     const userproducts = await Userproduct.find({ user_id: req.params.id })
     .populate('brand_id', 'name', { optional: true })
     .populate('category_id', 'name', { optional: true })
@@ -1553,25 +1547,10 @@ var userData = req.session.user;
     .populate('size_id', 'name', { optional: true })
     .exec();
 
-    console.log('Productsssssssssssssssssss');
-    
-
-    // if (!userproducts || userproducts.length === 0) {
-    //   return res.status(404).json({
-    //     status: "0",
-    //     message: "Not found!",
-    //     respdata: [],
-    //   });
-    // }
-
     const formattedUserProducts = [];
  
     for (const userproduct of userproducts) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
-
-      console.log('Product');
-      console.log(userproduct);
-      console.log(productImages);
 
       const formattedUserProduct = {
         _id: userproduct._id,
@@ -1600,10 +1579,6 @@ var userData = req.session.user;
       formattedUserProducts.push(formattedUserProduct);
     }
 
-    //console.log('Products***********************************************');
-    //console.log(userproducts);
-    console.log(formattedUserProducts);
-
     if(formattedUserProducts)
     {
       res.render("webpages/mypost", {
@@ -1611,16 +1586,9 @@ var userData = req.session.user;
       message: "Welcome to the My Post page!",
       respdata:formattedUserProducts,
       userData:req.session.user,
+      isLoggedIn: isLoggedIn,
 });
     }
-
-// res.render("webpages/mypost", {
-//   title: "My Post",
-//   message: "Welcome to the My Post page!",
-//   // respdata:,
-//   // userData:req.session.user,
-// });
-
 
 } catch (error) {
   console.error(error);
@@ -1671,6 +1639,7 @@ var userData = req.session.user;
 
 exports.addPostView = async function (req, res, next) {
 try{
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
  console.log('Add User Post');
  
  if (!req.session.user) {
@@ -1687,6 +1656,7 @@ try{
             respdata: req.session.user,
             productcondition: productConditions,
             subcate: categoriesWithoutParentId,
+            isLoggedIn: isLoggedIn,
   
     });
 
@@ -1819,7 +1789,7 @@ exports.signOut = async function (req, res, next) {
 // console.log('sign out');
 // console.log(req.session.user);
 
-
+let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   Users.findOne({ _id: req.session.user.userId }).then((user) => {
     if (!user)
       res.status(404).json({
@@ -1865,6 +1835,7 @@ exports.signOut = async function (req, res, next) {
               res.render("webpages/list", {
                 title: "Wish List Page",
                 message: "Successfully logged out!",
+                isLoggedIn: isLoggedIn,
               });
             });
           }
@@ -1880,6 +1851,7 @@ exports.signOut = async function (req, res, next) {
 exports.editUserWisePost = async function (req, res, next) {
 
 try{
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   console.log('Edit My Post');
   //console.log(req.params.id);
 
@@ -1926,6 +1898,7 @@ try{
       userData: req.session.user,
       productcondition: productConditions,
       subcate: categoriesWithoutParentId,
+      isLoggedIn: isLoggedIn,
         });
     // }
 

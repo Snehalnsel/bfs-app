@@ -50,10 +50,12 @@ async function searchByFilter() {
                 }
                 $('.sortdata').html(htmlContent);
             } else {
+                $('.sortdata').html(`No Products Found!!`);
                 //Write something for occuring the error
             }
         },
         error: function(response){
+            $('.sortdata').html(`No Products Found!!`);
             //Error while filter
         }
     });

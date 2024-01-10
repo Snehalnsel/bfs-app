@@ -1,5 +1,5 @@
 let productId = "";
-let isLoggedIn = $("#userReloggedIn").val();
+let isLoggedIn2 = $("#userReloggedIn").val();
 $(document).on("click",".bidNowAmountBtn",function() {
     let bidAmount = $("#bid_amount").val();
     if(productId !== "" && bidAmount != "") {
@@ -18,7 +18,7 @@ $(document).on("click",".bidNowAmountBtn",function() {
     }
 });
 $(document).on("click",".bidButton",function() {
-    if(isLoggedIn != "") {
+    if(isLoggedIn2 != "") {
         productId = $(this).siblings('a').data("id");
         $('#bid_modal').modal('show'); 
         //window.location.href = "/api/bid-for-product";
@@ -28,25 +28,35 @@ $(document).on("click",".bidButton",function() {
     }
 });
 $(document).on('click', ".buy-btn", function(e){
-    if(isLoggedIn != "") {
+    if(isLoggedIn2 != "") {
        var id = $(this).data('id');
        //console.log(id);
        $.ajax({
-          url: '/api/addtocart/'+id.trim(), // Route on the server to handle the request
-          method: 'POST',
-          success: function(data) 
-          {
+            url: '/api/addtocart/'+id.trim(), 
+            method: 'POST',
+            success: function(data) 
+            {
                 if (data.is_added) {
-                   alert(data.message);
+                    Swal.fire({
+                            html: data.message,  
+                            confirmButtonText: "OK",
+                            customClass: { confirmButton: 'alert-box-button' }
+                            
+                            });
+                getHeaderData();
                 } else {
-                   alert("Item Already Added to the cart.");
+                    Swal.fire({
+                            html: "You can add one item at a time",  
+                            confirmButtonText: "OK",
+                            customClass: { confirmButton: 'alert-box-button', popup: 'swal2-popup' }
+                            });
                 }
-          },
-          error: function(err) 
-          {
+            },
+            error: function(err) 
+            {
                 console.error('Error:', err);
-          } 
-       }); 
+            } 
+        });
     } else {
        $('#login_modal').modal('show'); 
     }

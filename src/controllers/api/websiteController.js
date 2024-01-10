@@ -806,7 +806,7 @@ exports.userFilter = async function (req, res, next) {
       _id: userproduct._id,
       name: userproduct.name,
       description: userproduct.description,
-      category: userproduct.category_id.name,
+      category: (typeof userproduct.category_id.name != "undefined") ? userproduct.category_id.name : "",
       brand: userproduct.brand_id.name,
       user_id: userproduct.user_id._id,
       user_name: userproduct.user_id.name,
@@ -1529,7 +1529,7 @@ exports.userWisePost = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-try{
+  try{
     
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;

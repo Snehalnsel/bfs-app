@@ -739,7 +739,7 @@ exports.userRelogin = async function (req, res, next) {
                     } else {
                       Users.findOne({ _id: user._id }).then((updatedUser) => {
                         res.status(200).json({
-                          status: "error",
+                          status: "success",
                           message: "Successful!",
                           accessToken: accessTokenGlobal,
                           refreshToken:refreshTokenGlobal,

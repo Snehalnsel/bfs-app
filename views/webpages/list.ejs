@@ -129,70 +129,9 @@
        </div>
     </div>
    </section>
-   <div class="modal theme_modal bid_modal show" id="bid_modal" aria-modal="true" role="dialog" style="padding-right: 17px; display: none;">
-      <div class="modal-dialog">
-         <button type="button" class="close" data-dismiss="modal">×</button>
-         <div class="modal-content login-box">
-            <div class="left-boxpart hide-mobile">
-               <div class="box-inner">
-                  <img src="/public/assets/images/white_logo.png" alt="image" class="lg-logo">
-                  <p>BFS ( Bid for Sale )</p>
-               </div>
-            </div>
-            <div class="right-formpart loginform-box">
-               <h5 class="box-title">Bid Amount</h5>
-               <div class="inner-formbox">
-                  <div class="tab-content">
-                     <div class="tab-pane active" id="login-password" role="tabpanel">
-                        <!--<form action="" method="POST">-->
-                           <div class="mb-3">   
-                              <input type="text" class="form-control" id="bid_amount" placeholder="Enter Amount" name="bid_amount" required="required">
-                           </div>
-                           <div class="button-row">
-                              <button type="submit" class="btn liginbtn bidNowAmountBtn">Submit</button>
-                           </div>
-                        <!--</form>-->
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </div>
-   </div>
   <%- include('../../public/assets/include/newsletter'); %>
   <%- include('../../public/assets/include/footer'); %>
 </body>
-<script>
-   let productId = "";
-   $(document).on("click",".bidNowAmountBtn",function() {
-      let bidAmount = $("#bid_amount").val();
-      if(productId !== "" && bidAmount != "") {
-         $.ajax({
-            url: '/api/bid-check-exist-reccord', // Request to bid for first time or update the bid amount
-            data: {productId:productId,bidAmount:bidAmount},
-            method: 'POST',
-            success: function(data) {
-               window.location.href = "/api/bid-for-product/"+data.bidId;
-               //console.log('Danger Alert');
-            },
-            error: function(err) {
-                  console.error('Error:', err);
-            } 
-        });
-      }
-   });
-   $(document).on("click",".bidButton",function() {
-      if(isLoggedIn != "") {
-         productId = $(this).siblings('a').data("id");
-         $('#bid_modal').modal('show'); 
-         //window.location.href = "/api/bid-for-product";
-      } else {
-         //$('.loginModal').trigger('click');
-         $('#login_modal').modal('show'); 
-      }
-   });
-   
-</script>
 <script>
    async function fetchData() {
      try {
@@ -305,29 +244,31 @@
         
         
         
-        $(document).on('click', ".buy-btn", function(e){
-
-          var id = $(this).data('id');
-          console.log(id);
-          $.ajax({
-                 url: '/api/addtocart/'+id.trim(), // Route on the server to handle the request
-                 method: 'POST',
-                 success: function(data) 
-                  {
-                      if (data.is_added) {
-                          alert(data.message);
-                      } else {
-                          alert("Item Already Added to the cart.");
-                      }
-                  },
-                 error: function(err) 
-                  {
-                      console.error('Error:', err);
-                  } 
-              }); 
-          
-            });
-         });
+      $(document).on('click', ".buy-btn", function(e){
+         if(isLoggedIn != "") {
+            var id = $(this).data('id');
+            //console.log(id);
+            $.ajax({
+               url: '/api/addtocart/'+id.trim(), // Route on the server to handle the request
+               method: 'POST',
+               success: function(data) 
+               {
+                     if (data.is_added) {
+                        alert(data.message);
+                     } else {
+                        alert("Item Already Added to the cart.");
+                     }
+               },
+               error: function(err) 
+               {
+                     console.error('Error:', err);
+               } 
+            }); 
+         } else {
+            $('#login_modal').modal('show'); 
+         }
+      });
+   });
 
 
 </script>

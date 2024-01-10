@@ -5,15 +5,20 @@
 <script>
    let isLoggedIn = "";
 </script>
+
 <section class="home-banner-slider">
     <!-- <div class="container"> -->
        <div class="slider banner-slider">
-          <div class="slider-item">
+         <% banner.forEach(function (item){ %>
+           <!-- // <img src="<%=item.image%>" /> -->
+            <div class="slider-item">
+               <img src="<%=item.image%>" alt="images" class="img-fluid">
+            </div>
+         <% }) %>
+         
+          <!-- <div class="slider-item">
              <img src="/public/assets/images/banner1.jpg" alt="images" class="img-fluid">
-          </div>
-          <div class="slider-item">
-             <img src="/public/assets/images/banner1.jpg" alt="images" class="img-fluid">
-          </div>
+          </div> -->
        </div>
     <!-- </div> -->
  </section>
@@ -197,13 +202,13 @@
          isLoggedIn = data.isLoggedIn;
      // Best deal populate
        const bestDeals = data.respdata.best_deal;
-       //console.log(bestDeals);
+       
        const bestDealsSlider = document.getElementById('best-deals-slider');
        populateSlider(bestDealsSlider, bestDeals);
 
         // whats hot populate
         const whatshot = data.respdata.whats_hot;
-        //console.log(whatshot);
+        
         const whatshotSlider = document.getElementById('whats-hot-slider');
         populateSlider(whatshotSlider, whatshot);
         

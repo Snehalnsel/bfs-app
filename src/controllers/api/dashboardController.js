@@ -64,9 +64,9 @@ exports.homedetails = async function (req, res) {
 
   try {
 
-      
+
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-      const requrl = req.protocol + '://' + req.get('host');
+    const requrl = req.protocol + '://' + req.get('host');
 
     const appSettings = await Appsettings.findOne();
 
@@ -84,7 +84,7 @@ exports.homedetails = async function (req, res) {
 
 
 
-    const products = await Userproduct.find({ percentage: { $gte: percentageFilter }, approval_status: 1 ,flag :0 }); // Adding approval_status filter
+    const products = await Userproduct.find({ percentage: { $gte: percentageFilter }, approval_status: 1, flag: 0 }); // Adding approval_status filter
 
 
 
@@ -124,9 +124,9 @@ exports.homedetails = async function (req, res) {
 
           original_invoice: product.original_invoice,
 
-          status_name: productCondition ? productCondition._id : '', 
+          status_name: productCondition ? productCondition._id : '',
 
-          status: productCondition ? productCondition.name : '', 
+          status: productCondition ? productCondition.name : '',
 
           image: productImage.image,
 
@@ -138,7 +138,7 @@ exports.homedetails = async function (req, res) {
 
 
 
-    const hotProducts = await Userproduct.find({ approval_status: 1,flag : 0}).sort({ hitCount: -1 });
+    const hotProducts = await Userproduct.find({ approval_status: 1, flag: 0 }).sort({ hitCount: -1 });
 
 
 
@@ -170,9 +170,9 @@ exports.homedetails = async function (req, res) {
 
           original_invoice: product.original_invoice,
 
-          status_name: productCondition ? productCondition._id : '', 
+          status_name: productCondition ? productCondition._id : '',
 
-          status: productCondition ? productCondition.name : '', 
+          status: productCondition ? productCondition.name : '',
 
           image: productImage.image,
 
@@ -192,7 +192,7 @@ exports.homedetails = async function (req, res) {
 
       approval_status: 1,
 
-      flag: 1 
+      flag: 1
 
     });
 
@@ -226,9 +226,9 @@ exports.homedetails = async function (req, res) {
 
           original_invoice: product.original_invoice,
 
-          status_name: productCondition ? productCondition._id : '', 
+          status_name: productCondition ? productCondition._id : '',
 
-          status: productCondition ? productCondition.name : '', 
+          status: productCondition ? productCondition.name : '',
 
           image: productImage.image,
 
@@ -256,10 +256,10 @@ exports.homedetails = async function (req, res) {
 
         top_categories: topCategories,
 
-        just_sold:justSoldProducts
+        just_sold: justSoldProducts
 
       },
-      isLoggedIn:isLoggedIn,
+      isLoggedIn: isLoggedIn,
     });
 
   } catch (error) {
@@ -330,9 +330,9 @@ exports.getWhatsHotProducts = async function (req, res) {
 
           original_invoice: product.original_invoice,
 
-          status_name: productCondition ? productCondition._id : '', 
+          status_name: productCondition ? productCondition._id : '',
 
-          status: productCondition ? productCondition.name : '', 
+          status: productCondition ? productCondition.name : '',
 
           image: productImage.image,
 
@@ -462,9 +462,9 @@ exports.getJustSoldProducts = async function (req, res) {
 
           original_invoice: product.original_invoice,
 
-          status_name: productCondition ? productCondition._id : '', 
+          status_name: productCondition ? productCondition._id : '',
 
-          status: productCondition ? productCondition.name : '', 
+          status: productCondition ? productCondition.name : '',
 
           image: productImage.image,
 
@@ -672,17 +672,17 @@ exports.getData = async function (req, res, next) {
 
   try {
 
-        //const requrl = req.protocol + '://' + req.get('host');
+    //const requrl = req.protocol + '://' + req.get('host');
 
-        const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : ""
+    const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : ""
 
-        var cartCount = (userId != "") ? await Cart.countDocuments({user_id: mongoose.Types.ObjectId(userId)}) : 0;
+    var cartCount = (userId != "") ? await Cart.countDocuments({ user_id: mongoose.Types.ObjectId(userId) }) : 0;
 
-        //console.log("userId", userId); 
+    //console.log("userId", userId); 
 
-        //return false;
+    //return false;
 
-    
+    const banner = await Banner.find({ status: 1 });
 
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
 
@@ -696,6 +696,7 @@ exports.getData = async function (req, res, next) {
 
       cart: cartCount,
       isLoggedIn: isLoggedIn,
+      banner:banner
 
     });
 

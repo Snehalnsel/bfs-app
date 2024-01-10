@@ -270,6 +270,7 @@ exports.bidExistReccord = async (req, res, next) => {
 
 exports.bidListProduct = async (req, res, next) => {
   try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const urlBidId = (typeof req.params.bid_id != "undefined" && req.params.bid_id != "") ? req.params.bid_id : "";
     const queryData = {
       userId:(typeof req.session.user != "undefined") ? req.session.user.userId : ""
@@ -303,7 +304,8 @@ exports.bidListProduct = async (req, res, next) => {
       sellerData:sellerData,
       requrl: req.app.locals.requrl,
       urlBidId:urlBidId,
-      message: "Welcome to the bids page!"
+      message: "Welcome to the bids page!",
+      isLoggedIn: isLoggedIn
     });
   } catch (error) {
     //console.log(error);

@@ -156,8 +156,7 @@ async function generateSellerPickup(data) {
 
 exports.productData = async function (req, res, next) {
   try {
-    console.log("Antu....################################################");
-
+    
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const productId = req.params.id;
     let query = {}; 
@@ -183,13 +182,8 @@ exports.productData = async function (req, res, next) {
   }
 
   userproducts.hitCount = (userproducts.hitCount || 0) + 1;
-
   await userproducts.save();
-
   const productImages = await Productimage.find({ product_id: userproducts._id });
-
-  //console.log(productImages);
-
   const productCondition = await Productcondition.findById(userproducts.status);
   const formattedUserProduct = {
     _id: userproducts._id,
@@ -263,10 +257,7 @@ const userproducts1 = await Userproduct.find({category_id: formattedUserProduct.
   
       formattedUserProducts1.push(formattedUserProduct1);
     }
-    console.log(formattedUserProducts1);
-
-// End //
-
+    
     res.render("webpages/productdetails", {
       title: "Dashboard",
       message: "Welcome to the Dashboard page!",
@@ -287,10 +278,11 @@ const userproducts1 = await Userproduct.find({category_id: formattedUserProduct.
 
 exports.privacypolicyData = async function (req, res, next) {
   try {
-    console.log("privacy policy");
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     res.render("webpages/privacypolicy", {
       title: "Privacy Policy",
-      message: "Welcome to the privacy policy page!"
+      message: "Welcome to the privacy policy page!",
+      isLoggedIn: isLoggedIn,
     });
   } catch (error) {
     console.error(error);
@@ -305,10 +297,11 @@ exports.privacypolicyData = async function (req, res, next) {
 
 exports.tremsandconditionData = async function (req, res, next) {
   try {
-    console.log("privacy policy");
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     res.render("webpages/trems", {
       title: "Trems and Condition",
-      message: "Welcome to the privacy policy page!"
+      message: "Welcome to the privacy policy page!",
+      isLoggedIn: isLoggedIn,
     });
   } catch (error) {
     console.error(error);
@@ -341,7 +334,8 @@ exports.registration = async function (req, res, next) {
 };
 
 exports.signin = async function (req, res, next) {
-  //console.log(req.body);
+  
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -776,6 +770,7 @@ exports.getUserLogin = async function (req, res, next) {
     });
   }
 
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   const { email, password } = req.body;
 
   Users.findOne({ email }).then(async (user) => {
@@ -903,15 +898,13 @@ exports.getUserLogin = async function (req, res, next) {
                       // });
                       
                     });
-                   // res.redirect('/api/home');
+                   
                     res.redirect('/api/my-account');
                   }
                 }              
-              );
-              //res.redirect('/api/my-account');
+              );             
             }
           });
-          //res.redirect('/api/my-account');
         } else {
           res.status(400).json({
             status: "0",
@@ -924,44 +917,6 @@ exports.getUserLogin = async function (req, res, next) {
   });
 };
 
-
-
-// exports.myAccount = async function (req, res, next) {
-//   try {
-//   // console.log("My Account");
-//     //console.log(req.session.user);
-    
-//   var userData = req.session.user;
-
-//   const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId) });
-  
-//   console.log('**************** ADDRESS 123 **************');
-//   console.log(address);
-
-//   if (userData === undefined || userData === null)
-//   {
-    
-//     res.redirect('/api/registration');
-//   }
-//   else{
-//     res.render("webpages/myaccount", {
-//       title: "My Account",
-//       message: "Welcome to the privacy policy page!",
-//       respdata: req.session.user,
-//       respdata1:address,
-//     });
-//   }
-
-    
-//   } catch (error) {
-//     //console.error(error);
-//     res.status(500).json({
-//       status: "0",
-//       message: "An error occurred while rendering the privacy policy.",
-//       error: error.message,
-//     });
-//   }
-// };
 exports.myAccount = async function (req, res, next) {
   try {
     if (!req.session.user || !req.session.user.userId) {
@@ -1339,10 +1294,7 @@ exports.userUpdate = async function (req, res, next) {
           respdata: errors.array(),
         });
       }
-
-      console.log('Update Profile...');
-      console.log(req.body);
-      
+      let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
       const user = await Users.findOne({ _id: req.body.userId });
       // console.log('Heloo');
       // console.log(user);
@@ -1402,26 +1354,7 @@ exports.userUpdate = async function (req, res, next) {
 
 exports.userAddressAdd = async function (req, res, next) {
 try {
- console.log('Add Address ....');
- console.log(req.body);
  const addr_name = req.body.addrType;
-  console.log(req.session.user);
-  
-//  if(req.body.addr_home == 'on')
-//  {
-//     var addr_name = 'Home';
-//  }
-
-//  if(req.body.addr_office == 'on')
-//  {
-//     var addr_name = 'Office';
-//  }
-
-//  if(req.body.addr_other == 'on')
-//  {
-//     var addr_name = 'Others';
-//  }
-
  //const address = await addressBook.findOne({ _id: req.params.id });
  const errors = validationResult(req);
  if (!errors.isEmpty()) {
@@ -1447,7 +1380,6 @@ try {
   created_dtime: dateTime,
 });
 
- 
     const savedAddress = await newAddress.save();
     const user = await Users.findById(newAddress.user_id);
     const randomSuffix = Math.floor(Math.random() * 1000); 
@@ -1464,24 +1396,15 @@ try {
       state: savedAddress.state_name,
       country: "India",
       pin_code: savedAddress.pin_code
-    };
-
-   
-    
+    };    
       const shiprocketResponse = await generateSellerPickup(PickupData);
-
-      console.log(shiprocketResponse.pickup_id);
 
       if (shiprocketResponse) {
         savedAddress.shiprocket_address = pickupLocation;
         savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
         await savedAddress.save();
-
-        res.redirect('/api/my-account');
-        
+        res.redirect('/api/my-account');       
       }
-      
-
 } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -1492,18 +1415,14 @@ try {
   }
 };
 
-
 exports.deleteUserAddress = async function (req, res, next) {
   try{
-      console.log('Delete Address');
-      console.log(req.params);
       addbook_id = req.params.id;
       const updatedAddress = await addressBook.findOneAndUpdate(
         { _id: addbook_id },
         { $set: { default_status: 1 } },
         { new: true }
       );
-
       if (!updatedAddress) {
         return res.status(404).json({
           status: "0",
@@ -1511,9 +1430,7 @@ exports.deleteUserAddress = async function (req, res, next) {
           respdata: {},
         });
       }
-
       res.redirect('/api/my-account');
-
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -1523,7 +1440,6 @@ exports.deleteUserAddress = async function (req, res, next) {
     });
   }
 };
-
 
 // My Post
 exports.userWisePost = async function (req, res, next) {
@@ -1599,43 +1515,6 @@ try{
   });
 } 
 };
-
-// My Post View
-
-// exports.addPostView = async function (req, res, next) {
-// try{
-//  console.log('Add User Post');
-//  console.log(req.session.user);
-
-//  const productConditions = await Productcondition.find();
-// //  console.log('Product Condition');
-// //  console.log(productConditions);
-
-//  const parentCategoryId = "650444488501422c8bf24bdb";
-//  const categoriesWithoutParentId = await Category.find({ parent_id: { $ne: parentCategoryId } });
-// //  console.log('Sub Category');
-// //  console.log(categoriesWithoutParentId);
-
-//  res.render("webpages/addmypost", {
-//   title: "My Account",
-//   message: "Welcome to the Add Post page!",
-//   respdata: req.session.user,
-//   productcondition: productConditions,
-//   subcate: categoriesWithoutParentId,
-  
-// });
-
-
-// } catch (error) {
-//   console.error(error);
-//   res.status(500).json({
-//     status: "0",
-//     message: "An error occurred while rendering the Edit Profile.",
-//     error: error.message,
-//   });
-// } 
-
-// };
 
 exports.addPostView = async function (req, res, next) {
 try{
@@ -1786,9 +1665,6 @@ exports.addNewPost = async function (req, res, next) {
 
 exports.signOut = async function (req, res, next) {
 
-// console.log('sign out');
-// console.log(req.session.user);
-
 let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   Users.findOne({ _id: req.session.user.userId }).then((user) => {
     if (!user)
@@ -1914,14 +1790,9 @@ try{
 } 
 };
 
-
-
-
 // For Wishlist
-
-exports.addToWishlistWeb = async function (req, res, next) {
-  
-    
+exports.addToWishlistWeb = async function (req, res, next) { 
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const errors = validationResult(req);
     if (!errors.isEmpty()) 
     {
@@ -1931,17 +1802,12 @@ exports.addToWishlistWeb = async function (req, res, next) {
       respdata: errors.array(),
       });
     }
-
     try
-    {
-      console.log('Add To Wishlist');
-      
+    {      
       const user_id = req.session.user.userId;
       const product_id = req.params.id;
       const status = 0;
-
-      const existingList = await Wishlist.findOne({ user_id, product_id, status: 0 });
-      
+      const existingList = await Wishlist.findOne({ user_id, product_id, status: 0 });      
       if (existingList) 
       {
          return res.status(200).json({
@@ -1953,9 +1819,6 @@ exports.addToWishlistWeb = async function (req, res, next) {
       {
         const user = await Users.findOne({ _id: user_id });
         const product = await Userproduct.findOne({ _id: product_id }).populate('category_id', 'name');
-
-        // console.log(product);
-
         const newFavList = new Wishlist({
           user_id,
           product_id,
@@ -1967,6 +1830,7 @@ exports.addToWishlistWeb = async function (req, res, next) {
 
          return res.status(200).json({
           message: 'Item added to your wishlist successfully',
+          isLoggedIn: isLoggedIn,
           wishlist: {
             user_id: user_id,
             user_name: user.name, 
@@ -1991,73 +1855,6 @@ exports.addToWishlistWeb = async function (req, res, next) {
     });
   }  
 };
-
-// exports.viewWishListByUserId = async function (req, res, next) {
-//   try{
-//     const user_id = req.session.user.userId;
-//     const existingList = await Wishlist.find({ user_id: user_id })
-//       .populate('user_id', 'name')
-//       .exec();
-
-//     if (existingList.length === 0)
-//     {
-//       return res.status(200).json({
-//         message: 'Wishlist is empty',
-//         existingList: [],
-//       });
-//     }
-//     else
-//      {
-
-      
-//       const formattedList = await Promise.all(
-//         existingList.map(async (item) => {
-//           const product = await Userproduct.findOne({ _id: item.product_id }).populate('category_id', 'name');
-          
-//           const productImages = await Productimage.find({ product_id: item.product_id }).limit(1);
-
-        
-//           const finalwishlistdata = {
-//             _id: item._id,
-//             user_id: item.user_id._id,
-//             user_name: item.user_id.name,
-//             product_id: item.product_id,
-//             product_name: product.name, 
-//             product_price : product.price,
-//             category_name: product.category_id.name, 
-//             images: productImages[0].image, 
-//             status: item.status,
-//             added_dtime: item.added_dtime,
-//             __v: item.__v,
-//           };
-         
-//           console.log('FINAL DATA');
-//           console.log(finalwishlistdata);
-        
-//           res.render("webpages/wishlist",{
-//             title: "Wish List Page",
-//             message: "Welcome to the Wish List page!",
-//             respdata: finalwishlistdata,
-//           });
-
-
-
-//         }));
-//       //console.log(formattedList);
-
-      
-//      }
-
-//   }
-//   catch (error) {
-//     console.error(error);
-//     res.status(500).json({
-//       status: "0",
-//       message: "An error occurred while rendering Wishlist Listing Page.",
-//       error: error.message,
-//     });
-//   } 
-// };
 
 exports.viewWishListByUserId = async function (req, res, next) {
   try {
@@ -2117,14 +1914,10 @@ exports.viewWishListByUserId = async function (req, res, next) {
 
 exports.removeWishlistWeb = async (req, res) => {
   try{
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const product_id = req.params.id;
     const user_id = req.session.user.userId;
-
-    const existingList = await Wishlist.findOne({ user_id, product_id});
-    console.log('Existing List');
-    console.log(existingList);
-
-  
+    const existingList = await Wishlist.findOne({ user_id, product_id});  
       if (!existingList) {
         return res.status(404).json({
           message: 'Product are not found in the Wishlist',
@@ -2136,6 +1929,7 @@ exports.removeWishlistWeb = async (req, res) => {
 
         res.status(200).json({
           message: 'Product removed from Wishlist successfully',
+          isLoggedIn,
         });
       }
   }
@@ -2343,84 +2137,6 @@ const removeItemAfterTime = async (cartId) => {
   }
 };
 
-// Cart Details Show
-// exports.viewCartListByUserId = async function (req, res, next){
-// try{
-//   console.log('.........View Cart Details By Users........');
-  
-//   const  user_id  = req.session.user.userId;
-//   const existingCart = await Cart.findOne({ user_id, status: 0 });
-
-//     if (!existingCart) 
-//       {
-//          return res.status(200).json({
-//           message: 'Cart is empty',
-//           cartList: [],
-//          });
-//       }
-//     else
-//      {
-//           const cartList = await CartDetail.find({ cart_id: existingCart._id, status: 0 })
-//           .populate({
-//             path: 'product_id',
-//             model: Userproduct,
-//             select: 'name images',
-//           })
-//           .exec();
-
-//          const user = await Users.findById(existingCart.user_id);
-
-//          if (!user)
-//           {
-//               return res.status(404).json({ error: 'User not found' });
-//           }
-//             const formattedCartList = await Promise.all(cartList.map(async (cartItem) => {
-//             const product = await Userproduct.findOne({ _id: cartItem.product_id._id }).populate('category_id', 'name');
-//             const productImages = await Productimage.find({ product_id: cartItem.product_id._id }).limit(1);
-      
-//               const finalData = {
-//                 _id: cartItem._id,
-//                 quantity: cartItem.qty,
-//                 product_id: cartItem.product_id._id,
-//                 product_name: cartItem.product_id.name,
-//                 product_price : product.offer_price,
-//                 product_est_price: product.price,
-//                 category_name: product.category_id.name,
-//                 images: productImages.length > 0 ? productImages[0].image : null,
-//                 user_name: user.name,
-//                 added_dtime: cartItem.added_dtime,
-//                 status: cartItem.status,
-//               };
-
-//               const product_price = finalData.product_price;              
-//               const gst = (product_price*18)/100;
-//               const finalPrice = parseInt(product_price)+250+parseInt(gst);
-
-//               console.log('FINAL PRICE');
-//               console.log(finalPrice);
-
-//               res.render("webpages/addtocart", {
-//                 title: "Cart List Page",
-//                 message: "Welcome to the Cart List page!",
-//                 respdata: finalData,
-//                 respdata1: finalPrice,
-//                 user: user_id,
-               
-//               });
-      
-//             }));
-
-//      }
-// }
-// catch (error) {
-//   console.error(error);
-//   res.status(500).json({
-//     status: "0",
-//     message: "An error occurred while rendering Cart List.",
-//     error: error.message,
-//   });
-// } 
-// };
 
 exports.viewCartListByUserId = async function (req, res, next){
 try{
@@ -2436,10 +2152,19 @@ try{
 
     if (!existingCart) 
       {
-         return res.status(200).json({
-           message: 'Cart is empty',
-           cartList: [],
-         });
+        //  return res.status(200).json({
+        //    message: 'Cart is empty',
+        //    cartList: [],
+        //  });
+        res.render("webpages/addtocart", {
+          title: "Cart List Page",
+          message: "Cart is empty",
+          respdata: [],
+          respdata1: [],
+          user: user_id,
+          isLoggedIn: isLoggedIn,
+         
+        });
       }
     else
      {
@@ -2508,24 +2233,17 @@ catch (error) {
 } 
 };
 
-
-
-
 // Delete cart
 exports.deleteCart = async function (req, res, next) {
-  try{
-    //console.log('Delete Cart');
-    
-    //const cartDetail_id = req.params.id;
+  try{ 
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const user_id = req.session.user.userId;
     const existingCart = await Cart.findOne({ user_id, status: 0 });
-
     if (!existingCart) {
       return res.status(404).json({
         message: 'Cart not found',
       });
     }
-
     const cartDetail = await CartDetail.findOne({
       cart_id: existingCart._id,
       status: 0,
@@ -2537,24 +2255,16 @@ exports.deleteCart = async function (req, res, next) {
       });
     }
     await cartDetail.remove();
-
     const cartDetailsCount = await CartDetail.countDocuments({ cart_id: existingCart._id });
-
     if (cartDetailsCount === 0) {
       await existingCart.remove();
     }
 
-    // res.status(200).json({
-    //   message: 'Product removed from cart successfully',
-    // });
-
     res.render("webpages/deletecart", {
       title: "Delete Cart",
       message: "Welcome to the Delete Cart page!",
-      
-     
+      isLoggedIn: isLoggedIn,     
     });
-
   }
   catch (error) {
     console.error(error);

@@ -72,7 +72,7 @@
                                  <ul class="list-group">
                                     <% conditionList.forEach(function(item) { %>
                                        <li class="single-list">                  
-                                          <input type="checkbox" class="chkfield filterByChecked searchByCondition" data-id="<%=item.name%>" value="">
+                                          <input type="checkbox" class="chkfield filterByChecked searchByCondition" data-id="<%=item._id%>" value="">
                                           <label class="label-check" for="incboxx1"><%=item.name%></label>                  
                                        </li>
                                     <% }) %>  
@@ -182,52 +182,3 @@
 <%- include('../../public/assets/include/newsletter'); %>
 <%- include('../../public/assets/include/footer'); %>
 <script src="/public/assets/js/subcategory-product-list.js"></script>
-<script>
-   $(document).on('change', ".sortBy", function(e){
-      let categoryId ="<%= product_category_id %>";
-      let optionId = $(this).val();
-  
-      $.ajax({
-          url: `/api/websubcategoriesproductswithsort/${categoryId}/${optionId.trim()}`,
-          method: 'GET',
-          success: function(data) {
-              console.log(data);
-  
-              // Update the content of the 'sortdata' div with the received data
-              let htmlContent = '';
-              if (data && data.respdata && data.respdata.length > 0) {
-                  data.respdata.forEach(function(item) {
-                      htmlContent += `
-                          <div class="product-box">
-                              <div class="product-image">
-                                  <a href="/api/productdeatils/${item._id}">
-                                      <img src="${item.product_images[0].image}" alt="images" class="img-fluid">
-                                  </a>
-                              </div>
-                              <div class="prd-short-info">
-                                  <div class="prd-name">
-                                      <a href="/api/productdeatils/${item._id}">${item.name}</a>
-                                  </div>
-                                  <div class="prd-price">
-                                      <span><i class="fa fa-inr" aria-hidden="true"></i></span>${item.offer_price}
-                                  </div>
-                                  <div class="rtl-price">
-                                      <span>Est. Retail:</span>${item.price}
-                                  </div>                 
-                              </div> 
-                          </div>`;
-                  });
-              } else {
-                  htmlContent = '<p>No products found yet.</p>';
-              }
-  
-              $('.sortdata').html(htmlContent);
-          },
-          error: function(err) {
-              console.error('Error:', err);
-          } 
-      });
-  });
-   </script>
-  
-

@@ -1272,4 +1272,7 @@ max: 10,
 router.post("/user-relogin",cors(),
   WebsiteController.userRelogin
 );
+router.post("/user-filter",cors(),
+  WebsiteController.userFilter
+);
 module.exports = router;

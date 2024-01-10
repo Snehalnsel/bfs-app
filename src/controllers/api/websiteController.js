@@ -761,6 +761,24 @@ exports.userRelogin = async function (req, res, next) {
   
 };
 
+exports.userFilter = async function (req, res, next) {
+  const { brandList,sizeList,conditionList,priceList } = req.body;
+  if(typeof priceList != "undefined") {
+    if(priceList.length > 0) {
+    }
+  }
+  let concatVar = ``;
+  let allProductData = await Userproduct.find({brand:{$in:brandList},size:{$in:sizeList}});
+  console.log(allProductData);return false;
+  if(brandList) {
+  } else {
+    res.status(200).json({
+      status: "error",
+      message: "Invalid Token!!",
+    });
+  }  
+};
+
 exports.getUserLogin = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

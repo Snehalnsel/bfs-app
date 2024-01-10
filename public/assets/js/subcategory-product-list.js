@@ -24,10 +24,10 @@ $(document).ready(async function() {
             type: 'POST',
             url:  webSiteUrl + "/api/user-filter",
             data: {
-                brandList:brandList.length ? brandList : [],
-                sizeList:sizeList.length ? sizeList : [],
-                conditionList:conditionList.length ? conditionList : [],
-                priceList:priceList.length ? priceList : []
+                brandList:brandList,
+                sizeList:sizeList,
+                conditionList:conditionList,
+                priceList:priceList
             },
             success: async function(obj){
                 let error_success = obj.status;

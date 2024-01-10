@@ -768,12 +768,20 @@ exports.userRelogin = async function (req, res, next) {
 
 exports.userFilter = async function (req, res, next) {
   const { brandList,sizeList,conditionList,priceList } = req.body;
+  console.log("brandList", brandList);
+  console.log("sizeList", sizeList);
+  console.log("conditionList", conditionList);
+  console.log("priceList", priceList);
   if(typeof priceList != "undefined") {
     if(priceList.length > 0) {
     }
   }
   let concatVar = ``;
-  let allProductData = await Userproduct.find({brand:{$in:brandList},size:{$in:sizeList}});
+  //let allProductData = await Userproduct.find({brand:{$in:brandList},size:{$in:sizeList}});
+  let allProductData = await Userproduct.find({
+    "brand" : { "$in": brandList },
+    "size" : { "$in": sizeList }
+  });
   console.log(allProductData);return false;
   if(brandList) {
   } else {
@@ -1202,7 +1210,7 @@ async function getProductDataWithSort(id,sortid)
 {
   try {
 
-    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    //let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   
     let sortCriteria = {};
 
@@ -1265,7 +1273,7 @@ async function getProductDataWithSort(id,sortid)
       status: '1',
       message: 'Success',
       respdata: formattedUserProducts,
-      isLoggedIn: isLoggedIn,
+      //isLoggedIn: isLoggedIn,
     };
   
   }

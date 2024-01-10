@@ -259,13 +259,12 @@ text ever since the 1500s, when an unknown printer took a galley of type and scr
           var id = $(this).data('id');
           console.log(id);
           $.ajax({
-                 url: '/api/addtocart/'+id.trim(), // Route on the server to handle the request
+                 url: '/api/addtocart/'+id.trim(), 
                  method: 'POST',
                  success: function(data) 
                   {
                       if (data.is_added) {
                           Swal.fire({
-                                    //title: "<i>Bid For Sale</i>", 
                                     html: data.message,  
                                     confirmButtonText: "OK",
                                     customClass: { confirmButton: 'alert-box-button' }
@@ -274,7 +273,6 @@ text ever since the 1500s, when an unknown printer took a galley of type and scr
                         getHeaderData();
                       } else {
                           Swal.fire({
-                                    //title: "<i>Bid For Sale</i>", 
                                     html: "You can add one item at a time",  
                                     confirmButtonText: "OK",
                                     customClass: { confirmButton: 'alert-box-button', popup: 'swal2-popup' }

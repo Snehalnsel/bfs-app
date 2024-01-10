@@ -153,11 +153,9 @@ async function generateSellerPickup(data) {
 }
 
 
-
 exports.productData = async function (req, res, next) {
   try {
-    console.log("Antu....################################################");
-
+  
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const productId = req.params.id;
     let query = {}; 

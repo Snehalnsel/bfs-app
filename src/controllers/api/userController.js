@@ -72,13 +72,13 @@ function randNumber(min, max) {
 }
 
 exports.getUsers = async function (req, res, next) {
-  
-
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   Users.find().then((users) => {
     res.status(200).json({
       status: "1",
       message: "Found!",
       respdata: users,
+      isLoggedIn: isLoggedIn,
     });
   });
 };
@@ -93,6 +93,7 @@ exports.signUp = async function (req, res, next) {
     });
   }
 
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   let userCount = await Users.countDocuments();
   let userCode = `BFS${(userCount + 1).toString().padStart(5, '0')}`;
 
@@ -140,6 +141,7 @@ exports.signUp = async function (req, res, next) {
                 status: "1",
                 message: "Added!",
                 respdata: user,
+                isLoggedIn: isLoggedIn,
               });
             })
             .catch((error) => {
@@ -301,10 +303,8 @@ exports.getLogin = async function (req, res, next) {
     });
   }
 
-  //const { email, password, deviceid, devicename, fcm_token } = req.body;
-
   const { email, password, deviceid, devicename, fcm_token, phone_no } = req.body;
-
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   let query = {};
 
   if (email) {
@@ -418,6 +418,7 @@ exports.getLogin = async function (req, res, next) {
                         status: "1",
                         message: "Successful!",
                         respdata: updatedUser,
+                        isLoggedIn: isLoggedIn,
                       });
                     });
                   }

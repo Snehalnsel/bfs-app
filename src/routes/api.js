@@ -1143,23 +1143,14 @@ router.get("/my-account",[],WebsiteController.myAccount);
 router.get("/edit-profile",[],WebsiteController.editProfile);
 router.get("/add-address",[],WebsiteController.addAddress);
 
-// // Product API's
-
+// Product API's
 router.get("/webSubCategories", WebsiteController.getParentCategories);
-
 router.get("/subcategory",CategoryController.getAllSubcategoriesWithProducts);
-
-
-
 // router.get("/websubcategories/:id",[],WebsiteController.getSubCategoriesWithMatchingParentId);
-
-
 router.get("/websubcategoriesproducts/:id",[],WebsiteController.getSubCategoriesProducts);
 router.get("/websubcategoriesproductswithsort/:id/:sortid",[],WebsiteController.getSubCategoriesProductswithSort);
 
-
 // Profile Edit API's
-
 router.post("/useredit",
     [
       check("name", "This is a required field!").not().isEmpty().trim().escape(),
@@ -1183,7 +1174,6 @@ router.post("/addnewpost",[], upload.array('image', 5),WebsiteController.addNewP
 router.get("/edit-mypost/:id",[],WebsiteController.editUserWisePost);
 
 // router.post("/updatepostdata",[],WebsiteController.updatePostData);
-
 
 // Add To cart 
 router.post("/addtocart/:id",[],WebsiteController.addToCart);

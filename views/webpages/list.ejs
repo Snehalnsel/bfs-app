@@ -200,7 +200,7 @@
          html += `
          <div class="product-box">
             <div class="product-image">
-               <a href="<%= requrl %>/api/productdeatils/${item._id}"><img src="${item.image}" alt="images" class="img-fluid"></a>
+               <a href="/api/productdeatils/${item._id}"><img src="${item.image}" alt="images" class="img-fluid"></a>
             </div>
             <div class="prd-short-info">
                <div class="prd-name"><a href="javascript:void(0)">${item.name}</a></div>
@@ -226,8 +226,13 @@
    window.onload = fetchData;
    
   
-    $(document).ready(function(){
-        var id1 = $(this).data('id');
+    $(document).ready(async function(){
+        var id1 = $('#userReloggedIn').val();
+
+        let cartListreCookieAccessToken = await getCookieFunc(accessTokenVar);
+        let cartListreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
+        await userReLogin(cartListreCookieAccessToken, cartListreCookieRefreshToken);
+        
         $.ajax({
                  url: '/api/cart-list', // Route on the server to handle the request
                  data: {id1:id1},
@@ -241,33 +246,6 @@
                       console.error('Error:', err);
                   } 
         });
-        
-        
-        
-      $(document).on('click', ".buy-btn", function(e){
-         if(isLoggedIn != "") {
-            var id = $(this).data('id');
-            //console.log(id);
-            $.ajax({
-               url: '/api/addtocart/'+id.trim(), // Route on the server to handle the request
-               method: 'POST',
-               success: function(data) 
-               {
-                     if (data.is_added) {
-                        alert(data.message);
-                     } else {
-                        alert("Item Already Added to the cart.");
-                     }
-               },
-               error: function(err) 
-               {
-                     console.error('Error:', err);
-               } 
-            }); 
-         } else {
-            $('#login_modal').modal('show'); 
-         }
-      });
    });
 
 

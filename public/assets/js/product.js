@@ -1,5 +1,5 @@
 let productId = "";
-let isLoggedIn = $("#isLoggedIn").val();
+let isLoggedIn = $("#userReloggedIn").val();
 $(document).on("click",".bidNowAmountBtn",function() {
     let bidAmount = $("#bid_amount").val();
     if(productId !== "" && bidAmount != "") {
@@ -27,4 +27,27 @@ $(document).on("click",".bidButton",function() {
         $('#login_modal').modal('show'); 
     }
 });
-   
+$(document).on('click', ".buy-btn", function(e){
+    if(isLoggedIn != "") {
+       var id = $(this).data('id');
+       //console.log(id);
+       $.ajax({
+          url: '/api/addtocart/'+id.trim(), // Route on the server to handle the request
+          method: 'POST',
+          success: function(data) 
+          {
+                if (data.is_added) {
+                   alert(data.message);
+                } else {
+                   alert("Item Already Added to the cart.");
+                }
+          },
+          error: function(err) 
+          {
+                console.error('Error:', err);
+          } 
+       }); 
+    } else {
+       $('#login_modal').modal('show'); 
+    }
+});

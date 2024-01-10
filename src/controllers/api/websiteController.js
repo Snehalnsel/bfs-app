@@ -157,6 +157,8 @@ async function generateSellerPickup(data) {
 exports.productData = async function (req, res, next) {
   try {
     console.log("Antu....################################################");
+
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const productId = req.params.id;
     let query = {}; 
     //if (req.body.product_id) {
@@ -270,6 +272,7 @@ const userproducts1 = await Userproduct.find({category_id: formattedUserProduct.
       message: "Welcome to the Dashboard page!",
       respdata: formattedUserProduct,
       relatedProducts: formattedUserProducts1,
+      isLoggedIn: isLoggedIn,
      
     });
   } catch (error) {
@@ -320,10 +323,12 @@ exports.tremsandconditionData = async function (req, res, next) {
 
 exports.registration = async function (req, res, next) {
   try {
-    console.log("Registration");
+    // console.log("Registration");
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     res.render("webpages/registration", {
       title: "Registration",
-      message: "Welcome to the privacy policy page!"
+      message: "Welcome to the privacy policy page!",
+      isLoggedIn: isLoggedIn,
     });
   } catch (error) {
     console.error(error);
@@ -984,6 +989,8 @@ exports.myAccount = async function (req, res, next) {
    var userData = req.session.user;
 
   const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId) });
+
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   
   console.log('************** ADDRESS 123 ************');
   console.log(address);
@@ -998,6 +1005,7 @@ exports.myAccount = async function (req, res, next) {
       message: "Welcome to the privacy policy page!",
       respdata: req.session.user,
       respdata1:address,
+      isLoggedIn: isLoggedIn,
     });
   }
 
@@ -1014,6 +1022,7 @@ exports.myAccount = async function (req, res, next) {
 
 exports.editProfile = async function (req, res, next) {
   try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
         console.log('**************** HI EDIT PROFILE**************');
         console.log(userData);
@@ -1022,6 +1031,7 @@ exports.editProfile = async function (req, res, next) {
       title: "Edit profile",
       message: "Welcome to the Edit Profile page!",
       respdata: req.session.user,
+      isLoggedIn: isLoggedIn,
     });
   } catch (error) {
     console.error(error);
@@ -1035,7 +1045,7 @@ exports.editProfile = async function (req, res, next) {
 
 exports.addAddress = async function (req, res, next) {
   try {
-    
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
         console.log('**************** HI EDIT Address**************');
         console.log(userData);
@@ -1062,6 +1072,7 @@ exports.addAddress = async function (req, res, next) {
       message: "Welcome to the Edit Profile page!",
       respdata: add,
       respdata1: userData,
+      isLoggedIn: isLoggedIn,
     });
   } catch (error) {
     console.error(error);
@@ -1079,9 +1090,11 @@ exports.addAddress = async function (req, res, next) {
 
 exports.getParentCategories = async function (req, res, next) {
   try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     res.render("webpages/productcategories", {
       title: "Product Categories",
       message: "Welcome to the Product Categories!",
+      isLoggedIn: isLoggedIn,
       //respdata: parentCategories,
      
     });
@@ -1188,6 +1201,8 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
 async function getProductDataWithSort(id,sortid) 
 {
   try {
+
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   
     let sortCriteria = {};
 
@@ -1250,6 +1265,7 @@ async function getProductDataWithSort(id,sortid)
       status: '1',
       message: 'Success',
       respdata: formattedUserProducts,
+      isLoggedIn: isLoggedIn,
     };
   
   }
@@ -1539,21 +1555,9 @@ exports.userWisePost = async function (req, res, next) {
     });
   }
 try{
-
-console.log('My Post');
-//console.log(req.params.id);
-
-var userData = req.session.user;
-
-//console.log('Posttttttttttttttttttttttttttttt');
-//console.log(userData);
-//let a = '654f368443db200178350161';
-// let user_id = req.params.id
-// let query = {};
-// if (req.params.id) {
-//       query.user_id = user_id;
-//     }
-//     console.log(query);
+    
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    var userData = req.session.user;
     const userproducts = await Userproduct.find({ user_id: req.params.id })
     .populate('brand_id', 'name', { optional: true })
     .populate('category_id', 'name', { optional: true })
@@ -1561,25 +1565,10 @@ var userData = req.session.user;
     .populate('size_id', 'name', { optional: true })
     .exec();
 
-    console.log('Productsssssssssssssssssss');
-    
-
-    // if (!userproducts || userproducts.length === 0) {
-    //   return res.status(404).json({
-    //     status: "0",
-    //     message: "Not found!",
-    //     respdata: [],
-    //   });
-    // }
-
     const formattedUserProducts = [];
  
     for (const userproduct of userproducts) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
-
-      console.log('Product');
-      console.log(userproduct);
-      console.log(productImages);
 
       const formattedUserProduct = {
         _id: userproduct._id,
@@ -1608,10 +1597,6 @@ var userData = req.session.user;
       formattedUserProducts.push(formattedUserProduct);
     }
 
-    //console.log('Products***********************************************');
-    //console.log(userproducts);
-    console.log(formattedUserProducts);
-
     if(formattedUserProducts)
     {
       res.render("webpages/mypost", {
@@ -1619,16 +1604,9 @@ var userData = req.session.user;
       message: "Welcome to the My Post page!",
       respdata:formattedUserProducts,
       userData:req.session.user,
+      isLoggedIn: isLoggedIn,
 });
     }
-
-// res.render("webpages/mypost", {
-//   title: "My Post",
-//   message: "Welcome to the My Post page!",
-//   // respdata:,
-//   // userData:req.session.user,
-// });
-
 
 } catch (error) {
   console.error(error);
@@ -1679,6 +1657,7 @@ var userData = req.session.user;
 
 exports.addPostView = async function (req, res, next) {
 try{
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
  console.log('Add User Post');
  
  if (!req.session.user) {
@@ -1695,6 +1674,7 @@ try{
             respdata: req.session.user,
             productcondition: productConditions,
             subcate: categoriesWithoutParentId,
+            isLoggedIn: isLoggedIn,
   
     });
 
@@ -1827,7 +1807,7 @@ exports.signOut = async function (req, res, next) {
 // console.log('sign out');
 // console.log(req.session.user);
 
-
+let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   Users.findOne({ _id: req.session.user.userId }).then((user) => {
     if (!user)
       res.status(404).json({
@@ -1873,6 +1853,7 @@ exports.signOut = async function (req, res, next) {
               res.render("webpages/list", {
                 title: "Wish List Page",
                 message: "Successfully logged out!",
+                isLoggedIn: isLoggedIn,
               });
             });
           }
@@ -1888,6 +1869,7 @@ exports.signOut = async function (req, res, next) {
 exports.editUserWisePost = async function (req, res, next) {
 
 try{
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   console.log('Edit My Post');
   //console.log(req.params.id);
 
@@ -1934,6 +1916,7 @@ try{
       userData: req.session.user,
       productcondition: productConditions,
       subcate: categoriesWithoutParentId,
+      isLoggedIn: isLoggedIn,
         });
     // }
 
@@ -2096,6 +2079,7 @@ exports.addToWishlistWeb = async function (req, res, next) {
 
 exports.viewWishListByUserId = async function (req, res, next) {
   try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     if (!req.session.user) {
       return res.redirect("/api/registration");
     }
@@ -2129,14 +2113,12 @@ exports.viewWishListByUserId = async function (req, res, next) {
           __v: item.__v,
         };
       }));
-
-      console.log('Formatted List:');
-      console.log(formattedList);
       
       res.render("webpages/wishlist", {
         title: "Wish List Page",
         message: "Welcome to the Wish List page!",
         respdata: formattedList,
+        isLoggedIn: isLoggedIn,
       });
     }
   } catch (error) {
@@ -2461,6 +2443,8 @@ const removeItemAfterTime = async (cartId) => {
 exports.viewCartListByUserId = async function (req, res, next){
 try{
 
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+
   if (!req.session.user || !req.session.user.userId) {
     return res.redirect("/api/registration");
   }
@@ -2524,6 +2508,7 @@ try{
                 respdata: finalData,
                 respdata1: finalPrice,
                 user: user_id,
+                isLoggedIn: isLoggedIn,
                
               });
       
@@ -2771,10 +2756,13 @@ exports.checkoutWeb = async function (req, res, next) {
 
 exports.myOrderWeb = async (req, res) => {
   try{
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+
     res.render("webpages/myorder",{
       title: "Wish List Page",
       message: "Welcome to the Wish List page!",
       respdata: req.session.user,
+      isLoggedIn: isLoggedIn,
     });
 
   }
@@ -2792,13 +2780,14 @@ exports.myOrderWeb = async (req, res) => {
 exports.myOrderDetailsWeb = async (req, res) => {
   try {
     const orderlistId = req.params.id;
-    console.log(orderlistId);
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     
     res.render("webpages/myorderdetails",{
       title: "Wish List Page",
       message: "Welcome to the Wish List page!",
       respdata: req.session.user,
       respdata1: orderlistId,
+      isLoggedIn: isLoggedIn,
     });
 
   }

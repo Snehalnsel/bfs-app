@@ -667,6 +667,7 @@ exports.getCategoriesWithMatchingParentId = async function (req, res, next) {
 
 exports.getAllSubcategoriesWithProducts = async function (req, res, next) {
   try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const subcategoriesWithProducts = await Userproduct.aggregate([
       {
         $lookup: {
@@ -730,6 +731,7 @@ exports.getAllSubcategoriesWithProducts = async function (req, res, next) {
         status: '1',
         message: 'Subcategories with associated products found!',
         respdata: subcategoriesWithProducts,
+        isLoggedIn: isLoggedIn,
     });
 
     // let response = () => {

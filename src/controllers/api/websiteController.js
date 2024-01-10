@@ -765,27 +765,79 @@ exports.userRelogin = async function (req, res, next) {
 };
 
 exports.userFilter = async function (req, res, next) {
-  const { brandList,sizeList,conditionList,priceList } = req.body;
-  console.log("brandList", brandList);
-  console.log("sizeList", sizeList);
-  console.log("conditionList", conditionList);
-  console.log("priceList", priceList);
+  let { brandList,sizeList,conditionList,priceList,optionId } = req.body;
+  if(typeof optionId != "undefined") {
+    if((optionId == 0)) {
+      optionId = -1;
+    } else {
+      optionId = 1;
+    } 
+  } else {
+    optionId = 1;
+  }
+  let concatVar = {};
+  let objConditionList = [];
+  if((typeof conditionList != "undefined") && (conditionList.length > 0)) {
+    conditionList.forEach(function (item) {
+      objConditionList.push(mongoose.Types.ObjectId(item));
+    });
+  }
+  if(typeof brandList != "undefined") {
+    concatVar["brand"] = { "$in": brandList };
+  }
+  if(typeof sizeList != "undefined") {
+    concatVar["size"] = { "$in": sizeList };
+  }
+  if((typeof conditionList != "undefined") && (objConditionList.length > 0)) {
+    concatVar["status"] = { "$in": objConditionList };
+  }
   if(typeof priceList != "undefined") {
     if(priceList.length > 0) {
+      priceList.forEach(function (item) {
+        let priceArr = item.split("-");
+        concatVar["offer_price"] = { "$gte": priceArr[0] };
+        concatVar["offer_price"] = { "$lte": priceArr[1] };
+      });
     }
   }
-  let concatVar = ``;
-  //let allProductData = await Userproduct.find({brand:{$in:brandList},size:{$in:sizeList}});
-  let allProductData = await Userproduct.find({
-    "brand" : { "$in": brandList },
-    "size" : { "$in": sizeList }
-  });
-  console.log(allProductData);return false;
-  if(brandList) {
+  let allProductData = await Userproduct.find(concatVar).sort({offer_price:optionId});
+  //console.log(allProductData);return false;
+  const formattedUserProducts = [];
+  for (const userproduct of allProductData) {
+
+    const productImages = await Productimage.find({ product_id: userproduct._id });
+
+    const formattedUserProduct = {
+      _id: userproduct._id,
+      name: userproduct.name,
+      description: userproduct.description,
+      category: userproduct.category_id.name,
+      brand: userproduct.brand_id.name,
+      user_id: userproduct.user_id._id,
+      user_name: userproduct.user_id.name,
+      size_id: userproduct.size_id.name,
+      price: userproduct.price,
+      offer_price: userproduct.offer_price,
+      percentage: userproduct.percentage,
+      status: userproduct.status,
+      flag: userproduct.flag,
+      approval_status: userproduct.approval_status,
+      added_dtime: userproduct.added_dtime,
+      __v: userproduct.__v,
+      product_images: productImages,
+    };
+    formattedUserProducts.push(formattedUserProduct);
+  }
+  if(formattedUserProducts.length > 0) {
+    return res.json({
+      status: 'success',
+      message: 'Success search result',
+      respdata: formattedUserProducts,
+    });
   } else {
     res.status(200).json({
       status: "error",
-      message: "Invalid Token!!",
+      message: "No Reccords Found for this search..",
     });
   }  
 };

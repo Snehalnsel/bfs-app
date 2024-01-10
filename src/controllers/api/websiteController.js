@@ -37,6 +37,7 @@ const Cartremove = require("../../models/api/cartremoveModel");
 const Cart = require('../../models/api/cartModel');
 const CartDetail = require('../../models/api/cartdetailsModel');
 const Order = require("../../models/api/orderModel");
+const Banner = require("../../models/api/bannerModel");
 const smtpUser = "sneha.lnsel@gmail.com";
 const nodemailer = require("nodemailer");
 const app = express();
@@ -1529,7 +1530,7 @@ exports.userWisePost = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-  try{
+try{
     
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
@@ -1741,7 +1742,7 @@ exports.addNewPost = async function (req, res, next) {
 
 
 exports.signOut = async function (req, res, next) {
-
+  const banner = await Banner.find({ status: 1 });
 let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   Users.findOne({ _id: req.session.user.userId }).then((user) => {
     if (!user)
@@ -1789,6 +1790,7 @@ let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.use
                 title: "Wish List Page",
                 message: "Successfully logged out!",
                 isLoggedIn: isLoggedIn,
+                banner: banner,
               });
             });
           }

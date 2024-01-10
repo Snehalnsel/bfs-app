@@ -72,7 +72,7 @@
                                  <ul class="list-group">
                                     <% conditionList.forEach(function(item) { %>
                                        <li class="single-list">                  
-                                          <input type="checkbox" class="chkfield filterByChecked searchByCondition" data-id="<%=item.name%>" value="">
+                                          <input type="checkbox" class="chkfield filterByChecked searchByCondition" data-id="<%=item._id%>" value="">
                                           <label class="label-check" for="incboxx1"><%=item.name%></label>                  
                                        </li>
                                     <% }) %>  
@@ -182,6 +182,3 @@
 <%- include('../../public/assets/include/newsletter'); %>
 <%- include('../../public/assets/include/footer'); %>
 <script src="/public/assets/js/subcategory-product-list.js"></script>
-
-  
-

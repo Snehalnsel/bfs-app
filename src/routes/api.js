@@ -1188,7 +1188,7 @@ router.post("/add-to-wishlist-web/:id",[],WebsiteController.addToWishlistWeb);
 
 router.get("/show-wishlist-details",[],WebsiteController.viewWishListByUserId);
 
-router.post("/remove-wishlist-web/:id",[],WebsiteController.removeWishlistWeb);
+router.get("/remove-wishlist-web/:id",[],WebsiteController.removeWishlistWeb);
 
 // Wishlist Web End
 

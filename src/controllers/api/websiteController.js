@@ -1949,9 +1949,12 @@ exports.viewWishListByUserId = async function (req, res, next) {
     console.log(existingList);
 
     if (existingList.length === 0) {
-      return res.status(200).json({
-        message: 'Wishlist is empty',
-        existingList: [],
+      res.render("webpages/wishlist", {
+        title: "Wish List Page",
+        message: "Welcome to the Wish List page!",
+        respdata: [],
+        isLoggedIn: isLoggedIn,
+        itemCount: 0, 
       });
     } else {
       const formattedList = await Promise.all(existingList.map(async (item) => {

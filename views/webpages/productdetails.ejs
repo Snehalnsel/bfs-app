@@ -300,7 +300,7 @@
                   console.log(id);
                   $.ajax({
                      url: '/api/remove-wishlist-web/' + id.trim(),
-                     method: 'POST',
+                     method: 'GET',
                      success: function (data) {
                         if (data.success) {
                            Swal.fire({

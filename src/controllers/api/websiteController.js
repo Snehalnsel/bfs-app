@@ -341,7 +341,6 @@ exports.registration = async function (req, res, next) {
 };
 
 exports.signin = async function (req, res, next) {
-  
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

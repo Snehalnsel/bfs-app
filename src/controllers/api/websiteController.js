@@ -764,9 +764,9 @@ exports.userFilter = async function (req, res, next) {
   let { brandList,sizeList,conditionList,priceList,optionId } = req.body;
   if(typeof optionId != "undefined") {
     if((optionId == 0)) {
-      optionId = -1;
-    } else {
       optionId = 1;
+    } else {
+      optionId = -1;
     } 
   } else {
     optionId = 1;

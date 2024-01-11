@@ -1,269 +1,206 @@
 <%- include('../../public/assets/include/header'); %>
 
-   <!DOCTYPE html>
-   <html lang="en">
-   <script>
-      let isLoggedIn = "";
-   </script>
+<!DOCTYPE html>
+<html lang="en">
+<script>
+   let isLoggedIn = "";
+</script>
 
-   <section class="home-banner-slider">
-      <!-- <div class="container"> -->
-      <div class="slider banner-slider">
+<section class="home-banner-slider">
+    <!-- <div class="container"> -->
+       <div class="slider banner-slider">
          <% banner.forEach(function (item){ %>
-            <!-- // <img src="<%=item.image%>" /> -->
+           <!-- // <img src="<%=item.image%>" /> -->
             <div class="slider-item">
                <img src="<%=item.image%>" alt="images" class="img-fluid">
             </div>
-            <% }) %>
-
-               <!-- <div class="slider-item">
+         <% }) %>
+         
+          <!-- <div class="slider-item">
              <img src="/public/assets/images/banner1.jpg" alt="images" class="img-fluid">
           </div> -->
-      </div>
-      <!-- </div> -->
-   </section>
-   <section class="product-wrapper pd-40" id="best-deals-section">
-      <div class="container">
-         <div class="top-title">
-            <div class="title-box">
-               <h3>Best Deals</h3>
-            </div>
-            <div class="short-box">
-               <a href="javascript:void(0)">See All</a>
-            </div>
+       </div>
+    <!-- </div> -->
+ </section>
+ <section class="product-wrapper pd-40" id="best-deals-section">
+   <div class="container">
+      <div class="top-title">
+         <div class="title-box">
+            <h3>Best Deals</h3>
          </div>
-         <div class="slider product_Slider product_Slider1" id="best-deals-slider">
-
-
+         <div class="short-box">
+            <a href="javascript:void(0)">See All</a>
          </div>
       </div>
-   </section>
+      <div class="slider product_Slider product_Slider1" id="best-deals-slider">
 
-
-
-
-
-
-
-
-   <section class="poster-wrapper">
-      <div class="container">
-         <div class="row">
-            <div class="col-md-6">
-               <div class="poster-box">
-                  <a href="javascript:void(0)">
-                     <img src="/public/assets/images/poster1.jpg" alt="images" class="img-fluid">
-                  </a>
-               </div>
-            </div>
-            <div class="col-md-6">
-               <div class="poster-box">
-                  <a href="javascript:void(0)">
-                     <img src="/public/assets/images/poster2.jpg" alt="images" class="img-fluid">
-                  </a>
-               </div>
-            </div>
-         </div>
-      </div>
-   </section>
-   <section class="product-wrapper pd-40" id="whats-hot-section">
-      <div class="container">
-         <div class="top-title">
-            <div class="title-box">
-               <h3>What's Hot</h3>
-            </div>
-            <div class="short-box">
-               <a href="javascript:void(0)">See All</a>
-            </div>
-         </div>
-         <div class="slider product_Slider product_Slider1" id="whats-hot-slider">
-
-         </div>
-      </div>
-   </section>
-   <section class="product-wrapper pd-40 " id="just-sold-section">
-      <div class="container">
-         <div class="top-title">
-            <div class="title-box">
-               <h3>Just Sold</h3>
-            </div>
-            <div class="short-box">
-               <a href="javascript:void(0)">See All</a>
-            </div>
-         </div>
-         <div class="slider product_Slider product_Slider1 " id="just-sold-slider">
-
-         </div>
-      </div>
-   </section>
-   <section class="policy_box">
-      <div class="container">
-         <div class="row">
-            <div class="col-md-4">
-               <div class="icon-sidebox">
-                  <div class="side-icon"><img src="/public/assets/images/check-icon.png" alt="images"></div>
-                  <div class="sidebox-info">
-                     <h6>Internal quality check</h6>
-                     <p>Lorem Ipsum is simply dummy text</p>
-                  </div>
-               </div>
-            </div>
-            <div class="col-md-4">
-               <div class="icon-sidebox">
-                  <div class="side-icon"><img src="/public/assets/images/return-icon.png" alt="images"></div>
-                  <div class="sidebox-info">
-                     <h6>Return within 24 hrs*</h6>
-                     <p>No questions asked returns refunds</p>
-                  </div>
-               </div>
-            </div>
-            <div class="col-md-4">
-               <div class="icon-sidebox">
-                  <div class="side-icon"><img src="/public/assets/images/payment-icon.png" alt="images"></div>
-                  <div class="sidebox-info">
-                     <h6>Secure Payment</h6>
-                     <p>Safe and hassle-free shopping with secure payment gateways</p>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </div>
-   </section>
-   <div class="modal theme_modal bid_modal show" id="bid_modal" aria-modal="true" role="dialog"
-      style="padding-right: 17px; display: none;">
-      <div class="modal-dialog">
-         <button type="button" class="close" data-dismiss="modal">×</button>
-         <div class="modal-content login-box">
-            <div class="left-boxpart hide-mobile">
-               <div class="box-inner">
-                  <img src="/public/assets/images/white_logo.png" alt="image" class="lg-logo">
-                  <p>BFS ( Bid for Sale )</p>
-               </div>
-            </div>
-            <div class="right-formpart loginform-box">
-               <h5 class="box-title">Bid Amount</h5>
-               <div class="inner-formbox">
-                  <div class="tab-content">
-                     <div class="tab-pane active" id="login-password" role="tabpanel">
-                        <!--<form action="" method="POST">-->
-                        <div class="mb-3">
-                           <input type="text" class="form-control" id="bid_amount" placeholder="Enter Amount"
-                              name="bid_amount" required="required">
-                        </div>
-                        <div class="button-row">
-                           <button type="submit" class="btn liginbtn bidNowAmountBtn">Submit</button>
-                        </div>
-                        <!--</form>-->
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
+         
       </div>
    </div>
-   <%- include('../../public/assets/include/newsletter'); %>
-      <%- include('../../public/assets/include/footer'); %>
-         </body>
-         <script>
-            let productId = "";
-            $(document).on("click", ".bidNowAmountBtn", function () {
-               let bidAmount = $("#bid_amount").val();
-               if (productId !== "" && bidAmount != "") {
-                  $.ajax({
-                     url: '/api/bid-check-exist-reccord', // Request to bid for first time or update the bid amount
-                     data: { productId: productId, bidAmount: bidAmount },
-                     method: 'POST',
-                     success: function (data) {
-                        window.location.href = "/api/bid-for-product/" + data.bidId;
-                        //console.log('Danger Alert');
-                     },
-                     error: function (err) {
-                        console.error('Error:', err);
-                     }
-                  });
+</section>
+
+
+
+
+
+
+
+
+ <section class="poster-wrapper">
+    <div class="container">
+       <div class="row">
+          <div class="col-md-6">
+             <div class="poster-box">
+                <a href="javascript:void(0)">
+                <img src="/public/assets/images/poster1.jpg" alt="images" class="img-fluid">
+                </a>
+             </div>
+          </div>
+          <div class="col-md-6">
+             <div class="poster-box">
+                <a href="javascript:void(0)">
+                <img src="/public/assets/images/poster2.jpg" alt="images" class="img-fluid">
+                </a>
+             </div>
+          </div>
+       </div>
+    </div>
+ </section>
+ <section class="product-wrapper pd-40" id="whats-hot-section">
+    <div class="container">
+       <div class="top-title">
+          <div class="title-box">
+             <h3>What's Hot</h3>
+          </div>
+          <div class="short-box">
+             <a href="javascript:void(0)">See All</a>
+          </div>
+       </div>
+       <div class="slider product_Slider product_Slider1" id="whats-hot-slider">
+          
+       </div>
+    </div>
+ </section>
+ <section class="product-wrapper pd-40 " id="just-sold-section">
+    <div class="container">
+       <div class="top-title">
+          <div class="title-box">
+             <h3>Just Sold</h3>
+          </div>
+          <div class="short-box">
+             <a href="javascript:void(0)">See All</a>
+          </div>
+       </div>
+       <div class="slider product_Slider product_Slider1 " id="just-sold-slider">
+          
+       </div>
+    </div>
+ </section>
+ <section class="policy_box">
+    <div class="container">
+       <div class="row">
+          <div class="col-md-4">
+             <div class="icon-sidebox">
+                <div class="side-icon"><img src="/public/assets/images/check-icon.png" alt="images"></div>
+                <div class="sidebox-info">
+                   <h6>Internal quality check</h6>
+                   <p>Lorem Ipsum is simply dummy text</p>
+                </div>
+             </div>
+          </div>
+          <div class="col-md-4">
+             <div class="icon-sidebox">
+                <div class="side-icon"><img src="/public/assets/images/return-icon.png" alt="images"></div>
+                <div class="sidebox-info">
+                   <h6>Return within 24 hrs*</h6>
+                   <p>No questions asked returns refunds</p>
+                </div>
+             </div>
+          </div>
+          <div class="col-md-4">
+             <div class="icon-sidebox">
+                <div class="side-icon"><img src="/public/assets/images/payment-icon.png" alt="images"></div>
+                <div class="sidebox-info">
+                   <h6>Secure Payment</h6>
+                   <p>Safe and hassle-free shopping with secure payment gateways</p>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+   </section>
+  <%- include('../../public/assets/include/newsletter'); %>
+  <%- include('../../public/assets/include/footer'); %>
+</body>
+<script>
+   async function fetchData() {
+     try {
+       const response = await fetch('/api/app-home');
+       const data = await response.json();
+
+         isLoggedIn = data.isLoggedIn;
+     // Best deal populate
+       const bestDeals = data.respdata.best_deal;
+       
+       const bestDealsSlider = document.getElementById('best-deals-slider');
+       populateSlider(bestDealsSlider, bestDeals);
+
+        // whats hot populate
+        const whatshot = data.respdata.whats_hot;
+        
+        const whatshotSlider = document.getElementById('whats-hot-slider');
+        populateSlider(whatshotSlider, whatshot);
+        
+        
+        // Just sold populate
+        const justsold = data.respdata.just_sold;
+        
+        const justsoldSlider = document.getElementById('just-sold-slider');
+        populateSlider(justsoldSlider, justsold);
+        
+        
+        
+      
+      $('.product_Slider1').removeClass("slick-initialized slick-slider");
+      $('.product_Slider1').slick({
+         dots: false,
+         infinite:true,  
+         speed: 300,
+         slidesToShow: 4,
+         loop:true,
+         slidesToScroll: 1,
+         autoplay: true,
+         autoplaySpeed: 3500, 
+         responsive: [ 
+         {
+               breakpoint:991,
+               settings: {
+               slidesToShow: 3,        
                }
-            });
-            $(document).on("click", ".bidButton", function () {
-               if (isLoggedIn != "") {
-                  productId = $(this).siblings('a').data("id");
-                  $('#bid_modal').modal('show');
-                  //window.location.href = "/api/bid-for-product";
-               } else {
-                  //$('.loginModal').trigger('click');
-                  $('#login_modal').modal('show');
-               }
-            });
-
-         </script>
-         <script>
-            async function fetchData() {
-               try {
-                  const response = await fetch('/api/app-home');
-                  const data = await response.json();
-
-                  isLoggedIn = data.isLoggedIn;
-                  // Best deal populate
-                  const bestDeals = data.respdata.best_deal;
-
-                  const bestDealsSlider = document.getElementById('best-deals-slider');
-                  populateSlider(bestDealsSlider, bestDeals);
-
-                  // whats hot populate
-                  const whatshot = data.respdata.whats_hot;
-
-                  const whatshotSlider = document.getElementById('whats-hot-slider');
-                  populateSlider(whatshotSlider, whatshot);
-
-
-                  // Just sold populate
-                  const justsold = data.respdata.just_sold;
-
-                  const justsoldSlider = document.getElementById('just-sold-slider');
-                  populateSlider(justsoldSlider, justsold);
-
-
-
-
-                  $('.product_Slider1').removeClass("slick-initialized slick-slider");
-                  $('.product_Slider1').slick({
-                     dots: false,
-                     infinite: true,
-                     speed: 300,
-                     slidesToShow: 4,
-                     loop: true,
-                     slidesToScroll: 1,
-                     autoplay: true,
-                     autoplaySpeed: 3500,
-                     responsive: [
-                        {
-                           breakpoint: 991,
-                           settings: {
-                              slidesToShow: 3,
-                           }
-                        },
-                        {
-                           breakpoint: 767,
-                           settings: {
-                              slidesToShow: 2,
-                           }
-                        }
-                     ]
-                  });
-
-               } catch (error) {
-                  console.error('Error fetching data:', error);
+            },   
+            {
+               breakpoint:767,
+               settings: {
+               slidesToShow: 2,        
                }
             }
+         ]
+         });
 
-            function populateSlider(sliderElement, data, isLoggedIn = "") {
-               data.forEach(item => {
-                  const sliderItem = document.createElement('div');
-                  sliderItem.classList.add('slider-item');
-                  let html = ``;
-                  html += `
+     } catch (error) {
+       console.error('Error fetching data:', error);
+     }
+   }
+
+   function populateSlider(sliderElement, data, isLoggedIn = "") {
+         data.forEach(item => {
+         const sliderItem = document.createElement('div');
+         sliderItem.classList.add('slider-item');
+         let html = ``;
+         html += `
          <div class="product-box">
             <div class="product-image">
-               <a href="<%= requrl %>/api/productdeatils/${item._id}"><img src="${item.image}" alt="images" class="img-fluid"></a>
+               <a href="/api/productdeatils/${item._id}"><img src="${item.image}" alt="images" class="img-fluid"></a>
             </div>
             <div class="prd-short-info">
                <div class="prd-name"><a href="javascript:void(0)">${item.name}</a></div>
@@ -272,69 +209,44 @@
             </div>
             <div class="prd-button-group">
                <a href="javascript:void(0)" class="prd-btn buy-btn" data-id="${item._id}">Buy Now</a>`;
-                  //if(isLoggedIn != "") {
-                  html += `<a href="javascript:void(0)" class="prd-btn orng-btn bidButton">Bid Now</a>`;
-                  //}
-                  html += `</div>
+            //if(isLoggedIn != "") {
+               html += `<a href="javascript:void(0)" class="prd-btn orng-btn bidButton">Bid Now</a>`;
+            //}
+            html += `</div>
             <div class="prd-batch">${item.status}</div>
          </div>
          `;
-                  sliderItem.innerHTML = html;
-                  sliderElement.appendChild(sliderItem);
-               });
+         sliderItem.innerHTML = html;
+         sliderElement.appendChild(sliderItem);
+      });
 
-            }
-
-
-            window.onload = fetchData;
+   }
 
 
-            $(document).ready(function () {
-               var id1 = $(this).data('id');
-               $.ajax({
-                  url: '/api/cart-list', // Route on the server to handle the request
-                  data: { id1: id1 },
-                  method: 'POST',
-                  success: function (data) {
-                     console.log('Danger Alert');
+   window.onload = fetchData;
+   
+  
+    $(document).ready(async function(){
+        var id1 = $('#userReloggedIn').val();
+
+        let cartListreCookieAccessToken = await getCookieFunc(accessTokenVar);
+        let cartListreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
+        await userReLogin(cartListreCookieAccessToken, cartListreCookieRefreshToken);
+        
+        $.ajax({
+                 url: '/api/cart-list', // Route on the server to handle the request
+                 data: {id1:id1},
+                 method: 'POST',
+                 success: function(data) 
+                  {
+                      console.log('Danger Alert');
                   },
-                  error: function (err) {
-                     console.error('Error:', err);
-                  }
-               });
+                 error: function(err) 
+                  {
+                      console.error('Error:', err);
+                  } 
+        });
+   });
 
 
-
-               $(document).on('click', ".buy-btn", function (e) {
-
-                  var id = $(this).data('id');
-                  console.log(id);
-                  $.ajax({
-                     url: '/api/addtocart/' + id.trim(), // Route on the server to handle the request
-                     method: 'POST',
-                     success: function (data) {
-                        if (data.is_added) {
-                           Swal.fire({
-                              html: data.message,
-                              confirmButtonText: "OK",
-                              customClass: { confirmButton: 'alert-box-button' }
-                           });
-                           getHeaderData();
-                        } else {
-                           Swal.fire({
-                              html: "You can add one item at a time",
-                              confirmButtonText: "OK",
-                              customClass: { confirmButton: 'alert-box-button', popup: 'swal2-popup' }
-                           });
-                        }
-                     },
-                     error: function (err) {
-                        console.error('Error:', err);
-                     }
-                  });
-
-               });
-            });
-
-
-         </script>
+</script>

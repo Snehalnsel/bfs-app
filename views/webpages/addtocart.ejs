@@ -1,11 +1,11 @@
 <%- include('../../public/assets/include/header'); %>
 
 <section class="bids-wrapper">
-    <div class="container">     
-       <div class="bids-lists cart-wrapper">     
+    <div class="container">  
+          
+       <div class="bids-lists cart-wrapper"> 
+         <% if(respdata != ''){ %>   
        <div class="cart-list">
-           
-         <!--<form action="/api/checkout-web" method="POST">  -->
          <form id="orderPlace"> 
             <input type="hidden" id="user_id" name="user_id" value="<%=user%>">
              <input type="hidden" id="seller_id" name="seller_id" value="<%=respdata.seller_id%>">
@@ -14,6 +14,7 @@
             <input type="hidden" id="total_amt" name="total_amt" value="<%=respdata1%>">
             <input type="hidden" id="gst" name="gst" value="28">
             <input type="hidden" id="payment_method" name="payment_method" value="0">
+         </form> 
           <div class="bids-row cart-row">             
              <div class="br-details">
                 <div class="bid-images">
@@ -41,63 +42,7 @@
                 </div>
              </div>
           </div>
- 
-          <!-- <div class="bids-row cart-row">             
-             <div class="br-details">
-                <div class="bid-images"><img src="assets/images/cart2.png" alt="images" class="img-fluid"></div>
-                <div class="bid-info">
-                   <div class="bd-title">Lorem ipsum dolor sit amet</div>
-                   <div class="bd-price">
-                      <span><i class="fa fa-inr" aria-hidden="true"></i></span>
-                      10,000
-                   </div>
-                   <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i> 110000</div>                
-                </div>
-             </div>
-            
-             <div class="br-results cart-right-box">
-                <div class="cart-price">
-                   <p>Final Bid Price</p>
-                   <div class="highlight-title "><span><i class="fa fa-inr" aria-hidden="true"></i></span>8,000</div>
-                </div>
-                <div class="cart-action">
-                   <div class="remove-cart">
-                      <a href="#"><i class="fa fa-times" aria-hidden="true"></i></a>
-                   </div>
-                </div>
-             </div>
-          </div>
- 
-          <div class="bids-row cart-row">             
-             <div class="br-details">
-                <div class="bid-images"><img src="assets/images/product4.jpg" alt="images" class="img-fluid"></div>
-                <div class="bid-info">
-                   <div class="bd-title">Lorem ipsum dolor sit amet</div>
-                   <div class="bd-price">
-                      <span><i class="fa fa-inr" aria-hidden="true"></i></span>
-                      10,000
-                   </div>
-                   <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i> 110000</div>                
-                </div>
-             </div>
-            
-             <div class="br-results cart-right-box">
-                <div class="cart-price">
-                   <p>Final Bid Price</p>
-                   <div class="highlight-title "><span><i class="fa fa-inr" aria-hidden="true"></i></span>8,000</div>
-                </div>
-                <div class="cart-action">
-                   <div class="remove-cart">
-                      <a href="#"><i class="fa fa-times" aria-hidden="true"></i></a>
-                   </div>
-                </div>
-             </div>
-          </div> -->
- 
-       </div> 
-
-
-      
+       </div>      
        <div class="cart-summery">
           <div class="summery-title">
              <h4>Price details</h4>
@@ -133,12 +78,10 @@
           
 
        </div> 
-          
-      </form>
- 
-       </div>
- 
-        
+       <% } else { %>
+         <div>Cart is Empty</div>
+       <% } %>    
+    </div>        
     </div>
  </section>
 
@@ -158,8 +101,10 @@ $(document).on("click", ".check-out", function(e) {
         seller_id: $('#seller_id').val(),
         payment_method: $('#payment_method').val()
     };
+    let addToCartreCookieAccessToken = await getCookieFunc(accessTokenVar);
+    let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
+    await userReLogin(addToCartreCookieAccessToken, addToCartreCookieRefreshToken);
 
-console.log(formData);
     $.ajax({
         type: 'POST',
         url: '/api/checkout-web', // URL to submit the form data to (process.php in this case)

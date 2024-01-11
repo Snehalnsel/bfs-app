@@ -196,7 +196,13 @@ function populateBuyerHtml(data)
                         <a href="/api/web-myorder-details/${item._id}">${item.product.name}</a>
                      </div>
                      <div class="bd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>${item.total_price}</div> 
-                     
+                     <div class="cnbtn-group">
+                        <p>Please Choose Either Option To Confirm Your Order.</p>
+                        <div class="cg-row">
+                           <a href="javascript:void(0)" data-toggle="modal" data-target="#short-modal" class="acb-btn rv-btn">Buy Shipping Kit</a>
+                           <a href="javascript:void(0)" class="acb-btn  grey-btn">Don't Buy Shipping Kit</a>
+                        </div>
+                     </div>   
                      
                 </div>
                </div>

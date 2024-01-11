@@ -1,53 +1,104 @@
 <%- include('../../public/assets/include/header'); %>
 
-<section class="bids-wrapper">
-    <div class="container">
-       <div class="title-box title-with-count">
-          <h1>My Wishlist</h1>
-          <span class="wishlist-count">(<%= itemCount %>)</span>
-       </div>
-       <div class="bids-lists cart-wrapper">
-          <div class="cart-list wishlist-list">
+   <section class="bids-wrapper">
+      <div class="container">
+         <div class="title-box title-with-count">
+            <h1>My Wishlist</h1>
+            <span class="wishlist-count">(<%= itemCount %>)</span>
+         </div>
+         <div class="bids-lists cart-wrapper">
+            <% console.log(respdata);%>
+               <div class="cart-list wishlist-list">
+                  <% if (respdata && respdata.length> 0) { %>
+                     <% respdata.forEach(function(item) { %>
+                        <div class="bids-row wishlist-row " id="<%=item._id%>">
+                           <div class="br-details">
+                              <div class="bid-images"><img src="<%=item.images%>" alt="images" class="img-fluid"></div>
+                              <div class="bid-info">
+                                 <div class="bd-title">
+                                    <a href="javascript:void(0)">
+                                       <%=item.product_name%>
+                                    </a>
+                                 </div>
+                                 <div class="bd-price">
+                                    <span><i class="fa fa-inr" aria-hidden="true"></i></span>
+                                    <%=item.product_price%>
+                                 </div>
+                                 <div class="Stock-info">
+                                    <div class="stocks-status instocks">In Stocks</div>
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="br-results ">
+                              <div class="addcart-button">
+                                 <div class="show-date">Added on <label>
+                                       <%=item.added_dtime%>
+                                    </label></div>
+                                 <a href="/api/addtocart/<%=item.product_id%>" class="acb-btn">Add to Cart</a>
+                              </div>
+                              <div class="cart-action">
+                                 <div class="remove-cart">
+                                    <a href="javascript:void(0)" class="prd-btn wish-rem-btn"
+                                       data-id="<%=item.product_id%>"><i class="fa fa-trash-o"
+                                          aria-hidden="true"></i></a>
+                                 </div>
+                              </div>
+                           </div>
 
-             <div class="bids-row wishlist-row ">
-               <% if (respdata && respdata.length > 0) { %>
-                  <% respdata.forEach(function(item) { %>
-                <div class="br-details">
-                   <div class="bid-images"><img src="<%=item.images%>" alt="images" class="img-fluid"></div>
-                   <div class="bid-info">
-                      <div class="bd-title">
-                         <a href="javascript:void(0)"><%=item.product_name%></a>
-                      </div>
-                      <div class="bd-price">
-                         <span><i class="fa fa-inr" aria-hidden="true"></i></span>
-                         <%=item.product_price%>
-                      </div>
-                      <div class="Stock-info">
-                         <div class="stocks-status instocks">In Stocks</div>
-                      </div>
-                   </div>
-                </div>
-                <div class="br-results ">
-                   <div class="addcart-button">
-                      <div class="show-date">Added on <label><%=item.added_dtime%></label></div>
-                      <a href="/api/addtocart/<%=item.product_id%>" class="acb-btn">Add to Cart</a>
-                   </div>
-                   <div class="cart-action">
-                      <div class="remove-cart">
-                         <a href="/api/remove-wishlist-web/<%=item.product_id%>"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
-                      </div>
-                   </div>
-                </div>
-                <% }); %>
-                 <% } else { %>
-                    <p>No products found yet.</p>
-                  <% } %>
-             </div>
+                        </div>
+                        <% }); %>
+                           <% } else { %>
+                              <p>No products found in the Wishlist.</p>
+                              <% } %>
 
-          </div>
-       </div>
-    </div>
- </section>
+               </div>
+         </div>
+      </div>
+   </section>
 
-<%- include('../../public/assets/include/newsletter'); %>
-<%- include('../../public/assets/include/footer'); %>
+   <%- include('../../public/assets/include/newsletter'); %>
+      <%- include('../../public/assets/include/footer'); %>
+
+         <script>
+            $(document).on('click', ".wish-rem-btn", function (e) {
+
+               var divid = $(this).closest('.bids-row').attr('id');
+               console.log(divid);
+
+               var id = $(this).data('id');
+               $.ajax({
+                  url: '/api/remove-wishlist-web/' + id.trim(),
+                  method: 'GET',
+                  success: function (data) {
+                     if (data.success) {
+                        Swal.fire({
+                           html: data.message,
+                           confirmButtonText: "OK",
+                           customClass: { confirmButton: 'alert-box-button' }
+                        });
+                        $("#" + divid).remove();
+                        // Update the wishlist count
+                        updateWishlistCount(data);
+                     } else {
+                        Swal.fire({
+                           html: data.message,
+                           confirmButtonText: "OK",
+                           customClass: { confirmButton: 'alert-box-button', popup: 'swal2-popup' }
+                        });
+                     }
+                  },
+                  error: function (err) {
+                     console.error('Error:', err);
+                  }
+               });
+
+               function updateWishlistCount(data) {
+                  var itemCount = data.count; 
+
+                  console.log(itemCount);
+                  
+                  $(".wishlist-count").text(`(${itemCount})`);
+               }
+
+            });
+         </script>

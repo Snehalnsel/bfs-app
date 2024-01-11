@@ -1948,9 +1948,12 @@ exports.viewWishListByUserId = async function (req, res, next) {
     console.log(existingList);
 
     if (existingList.length === 0) {
-      return res.status(200).json({
-        message: 'Wishlist is empty',
-        existingList: [],
+      res.render("webpages/wishlist", {
+        title: "Wish List Page",
+        message: "Welcome to the Wish List page!",
+        respdata: [],
+        isLoggedIn: isLoggedIn,
+        itemCount: 0, 
       });
     } else {
       const formattedList = await Promise.all(existingList.map(async (item) => {
@@ -2007,19 +2010,22 @@ exports.removeWishlistWeb = async (req, res) => {
     const product_id = req.params.id;
     const user_id = req.session.user.userId;
     const existingList = await Wishlist.findOne({ user_id, product_id});
+    
     if (Object.keys(existingList).length == 0) {
       return res.status(404).json({
         message: 'Product is not found in the Wishlist',
-        success: false
+        success: false,
+        count:count
       });
     }
     else
     {
       await existingList.remove();
-
+      const count = await Wishlist.countDocuments({ user_id });
       return res.status(200).json({
         message: 'Product removed from Wishlist successfully',
-        success: true
+        success: true,
+        count:count
       });
     }
   }
@@ -2225,10 +2231,6 @@ try{
 
     if (!existingCart) 
       {
-        //  return res.status(200).json({
-        //    message: 'Cart is empty',
-        //    cartList: [],
-        //  });
         res.render("webpages/addtocart", {
           title: "Cart List Page",
           message: "Cart is empty",
@@ -2258,9 +2260,6 @@ try{
             const formattedCartList = await Promise.all(cartList.map(async (cartItem) => {
             const product = await Userproduct.findOne({ _id: cartItem.product_id._id }).populate('category_id', 'name');
             const productImages = await Productimage.find({ product_id: cartItem.product_id._id }).limit(1);
-      
-      
-      
       
               const finalData = {
                 _id: cartItem._id,

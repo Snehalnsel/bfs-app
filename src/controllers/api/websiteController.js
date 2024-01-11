@@ -1013,10 +1013,11 @@ exports.myAccount = async function (req, res, next) {
 
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   
-  console.log('************** ADDRESS 123 ************');
-  console.log(address);
+  //console.log('************** ADDRESS 123 ************');
+  //console.log(address);
 
-  if (userData === undefined || userData === null)
+  //if (userData === undefined || userData === null)
+  if (isLoggedIn == "")
   {
     res.redirect('/api/registration');
   }
@@ -2225,7 +2226,8 @@ try{
 
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
 
-  if (!req.session.user || !req.session.user.userId) {
+  //if (!req.session.user || !req.session.user.userId) {
+  if (isLoggedIn == "") {
     return res.redirect("/api/registration");
   }
   

@@ -54,7 +54,9 @@
                             <li class="nav-item"><a href="/api/home">Home</a></li>
                             <!-- <li class="nav-item"><a href="javascript:void(0)">About Us</a></li> -->
                             <li class="nav-item"><a href="/api/webSubCategories">Categories</a></li>
-                            <li class="nav-item"><a href="/api/my-account">My Account</a></li>
+                            <%if(isLoggedIn != "") {%>
+                                <li class="nav-item"><a href="/api/my-account">My Account</a></li>
+                            <% } %>
                         </ul>
                        
                     </nav>
@@ -81,12 +83,13 @@
                         <div class="top-count" id="cartCount">0</div>
                     </a>
                     </div>
-
-                    <div class="pib-box">
-                        <a href="javascript:void(0)" data-toggle="modal" data-target="#login_modal">
-                        <i class="fa fa-user-o" aria-hidden="true"></i>
-                        </a>                        
-                    </div>
+                    <%if(isLoggedIn == "") {%>
+                        <div class="pib-box">
+                            <a href="javascript:void(0)" data-toggle="modal" data-target="#login_modal">
+                            <i class="fa fa-user-o" aria-hidden="true"></i>
+                            </a>                        
+                        </div>
+                    <% } %>
                 </div>
 
                 </div>
@@ -242,12 +245,13 @@
                         <div class="top-count">0</div>
                     </a>
                     </div>
-
-                    <div class="pib-box">
-                        <a href="javascript:void(0)" data-toggle="modal" data-target="#login_modal">
-                        <i class="fa fa-user-o" aria-hidden="true"></i>
-                        </a>                        
-                    </div>
+                    <%if(isLoggedIn == "") {%>
+                        <div class="pib-box">
+                            <a href="javascript:void(0)" data-toggle="modal" data-target="#login_modal">
+                            <i class="fa fa-user-o" aria-hidden="true"></i>
+                            </a>                        
+                        </div>
+                    <% } %>
                 </div>
             </div>
         </div>

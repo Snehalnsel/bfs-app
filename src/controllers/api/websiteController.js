@@ -2010,19 +2010,22 @@ exports.removeWishlistWeb = async (req, res) => {
     const product_id = req.params.id;
     const user_id = req.session.user.userId;
     const existingList = await Wishlist.findOne({ user_id, product_id});
+    
     if (Object.keys(existingList).length == 0) {
       return res.status(404).json({
         message: 'Product is not found in the Wishlist',
-        success: false
+        success: false,
+        count:count
       });
     }
     else
     {
       await existingList.remove();
-
+      const count = await Wishlist.countDocuments({ user_id });
       return res.status(200).json({
         message: 'Product removed from Wishlist successfully',
-        success: true
+        success: true,
+        count:count
       });
     }
   }

@@ -897,9 +897,7 @@ exports.updateOrderById = async function (req, res, next) {
 
 exports.getOrderListByUser = async (req, res) => {
   try {
-    let  user_id  = req.body.length > 0 ? req.body : req.session.user.userId;
-    
-    console.log('Heloo################');
+    let  user_id  = typeof req.body.user_id != "undefined"  ? req.body.user_id : "";
     
 
     const orders = await Order.find({ user_id: user_id }).populate('seller_id', 'name').populate('user_id', 'name');

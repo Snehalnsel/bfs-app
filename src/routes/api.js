@@ -1096,6 +1096,8 @@ router.post("/deletenotification", auth.isAuthorized, [],NotificationsController
 // generate 
 router.post("/get-shipmentkit", auth.isAuthorized,[],ShippingkitController.addShipmentData);
 
+router.get("/get-shipmentkitweb/:id",[],WebsiteController.addShipmentData);
+
 
 // WEBSITE API'S
 router.get("/home",[],DashboardController.getData);

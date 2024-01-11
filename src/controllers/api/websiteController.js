@@ -1965,7 +1965,7 @@ exports.viewWishListByUserId = async function (req, res, next) {
         const productImages = await Productimage.find({ product_id: item.product_id }).limit(1);
 
         const date = moment(item.added_dtime);
-        const addedDate = date.format('MM/DD/YYYY');
+        const addedDate = date.format('DD/MM/YYYY');
     
         return {
           _id: item._id,

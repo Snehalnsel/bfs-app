@@ -949,7 +949,7 @@ exports.getOrdersBySeller = async (req, res) => {
   try {
     //const { seller_id } = req.body;
     
-    let  seller_id  = req.body.length > 0 ? req.body : req.session.user.userId;
+    let  seller_id  = typeof req.body.user_id != "undefined"  ? req.body.user_id : req.session.user.userId;
 
     const orders = await Order.find({ seller_id }).populate('seller_id', 'name').populate('user_id', 'name');
 

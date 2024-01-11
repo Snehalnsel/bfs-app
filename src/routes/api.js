@@ -932,10 +932,11 @@ router.post(
 
 router.post(
   "/orderlist",
-  auth.isAuthorized, 
+  //auth.isAuthorized, 
   [],
   OrderController.getOrderListByUser
 );
+
 
 router.post(
   "/selllist",

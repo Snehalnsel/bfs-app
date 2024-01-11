@@ -4,25 +4,23 @@
     <div class="container">
        <div class="title-box title-with-count">
           <h1>My Wishlist</h1>
-          <span class="wishlist-count">(16)</span>
+          <span class="wishlist-count">(<%= itemCount %>)</span>
        </div>
        <div class="bids-lists cart-wrapper">
           <div class="cart-list wishlist-list">
 
-            
-            
-            <% console.log('Wishlist Page 1'); console.log(respdata);%>
-
              <div class="bids-row wishlist-row ">
+               <% if (respdata && respdata.length > 0) { %>
+                  <% respdata.forEach(function(item) { %>
                 <div class="br-details">
-                   <div class="bid-images"><img src="<%=respdata.images%>" alt="images" class="img-fluid"></div>
+                   <div class="bid-images"><img src="<%=item.images%>" alt="images" class="img-fluid"></div>
                    <div class="bid-info">
                       <div class="bd-title">
-                         <a href="javascript:void(0)"><%=respdata.product_name%></a>
+                         <a href="javascript:void(0)"><%=item.product_name%></a>
                       </div>
                       <div class="bd-price">
                          <span><i class="fa fa-inr" aria-hidden="true"></i></span>
-                         <%=respdata.product_price%>
+                         <%=item.product_price%>
                       </div>
                       <div class="Stock-info">
                          <div class="stocks-status instocks">In Stocks</div>
@@ -31,77 +29,20 @@
                 </div>
                 <div class="br-results ">
                    <div class="addcart-button">
-                      <div class="show-date">Added on <label><%=respdata.added_dtime%></label></div>
-                      <a href="/api/addtocart/<%=respdata.product_id%>" class="acb-btn">Add to Cart</a>
+                      <div class="show-date">Added on <label><%=item.added_dtime%></label></div>
+                      <a href="/api/addtocart/<%=item.product_id%>" class="acb-btn">Add to Cart</a>
                    </div>
                    <div class="cart-action">
                       <div class="remove-cart">
-                         <a href="/api/remove-wishlist-web/<%=respdata.product_id%>"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                         <a href="/api/remove-wishlist-web/<%=item.product_id%>"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
                       </div>
                    </div>
                 </div>
+                <% }); %>
+                 <% } else { %>
+                    <p>No products found yet.</p>
+                  <% } %>
              </div>
-
-             <!-- <div class="bids-row wishlist-row ">
-                <div class="br-details">
-                   <div class="bid-images"><img src="assets/images/product2.jpg" alt="images" class="img-fluid"></div>
-                   <div class="bid-info">
-                      <div class="bd-title">
-                         <a href="javascript:void(0)">Ut enim ad minim veniam nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</a>
-                      </div>
-                      <div class="bd-price">
-                         <span><i class="fa fa-inr" aria-hidden="true"></i></span>
-                         2,000
-                      </div>
-                      <div class="Stock-info">
-                         <div class="stocks-status outstocks">Out of Stocks</div>
-                      </div>
-                   </div>
-                </div>
-                <div class="br-results ">
-                   <div class="addcart-button">
-                      <div class="show-date">Added on <label>09/09/2023</label></div>
-                      <a href="javascript:void(0)" class="acb-btn">Add to Cart</a>
-                   </div>
-                   <div class="cart-action">
-                      <div class="remove-cart">
-                         <a href="#"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
-                      </div>
-                   </div>
-                </div>
-             </div>
-
-             <div class="bids-row wishlist-row ">
-                <div class="br-details">
-                   <div class="bid-images"><img src="assets/images/product5.jpg" alt="images" class="img-fluid"></div>
-                   <div class="bid-info">
-                      <div class="bd-title">
-                         <a href="javascript:void(0)">Ut enim ad minim veniam nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</a>
-                      </div>
-                      <div class="bd-price">
-                         <span><i class="fa fa-inr" aria-hidden="true"></i></span>
-                         10,000
-                      </div>
-                      <div class="Stock-info">
-                         <div class="stocks-status instocks">In Stocks</div>
-                      </div>
-                   </div>
-                </div>
-                <div class="br-results ">
-                   <div class="addcart-button">
-                      <div class="show-date">Added on <label>07/05/2023</label></div>
-                      <a href="javascript:void(0)" class="acb-btn">Add to Cart</a>
-                   </div>
-                   <div class="cart-action">
-                      <div class="remove-cart">
-                         <a href="#"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
-                      </div>
-                   </div>
-                </div>
-             </div> -->
-       
-
-
 
           </div>
        </div>

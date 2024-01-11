@@ -1194,11 +1194,11 @@ router.get("/show-cart-details",[],WebsiteController.viewCartListByUserId);
 router.get("/delete-cart/:id",[],WebsiteController.deleteCart); //auth.isAuthorized
 
 // Wishlist Web Start
-router.get("/add-to-wishlist-web/:id",[],WebsiteController.addToWishlistWeb);
+router.post("/add-to-wishlist-web/:id",[],WebsiteController.addToWishlistWeb);
 
 router.get("/show-wishlist-details",[],WebsiteController.viewWishListByUserId);
 
-router.get("/remove-wishlist-web/:id",[],WebsiteController.removeWishlistWeb);
+router.post("/remove-wishlist-web/:id",[],WebsiteController.removeWishlistWeb);
 
 // Wishlist Web End
 

@@ -46,9 +46,7 @@ const tokenDecode = require("../../utils/tokenDecode");
 const brandModel = require("../../models/api/brandModel");
 const sizeModel = require("../../models/api/sizeModel");
 const productconditionModel = require("../../models/api/productconditionModel");
-// const yourSecretKey = crypto.randomBytes(64).toString('hex');
 
-// console.log('Generated Secret Key:', yourSecretKey);
 
 const transporter = nodemailer.createTransport({
   port: 465, 
@@ -73,8 +71,7 @@ const authToken = 'ea9a24bf2a9ca43a95b991c9c471ba93';
 const twilioClient = new twilio(accountSid, authToken);
 
 async function generateToken(user) {
-  //console.log('Token......');
-  //console.log(user);
+
   return jwt.sign({ data: user }, tokenSecret, { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN });
 }
 const refreshToken = (user) => {
@@ -138,8 +135,7 @@ async function generateSellerPickup(data) {
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = JSON.parse(body);
-       //console.log(responseBody);
-       //console.log("hi");
+      
        const token = responseBody;
        resolve(token);
      } else {
@@ -162,6 +158,18 @@ exports.productData = async function (req, res, next) {
     //if (req.body.product_id) {
       query._id = productId; 
     //}
+    console.log(productId);
+    console.log("hello");
+    console.log(isLoggedIn);
+    let isProductInWishlist = "";
+    if(isLoggedIn)
+    {
+      isProductInWishlist = await Wishlist.findOne({
+        user_id: isLoggedIn, 
+        product_id: productId, 
+      });
+      console.log("product");
+    }
     
     const userproducts = await Userproduct.findById(query)
     .populate('brand_id', 'name') 
@@ -170,7 +178,7 @@ exports.productData = async function (req, res, next) {
     .populate('size_id', 'name')
     .exec();
     
-    //console.log(userproducts);
+
   
     if (!userproducts) {
     return res.status(404).json({
@@ -185,8 +193,6 @@ exports.productData = async function (req, res, next) {
   await userproducts.save();
 
   const productImages = await Productimage.find({ product_id: userproducts._id });
-
-  //console.log(productImages);
 
   const productCondition = await Productcondition.findById(userproducts.status);
   const formattedUserProduct = {
@@ -215,63 +221,59 @@ exports.productData = async function (req, res, next) {
   };
 
 
-  // Related Products //
 
-const userproducts1 = await Userproduct.find({category_id: formattedUserProduct.category_id})
-    .populate('brand_id', 'name') 
-    .populate('category_id', 'name') 
-    .populate('user_id', 'name')
-    .populate('size_id', 'name')
-    .exec();
+    const userproducts1 = await Userproduct.find({category_id: formattedUserProduct.category_id})
+        .populate('brand_id', 'name') 
+        .populate('category_id', 'name') 
+        .populate('user_id', 'name')
+        .populate('size_id', 'name')
+        .exec();
+        
+        if (!userproducts1 || userproducts1.length === 0) {
+          return res.status(404).json({
+            status: "0",
+            message: "Not found!",
+            respdata: [],
+          });
+        }
+
+        const formattedUserProducts1 = [];
+        for (const userproduct1 of userproducts1) {
+          const productImages1 = await Productimage.find({ product_id: userproduct1._id });
+
+          const formattedUserProduct1 = {
+            _id: userproduct1._id,
+            name: userproduct1.name,
+            description: userproduct1.description,
+            //category: userproduct1.category_id.name, 
+            // brand: userproduct1.brand_id.name, 
+            // user_id: userproduct1.user_id._id,
+            // user_name: userproduct1.user_id.name,
+            // size_id: userproduct1.size_id.name,
+            price: userproduct1.price,
+            offer_price: userproduct1.offer_price,
+            percentage: userproduct1.percentage,
+            status: userproduct1.status,
+            flag: userproduct1.flag,
+            approval_status: userproduct1.approval_status,
+            added_dtime: userproduct1.added_dtime,
+            __v: userproduct1.__v,
+            product_images: productImages1, 
+          };
+      
+          formattedUserProducts1.push(formattedUserProduct1);
+        }
+       
+
+    // End //
     
-    
-   // console.log(formattedUserProduct.category_id);
-
-    if (!userproducts1 || userproducts1.length === 0) {
-      return res.status(404).json({
-        status: "0",
-        message: "Not found!",
-        respdata: [],
-      });
-    }
-
-    const formattedUserProducts1 = [];
-    for (const userproduct1 of userproducts1) {
-      const productImages1 = await Productimage.find({ product_id: userproduct1._id });
-
-      const formattedUserProduct1 = {
-        _id: userproduct1._id,
-        name: userproduct1.name,
-        description: userproduct1.description,
-        //category: userproduct1.category_id.name, 
-        // brand: userproduct1.brand_id.name, 
-        // user_id: userproduct1.user_id._id,
-        // user_name: userproduct1.user_id.name,
-        // size_id: userproduct1.size_id.name,
-        price: userproduct1.price,
-        offer_price: userproduct1.offer_price,
-        percentage: userproduct1.percentage,
-        status: userproduct1.status,
-        flag: userproduct1.flag,
-        approval_status: userproduct1.approval_status,
-        added_dtime: userproduct1.added_dtime,
-        __v: userproduct1.__v,
-        product_images: productImages1, 
-      };
-  
-      formattedUserProducts1.push(formattedUserProduct1);
-    }
-    console.log(formattedUserProducts1);
-
-// End //
-
     res.render("webpages/productdetails", {
       title: "Dashboard",
       message: "Welcome to the Dashboard page!",
       respdata: formattedUserProduct,
       relatedProducts: formattedUserProducts1,
       isLoggedIn: isLoggedIn,
-     
+      isWhislist: isProductInWishlist != null && Object.keys(isProductInWishlist).length  ? true : false
     });
   } catch (error) {
     console.error(error);
@@ -739,7 +741,7 @@ exports.userRelogin = async function (req, res, next) {
                     } else {
                       Users.findOne({ _id: user._id }).then((updatedUser) => {
                         res.status(200).json({
-                          status: "error",
+                          status: "success",
                           message: "Successful!",
                           accessToken: accessTokenGlobal,
                           refreshToken:refreshTokenGlobal,
@@ -1876,8 +1878,6 @@ exports.editUserWisePost = async function (req, res, next) {
 
 try{
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-  console.log('Edit My Post');
-  //console.log(req.params.id);
 
  const productConditions = await Productcondition.find();
  
@@ -1970,7 +1970,9 @@ exports.addToWishlistWeb = async function (req, res, next) {
       {
          return res.status(200).json({
                 message: 'Item already added to your favorite successfully',
-                cart: existingList,
+                wishlist: existingList,
+                success: true,
+                is_wishlisted: true
          });
       } 
       else
@@ -1991,17 +1993,8 @@ exports.addToWishlistWeb = async function (req, res, next) {
 
          return res.status(200).json({
           message: 'Item added to your wishlist successfully',
-          wishlist: {
-            user_id: user_id,
-            user_name: user.name, 
-            product_id: product_id,
-            product_name: product.name, 
-            category_name: product.category_id.name,
-            status: 0,
-            added_dtime: savedFavData.added_dtime,
-            _id: savedFavData._id,
-            __v: savedFavData.__v,
-          } 
+          success: true,
+          is_wishlisted: true
         });
       }
 
@@ -2010,6 +2003,8 @@ exports.addToWishlistWeb = async function (req, res, next) {
     console.error(error);
     res.status(500).json({
       status: "0",
+      success: false,
+      is_wishlisted: false,
       message: "An error occurred while rendering Wishlist.",
       error: error.message,
     });
@@ -2091,9 +2086,11 @@ exports.viewWishListByUserId = async function (req, res, next) {
     }
     
     const user_id = req.session.user.userId;
-    const existingList = await Wishlist.find({ user_id: user_id })
+    const existingList = await Wishlist.find({ user_id: isLoggedIn })
       .populate('user_id', 'name')
       .exec();
+
+    console.log(existingList);
 
     if (existingList.length === 0) {
       return res.status(200).json({
@@ -2102,8 +2099,15 @@ exports.viewWishListByUserId = async function (req, res, next) {
       });
     } else {
       const formattedList = await Promise.all(existingList.map(async (item) => {
+        console.log(item.product_id);
         const product = await Userproduct.findOne({ _id: item.product_id }).populate('category_id', 'name');
+        
+
+        console.log(product);
         const productImages = await Productimage.find({ product_id: item.product_id }).limit(1);
+
+        const date = new Date(product.added_dtime);
+        const addedDate = `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear().toString()}`;
 
         return {
           _id: item._id,
@@ -2115,16 +2119,19 @@ exports.viewWishListByUserId = async function (req, res, next) {
           category_name: product.category_id.name, 
           images: productImages[0].image, 
           status: item.status,
-          added_dtime: item.added_dtime,
+          added_dtime: addedDate,
           __v: item.__v,
         };
       }));
       
+      const count = formattedList.length;
+
       res.render("webpages/wishlist", {
         title: "Wish List Page",
         message: "Welcome to the Wish List page!",
         respdata: formattedList,
         isLoggedIn: isLoggedIn,
+        itemCount: formattedList.length, 
       });
     }
   } catch (error) {
@@ -2143,31 +2150,30 @@ exports.removeWishlistWeb = async (req, res) => {
   try{
     const product_id = req.params.id;
     const user_id = req.session.user.userId;
-
     const existingList = await Wishlist.findOne({ user_id, product_id});
-    console.log('Existing List');
-    console.log(existingList);
+    if (Object.keys(existingList).length == 0) {
+      return res.status(404).json({
+        message: 'Product is not found in the Wishlist',
+        success: false
+      });
+    }
+    else
+    {
+      await existingList.remove();
 
-  
-      if (!existingList) {
-        return res.status(404).json({
-          message: 'Product are not found in the Wishlist',
-        });
-      }
-      else
-      {
-        await existingList.remove();
-
-        res.status(200).json({
-          message: 'Product removed from Wishlist successfully',
-        });
-      }
+      return res.status(200).json({
+        message: 'Product removed from Wishlist successfully',
+        success: true
+      });
+    }
   }
   catch (error) {
     console.error(error);
     res.status(500).json({
       status: "0",
-      message: "An error occurred while Remove Product from Wishlist .",
+      success: false,
+      is_wishlisted: false,
+      message: "An error occurred while rendering Wishlist.",
       error: error.message,
     });
   }
@@ -2286,16 +2292,6 @@ try{
       __v: savedCart.__v,
     };
     
-    console.log('Cart Response ###############');
-    console.log(cartResponse);
-
-    // res.render("webpages/addtocart", {
-    //     title: "Dashboard",
-    //     message: "Welcome to the Dashboard page!",
-    //     respdata: cartResponse,
-    //     //respdata1: total,
-       
-    //   });
      const cartRemove = await Cartremove.findOne({}, { name: 1, _id: 0 });
 
       const durationInSeconds = cartRemove.name; // Assuming 'name' holds a duration in seconds
@@ -2328,15 +2324,6 @@ try{
     
     
   }
-  
-  // console.log(total);
-  // res.render("webpages/addtocart", {
-  //   title: "Dashboard",
-  //   message: "Welcome to the Dashboard page!",
-  //   respdata: formattedUserProduct,
-  //   respdata1: total,
-   
-  // });
 
 } catch (error) {
   console.error(error);

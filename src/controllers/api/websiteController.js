@@ -2231,10 +2231,6 @@ try{
 
     if (!existingCart) 
       {
-        //  return res.status(200).json({
-        //    message: 'Cart is empty',
-        //    cartList: [],
-        //  });
         res.render("webpages/addtocart", {
           title: "Cart List Page",
           message: "Cart is empty",
@@ -2264,9 +2260,6 @@ try{
             const formattedCartList = await Promise.all(cartList.map(async (cartItem) => {
             const product = await Userproduct.findOne({ _id: cartItem.product_id._id }).populate('category_id', 'name');
             const productImages = await Productimage.find({ product_id: cartItem.product_id._id }).limit(1);
-      
-      
-      
       
               const finalData = {
                 _id: cartItem._id,

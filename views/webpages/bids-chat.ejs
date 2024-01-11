@@ -84,6 +84,7 @@
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
    const socket = io("<%=siteUrl; %>");
+   let msgSendStatus = false;
 </script>
 <script>
    $( document ).ready(function() {
@@ -91,6 +92,7 @@
       if(urlBidId != "") {
          $( "#"+urlBidId ).trigger( "click" );
       }
+      
    });
    const chatForm = document.getElementById('chat-form');
    const chatMessages = document.querySelector('.chat-messages');

@@ -1748,62 +1748,65 @@ exports.addNewPost = async function (req, res, next) {
 
 
 exports.signOut = async function (req, res, next) {
-  const banner = await Banner.find({ status: 1 });
-let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-  Users.findOne({ _id: req.session.user.userId }).then((user) => {
-    if (!user)
-      res.status(404).json({
-        status: "0",
-        message: "User not found!",
-        respdata: {},
-      });
-    else {
-      var updData = {
-        token: "na",
-        last_logout: dateTime,
-      };
-      Users.findOneAndUpdate(
-        { _id: req.session.user.userId },
-        { $set: updData },
-        { upsert: true },
-        function (err, doc) {
-          if (err) {
-            throw err;
-          } else {
-            // Users.findOne({ _id: req.session.user.userId }).then((user) => {
-            //   // res.status(200).json({
-            //   //   status: "1",
-            //   //   message: "Successfully logged out!",
-            //   //   respdata: user,
-            //   // });
-            //   res.render("webpages/list",{
-            //     title: "Wish List Page",
-            //     message: "Successfully logged out!",
-                
-            //   });
-            // });
-            req.session.destroy((err) => {
-              if (err) {
-                console.error('Error destroying session:', err);
-                return res.status(500).json({
-                  status: "0",
-                  message: "Error logging out",
-                  respdata: {},
-                });
-              }
-              // Session destroyed, redirect or render logout success message
-              res.render("webpages/list", {
-                title: "Wish List Page",
-                message: "Successfully logged out!",
-                isLoggedIn: isLoggedIn,
-                banner: banner,
+  //const banner = await Banner.find({ status: 1 });
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+  if(isLoggedIn != ''){
+    Users.findOne({ _id: req.session.user.userId }).then((user) => {
+      if (!user)
+        res.status(404).json({
+          status: "0",
+          message: "User not found!",
+          respdata: {},
+        });
+      else {
+        var updData = {
+          token: "na",
+          last_logout: dateTime,
+        };
+        Users.findOneAndUpdate(
+          { _id: req.session.user.userId },
+          { $set: updData },
+          { upsert: true },
+          function (err, doc) {
+            if (err) {
+              throw err;
+            } else {
+              req.session.destroy((err) => {
+                if (err) {
+                  console.error('Error destroying session:', err);
+                  res.status(500).json({
+                    status: "error",
+                    message: "Error logging out",
+                    respdata: {},
+                  });
+                }
+
+                res.status(200).json({
+                    status: "success",                 
+                    message: "Sign out!",
               });
-            });
+                // Session destroyed, redirect or render logout success message
+                // res.render("webpages/list", {
+                //   title: "Wish List Page",
+                //   message: "Successfully logged out!",
+                //   isLoggedIn: isLoggedIn,
+                //   banner: banner,
+                // });
+              });
+            }
           }
-        }
-      );
-    }
-  });
+        );
+      }
+    });
+  }
+  else
+  {
+    res.status(200).json({
+      status: "error",
+      message: "Unable to logout at this moment.",
+     
+    });
+  }
 };
 
 

@@ -1134,7 +1134,7 @@ max: 10,
   WebsiteController.getUserLogin
 );
 
-router.get("/sign-out",[],WebsiteController.signOut);
+router.post("/sign-out",[],WebsiteController.signOut);
 
 
 // // Web user Profile API's

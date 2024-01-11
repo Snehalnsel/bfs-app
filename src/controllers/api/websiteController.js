@@ -1967,9 +1967,9 @@ exports.viewWishListByUserId = async function (req, res, next) {
         console.log(product);
         const productImages = await Productimage.find({ product_id: item.product_id }).limit(1);
 
-        const date = new Date(product.added_dtime);
-        const addedDate = `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear().toString()}`;
-
+        const date = moment(item.added_dtime);
+        const addedDate = date.format('DD/MM/YYYY');
+    
         return {
           _id: item._id,
           user_id: item.user_id._id,
@@ -2234,10 +2234,6 @@ try{
 
     if (!existingCart) 
       {
-        //  return res.status(200).json({
-        //    message: 'Cart is empty',
-        //    cartList: [],
-        //  });
         res.render("webpages/addtocart", {
           title: "Cart List Page",
           message: "Cart is empty",
@@ -2267,9 +2263,6 @@ try{
             const formattedCartList = await Promise.all(cartList.map(async (cartItem) => {
             const product = await Userproduct.findOne({ _id: cartItem.product_id._id }).populate('category_id', 'name');
             const productImages = await Productimage.find({ product_id: cartItem.product_id._id }).limit(1);
-      
-      
-      
       
               const finalData = {
                 _id: cartItem._id,

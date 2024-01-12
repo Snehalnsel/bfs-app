@@ -679,7 +679,7 @@ exports.checkout = async (req, res) => {
 
 
     const order = new Order({
-      order_code: orderCode, // Add the order code to the Order model
+      order_code: orderCode, 
       user_id,
       seller_id,
       product_id,
@@ -912,6 +912,19 @@ exports.getOrderListByUser = async (req, res) => {
       const productDetails = await Userproduct.find({ _id: order.product_id });
       const productId = order.product_id.toString();
       const productImage = await Productimage.find({ product_id: productId }).limit(1);
+      
+      const shipdetails = await Ordertracking.find({ order_id: order._id });
+
+      let shipping_details; 
+
+      if (!(shipdetails) || shipdetails !== null) {
+
+          console.log(shipdetails[0].tracking_id);
+          shipping_details = await Track({ _id: shipdetails[0].tracking_id });
+
+          console.log(shipping_details);
+          console.log("========");
+      }
 
       const orderDetails = {
         _id: order._id,
@@ -924,11 +937,14 @@ exports.getOrderListByUser = async (req, res) => {
         product: {
           name: productDetails.length ? productDetails[0].name : 'Unknown Product',
           image: productImage.length ? productImage[0].image : 'No Image',
-        }
+        },
+        shippingkit_status: shipping_details.length > 0 ? shipping_details.shippingkit_status : 0, 
       };
 
       ordersWithProductDetails.push(orderDetails);
     }
+
+     console.log(ordersWithProductDetails);
 
     res.status(200).json({
       message: 'Orders retrieved successfully',

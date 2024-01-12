@@ -265,10 +265,8 @@ exports.productData = async function (req, res, next) {
 
       formattedUserProducts1.push(formattedUserProduct1);
     }
-
-
-    // End //
-
+console.log('CHECK');
+console.log(formattedUserProduct);
     res.render("webpages/productdetails", {
       title: "Dashboard",
       message: "Welcome to the Dashboard page!",
@@ -541,7 +539,6 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
                   user.name +
                   ", <br> <p>Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items </p>",
               };
-
               transporter.sendMail(mailData, function (err, info) {
                 if (err) console.log(err);
                 else console.log(info);
@@ -790,9 +787,11 @@ exports.userFilter = async function (req, res, next) {
   if (typeof brandList != "undefined") {
     concatVar["brand"] = { "$in": brandList };
   }
-  if (typeof sizeList != "undefined") {
-    concatVar["size"] = { "$in": sizeList };
-  }
+  //if(typeof brandList != "undefined" && concatVar.length > 0) {
+    if (typeof sizeList != "undefined") {
+      concatVar["size"] = { "$in": sizeList };
+    }
+  //}
   if ((typeof conditionList != "undefined") && (objConditionList.length > 0)) {
     concatVar["status"] = { "$in": objConditionList };
   }
@@ -800,12 +799,12 @@ exports.userFilter = async function (req, res, next) {
     if (priceList.length > 0) {
       priceList.forEach(function (item) {
         let priceArr = item.split("-");
-        concatVar["offer_price"] = { "$gte": priceArr[0] };
+        concatVar["offer_price"] = { "$gt": priceArr[0] };
         concatVar["offer_price"] = { "$lte": priceArr[1] };
       });
     }
   }
-  let allProductData = await Userproduct.find(concatVar).sort({ offer_price: optionId });
+  let allProductData = await Userproduct.find({ $and: [concatVar]}).sort({ offer_price: optionId });
   //console.log(allProductData);return false;
   const formattedUserProducts = [];
   for (const userproduct of allProductData) {
@@ -816,19 +815,19 @@ exports.userFilter = async function (req, res, next) {
       _id: userproduct._id,
       name: userproduct.name,
       description: userproduct.description,
-      category: (typeof userproduct.category_id.name != "undefined") ? userproduct.category_id.name : "",
-      brand: userproduct.brand_id.name,
-      user_id: userproduct.user_id._id,
-      user_name: userproduct.user_id.name,
-      size_id: userproduct.size_id.name,
-      price: userproduct.price,
-      offer_price: userproduct.offer_price,
-      percentage: userproduct.percentage,
-      status: userproduct.status,
-      flag: userproduct.flag,
-      approval_status: userproduct.approval_status,
-      added_dtime: userproduct.added_dtime,
-      __v: userproduct.__v,
+      category: (typeof userproduct.category_id != "undefined") ? userproduct.category_id.name : "",
+      brand: (typeof userproduct.brand_id != "undefined") ? userproduct.brand_id.name : "",
+      user_id: (typeof userproduct.user_id != "undefined") ? userproduct.user_id._id : "",
+      user_name: (typeof userproduct.user_id != "undefined") ? userproduct.user_id.name : "",
+      size_id: (typeof userproduct.size_id != "undefined") ? userproduct.size_id.name: "",
+      price: (typeof userproduct.price != "undefined") ? userproduct.price : "",
+      offer_price: (typeof userproduct.offer_price != "undefined") ? userproduct.offer_price : "",
+      percentage: (typeof userproduct.percentage != "undefined") ? userproduct.percentage : "",
+      status: (typeof userproduct.status != "undefined") ? userproduct.status : "",
+      flag: (typeof userproduct.flag != "undefined") ? userproduct.flag : "",
+      approval_status: (typeof userproduct.approval_status != "undefined") ? userproduct.approval_status : "",
+      added_dtime: (typeof userproduct.added_dtime != "undefined") ? userproduct.added_dtime : "",
+      __v: (typeof userproduct.__v != "undefined") ? userproduct.__v : "",
       product_images: productImages,
     };
     formattedUserProducts.push(formattedUserProduct);
@@ -1040,8 +1039,8 @@ exports.editProfile = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
-    console.log('**************** HI EDIT PROFILE**************');
-    console.log(userData);
+    //console.log('**************** HI EDIT PROFILE**************');
+    //console.log(userData);
     //console.log("Edit profile");
     res.render("webpages/edit-profile", {
       title: "Edit profile",
@@ -1313,6 +1312,11 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
     console.log(productCount);
    console.log("product changes");
 
+
+    const categoryName = await Category.find({ _id: id}).populate('name');
+    
+    //Get All Filter Data
+    //Brand List
     const brandList = await brandModel.find({});
     const sizeList = await sizeModel.find({});
     const conditionList = await productconditionModel.find({});
@@ -1326,6 +1330,7 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
         product_category_id: id,
         brandList: brandList,
         sizeList: sizeList,
+        categoryName:categoryName,
         conditionList: conditionList,
         productCount:productCount,
         isLoggedIn: isLoggedIn
@@ -1604,9 +1609,9 @@ exports.userWisePost = async function (req, res, next) {
 exports.addPostView = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-    console.log('Add User Post');
+    //console.log('Add User Post');
 
-    if (!req.session.user) {
+    if (isLoggedIn == "") {
       res.redirect("/api/registration");
     }
     const productConditions = await Productcondition.find();
@@ -2211,7 +2216,8 @@ exports.viewCartListByUserId = async function (req, res, next) {
 
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
 
-    if (!req.session.user || !req.session.user.userId) {
+    //if (!req.session.user || !req.session.user.userId) {
+    if (isLoggedIn == "") {
       return res.redirect("/api/registration");
     }
 

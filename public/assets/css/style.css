@@ -2765,6 +2765,10 @@ a.edit_link {
     margin-bottom: 25px;
 }
 
+.bid_modal .left-boxpart .box-inner .lg-logo {    
+    margin-bottom: 0px;
+}
+
 .or-part span {
     background-color: #f7f7f7;
     position: relative;
@@ -2861,7 +2865,7 @@ input.chat-input {
 
 .chat-input-holder form {  
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     grid-gap: 15px;
 }
@@ -2937,6 +2941,7 @@ button.message-send {
     font-family: var(--short-font);
     margin: 0;
     color: #404040;
+    display: flex;
 }
 
 .message-box label.bid-amount i {
@@ -3028,7 +3033,7 @@ button.message-send {
 }
 
 .bids-chatbox .bids-productbox .br-details.selectedProduct {
-    background-color: #d6d9ed;
+    background-color: #f1f1f1;
 }
 
 .bids-chatbox .bids-productbox .bidding-price {
@@ -3066,7 +3071,7 @@ button.message-send {
     color: #959494;
   }
 
-  .bids-chatbox .bidding-box {
+.bids-chatbox .bidding-box {
     display: flex;
     align-items: center;
     grid-gap:10px;
@@ -3079,7 +3084,7 @@ button.message-send {
 
 .search-result-box {
     background: #fff;
-    padding: 8px;
+    padding: 0px;
     position: absolute;
     left: 0;
     top: 100%;
@@ -3116,7 +3121,17 @@ button.message-send {
     background: #e3683d;
     letter-spacing: 1px;
 }
+/*Add css By Manick da from palash machine*/
+#chat-form .chat-field {
+    width: 100%;
+}
 
+p#msg-error {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    margin-top: 5px;
+}
 /* add from local 12.01.2024 */
 .ob-details {
     width: 100%;

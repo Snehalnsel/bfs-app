@@ -59,7 +59,7 @@
                   </li>
     
                   <li class="nav-item">
-                    <a class="nav-link" href="/api/my-post/<%=userData.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Posts</span></a>
+                    <a class="nav-link" href="/api/my-post/<%=userData.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Product</span></a>
                   </li>
     
                   <li class="nav-item">
@@ -85,13 +85,13 @@
       <div class="dashboard-content">
          <div class="dashboard-infobox">
             <div class="dashboard-title-arrow mb-25">
-               <h4 class="di-title mr-25">My Post</h4>
+               <h4 class="di-title mr-25">My Product</h4>
                <!--<div class="edit-link"><a href="/api/my-account">Back </a></div>&nbsp;&nbsp;-->
-               <div class="edit-link"><a href="/api/add-post">Add Post </a></div>
+               <div class="edit-link"><a href="/api/add-post">Add Product </a></div>
             </div>
             <%if(respdata.length === 0){%>
                <div class="all-postview">
-                  <p>No Post Found</p>
+                  <p>No Product Found</p>
                </div>
                <%}else{%>
             <div class="all-postview">

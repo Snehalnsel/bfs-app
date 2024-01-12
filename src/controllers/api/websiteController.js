@@ -2622,18 +2622,22 @@ exports.addShipmentData = async (req, res) => {
 
     const order_id = req.params.id;
 
-    const track = await Ordertracking.findOne({ order_id: order_id, status: 1 }).exec();
+    const price = 350;
+    const gst = (price * 18)/100;
+    const final_price = price +  gst;
+
+    const track = await Ordertracking.findOne({ order_id: order_id }).exec();
+   
     if (track == null)  {
+      console.log(4556646546);
       //return res.status(404).json({ message: 'Order Delivery Partner Not chosse yet' });
-      res.status(200).json({
+      return res.status(200).json({
         status: "0",
         message: 'Order Delivery Partner Not chosse yet',
         is_shippingkit: false,
       });
     }
-
-    console.log(track);
-
+  
     const hubaddress = await Track.findById(track.tracking_id)
       .populate('seller_id', 'name phone_no email')
       .populate('billing_address_id')
@@ -2643,7 +2647,7 @@ exports.addShipmentData = async (req, res) => {
       // return res.status(404).json({ message: 'Order Delivery Partner Not chosse yet' });
       res.status(200).json({
         status: "0",
-        message: 'Order Delivery Partner Not chosse yet',
+        message: 'Order Delivery Partnerss Not chosse yet',
         is_shippingkit: false,
       });
 
@@ -2657,8 +2661,8 @@ exports.addShipmentData = async (req, res) => {
       product_id: hubaddress.product_id,
       shipping_address_id: hubaddress.billing_address_id._id,
       order_id: order_id,
-      total_price,
-      payment_method,
+      total_price : final_price,
+      payment_method : 1,
       added_dtime: new Date().toISOString(),
     });
 

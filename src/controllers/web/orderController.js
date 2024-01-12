@@ -1036,9 +1036,9 @@ exports.orderplaced = async (req, res) => {
     }
     else {
       const updatedOrderTracking = await Ordertracking.findOneAndUpdate(
-        { tracking_id: track_id }, // Find the document by track_id
-        { $set: { status: 1 } }, // Update the status value to 1
-        { new: true } // To get the updated document as output
+        { tracking_id: track_id }, 
+        { $set: { status: 1 } }, 
+        { new: true } 
       );
       //res.redirect("/orderlist");
       res.redirect(`/check-Couriresserviceability/${track_id}`);

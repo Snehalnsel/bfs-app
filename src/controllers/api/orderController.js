@@ -915,12 +915,14 @@ exports.getOrderListByUser = async (req, res) => {
       
       const shipdetails = await Ordertracking.find({ order_id: order._id });
 
-      let shipping_details = []; 
+      let shipping_details = {}; 
       
 
       if (typeof shipdetails !="undefined" && shipdetails.length > 0) {
-          shipping_details = await Track({ _id: shipdetails[0].tracking_id });
+          shipping_details = await Track.find({ _id: shipdetails[0].tracking_id });
       }
+
+      console.log(shipping_details);
 
       const orderDetails = {
         _id: order._id,
@@ -934,7 +936,7 @@ exports.getOrderListByUser = async (req, res) => {
           name: productDetails.length ? productDetails[0].name : 'Unknown Product',
           image: productImage.length ? productImage[0].image : 'No Image',
         },
-        shippingkit_status: shipping_details.length > 0 ? shipping_details.shippingkit_status : 0, 
+        shippingkit_status: (Object.keys(shipping_details).length > 0) ? shipping_details[0].shippingkit_status : 2, 
       };
 
       ordersWithProductDetails.push(orderDetails);

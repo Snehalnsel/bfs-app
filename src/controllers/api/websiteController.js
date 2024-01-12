@@ -264,10 +264,8 @@ exports.productData = async function (req, res, next) {
 
       formattedUserProducts1.push(formattedUserProduct1);
     }
-
-
-    // End //
-
+console.log('CHECK');
+console.log(formattedUserProduct);
     res.render("webpages/productdetails", {
       title: "Dashboard",
       message: "Welcome to the Dashboard page!",
@@ -1305,6 +1303,8 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
     const formattedUserProducts = data.respdata;
 
 
+    const categoryName = await Category.find({ _id: id}).populate('name');
+    
     //Get All Filter Data
     //Brand List
     const brandList = await brandModel.find({});
@@ -1320,6 +1320,7 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
         product_category_id: id,
         brandList: brandList,
         sizeList: sizeList,
+        categoryName:categoryName,
         conditionList: conditionList,
         isLoggedIn: isLoggedIn
 

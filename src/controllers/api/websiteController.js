@@ -47,6 +47,7 @@ const tokenDecode = require("../../utils/tokenDecode");
 const brandModel = require("../../models/api/brandModel");
 const sizeModel = require("../../models/api/sizeModel");
 const productconditionModel = require("../../models/api/productconditionModel");
+const Ordertracking = require("../../models/api/ordertrackModel");
 
 
 const transporter = nodemailer.createTransport({
@@ -2546,9 +2547,48 @@ exports.myOrderWeb = async (req, res) => {
 
 exports.myOrderDetailsWeb = async (req, res) => {
   try {
-    const orderlistId = req.params.id;
-    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    const orderlistId = req.params.id; //659fdcdf6b87dfc8438b551e
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : ""; //65646d41e7e0d7d6d594d920
     
+    if (!orderlistId) {
+      return res.status(400).json({ message: 'Order ID is missing in the request' });
+    }
+
+    const order = await Order.findById(orderlistId)
+      .populate('seller_id', 'name')
+      .populate('user_id', 'name');
+    
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    let productId;
+    if (order.product_id) {
+      productId = order.product_id.toString();
+    } else {
+      return res.status(404).json({ message: 'Product ID not found for this order' });
+    }
+
+    const productDetails = await Userproduct.findById(productId);
+    
+    if (!productDetails) {
+      return res.status(404).json({ message: 'Product details not found' });
+    }
+
+    const productImage = await Productimage.findOne({ product_id: productId }).limit(1);
+    const orderTrackStatusOne = await Ordertracking.find({ orderlistId, status: 1 });
+    
+    let shiprocketResponse = [];
+    let shiprocketResponselabel = [];
+    let shiprocketResponseinvoice = [];
+    let shiprocketResponsefortracking = [];
+
+    
+
+
+
+
+    return false;
     res.render("webpages/myorderdetails",{
       title: "Wish List Page",
       message: "Welcome to the Wish List page!",

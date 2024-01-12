@@ -6,9 +6,16 @@
    <link rel="stylesheet" href="../../public/assets/css/chat.css" />
 </head>
 <body>
-
+   
       <section class="bids-wrapper">
                   <div class="container">
+                     <div class="breadcum-product">
+                        <ul>
+                           <li><a href="/api/home">Home</a></li>
+                           <li><a href="/api/my-account">My Account</a></li>
+                           <li>My Bids</li>
+                        </ul>
+                     </div>
                      <div class="bids-chatbox">
                         <div class="bids-productbox">
                            <h6 class="buyer-heading">Buyer</h6>  
@@ -53,24 +60,20 @@
                         <div class="chatbid-box">
                            <div class="chat-title">Enter Your Price</div>
                            <div class="chat-messages">
-                              <!--<div class="message-box-holder">
-                                 <div class="message-box incoming-message">
-                                    <label class="bid-amount"><span><i class="fa fa-inr" aria-hidden="true"></i></span>400</label>
-                                    <div class="chat-time">14.40</div>
-                                 </div>
-                              </div>-->
                            </div>
                            <div class="chat-input-holder">  
-                           <form id="chat-form"> 
-                              <input id="msg" type="text" placeholder="Enter Message" class="chat-input" required autocomplete="off"/>
-                              <button class="btn message-send">Send</button>
+                              <form id="chat-form"> 
+                                 <div class="chat-field">
+                                    <input id="msg" type="number"name="msg" placeholder="Enter Amount" class="chat-input sendMessageField" required autocomplete="off"/>
+                                 </div>                                 
+                                 <button class="btn message-send sendMessageButton">Send</button>
                               </form>
                            </div>
                            <div class="action-botton-group">
                               <ul class="resultlist">
-                                 <li><a href="javascript:void(0)" class="chatbox-btn">Re Bid</a></li>
-                                 <li><a href="javascript:void(0)" class="chatbox-btn">Accept</a></li>
-                                 <li><a href="javascript:void(0)" class="chatbox-btn black-btn">Withdraw</a></li>
+                                 <li><a href="javascript:void(0)" class="chatbox-btn" id="reBidButton">Re Bid</a></li>
+                                 <!--<li><a href="javascript:void(0)" class="chatbox-btn" id="acceptButton">Accept</a></li>
+                                 <li><a href="javascript:void(0)" class="chatbox-btn black-btn" id="withdrawButton">Withdraw</a></li>-->
                               </ul>
                            </div>
                         </div>
@@ -80,12 +83,44 @@
    <input type="hidden" name="userId" id="userId" value="<%=userId%>" />  
   <%- include('../../public/assets/include/newsletter'); %>
   <%- include('../../public/assets/include/footer'); %>
+  <script src="/public/assets/js/bids.js"></script>
 </body>
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
    const socket = io("<%=siteUrl; %>");
    let msgSendStatus = false;
-   
+   let selectedBid = ``;
+   async function updateSendMessage() {
+      if(!msgSendStatus) {
+         $(".sendMessageButton").attr("disabled", true);
+         $(".sendMessageField").attr("disabled", true);
+         $(".errorMsgClass").html("");
+      } else {
+         $(".sendMessageButton").attr("disabled", false);
+         $(".sendMessageField").attr("disabled", false);
+         $(".errorMsgClass").html("");
+      }
+   }
+   (async function(){
+      await updateSendMessage();
+   })();
+   $(document).on("click","#reBidButton", async function() {
+      $(".clickOnProduct").each(async function(index) {
+         if($(".clickOnProduct").hasClass("selectedProduct")){
+            selectedBid = this.id;
+            msgSendStatus = true;
+            await updateSendMessage();
+         }
+      });
+   });
+   $(document).on("click","#acceptButton", async function() {
+      /*$(".clickOnProduct").each(async function(index) {
+         if($(".clickOnProduct").hasClass("selectedProduct")){
+            let acceptBidId = this.id;
+            
+         }
+      });*/
+   });
 </script>
 <script>
    $( document ).ready(function() {
@@ -128,10 +163,12 @@
    });*/
 
    // Message from server
-   socket.on('message', (message) => {
+   socket.on('message', async (message) => {
       //console.log(message);
       outputMessage(message, "incoming-message");
-
+      //dDieble The Send Button
+      msgSendStatus = false;
+      await updateSendMessage();
       // Scroll down
       chatMessages.scrollTop = chatMessages.scrollHeight;
    });
@@ -145,10 +182,11 @@
 
       msg = msg.trim();
 
-      if (!msg) {
+      if (!msg && !isNaN(msg)) {
          return false;
       }
-
+      //Hide error message
+      $(".errorMsgClass").html("");
       // Emit message to server
       socket.emit('chatMessage', {username,roomName,msg});
 

@@ -2861,7 +2861,7 @@ input.chat-input {
 
 .chat-input-holder form {  
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     grid-gap: 15px;
 }
@@ -3066,7 +3066,7 @@ button.message-send {
     color: #959494;
   }
 
-  .bids-chatbox .bidding-box {
+.bids-chatbox .bidding-box {
     display: flex;
     align-items: center;
     grid-gap:10px;
@@ -3115,4 +3115,15 @@ button.message-send {
     padding: 6px 15px;
     background: #e3683d;
     letter-spacing: 1px;
+}
+
+#chat-form .chat-field {
+    width: 100%;
+}
+
+p#msg-error {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    margin-top: 5px;
 }

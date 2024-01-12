@@ -832,6 +832,7 @@ router.get(
 );
 
 
+
 router.get(
   "/whats-hot",
   [],
@@ -1101,6 +1102,10 @@ router.get("/get-shipmentkitweb/:id",[],WebsiteController.addShipmentData);
 
 // WEBSITE API'S
 router.get("/home",[],DashboardController.getData);
+
+router.get("/bestdeal",[],WebsiteController.getBestDealProductsweb);
+router.get("/whatshot",[],WebsiteController.getWhatsHotProductsweb);
+router.get("/justsold",[],WebsiteController.getJustSoldProductsweb);
 router.get("/productdeatils/:id",[],WebsiteController.productData);
 router.get("/privacy-policy",[],WebsiteController.privacypolicyData);
 router.get("/trems",[],WebsiteController.tremsandconditionData);
@@ -1122,7 +1127,7 @@ router.post(
       }
     ),
     check("confirmpassword", "This is a required field!").not().isEmpty().trim().escape(),
-    //check("fcm_token", "This is a required field!").not().isEmpty().trim().escape(),
+    check("confirmpassword", "This is a required field!").not().isEmpty().trim().escape(),
   ],
   WebsiteController.signin
 );

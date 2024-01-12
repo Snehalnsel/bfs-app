@@ -53,6 +53,7 @@ const Shippingkit = require("../../models/api/shippingkitModel");
 const Track = require("../../models/api/trackingModel");
 
 
+
 const transporter = nodemailer.createTransport({
   port: 465,
   host: "smtp.gmail.com",
@@ -1312,13 +1313,10 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
     console.log(productCount);
    console.log("product changes");
 
-
-    //Get All Filter Data
-    //Brand List
     const brandList = await brandModel.find({});
     const sizeList = await sizeModel.find({});
     const conditionList = await productconditionModel.find({});
-    //console.log("brand",conditionList);
+
 
     res.render("webpages/subcategoryproduct",
       {
@@ -2727,4 +2725,269 @@ exports.addShipmentData = async (req, res) => {
       is_shippingkit: false,
     });
   }
+};
+
+
+exports.getWhatsHotProductsweb = async function (req, res) {
+
+  const page = parseInt(req.body.page) || 1; // Current page, default: 1
+
+  const pageSize = parseInt(req.body.pageSize) || 10; // Items per page, default: 10
+
+
+  try {
+
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    const hotProductsCount = await Userproduct.countDocuments({ approval_status: 1, flag: 0 });
+
+    const totalPages = Math.ceil(hotProductsCount / pageSize);
+
+
+    const brandList = await brandModel.find({});
+    const sizeList = await sizeModel.find({});
+    const conditionList = await productconditionModel.find({});
+
+    const hotProducts = await Userproduct.find({ approval_status: 1, flag: 0 }).sort({ hitCount: -1 });
+
+    const whatsHotProducts = [];
+
+    for (const product of hotProducts) {
+
+      const productImage = await Productimage.findOne({ product_id: product._id });
+
+      if (productImage) {
+
+        const productCondition = await Productcondition.findById(product.status);
+
+        whatsHotProducts.push({
+
+          _id: product._id,
+
+          name: product.name,
+
+          price: product.price,
+
+          offer_price: product.offer_price,
+
+          original_packaging: product.original_packaging,
+
+          original_invoice: product.original_invoice,
+
+          status_name: productCondition ? productCondition._id : '',
+
+          status: productCondition ? productCondition.name : '',
+
+          image: productImage,
+
+        });
+
+      }
+
+    }
+
+    res.render("webpages/allhomeproduct",
+      {
+        title: "Product Sub Categories",
+        message: "Welcome to the Product Sub Categories!",
+        respdata: whatsHotProducts,
+        brandList: brandList,
+        sizeList: sizeList,
+        conditionList: conditionList,
+        productCount:hotProductsCount,
+        isLoggedIn: isLoggedIn
+
+      });
+
+  } catch (error) {
+
+    console.error('Error fetching what\'s hot products:', error);
+
+    return res.status(500).json({ message: 'Internal server error' });
+
+  }
+
+};
+
+
+exports.getJustSoldProductsweb = async function (req, res) {
+
+  const page = parseInt(req.query.page) || 1; 
+
+  const pageSize = parseInt(req.query.pageSize) || 10; 
+
+
+
+  try {
+
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    const soldItemsCount = await Userproduct.countDocuments({ approval_status: 1, flag: 1 });
+
+    const totalPages = Math.ceil(soldItemsCount / pageSize);
+
+    const brandList = await brandModel.find({});
+    const sizeList = await sizeModel.find({});
+    const conditionList = await productconditionModel.find({});
+
+
+
+
+    const solditems = await Userproduct.find({ approval_status: 1, flag: 1 });
+
+    const justSoldProducts = [];
+
+
+
+    for (const product of solditems) {
+
+      const productImage = await Productimage.findOne({ product_id: product._id });
+
+
+
+      if (productImage) {
+
+        const productCondition = await Productcondition.findById(product.status);
+
+
+
+        justSoldProducts.push({
+
+          _id: product._id,
+
+          name: product.name,
+
+          price: product.price,
+
+          offer_price: product.offer_price,
+
+          original_packaging: product.original_packaging,
+
+          original_invoice: product.original_invoice,
+
+          status_name: productCondition ? productCondition._id : '',
+
+          status: productCondition ? productCondition.name : '',
+
+          image: productImage,
+
+        });
+
+      }
+
+    }
+
+    res.render("webpages/allhomeproduct",
+      {
+        title: "Product Sub Categories",
+        message: "Welcome to the Product Sub Categories!",
+        respdata: justSoldProducts,
+        brandList: brandList,
+        sizeList: sizeList,
+        conditionList: conditionList,
+        productCount:soldItemsCount,
+        isLoggedIn: isLoggedIn
+
+      });
+
+  } catch (error) {
+
+    console.error('Error fetching just sold products:', error);
+
+    return res.status(500).json({ message: 'Internal server error' });
+
+  }
+
+};
+
+exports.getBestDealProductsweb = async function (req, res) {
+
+  const page = parseInt(req.query.page) || 1; 
+
+  const pageSize = parseInt(req.query.pageSize) || 10; 
+
+  try {
+
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    const soldItemsCount = await Userproduct.countDocuments({ approval_status: 1, flag: 1 });
+
+    const totalPages = Math.ceil(soldItemsCount / pageSize);
+
+    const brandList = await brandModel.find({});
+    const sizeList = await sizeModel.find({});
+    const conditionList = await productconditionModel.find({});
+
+
+    const appSettings = await Appsettings.findOne();
+
+    if (!appSettings) {
+      return res.status(404).json({ message: 'App settings not found' });
+    }
+    const percentageFilter = parseInt(appSettings.best_deal);
+
+    const count = await Userproduct.countDocuments({
+      percentage: { $gte: percentageFilter },
+      approval_status: 1,
+      flag: 0
+    });
+    
+    const products = await Userproduct.find({ percentage: { $gte: percentageFilter }, approval_status: 1, flag: 0 }); // Adding approval_status filter
+
+
+    if (!products || products.length === 0) {
+      return res.status(404).json({ message: 'No products meet the percentage filter criteria' });
+    }
+
+    const bestDealProducts = [];
+
+    for (const product of products) {
+      const productImage = await Productimage.findOne({ product_id: product._id });
+      if (productImage) {
+
+        const productCondition = await Productcondition.findById(product.status);
+
+        bestDealProducts.push({
+
+          _id: product._id,
+
+          name: product.name,
+
+          price: product.price,
+
+          offer_price: product.offer_price,
+
+          original_packaging: product.original_packaging,
+
+          original_invoice: product.original_invoice,
+
+          status_name: productCondition ? productCondition._id : '',
+
+          status: productCondition ? productCondition.name : '',
+
+          image: productImage,
+
+        });
+
+      }
+
+    }
+    res.render("webpages/allhomeproduct",
+      {
+        title: "Product Sub Categories",
+        message: "Welcome to the Product Sub Categories!",
+        respdata: bestDealProducts,
+        brandList: brandList,
+        sizeList: sizeList,
+        conditionList: conditionList,
+        productCount:count,
+        isLoggedIn: isLoggedIn
+
+      });
+
+  } catch (error) {
+
+    console.error('Error fetching just sold products:', error);
+
+    return res.status(500).json({ message: 'Internal server error' });
+
+  }
+
 };

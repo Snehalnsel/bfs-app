@@ -253,7 +253,7 @@
             const orderList = await fetch('/api/orderlist', {
                method: 'POST',
                headers: {
-                  'Content-Type': 'application/json' // Specify the content type if sending JSON data
+                  'Content-Type': 'application/json' 
                }
             });
             const orderListData = await orderList.json();
@@ -275,7 +275,7 @@
                 </div>
                 <div class="bd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>${item.total_price}</div>
                 <div class="cnbtn-group">
-                    ${item.shippingkit_status ? `<p>Shipping kit has already been bought.</p>` : `
+                    ${item.shippingkit_status == 1 ? `<p>Shipping kit has already been bought.</p>` : `
                         <p>Please Choose Either Option To Confirm Your Order.</p>
                         <div class="cg-row">
                             <a href="javascript:void(0)" data-toggle="modal" data-target="#short-modal" class="acb-btn rv-btn buy-shipping-kit" data-orderid="${item._id}">Buy Shipping Kit</a>
@@ -299,14 +299,10 @@
             const sellerList = await fetch('/api/selllist', {
                method: 'POST',
                headers: {
-                  'Content-Type': 'application/json' // Specify the content type if sending JSON data
+                  'Content-Type': 'application/json' 
                }
             });
             const sellerListData = await sellerList.json();
-
-
-
-
             populateSellerHtml(sellerListData);
          }
 
@@ -351,7 +347,6 @@
             var orderId = $(this).data('orderid');
             var cgRowElement = $(`.cg-row[data-orderid="${orderId}"]`);
             $.ajax({
-               //url: `/api/get-shipmentkitweb/${orderId}`,
                url: '/api/get-shipmentkitweb/' + orderId.trim(),
                method: 'GET',
                success: function (data) {

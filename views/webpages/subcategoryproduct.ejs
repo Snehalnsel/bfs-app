@@ -135,7 +135,10 @@
             <div class="main_product-wrapper ">
                <div class="top-title shorting-row">
                   <div class="product-result d-flex aling-center">
-                     <h5>Showing all results for Mix of Everything</h5>
+                    
+                        <h5>Showing <%= productCount ? productCount : 0 %> products</h5>
+
+
                   </div>
                   <div class="shorting-box">
                      <div class="short-label">Sort by:</div>
@@ -166,7 +169,8 @@
                     <div class="prd-short-info">
                        <div class="prd-name"><a href="/api/productdeatils/<%=item._id%>"><%=item.name%></a></div>
                        <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%=item.offer_price%></div>
-                       <div class="rtl-price"><span>Est. Retail:</span><%=item.price%></div>                 
+                       <div class="rtl-price"><span>Est. Retail:</span><%=item.price%></div>   
+                       <div class="prd-batch"><%=item.status_name%></div>              
                     </div> 
                  </div>
                  

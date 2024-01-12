@@ -1249,6 +1249,9 @@ async function getProductDataWithSort(id, sortid) {
 
       const productImages = await Productimage.find({ product_id: userproduct._id });
 
+      const productCondition = await Productcondition.findById(userproduct.status);
+
+
       const formattedUserProduct = {
         _id: userproduct._id,
         name: userproduct.name,
@@ -1267,6 +1270,7 @@ async function getProductDataWithSort(id, sortid) {
         added_dtime: userproduct.added_dtime,
         __v: userproduct.__v,
         product_images: productImages,
+        status_name: productCondition ? productCondition.name : '',
       };
 
       formattedUserProducts.push(formattedUserProduct);
@@ -1300,6 +1304,10 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
 
     const data = await getProductDataWithSort(id, sortid);
     const formattedUserProducts = data.respdata;
+    const productCount = formattedUserProducts.length;
+
+    console.log(productCount);
+   console.log("product changes");
 
 
     //Get All Filter Data
@@ -1318,6 +1326,7 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
         brandList: brandList,
         sizeList: sizeList,
         conditionList: conditionList,
+        productCount:productCount,
         isLoggedIn: isLoggedIn
 
       });
@@ -1345,12 +1354,15 @@ exports.getSubCategoriesProductswithSort = async function (req, res, next) {
 
   const data = await getProductDataWithSort(id, sortid);
   const formattedUserProducts = data.respdata;
+  const productCount = formattedUserProducts.length;
 
-
+console.log(productCount);
+console.log("product changes");
   return res.json({
     status: '1',
     message: 'Success',
     respdata: formattedUserProducts,
+    productCount:productCount,
     isLoggedIn: isLoggedIn
   });
 

@@ -235,7 +235,7 @@ io.on("connection", (socket) => {
     await updateBidData(updateData,bidId);
     await insertBidOfferData(currentOffer,currentOffer.id);
     let currUserDetails = await UserModel.findOne({_id:username});
-    io.to(roomName).emit("message", formatMessage(currUserDetails.name, msg, roomName));
+    io.to(roomName).emit("message",formatMessage(currUserDetails.name, msg,username, roomName));
   });
   //Get old messages form database
   socket.on("getOldMessages", async ({ roomName,username }) => {
@@ -247,7 +247,7 @@ io.on("connection", (socket) => {
     if(allData.length > 0 ) {
       for(let newElement of allData) {
         let currUserDetails = await UserModel.findOne({_id:newElement.userId});
-        io.to(socket.id).emit("message", formatMessage(currUserDetails.name, newElement.price, roomName));
+        io.to(socket.id).emit("message", formatMessage(currUserDetails.name, newElement.price,username, roomName));
       }
     }
   });

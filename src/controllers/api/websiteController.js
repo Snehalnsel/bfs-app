@@ -1003,33 +1003,25 @@ exports.getUserLogin = async function (req, res, next) {
 
 exports.myAccount = async function (req, res, next) {
   try {
-    if (!req.session.user || !req.session.user.userId) {
-      return res.redirect("/api/registration");
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+
+    //if (userData === undefined || userData === null)
+    if (isLoggedIn == "")
+    {
+      res.redirect('/api/registration');
     }
-    
-   var userData = req.session.user;
+    else{
+      var userData = req.session.user;
 
-  const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId) });
-
-  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-  
-  //console.log('************** ADDRESS 123 ************');
-  //console.log(address);
-
-  //if (userData === undefined || userData === null)
-  if (isLoggedIn == "")
-  {
-    res.redirect('/api/registration');
-  }
-  else{
-    res.render("webpages/myaccount", {
-      title: "My Account",
-      message: "Welcome to the privacy policy page!",
-      respdata: req.session.user,
-      respdata1:address,
-      isLoggedIn: isLoggedIn,
-    });
-  }
+      const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId) });
+      res.render("webpages/myaccount", {
+        title: "My Account",
+        message: "Welcome to the privacy policy page!",
+        respdata: req.session.user,
+        respdata1:address,
+        isLoggedIn: isLoggedIn,
+      });
+    }
 
     
   } catch (error) {

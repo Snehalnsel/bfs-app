@@ -49,7 +49,7 @@ const sizeModel = require("../../models/api/sizeModel");
 const productconditionModel = require("../../models/api/productconditionModel");
 const Ordertracking = require("../../models/api/ordertrackModel");
 const Shippingkit = require("../../models/api/shippingkitModel");
-const Ordertracking = require("../../models/api/ordertrackModel");
+//const Ordertracking = require("../../models/api/ordertrackModel");
 const Track = require("../../models/api/trackingModel");
 
 
@@ -571,6 +571,7 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
                 title: user.title,
                 name: user.name,
                 age: user.age,
+                image: user.image ? user.image:'',
                 //usertoken:user.token,
                 phone_no: user.phone_no,
                 weight: user.weight,
@@ -705,6 +706,7 @@ exports.userRelogin = async function (req, res, next) {
             password: user.password,
             title: user.title,
             name: user.name,
+            image: user.image ? user.image:'',
             age: user.age,
             phone_no: user.phone_no,
             weight: user.weight,
@@ -2509,6 +2511,7 @@ exports.myOrderWeb = async (req, res) => {
 
 exports.myOrderDetailsWeb = async (req, res) => {
   try {
+    
     const orderlistId = req.params.id; //659fdcdf6b87dfc8438b551e
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : ""; //65646d41e7e0d7d6d594d920
     
@@ -2545,17 +2548,60 @@ exports.myOrderDetailsWeb = async (req, res) => {
     let shiprocketResponseinvoice = [];
     let shiprocketResponsefortracking = [];
 
-    
+  //   if (orderTrackStatusOne && orderTrackStatusOne.length > 0)  {
+  //     const trackingId = orderTrackStatusOne[0].tracking_id;
+  //     const trackDetails = await Track.findById(trackingId);
 
+  //     if(trackDetails.shiprocket_shipment_id)
+  //     {
 
+  //       shiprocketResponselabel = await generateLabel(trackDetails.shiprocket_shipment_id);
 
+  //       shiprocketResponseinvoice = await generateInvoice(trackDetails.shiprocket_order_id);
+  //     }
 
-    return false;
+  //     if (trackDetails.shiprocket_shipment_id) {
+  //       shiprocketResponse = await generateOrderDetails(trackDetails.shiprocket_order_id);
+  //     }
+
+  //     if (trackDetails.shiprocket_shipment_id) {
+  //       shiprocketResponsefortracking = await trackbyaorderid(trackDetails.shiprocket_order_id);
+  //     }
+  // }
+    const sellerAddress = await addressBook.findOne({ user_id: order.seller_id });
+    const buyerAddress = await addressBook.findOne({ user_id: order.user_id });
+
+    const shippingKitData = await Shippingkit.findOne({ order_id: order._id });
+
+    const orderDetails = {
+      _id: order._id,
+      total_price: order.total_price,
+      payment_method: order.payment_method,
+      order_status: order.order_status,
+      gst: order.gst,
+      seller: {
+        _id: order.seller_id._id,
+        name: order.seller_id.name,
+      },
+      buyeraddress: buyerAddress ? buyerAddress: 'No Buyer Address Found',
+      user: {
+        _id: order.user_id._id,
+        name: order.user_id.name,
+        phone_no: req.session.user.phone_no,
+      },
+      selleraddress: sellerAddress ? sellerAddress : 'No Buyer Address Found',
+      product: {
+        name: productDetails ? productDetails.name : 'Unknown Product',
+        offer_price : productDetails ? productDetails.offer_price : 'Unknown Product',
+        image: productImage ? productImage.image : 'No Image',
+      },
+    };
+    //return false;
     res.render("webpages/myorderdetails",{
       title: "Wish List Page",
       message: "Welcome to the Wish List page!",
-      respdata: req.session.user,
-      respdata1: orderlistId,
+      respdata: orderDetails,
+      //respdata1: orderlistId,
       isLoggedIn: isLoggedIn,
     });
 

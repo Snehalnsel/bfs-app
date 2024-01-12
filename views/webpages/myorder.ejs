@@ -24,7 +24,7 @@
                              </li>
                
                              <li class="nav-item">
-                               <a class="nav-link" href="/api/my-post/<%=respdata.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Posts</span></a>
+                               <a class="nav-link" href="/api/my-post/<%=respdata.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Product</span></a>
                              </li>
                
                              <li class="nav-item">
@@ -54,155 +54,12 @@
                     <li><a data-toggle="tab" href="#viewers-tab" class="active">Seller</a></li>
                </ul>
                <div class="tab-content theme-tab-content">
-                   <div id="buyers-tab" class="tab-pane fade" ></div>
-                   
-                   
-                  <div id="viewers-tab" class="tab-pane fade active show">                     
-
-                     <div class="user-name">
-                        <%=respdata.title%>
-                           <%=respdata.name%>
-                     </div>
-                  </div>
-               </div>
-               <div class="sidbar-box sidbar-nav">
-                  <ul class="nav d-flex flex-column mb-2 ">
-                     <li class="nav-item">
-                        <a class="nav-link" href="/api/my-account"><i class="fa fa-user" aria-hidden="true"></i>
-                           <span>Profile</span></a>
-                     </li>
-                     <li class="nav-item">
-                        <a class="nav-link" href="/api/web-my-order"><i class="fa fa-list-ul" aria-hidden="true"></i>
-                           <span>My Orders</span></a>
-                     </li>
-
-                     <li class="nav-item">
-                        <a class="nav-link" href="/api/my-post/<%=respdata.userId%>"><i class="fa fa-file-image-o"
-                              aria-hidden="true"></i> <span>My Posts</span></a>
-                     </li>
-
-                     <li class="nav-item">
-                        <a class="nav-link" href="/api/bid-for-product"><i class="fa fa-arrow-circle-o-right"
-                              aria-hidden="true"></i> <span>My Bids</span></a>
-                     </li>
-
-                  </ul>
-                  <div class="bottom-link">
-                     <ul class="nav d-flex flex-column mb-2 ">
-                        <li><a class="nav-link" href="/api/sign-out"><i class="fa fa-sign-out" aria-hidden="true"></i>
-                              <span>Sign Out</span></a></li>
-                     </ul>
-
-
-                  </div>
-
+                   <div id="buyers-tab" class="tab-pane fade "></div>                   
+                  <div id="viewers-tab" class="tab-pane fade active show"></div>                                    
                </div>
             </div>
          </div>
-         <div class="dashboard-content">
-            <div class="dashboard-infobox">
-               <div class="dashboard-title-arrow mb-25">
-                  <h4 class="di-title mr-25">My Orders</h4>
-               </div>
-               <div class="tabs-wrapper">
-                  <ul class="nav nav-tabs">
-                     <li><a data-toggle="tab" href="#buyers-tab" class="">Buyers</a></li>
-                     <li><a data-toggle="tab" href="#viewers-tab" class="active">Seller</a></li>
-                  </ul>
-                  <div class="tab-content theme-tab-content">
-                     <div id="buyers-tab" class="tab-pane fade"></div>
-
-
-                     <div id="viewers-tab" class="tab-pane fade active show">
-                        <!--<div class="cart-list wishlist-list">-->
-                        <!--   <div class="bids-row wishlist-row order-list">-->
-                        <!--      <div class="br-details">-->
-                        <!--         <div class="bid-images"><img src="assets/images/product4.jpg" alt="images" class="img-fluid"></div>-->
-                        <!--         <div class="bid-info">-->
-                        <!--            <div class="bd-title">-->
-                        <!--               <a href="order-details.php">Hugo Boss Black Crossbody Sling Bag</a>-->
-                        <!--            </div>-->
-                        <!--            <div class="bd-price">-->
-                        <!--               <span><i class="fa fa-inr" aria-hidden="true"></i></span>-->
-                        <!--               10,000-->
-                        <!--            </div> -->
-
-                        <!--            <div class="cnbtn-group">-->
-                        <!--               <p>Please Choose Either Option To Confirm Your Order.</p>-->
-                        <!--               <div class="cg-row">-->
-                        <!--                  <a href="javascript:void(0)" data-toggle="modal" data-target="#short-modal" class="acb-btn rv-btn">Buy Shipping Kit</a>-->
-                        <!--                  <a href="javascript:void(0)" class="acb-btn  grey-btn">Don't Buy Shipping Kit</a>-->
-                        <!--               </div>-->
-                        <!--            </div>                    -->
-                        <!--         </div>-->
-                        <!--      </div>-->
-
-                        <!--      <div class="br-details">-->
-                        <!--         <div class="bid-images"><img src="assets/images/product4.jpg" alt="images" class="img-fluid"></div>-->
-                        <!--         <div class="bid-info">-->
-                        <!--            <div class="bd-title">-->
-                        <!--               <a href="order-details.php">Hugo Boss Black Crossbody Sling Bag</a>-->
-                        <!--            </div>-->
-                        <!--            <div class="bd-price">-->
-                        <!--               <span><i class="fa fa-inr" aria-hidden="true"></i></span>-->
-                        <!--               10,000-->
-                        <!--            </div> -->
-
-                        <!--            <div class="cnbtn-group">-->
-                        <!--               <p>Please Choose Either Option To Confirm Your Order.</p>-->
-                        <!--               <div class="cg-row">-->
-                        <!--                  <a href="javascript:void(0)" data-toggle="modal" data-target="#short-modal" class="acb-btn rv-btn">Buy Shipping Kit</a>-->
-                        <!--                  <a href="javascript:void(0)" class="acb-btn  grey-btn">Don't Buy Shipping Kit</a>-->
-                        <!--               </div>-->
-                        <!--            </div>                    -->
-                        <!--         </div>-->
-                        <!--      </div>-->
-
-                        <!--   </div>     -->
-
-                        <!--</div>-->
-
-                     </div>
-
-
-                     <!--<div class="cart-list wishlist-list">-->
-                     <!-- <div class="bids-row wishlist-row order-list" id="populate-orderlist">-->
-                     <!--<div class="br-details">-->
-                     <!--   <div class="bid-images"><img src="assets/images/product4.jpg" alt="images" class="img-fluid"></div>-->
-                     <!--   <div class="bid-info">-->
-                     <!--      <div class="bd-title">-->
-                     <!--         <a href="order-details.php">Hugo Boss Black Crossbody Sling Bag</a>-->
-                     <!--      </div>-->
-                     <!--      <div class="bd-price">-->
-                     <!--         <span><i class="fa fa-inr" aria-hidden="true"></i></span>-->
-                     <!--         10,000-->
-                     <!--      </div> -->
-
-                     <!--   </div>-->
-                     <!--</div>-->
-
-                     <!--<div class="br-details">-->
-                     <!--   <div class="bid-images"><img src="assets/images/product4.jpg" alt="images" class="img-fluid"></div>-->
-                     <!--   <div class="bid-info">-->
-                     <!--      <div class="bd-title">-->
-                     <!--         <a href="order-details.php">Hugo Boss Black Crossbody Sling Bag</a>-->
-                     <!--      </div>-->
-                     <!--      <div class="bd-price">-->
-                     <!--         <span><i class="fa fa-inr" aria-hidden="true"></i></span>-->
-                     <!--         10,000-->
-                     <!--      </div>                   -->
-
-                     <!--   </div>-->
-                     <!--</div>-->
-
-                     <!--   </div>     -->
-
-                     <!--</div>-->
-
-                  </div>
-               </div>
-            </div>
-         </div>
+         
       </div>
    </section>
 
@@ -231,7 +88,7 @@
             const orderList = await fetch('/api/orderlist', {
                method: 'POST',
                headers: {
-                  'Content-Type': 'application/json' // Specify the content type if sending JSON data
+                  'Content-Type': 'application/json' 
                }
             });
             const orderListData = await orderList.json();
@@ -244,26 +101,30 @@
             data.orders.forEach(item => {
 
                var hTml = `<div class="cart-list wishlist-list">
-        <div class="bids-row wishlist-row order-list" >
-              <div class="br-details">
-                  <div class="bid-images"><img src="${item.product.image}" alt="images" class="img-fluid"></div>
-                  <div class="bid-info">
-                     <div class="bd-title">
-                        <a href="/api/web-myorder-details/${item._id}">${item.product.name}</a>
-                     </div>
-                     <div class="bd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>${item.total_price}</div> 
-                     <div class="cnbtn-group">
+    <div class="bids-row wishlist-row order-list">
+        <div class="br-details">
+            <div class="bid-images"><img src="${item.product.image}" alt="images" class="img-fluid"></div>
+            <div class="bid-info">
+                <div class="bd-title">
+                    <a href="/api/web-myorder-details/${item._id}">${item.product.name}</a>
+                </div>
+                <div class="bd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>${item.total_price}</div>
+                <div class="cnbtn-group">`;
+                  if(item.shippingkit_status == 1) {
+                     hTml += `<p>Shipping kit has already been bought.</p>`;
+                  } else {
+                     hTml += `
                         <p>Please Choose Either Option To Confirm Your Order.</p>
                         <div class="cg-row">
                            <a href="javascript:void(0)" data-toggle="modal" data-target="#short-modal" class="acb-btn rv-btn buy-shipping-kit" data-orderid="${item._id}">Buy Shipping Kit</a>
                            <a href="javascript:void(0)" class="acb-btn  grey-btn">Don't Buy Shipping Kit</a>
                         </div>
-                     </div>   
-                     
-                </div>
-               </div>
-               </div>
-               </div>`;
+                             `; 
+                  }
+                  hTml += `</div>
+                     </div>
+                     </div>
+                     </div></div>`;
                $("#buyers-tab").append(hTml);
             });
 
@@ -275,14 +136,10 @@
             const sellerList = await fetch('/api/selllist', {
                method: 'POST',
                headers: {
-                  'Content-Type': 'application/json' // Specify the content type if sending JSON data
+                  'Content-Type': 'application/json' 
                }
             });
             const sellerListData = await sellerList.json();
-
-
-
-
             populateSellerHtml(sellerListData);
          }
 
@@ -322,7 +179,6 @@
             var orderId = $(this).data('orderid');
             var cgRowElement = $(`.cg-row[data-orderid="${orderId}"]`);
             $.ajax({
-               //url: `/api/get-shipmentkitweb/${orderId}`,
                url: '/api/get-shipmentkitweb/' + orderId.trim(),
                method: 'GET',
                success: function (data) {

@@ -138,4 +138,4 @@ const model = mongoose.Schema({
   },
 });
 
-module.exports = new mongoose.model("mt_track", model);
+module.exports = new mongoose.model("mt_tracks", model);

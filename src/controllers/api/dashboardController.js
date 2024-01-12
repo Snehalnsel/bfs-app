@@ -67,48 +67,26 @@ exports.homedetails = async function (req, res) {
 
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const requrl = req.protocol + '://' + req.get('host');
-
     const appSettings = await Appsettings.findOne();
 
-
-
     if (!appSettings) {
-
       return res.status(404).json({ message: 'App settings not found' });
-
     }
-
-
-
     const percentageFilter = parseInt(appSettings.best_deal);
-
-
-
     const products = await Userproduct.find({ percentage: { $gte: percentageFilter }, approval_status: 1, flag: 0 }); // Adding approval_status filter
 
 
-
     if (!products || products.length === 0) {
-
       return res.status(404).json({ message: 'No products meet the percentage filter criteria' });
-
     }
-
-
 
     const bestDealProducts = [];
 
-
-
     for (const product of products) {
-
       const productImage = await Productimage.findOne({ product_id: product._id });
-
       if (productImage) {
 
         const productCondition = await Productcondition.findById(product.status);
-
-
 
         bestDealProducts.push({
 
@@ -136,18 +114,11 @@ exports.homedetails = async function (req, res) {
 
     }
 
-
-
     const hotProducts = await Userproduct.find({ approval_status: 1, flag: 0 }).sort({ hitCount: -1 });
-
-
 
     const whatsHotProducts = [];
 
-
-
     for (const product of hotProducts) {
-
       const productImage = await Productimage.findOne({ product_id: product._id });
 
       if (productImage) {
@@ -341,8 +312,6 @@ exports.getWhatsHotProducts = async function (req, res) {
       }
 
     }
-
-
 
     return res.status(200).json({
 

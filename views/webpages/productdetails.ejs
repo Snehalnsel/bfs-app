@@ -80,8 +80,18 @@
                         <a href="javascript:void(0)" class="prd-btn wish-rem-btn" data-id="<%=respdata._id%>"><i
                               class="fa fa-heart" aria-hidden="true"></i></a>
                         <% } %>
-                           <a href="single-product.php" class="prd-btn"><i class="fa fa-share-alt"
-                                 aria-hidden="true"></i></a>
+                           <!--<a href="single-product.php" class="prd-btn"><i class="fa fa-share-alt"
+                                 aria-hidden="true"></i></a>-->
+                           <!-- Basic Share Links -->
+                           <!-- Twitter (url, text, @mention) -->
+                           <a href="https://api.whatsapp.com/send?text=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>" data-action="share/whatsapp/share">Whatsapp</a>
+                           <a href="https://twitter.com/share?url=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>&text=<%=respdata.name%>via=<%=respdata.name%>">Twitter</a>
+                           <a href="https://www.facebook.com/sharer/sharer.php?u=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>">
+                              Facebook
+                           </a>
+                           <a href="https://www.linkedin.com/shareArticle?url=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>&title=<%=respdata.name%>&summary=<%=respdata.name%>&source=<%=websiteUrl%>">
+                              LinkedIn
+                           </a>
                </div>
                <br>
                <h6>Product Details</h6>
@@ -226,117 +236,37 @@
    <%- include('../../public/assets/include/newsletter'); %>
       <%- include('../../public/assets/include/footer'); %>
 
-         <script>
-            $(document).ready(function () {
-               $(document).on('click', ".buy-btn", function (e) {
+   <script>
+      $(document).ready(function () {
+         /*$(document).on('click', ".buy-btn", function (e) {
 
-                  var id = $(this).data('id');
-                  console.log(id);
-                  $.ajax({
-                     url: '/api/addtocart/' + id.trim(),
-                     method: 'POST',
-                     success: function (data) {
-                        if (data.is_added) {
-                           Swal.fire({
-                              html: data.message,
-                              confirmButtonText: "OK",
-                              customClass: { confirmButton: 'alert-box-button' }
+            var id = $(this).data('id');
+            console.log(id);
+            $.ajax({
+               url: '/api/addtocart/' + id.trim(),
+               method: 'POST',
+               success: function (data) {
+                  if (data.is_added) {
+                     Swal.fire({
+                        html: data.message,
+                        confirmButtonText: "OK",
+                        customClass: { confirmButton: 'alert-box-button' }
 
-                           });
-                           getHeaderData();
-                        } else {
-                           Swal.fire({
-                              html: "You can add one item at a time",
-                              confirmButtonText: "OK",
-                              customClass: { confirmButton: 'alert-box-button', popup: 'swal2-popup' }
-                           });
-                        }
-                     },
-                     error: function (err) {
-                        console.error('Error:', err);
-                     }
-                  });
-
-               });
-
-
-               $(document).on('click', ".wish-btn", async function (e) {
-
-                  let wishlistreCookieAccessToken = await getCookieFunc(accessTokenVar);
-                  let wishlistreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
-                  await userReLogin(wishlistreCookieAccessToken, wishlistreCookieRefreshToken);
-
-                  var id = $(this).data('id');
-                  console.log(id);
-                  $.ajax({
-                     url: '/api/add-to-wishlist-web/' + id.trim(),
-                     method: 'POST',
-                     success: function (data) {
-                        if (data.is_wishlisted) {
-                           Swal.fire({
-                              html: data.message,
-                              confirmButtonText: "OK",
-                              customClass: { confirmButton: 'alert-box-button' }
-                           });
-                           $(".wish-btn").addClass("wish-rem-btn").find("i").removeClass("fa fa-heart-o").addClass("fa fa-heart");
-                           setTimeout(() => {
-                              $(".wish-rem-btn").removeClass("wish-btn");
-                           }, 200);
-                        } else {
-                           Swal.fire({
-                              html: data.message,
-                              confirmButtonText: "OK",
-                              customClass: { confirmButton: 'alert-box-button', popup: 'swal2-popup' }
-                           });
-                        }
-                     },
-                     error: function (err) {
-                        console.error('Error:', err);
-                     }
-                  });
-
-               });
-
-
-               $(document).on('click', ".wish-rem-btn", async function (e) {
-
-                  let wishlistreagCookieAccessToken = await getCookieFunc(accessTokenVar);
-                  let wishlistreagCookieRefreshToken = await getCookieFunc(refreshTokenVar);
-                  await userReLogin(wishlistreagCookieAccessToken, wishlistreagCookieRefreshToken);
-
-                  var id = $(this).data('id');
-                  console.log(id);
-                  $.ajax({
-                     url: '/api/remove-wishlist-web/' + id.trim(),
-                     method: 'GET',
-                     success: function (data) {
-                        if (data.success) {
-                           Swal.fire({
-                              html: data.message,
-                              confirmButtonText: "OK",
-                              customClass: { confirmButton: 'alert-box-button' }
-                           });
-                           $(".wish-rem-btn").addClass("wish-btn").find("i").removeClass("fa fa-heart").addClass("fa fa-heart-o");
-                           setTimeout(() => {
-                              $(".wish-btn").removeClass("wish-rem-btn");
-                           }, 200);
-
-                        } else {
-                           Swal.fire({
-                              html: data.message,
-                              confirmButtonText: "OK",
-                              customClass: { confirmButton: 'alert-box-button', popup: 'swal2-popup' }
-                           });
-                        }
-                     },
-                     error: function (err) {
-                        console.error('Error:', err);
-                     }
-                  });
-
-               });
+                     });
+                     getHeaderData();
+                  } else {
+                     Swal.fire({
+                        html: "You can add one item at a time",
+                        confirmButtonText: "OK",
+                        customClass: { confirmButton: 'alert-box-button', popup: 'swal2-popup' }
+                     });
+                  }
+               },
+               error: function (err) {
+                  console.error('Error:', err);
+               }
             });
 
-
-
-         </script>
+         });*/
+      });
+   </script>

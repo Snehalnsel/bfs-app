@@ -811,6 +811,7 @@ exports.userFilter = async function (req, res, next) {
   for (const userproduct of allProductData) {
 
     const productImages = await Productimage.find({ product_id: userproduct._id });
+    const productCondition = await Productcondition.findById(userproduct.status);
 
     const formattedUserProduct = {
       _id: userproduct._id,
@@ -830,6 +831,7 @@ exports.userFilter = async function (req, res, next) {
       added_dtime: (typeof userproduct.added_dtime != "undefined") ? userproduct.added_dtime : "",
       __v: (typeof userproduct.__v != "undefined") ? userproduct.__v : "",
       product_images: productImages,
+      status_name: productCondition.name
     };
     formattedUserProducts.push(formattedUserProduct);
   }
@@ -1100,10 +1102,6 @@ exports.addAddress = async function (req, res, next) {
   }
 };
 
-
-
-
-
 exports.getParentCategories = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -1217,35 +1215,79 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
 async function getProductDataWithSort(id, sortid) {
   try {
 
-    //let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    let categoryId;
 
     let sortCriteria = {};
 
     if (sortid == 0) {
-      sortCriteria = { offer_price: 1 }; // Ascending order
+      sortCriteria = { offer_price: 1 }; 
     } else if (sortid == 1) {
-      sortCriteria = { offer_price: -1 }; // Descending order
+      sortCriteria = { offer_price: -1 }; 
     } else {
       sortCriteria = { offer_price: 1 };
     }
 
+    let userproducts = [];
+  
+    if (id === "whatshot") {
+       userproducts = await Userproduct.find({
+        approval_status: 1,
+        flag: 1
+    })
+        .populate('brand_id', 'name')
+        .populate('category_id', 'name')
+        .populate('user_id', 'name')
+        .populate('size_id', 'name')
+        .sort([
+            sortCriteria,
+            { hitCount: -1 }
+        ])
+        .exec();
+    
+  
+    } else if (id === "justsold") {
+       userproducts = await Userproduct.find({
+        approval_status: 1,
+        flag: 1
+    })
+        .populate('brand_id', 'name')
+        .populate('category_id', 'name')
+        .populate('user_id', 'name')
+        .populate('size_id', 'name')
+        .sort(sortCriteria)
+        .exec();
+    
+    } else if (id === "bestDeal") {
 
-    const userproducts = await Userproduct.find({ category_id: id })
+      const appSettings = await Appsettings.findOne();
+
+      const percentageFilter = parseInt(appSettings.best_deal);
+  
+       userproducts = await Userproduct.find({
+        percentage: { $gte: percentageFilter },
+        approval_status: 1,
+        flag: 0
+    })
+        .populate('brand_id', 'name')
+        .populate('category_id', 'name')
+        .populate('user_id', 'name')
+        .populate('size_id', 'name')
+        .sort(sortCriteria)
+        .exec();
+    
+    } else {
+      categoryId = id; 
+
+       userproducts = await Userproduct.find({ category_id: id })
       .populate('brand_id', 'name')
       .populate('category_id', 'name')
       .populate('user_id', 'name')
       .populate('size_id', 'name')
       .sort(sortCriteria)
       .exec();
-
-
-    if (!userproducts || userproducts.length === 0) {
-      return {
-        status: '0',
-        message: 'Not Found',
-      };
-
     }
+
+
 
     const formattedUserProducts = [];
 
@@ -1309,10 +1351,6 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
     const data = await getProductDataWithSort(id, sortid);
     const formattedUserProducts = data.respdata;
     const productCount = formattedUserProducts.length;
-
-    console.log(productCount);
-   console.log("product changes");
-
 
     const categoryName = await Category.find({ _id: id}).populate('name');
     
@@ -1389,8 +1427,6 @@ exports.userUpdate = async function (req, res, next) {
     }
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const user = await Users.findOne({ _id: req.body.userId });
-    // console.log('Heloo');
-    // console.log(user);
 
     if (!user) {
       return res.status(404).json({
@@ -2801,7 +2837,8 @@ exports.getWhatsHotProductsweb = async function (req, res) {
         sizeList: sizeList,
         conditionList: conditionList,
         productCount:hotProductsCount,
-        isLoggedIn: isLoggedIn
+        isLoggedIn: isLoggedIn,
+        filter_basedon:"whatshot"
 
       });
 
@@ -2891,7 +2928,8 @@ exports.getJustSoldProductsweb = async function (req, res) {
         sizeList: sizeList,
         conditionList: conditionList,
         productCount:soldItemsCount,
-        isLoggedIn: isLoggedIn
+        isLoggedIn: isLoggedIn,
+        filter_basedon:"justsold"
 
       });
 
@@ -2985,8 +3023,8 @@ exports.getBestDealProductsweb = async function (req, res) {
         sizeList: sizeList,
         conditionList: conditionList,
         productCount:count,
-        isLoggedIn: isLoggedIn
-
+        isLoggedIn: isLoggedIn,
+        filter_basedon:"bestDeal"
       });
 
   } catch (error) {

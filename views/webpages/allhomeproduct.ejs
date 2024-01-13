@@ -15,7 +15,7 @@
             <div class="short-sidebar">                   
                <div class="filter-header">
                   <div class="flt-title">All Filters</div>
-                  <div class="flt-clear"><a href="javascript:void(0)">Clear All</a></div>
+                  <div class="flt-clear"><a href="javascript:void(0)" onclick="clearAllAndReload()">Clear All</a></div>
                </div>
                <div class="accordion theme-accordion" id="theme-accordion">
                   <div class="card">
@@ -183,6 +183,7 @@
                 </div>
             </div>
  </section>
+ <input type="hidden" name="product_category_id" id="product_category_id" value="<%=filter_basedon%>" />
 <%- include('../../public/assets/include/newsletter'); %>
 <%- include('../../public/assets/include/footer'); %>
 <script src="/public/assets/js/subcategory-product-list.js"></script>

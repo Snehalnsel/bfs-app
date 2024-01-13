@@ -65,6 +65,22 @@ $(document).on('change', ".sortBy", function(e){
         searchByFilter();
     } else {
         let categoryId =$("#product_category_id").val();
+
+        if (categoryId === "whatshot") {
+            
+            categoryId = "whatshot";
+        } else if (categoryId === "justsold") {
+          
+            categoryId = "justsold";
+        } else if (categoryId === "bestDeal") {
+           
+            categoryId = "bestDeal";
+        }
+        else
+        {
+            categoryId = categoryId;
+        }
+
         let checkOption = $("#sortBy").val();
         let optionId = "";
         if(checkOption != "Choose") {
@@ -76,9 +92,8 @@ $(document).on('change', ".sortBy", function(e){
             url: `/api/websubcategoriesproductswithsort/${categoryId}/${optionId.trim()}`,
             method: 'GET',
             success: async function(data) {
-                //console.log(data);
+                console.log(data);
 
-                // Update the content of the 'sortdata' div with the received data
                 let htmlContent = '';
                 if (data && data.respdata && data.respdata.length > 0) {
                     htmlContent = await makeHtml(data);
@@ -94,6 +109,10 @@ $(document).on('change', ".sortBy", function(e){
         });
     }
 });
+
+async function clearAllAndReload() {
+    location.reload();
+  }
 async function makeHtml(data) {
     let htmlContent = ``;
     data.respdata.forEach(function(item) {
@@ -113,7 +132,8 @@ async function makeHtml(data) {
                     </div>
                     <div class="rtl-price">
                         <span>Est. Retail:</span>${item.price}
-                    </div>                 
+                    </div>
+                    <div class="prd-batch">${item.status_name}</div>                 
                 </div> 
             </div>`;
     });

@@ -178,6 +178,7 @@
          $(document).on('click', '.order-shipping-kit', function () {
             var orderId = $(this).data('orderid');
             var cgRowElement = $(`.cg-row[data-orderid="${orderId}"]`);
+           
             $.ajax({
                url: '/api/get-shipmentkitweb/' + orderId.trim(),
                method: 'GET',
@@ -188,10 +189,9 @@
                            confirmButtonText: "OK",
                            customClass: { confirmButton: 'alert-box-button' }
                         });
-                        //$(`.cg-row[data-orderid="${orderId}"]`).hide();
-                        //cgRowElement.replaceWith(successMessageElement);
                         $("#"+orderId).siblings("p").text("sdfsdfesdf");
-                        location.reload();
+                        $("#"+orderId).hide();
+                        //location.reload();
                      } else {
                         Swal.fire({
                            html: data.message,

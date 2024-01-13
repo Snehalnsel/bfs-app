@@ -23,7 +23,7 @@ const model = mongoose.Schema({
   },
   priority_status: {
     type: Number,
-    enum: [0,1],
+    enum: [0,1,2],
     default: 0,
   },
   added_dtime: {

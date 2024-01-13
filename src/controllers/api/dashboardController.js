@@ -377,7 +377,20 @@ exports.getTopCategories = async function (req, res) {
 
 };
 
+exports.getTopCategoriesweb = async function (req, res) {
 
+  try {
+    const topCategories = await Category.find({ priority_status: { $in: [1, 2] } });
+    return res.status(200).json({
+      status: "1",
+      message: "Top categories",
+      respdata: topCategories,
+    });
+  } catch (error) {
+    console.error('Error fetching top categories:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
 
 exports.getJustSoldProducts = async function (req, res) {
 

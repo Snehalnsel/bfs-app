@@ -425,7 +425,7 @@
     var hTml = ``;
     async function fetchData1() {
         try {
-            const response = await fetch('/api/top-categories');
+            const response = await fetch('/api/top-categoriesweb');
             const data = await response.json();
             const topmenu = data.respdata;
             populateSlider1(topmenu);

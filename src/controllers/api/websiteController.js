@@ -835,11 +835,15 @@ exports.userFilter = async function (req, res, next) {
     };
     formattedUserProducts.push(formattedUserProduct);
   }
+
+  const userProductsCount = formattedUserProducts.length;
+
   if (formattedUserProducts.length > 0) {
     return res.json({
       status: 'success',
       message: 'Success search result',
       respdata: formattedUserProducts,
+      userProductsCount:userProductsCount
     });
   } else {
     res.status(200).json({

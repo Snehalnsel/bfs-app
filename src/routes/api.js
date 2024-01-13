@@ -1103,6 +1103,13 @@ router.get("/get-shipmentkitweb/:id",[],WebsiteController.addShipmentData);
 // WEBSITE API'S
 router.get("/home",[],DashboardController.getData);
 
+
+router.get(
+  "/top-categoriesweb",
+  [],
+  DashboardController.getTopCategoriesweb
+);
+
 router.get("/bestdeal",[],WebsiteController.getBestDealProductsweb);
 router.get("/whatshot",[],WebsiteController.getWhatsHotProductsweb);
 router.get("/justsold",[],WebsiteController.getJustSoldProductsweb);

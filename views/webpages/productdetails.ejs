@@ -70,9 +70,12 @@
                </div>
 
                <div class="prd-button-group spb-button-row">
-                  <!--<a href="/api/addtocart/<%=respdata._id%>" class="prd-btn">Buy Now</a>-->
-                  <a href="javascript:void(0)" class="prd-btn buy-btn" data-id="<%=respdata._id%>">Buy Now</a>
-                  <a href="javascript:void(0)" class="prd-btn orng-btn bidButton">Bid Now</a>
+                  <div class="single-button-group">
+                    <!--<a href="/api/addtocart/<%=respdata._id%>" class="prd-btn">Buy Now</a>-->
+                    <%if(respdata.flag == 0) {%>
+                     <a href="javascript:void(0)" class="prd-btn buy-btn" data-id="<%=respdata._id%>">Buy Now</a>
+                     <a href="javascript:void(0)" class="prd-btn orng-btn bidButton">Bid Now</a>
+                     <% } %>
                   <% if(isWhislist==false) {%>
                      <a href="javascript:void(0)" class="prd-btn wish-btn" data-id="<%=respdata._id%>"><i
                            class="fa fa-heart-o" aria-hidden="true"></i></a>
@@ -80,18 +83,31 @@
                         <a href="javascript:void(0)" class="prd-btn wish-rem-btn" data-id="<%=respdata._id%>"><i
                               class="fa fa-heart" aria-hidden="true"></i></a>
                         <% } %>
-                           <!--<a href="single-product.php" class="prd-btn"><i class="fa fa-share-alt"
-                                 aria-hidden="true"></i></a>-->
+                           <a href="javascript:void(0)" class="prd-btn share-product-icon"><i class="fa fa-share-alt"
+                                 aria-hidden="true"></i></a>
                            <!-- Basic Share Links -->
                            <!-- Twitter (url, text, @mention) -->
-                           <a href="https://api.whatsapp.com/send?text=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>" data-action="share/whatsapp/share">Whatsapp</a>
-                           <a href="https://twitter.com/share?url=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>&text=<%=respdata.name%>via=<%=respdata.name%>">Twitter</a>
-                           <a href="https://www.facebook.com/sharer/sharer.php?u=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>">
-                              Facebook
-                           </a>
-                           <a href="https://www.linkedin.com/shareArticle?url=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>&title=<%=respdata.name%>&summary=<%=respdata.name%>&source=<%=websiteUrl%>">
-                              LinkedIn
-                           </a>
+                           <div class="share-linksbox">
+                              <span class="close-icon"><i class="fa fa-times" aria-hidden="true"></i></span>
+                              <ul>
+                                 <li><a target="_blank" href="https://api.whatsapp.com/send?text=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>" data-action="share/whatsapp/share" class="slc-btn wa-btn "><i class="fa fa-whatsapp" aria-hidden="true"></i></a>
+                                 </li>
+                                 <li>
+                                    <a target="_blank" href="https://twitter.com/share?url=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>&text=<%=respdata.name%>via=<%=respdata.name%>" class="slc-btn tw-btn "><i class="fa fa-twitter" aria-hidden="true"></i></a>
+                                 </li>
+                                 <li>
+                                    <a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>" class="slc-btn fb-btn ">
+                                       <i class="fa fa-facebook" aria-hidden="true"></i>
+                                    </a>
+                                 </li>
+                                 <li>
+                                    <a target="_blank" href="https://www.linkedin.com/shareArticle?url=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>&title=<%=respdata.name%>&summary=<%=respdata.name%>&source=<%=websiteUrl%>" class="slc-btn lnk-btn ">
+                                       <i class="fa fa-linkedin" aria-hidden="true"></i>
+                                    </a>
+                                 </li>
+                              </ul>
+                           </div>
+                  </div>                           
                </div>
                <br>
                <h6>Product Details</h6>

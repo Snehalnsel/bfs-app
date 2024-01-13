@@ -93,7 +93,7 @@ exports.homedetails = async function (req, res) {
           _id: product._id,
 
           name: product.name,
-
+          flag: (typeof product.flag != "undefined") ? product.flag : 0, //Added By Palash 13-01-2024
           price: product.price,
 
           offer_price: product.offer_price,
@@ -132,7 +132,7 @@ exports.homedetails = async function (req, res) {
           _id: product._id,
 
           name: product.name,
-
+          flag: (typeof product.flag != "undefined") ? product.flag : 0,//Added By Palash 13-01-2024
           price: product.price,
 
           offer_price: product.offer_price,
@@ -188,7 +188,7 @@ exports.homedetails = async function (req, res) {
           _id: product._id,
 
           name: product.name,
-
+          flag: (typeof product.flag != "undefined") ? product.flag : 0,//Added By Palash 13-01-2024
           price: product.price,
 
           offer_price: product.offer_price,

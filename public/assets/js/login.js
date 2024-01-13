@@ -59,7 +59,12 @@ $(document).ready(async function(){
                             $('#loginForm')[0].reset();
                         }, 500);
                         if((typeof obj.respdata.refreshReset != "undefined") && (obj.respdata.refreshReset)) {
-                            location.reload();
+                            let pathArray = window.location.pathname.split( '/' );
+                            if(pathArray[2] != "registration") {
+                                location.reload();
+                            } else {
+                                location.href= webSiteUrl + "/api/home";
+                            }
                         }
                     } else {
                         $('#error-msg').html(obj.message);

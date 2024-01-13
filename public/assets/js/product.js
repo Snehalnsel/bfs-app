@@ -143,3 +143,14 @@ $(document).on('click', ".wish-rem-btn", async function (e) {
         $('#login_modal').modal('show'); 
     }
 });
+
+$(document).on('click', ".share-product-icon", async function (e) {
+    $(".share-linksbox").addClass("icon-show");
+});
+$(document).on('click', ".slc-btn", async function (e) {
+    $(".share-linksbox").removeClass("icon-show");
+});
+
+$(document).on('click', ".close-icon", async function (e) {
+    $(".share-linksbox").removeClass("icon-show");
+});

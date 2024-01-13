@@ -65,6 +65,22 @@ $(document).on('change', ".sortBy", function(e){
         searchByFilter();
     } else {
         let categoryId =$("#product_category_id").val();
+
+        if (categoryId === "whatshot") {
+            
+            categoryId = "whatshot";
+        } else if (categoryId === "justsold") {
+          
+            categoryId = "justsold";
+        } else if (categoryId === "bestDeal") {
+           
+            categoryId = "bestDeal";
+        }
+        else
+        {
+            categoryId = categoryId;
+        }
+
         let checkOption = $("#sortBy").val();
         let optionId = "";
         if(checkOption != "Choose") {

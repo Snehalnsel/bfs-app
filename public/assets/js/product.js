@@ -61,3 +61,85 @@ $(document).on('click', ".buy-btn", function(e){
        $('#login_modal').modal('show'); 
     }
 });
+
+
+
+$(document).on('click', ".wish-btn", async function (e) {
+    if(isLoggedIn2 != "") {
+        let wishlistreCookieAccessToken = await getCookieFunc(accessTokenVar);
+        let wishlistreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
+        await userReLogin(wishlistreCookieAccessToken, wishlistreCookieRefreshToken);
+
+        var id = $(this).data('id');
+        console.log(id);
+        $.ajax({
+            url: '/api/add-to-wishlist-web/' + id.trim(),
+            method: 'POST',
+            success: function (data) {
+                if (data.is_wishlisted) {
+                Swal.fire({
+                    html: data.message,
+                    confirmButtonText: "OK",
+                    customClass: { confirmButton: 'alert-box-button' }
+                });
+                $(".wish-btn").addClass("wish-rem-btn").find("i").removeClass("fa fa-heart-o").addClass("fa fa-heart");
+                setTimeout(() => {
+                    $(".wish-rem-btn").removeClass("wish-btn");
+                }, 200);
+                } else {
+                Swal.fire({
+                    html: data.message,
+                    confirmButtonText: "OK",
+                    customClass: { confirmButton: 'alert-box-button', popup: 'swal2-popup' }
+                });
+                }
+            },
+            error: function (err) {
+                console.error('Error:', err);
+            }
+        });
+    } else {
+        $('#login_modal').modal('show'); 
+    }
+});
+
+
+$(document).on('click', ".wish-rem-btn", async function (e) {
+    if(isLoggedIn2 != "") {
+        let wishlistreagCookieAccessToken = await getCookieFunc(accessTokenVar);
+        let wishlistreagCookieRefreshToken = await getCookieFunc(refreshTokenVar);
+        await userReLogin(wishlistreagCookieAccessToken, wishlistreagCookieRefreshToken);
+
+        var id = $(this).data('id');
+        console.log(id);
+        $.ajax({
+            url: '/api/remove-wishlist-web/' + id.trim(),
+            method: 'GET',
+            success: function (data) {
+                if (data.success) {
+                Swal.fire({
+                    html: data.message,
+                    confirmButtonText: "OK",
+                    customClass: { confirmButton: 'alert-box-button' }
+                });
+                $(".wish-rem-btn").addClass("wish-btn").find("i").removeClass("fa fa-heart").addClass("fa fa-heart-o");
+                setTimeout(() => {
+                    $(".wish-btn").removeClass("wish-rem-btn");
+                }, 200);
+
+                } else {
+                Swal.fire({
+                    html: data.message,
+                    confirmButtonText: "OK",
+                    customClass: { confirmButton: 'alert-box-button', popup: 'swal2-popup' }
+                });
+                }
+            },
+            error: function (err) {
+                console.error('Error:', err);
+            }
+        });
+    } else {
+        $('#login_modal').modal('show'); 
+    }
+});

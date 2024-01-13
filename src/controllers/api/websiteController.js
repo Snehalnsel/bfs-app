@@ -272,6 +272,7 @@ console.log(formattedUserProduct);
       message: "Welcome to the Dashboard page!",
       respdata: formattedUserProduct,
       relatedProducts: formattedUserProducts1,
+      websiteUrl:process.env.SITE_URL,
       isLoggedIn: isLoggedIn,
       isWhislist: isProductInWishlist != null && Object.keys(isProductInWishlist).length ? true : false
     });

@@ -191,6 +191,7 @@
                         //$(`.cg-row[data-orderid="${orderId}"]`).hide();
                         //cgRowElement.replaceWith(successMessageElement);
                         $("#"+orderId).siblings("p").text("sdfsdfesdf");
+                        location.reload();
                      } else {
                         Swal.fire({
                            html: data.message,

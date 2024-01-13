@@ -189,7 +189,8 @@
                            customClass: { confirmButton: 'alert-box-button' }
                         });
                         //$(`.cg-row[data-orderid="${orderId}"]`).hide();
-                        cgRowElement.replaceWith(successMessageElement);
+                        //cgRowElement.replaceWith(successMessageElement);
+                        $("#"+orderId).siblings("p").text("sdfsdfesdf");
                      } else {
                         Swal.fire({
                            html: data.message,

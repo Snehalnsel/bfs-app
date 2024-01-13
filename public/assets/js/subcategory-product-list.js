@@ -44,11 +44,13 @@ async function searchByFilter() {
             if(error_success == 'success'){
                 let htmlContent = '';
                 if (obj && obj.respdata && obj.respdata.length > 0) {
+                    console.log(obj.respdata.length);
                     htmlContent = await makeHtml(obj);
                 } else {
                     htmlContent = '<p>No products found yet.</p>';
                 }
                 $('.sortdata').html(htmlContent);
+                $('.show-count').html(`Showing ${(obj.respdata.length > 0 ? obj.respdata.length : 0)} products`);
             } else {
                 $('.sortdata').html(`No Products Found!!`);
                 //Write something for occuring the error

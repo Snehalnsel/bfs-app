@@ -811,6 +811,7 @@ exports.userFilter = async function (req, res, next) {
   for (const userproduct of allProductData) {
 
     const productImages = await Productimage.find({ product_id: userproduct._id });
+    const productCondition = await Productcondition.findById(userproduct.status);
 
     const formattedUserProduct = {
       _id: userproduct._id,
@@ -830,6 +831,7 @@ exports.userFilter = async function (req, res, next) {
       added_dtime: (typeof userproduct.added_dtime != "undefined") ? userproduct.added_dtime : "",
       __v: (typeof userproduct.__v != "undefined") ? userproduct.__v : "",
       product_images: productImages,
+      status_name: productCondition.name
     };
     formattedUserProducts.push(formattedUserProduct);
   }
@@ -1100,10 +1102,6 @@ exports.addAddress = async function (req, res, next) {
   }
 };
 
-
-
-
-
 exports.getParentCategories = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -1353,10 +1351,6 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
     const data = await getProductDataWithSort(id, sortid);
     const formattedUserProducts = data.respdata;
     const productCount = formattedUserProducts.length;
-
-    console.log(productCount);
-   console.log("product changes");
-
 
     const categoryName = await Category.find({ _id: id}).populate('name');
     

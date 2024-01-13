@@ -109,6 +109,10 @@ $(document).on('change', ".sortBy", function(e){
         });
     }
 });
+
+async function clearAllAndReload() {
+    location.reload();
+  }
 async function makeHtml(data) {
     let htmlContent = ``;
     data.respdata.forEach(function(item) {

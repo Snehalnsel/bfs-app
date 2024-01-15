@@ -1259,4 +1259,13 @@ router.post("/user-relogin",cors(),
 router.post("/user-filter",cors(),
   WebsiteController.userFilter
 );
+
+router.get("/forgot-password",cors(),
+  WebsiteController.forgotPassword
+);
+
+router.post("/forgotpassword-sendotp",cors(),
+  WebsiteController.sendotp
+);
+
 module.exports = router;

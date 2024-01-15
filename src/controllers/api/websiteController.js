@@ -65,12 +65,9 @@ const transporter = nodemailer.createTransport({
 });
 
 
-// app.use(session({
-//   secret: yourSecretKey,
-//   resave: false,
-//   saveUninitialized: false
-// }));
-
+function randNumber(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
+}
 
 const accountSid = 'ACa1b71e8226f3a243196beeee233311a9';
 const authToken = 'ea9a24bf2a9ca43a95b991c9c471ba93';
@@ -1291,8 +1288,6 @@ async function getProductDataWithSort(id, sortid) {
       .exec();
     }
 
-
-
     const formattedUserProducts = [];
 
     for (const userproduct of userproducts) {
@@ -1300,7 +1295,6 @@ async function getProductDataWithSort(id, sortid) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
 
       const productCondition = await Productcondition.findById(userproduct.status);
-
 
       const formattedUserProduct = {
         _id: userproduct._id,
@@ -1330,7 +1324,6 @@ async function getProductDataWithSort(id, sortid) {
       status: '1',
       message: 'Success',
       respdata: formattedUserProducts,
-      //isLoggedIn: isLoggedIn,
     };
 
   }
@@ -1358,8 +1351,6 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
 
     const categoryName = await Category.find({ _id: id}).populate('name');
     
-    //Get All Filter Data
-    //Brand List
     const brandList = await brandModel.find({});
     const sizeList = await sizeModel.find({});
     const conditionList = await productconditionModel.find({});
@@ -1405,15 +1396,15 @@ exports.getSubCategoriesProductswithSort = async function (req, res, next) {
   const formattedUserProducts = data.respdata;
   const productCount = formattedUserProducts.length;
 
-console.log(productCount);
-console.log("product changes");
-  return res.json({
-    status: '1',
-    message: 'Success',
-    respdata: formattedUserProducts,
-    productCount:productCount,
-    isLoggedIn: isLoggedIn
-  });
+  console.log(productCount);
+  console.log("product changes");
+    return res.json({
+      status: '1',
+      message: 'Success',
+      respdata: formattedUserProducts,
+      productCount:productCount,
+      isLoggedIn: isLoggedIn
+    });
 
 };
 
@@ -3039,4 +3030,108 @@ exports.getBestDealProductsweb = async function (req, res) {
 
   }
 
+};
+
+exports.forgotPassword = async function (req, res, next) {
+
+  try {
+
+    const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : ""
+
+    var cartCount = (userId != "") ? await Cart.countDocuments({ user_id: mongoose.Types.ObjectId(userId) }) : 0;
+
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+
+    res.render("webpages/forget-password", {
+
+      title: "Home Page 123",
+
+      requrl: req.app.locals.requrl,
+
+      message: "Welcome to the Dashboard page!",
+
+      cart: cartCount,
+      isLoggedIn: isLoggedIn,
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+
+      status: "0",
+
+      message: "An error occurred while rendering the dashboard.",
+
+      error: error.message,
+
+    });
+
+  }
+
+};
+
+exports.sendotp = async function (req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(200).json({
+      status: "0",
+      message: "Validation error!",
+      respdata: errors.array(),
+    });
+  }
+
+  Users.findOne({ email: req.body.email }).then((user) => {
+    if (!user)
+      res.status(200).json({
+        status: "0",
+        message: "User not found!",
+        respdata: {},
+      });
+    else {
+      var otp = randNumber(1000, 2000);
+
+      const mailData = {
+        from: smtpUser, 
+        to: user.email,
+        subject: "BFS - Bids For Sale - Forgot password OTP",
+        text: "Server Email!",
+        html:
+          "Hey " +
+          user.name +
+          ", <br> <p> Please use this OTP : <b>" +
+          otp +
+          "</b> to reset your password! </p>",
+      };
+
+      transporter.sendMail(mailData, function (err, info) {
+        if (err) console.log(err);
+        else console.log(info);
+      });
+
+      var updData = {
+        forget_otp: otp,
+      };
+      Users.findOneAndUpdate(
+        { _id: user._id },
+        { $set: updData },
+        { upsert: true },
+        function (err, doc) {
+          if (err) {
+            throw err;
+          } else {
+            Users.findOne({ _id: user._id }).then((user) => {
+              res.status(200).json({
+                status: "1",
+                message: "OTP sent!",
+                resdpata: user,
+                is_forgetpassword: true
+              });
+            });
+          }
+        }
+      );
+    }
+  });
 };

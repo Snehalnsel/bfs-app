@@ -64,10 +64,16 @@ const transporter = nodemailer.createTransport({
   secure: true,
 });
 
-
 function randNumber(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
+
+// app.use(session({
+//   secret: yourSecretKey,
+//   resave: false,
+//   saveUninitialized: false
+// }));
+
 
 const accountSid = 'ACa1b71e8226f3a243196beeee233311a9';
 const authToken = 'ea9a24bf2a9ca43a95b991c9c471ba93';
@@ -793,17 +799,29 @@ exports.userFilter = async function (req, res, next) {
   if ((typeof conditionList != "undefined") && (objConditionList.length > 0)) {
     concatVar["status"] = { "$in": objConditionList };
   }
-  if (typeof priceList != "undefined") {
+  /*if (typeof priceList != "undefined") {
     if (priceList.length > 0) {
       priceList.forEach(function (item) {
-        let priceArr = item.split("-");
+        var priceArr = item.split("-");
         concatVar["offer_price"] = { "$gt": priceArr[0] };
         concatVar["offer_price"] = { "$lte": priceArr[1] };
       });
     }
   }
-  let allProductData = await Userproduct.find({ $and: [concatVar]}).sort({ offer_price: optionId });
-  //console.log(allProductData);return false;
+  let allProductData = await Userproduct.find({ $and: [concatVar]},{from:{$gte:concatVar["offer_price"]}, to:{$lt:concatVar["offer_price"]}}).sort({ offer_price: optionId });
+*/
+  console.log('#######################################');
+   console.log(allProductData);
+   console.log('#######################################');
+  
+  //let allProductData = await Userproduct.find(concatVar).sort({ offer_price: optionId });
+   
+  //  console.log('*****************************************');
+  //  console.log(allProductData);
+  //  console.log('*****************************************');
+   return false;
+  
+ 
   const formattedUserProducts = [];
   for (const userproduct of allProductData) {
 
@@ -1288,6 +1306,8 @@ async function getProductDataWithSort(id, sortid) {
       .exec();
     }
 
+
+
     const formattedUserProducts = [];
 
     for (const userproduct of userproducts) {
@@ -1295,6 +1315,7 @@ async function getProductDataWithSort(id, sortid) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
 
       const productCondition = await Productcondition.findById(userproduct.status);
+
 
       const formattedUserProduct = {
         _id: userproduct._id,
@@ -1324,6 +1345,7 @@ async function getProductDataWithSort(id, sortid) {
       status: '1',
       message: 'Success',
       respdata: formattedUserProducts,
+      //isLoggedIn: isLoggedIn,
     };
 
   }
@@ -1351,6 +1373,8 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
 
     const categoryName = await Category.find({ _id: id}).populate('name');
     
+    //Get All Filter Data
+    //Brand List
     const brandList = await brandModel.find({});
     const sizeList = await sizeModel.find({});
     const conditionList = await productconditionModel.find({});
@@ -1396,15 +1420,15 @@ exports.getSubCategoriesProductswithSort = async function (req, res, next) {
   const formattedUserProducts = data.respdata;
   const productCount = formattedUserProducts.length;
 
-  console.log(productCount);
-  console.log("product changes");
-    return res.json({
-      status: '1',
-      message: 'Success',
-      respdata: formattedUserProducts,
-      productCount:productCount,
-      isLoggedIn: isLoggedIn
-    });
+console.log(productCount);
+console.log("product changes");
+  return res.json({
+    status: '1',
+    message: 'Success',
+    respdata: formattedUserProducts,
+    productCount:productCount,
+    isLoggedIn: isLoggedIn
+  });
 
 };
 
@@ -1477,6 +1501,7 @@ exports.userUpdate = async function (req, res, next) {
 // user checkout address add
 exports.userNewCheckOutAddressAdd = async function (req, res, next) {
   try{
+    
     const addr_name = req.body.addrType;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -1526,10 +1551,8 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
       savedAddress.shiprocket_address = pickupLocation;
       savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
       await savedAddress.save();
-      //res.redirect('/api/my-account');
-    }
-
-    
+      res.redirect('/api/checkout-web');
+    }    
 
   } catch (error) {
     console.error(error);
@@ -2202,7 +2225,7 @@ exports.addToCart = async function (req, res, next) {
 
       setTimeout(() => {
         removeItemAfterTime(existingCart._id); // savedata._id contains the ID of the added item
-      }, 2 * 60 * 1000);
+      }, 20 * 60 * 1000);
 
       return res.status(200).json({
         message: 'Item Added to Cart',
@@ -3082,6 +3105,108 @@ exports.getBestDealProductsweb = async function (req, res) {
 
   }
 
+};
+
+exports.userPlacedOrder = async function (req, res) {
+
+ try{
+     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+     let user_id = req.body.data.user_id;
+     let seller_id = req.body.data.seller_id;
+     let cart_id = req.body.data.cart_id;
+     let product_id = req.body.data.product_id;
+     let total_price = req.body.data.total_amt;
+     let payment_method = req.body.data.payment_method;
+     let gst = req.body.data.gst;
+     let order_status = '0';
+     let delivery_charges = '0';
+     let discount = '0';
+     let pickup_status = '0';
+     let delivery_status = '0';
+
+    // Get Shipping Address id 
+    const shippingaddress = await addressBook.findOne({ user_id: seller_id });
+    if (!shippingaddress) {
+      return res.status(404).json({ message: 'Shipping address not found' });
+    }
+    const shipping_address_id = shippingaddress._id;
+
+    // Get Billing Address id
+    const productdetails = await Userproduct.findById(product_id);
+    if (!productdetails) {
+      return res.status(404).json({ message: 'Billing address not found' });
+    }
+    const billing_address_id = productdetails.user_id;
+    console.log(billing_address_id);
+
+    const now = new Date();
+    const currentHour = now.getHours().toString().padStart(2, '0');
+    const currentMinute = now.getMinutes().toString().padStart(2, '0');
+    const currentSecond = now.getSeconds().toString().padStart(2, '0');
+    const currentMillisecond = now.getMilliseconds().toString().padStart(3, '0');
+
+    // Generate the unique code using the current time components
+    const orderCode = `BFSORD${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
+
+    // Create value for saving data in order table
+    const order = new Order({
+      order_code: orderCode,
+      user_id,
+      cart_id,
+      seller_id,
+      product_id,
+      billing_address_id,
+      shipping_address_id,
+      total_price,
+      payment_method,
+      order_status,
+      gst,
+      delivery_charges,
+      discount,
+      pickup_status,
+      delivery_status,
+      added_dtime: new Date().toISOString(),
+    });
+    const savedOrder = await order.save();
+
+    if (savedOrder) {
+      const user = await Users.findById(savedOrder.user_id);
+
+      const mailData = {
+        from: smtpUser,
+        to: user.email,
+        subject: "BFS - Bid For Sale  - Order Placed Successfully",
+        text: "Server Email!",
+        html:
+          "Hey " +
+          user.name +
+          ", <br> <p>Congratulations your order is placed.please wait for some times and the delivery details you will show on the app.</p>",
+      };
+
+      transporter.sendMail(mailData, function (err, info) {
+        if (err) console.log(err);
+        else console.log(info);
+      });
+
+      const updatedProduct = await Userproduct.findOneAndUpdate(
+        { _id: product_id },
+        { $set: { flag: 1 } },
+        { new: true }
+      );
+      res.status(200).json({
+        status: "1",
+        is_orderPlaced: 1,
+        message: 'Order placed successfully',
+        order: savedOrder
+      });
+    }
+ } catch (error) {
+
+  console.error('Error fetching Order Palced: ', error);
+
+  return res.status(500).json({ message: 'Internal server error' });
+
+}
 };
 
 exports.forgotPassword = async function (req, res, next) {

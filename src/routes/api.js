@@ -1215,13 +1215,16 @@ router.get("/web-my-order",WebsiteController.myOrderWeb);
 
 router.get("/web-myorder-details/:id",WebsiteController.myOrderDetailsWeb);
 
-
 router.get("/bannerlist",[],DashboardController.bannerlist);
-
 
 router.post("/change-profile-image-web",[],upload.array('image', 1),WebsiteController.changeProfileImgWeb);
 
 router.get("/checkout-web",WebsiteController.checkoutWeb);
+
+router.post("/placed-order",WebsiteController.userPlacedOrder);
+
+
+
 //Routes Added By Palash
 
 router.get(

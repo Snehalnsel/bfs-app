@@ -673,11 +673,7 @@ exports.checkout = async (req, res) => {
 
     // Generate the unique code using the current time components
     const orderCode = `BFSORD${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
-    console.log(`Unique code: ${orderCode}`);
     
-    // const orderCode = `BFSORD${Date.now().toString()}`;
-
-
     const order = new Order({
       order_code: orderCode, 
       user_id,
@@ -954,11 +950,6 @@ exports.getOrderListByUser = async (req, res) => {
   }
 };
 
-
-
-
-
-
 exports.getOrdersBySeller = async (req, res) => {
   try {
     //const { seller_id } = req.body;
@@ -1117,8 +1108,6 @@ exports.getOrderDetails = async (req, res) => {
   }
 };
 
-
-
 exports.cancelOrderById = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -1182,8 +1171,6 @@ exports.cancelOrderById = async function (req, res, next) {
     });
   }
 };
-
-
 
 exports.changestatsByUser = async function (req, res, next) {
   const errors = validationResult(req);

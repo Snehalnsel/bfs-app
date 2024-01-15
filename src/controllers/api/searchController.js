@@ -442,6 +442,8 @@ exports.filterData = async function (req, res, next) {
           return res.status(400).json({ status: '0', message: 'Invalid type' });
       }
     }
+
+    console.log('Hello###################');
     console.log(filterQuery);
     const products = await Userproduct.find(filterQuery);
 

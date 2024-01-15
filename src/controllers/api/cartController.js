@@ -289,7 +289,7 @@ exports.addToCart = async (req, res) => {
 
       setTimeout(() => {
         removeItemAfterTime(existingCart._id); // savedata._id contains the ID of the added item
-      }, 2 * 60 * 1000);
+      }, 20 * 60 * 1000);
 
       return res.status(200).json({
         message: 'Item added to existing cart successfully',

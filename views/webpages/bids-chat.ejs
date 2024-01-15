@@ -209,7 +209,11 @@
          div.classList.add('message-box-holder');
          const div2 = document.createElement('div');
          div2.classList.add('message-box');
-         div2.classList.add(inOutClass);
+         if(message.username == username) {
+            div2.classList.add("outgoing-message");
+         } else {
+            div2.classList.add("incoming-message");
+         }
          div2.innerText = message.name;
          const i = document.createElement('i');
          i.classList.add('fa');

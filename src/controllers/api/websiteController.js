@@ -64,6 +64,9 @@ const transporter = nodemailer.createTransport({
   secure: true,
 });
 
+function randNumber(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
+}
 
 // app.use(session({
 //   secret: yourSecretKey,
@@ -3204,4 +3207,162 @@ exports.userPlacedOrder = async function (req, res) {
   return res.status(500).json({ message: 'Internal server error' });
 
 }
+};
+
+exports.forgotPassword = async function (req, res, next) {
+
+  try {
+
+    const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : ""
+
+    var cartCount = (userId != "") ? await Cart.countDocuments({ user_id: mongoose.Types.ObjectId(userId) }) : 0;
+
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+
+    res.render("webpages/forget-password", {
+
+      title: "Home Page 123",
+
+      requrl: req.app.locals.requrl,
+
+      message: "Welcome to the Dashboard page!",
+
+      cart: cartCount,
+      isLoggedIn: isLoggedIn,
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+
+      status: "0",
+
+      message: "An error occurred while rendering the dashboard.",
+
+      error: error.message,
+
+    });
+
+  }
+
+};
+
+exports.sendotp = async function (req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(200).json({
+      status: "0",
+      message: "Validation error!",
+      respdata: errors.array(),
+    });
+  }
+
+  Users.findOne({ email: req.body.email }).then((user) => {
+    if (!user)
+      res.status(200).json({
+        status: "0",
+        message: "User not found!",
+        respdata: {},
+      });
+    else if(!req.body.otp){
+      var otp = randNumber(1000, 2000);
+
+      const mailData = {
+        from: smtpUser, 
+        to: user.email,
+        subject: "BFS - Bids For Sale - Forgot password OTP",
+        text: "Server Email!",
+        html:
+          "Hey " +
+          user.name +
+          ", <br> <p> Please use this OTP : <b>" +
+          otp +
+          "</b> to reset your password! </p>",
+      };
+
+      transporter.sendMail(mailData, function (err, info) {
+        if (err) console.log(err);
+        else console.log(info);
+      });
+
+      var updData = {
+        forget_otp: otp,
+      };
+      Users.findOneAndUpdate(
+        { _id: user._id },
+        { $set: updData },
+        { upsert: true },
+        function (err, doc) {
+          if (err) {
+            throw err;
+          } else {
+            Users.findOne({ _id: user._id }).then((user) => {
+              res.status(200).json({
+                status: "1",
+                message: "OTP sent!",
+                resdpata: user,
+                is_forgetpassword: true
+              });
+            });
+          }
+        }
+      );
+    }
+    else
+    {
+      if (user.forget_otp == req.body.otp) {
+        bcrypt.hash(req.body.newPassword, rounds, (error, hash) => {
+          bcrypt.compare(req.body.confirmPassword, hash, (error, match) => {
+            if (error) {
+              res.status(200).json({
+                status: "0",
+                message: "Error!",
+                respdata: error,
+              });
+            } else if (match) {
+              var updData = {
+                password: hash,
+                forget_otp: "0",
+              };
+              Users.findOneAndUpdate(
+                { _id: req.body.user_id },
+                { $set: updData },
+                { upsert: true },
+                function (err, doc) {
+                  if (err) {
+                    throw err;
+                  } else {
+                    Users.findOne({ _id: req.body.user_id }).then((user) => {
+                      res.status(200).json({
+                        status: "1",
+                        message: "Successfully updated! Please login with your new password",
+                        respdata: user,
+                        is_forgetpassword: true,
+                        is_changepassword: true
+                      });
+                    });
+                  }
+                }
+              );
+            } else {
+              res.status(200).json({
+                status: "0",
+                message: "New and Repeat password does not match!",
+                respdata: {},
+                is_changepassword: false
+              });
+            }
+          });
+        });
+      } else {
+        res.status(200).json({
+          status: "0",
+          message: "OTP does not match!",
+          respdata: {},
+        });
+      }
+    }
+  });
 };

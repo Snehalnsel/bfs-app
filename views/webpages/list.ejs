@@ -52,14 +52,14 @@
           <div class="col-md-6">
              <div class="poster-box">
                 <a href="javascript:void(0)">
-                <img src="/public/assets/images/poster1.jpg" alt="images" class="img-fluid">
+                <img src="/public/assets/images/newposter-1.webp" alt="images" class="img-fluid">
                 </a>
              </div>
           </div>
           <div class="col-md-6">
              <div class="poster-box">
                 <a href="javascript:void(0)">
-                <img src="/public/assets/images/poster2.jpg" alt="images" class="img-fluid">
+                <img src="/public/assets/images/newposter-2.webp" alt="images" class="img-fluid">
                 </a>
              </div>
           </div>
@@ -207,11 +207,14 @@
                <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>${item.offer_price}</div>
                <div class="rtl-price"><span>Est. Retail:</span>₹${item.price}</div>
             </div>
-            <div class="prd-button-group">
-               <a href="javascript:void(0)" class="prd-btn buy-btn" data-id="${item._id}">Buy Now</a>`;
-            //if(isLoggedIn != "") {
-               html += `<a href="javascript:void(0)" class="prd-btn orng-btn bidButton">Bid Now</a>`;
-            //}
+            <div class="prd-button-group">`;
+            if(item.flag == 0) {
+               html += `<a href="javascript:void(0)" class="prd-btn buy-btn" data-id="${item._id}">Buy Now</a>`;
+               //if(isLoggedIn != "") {
+                  html += `<a href="javascript:void(0)" class="prd-btn orng-btn bidButton">Bid Now</a>`;
+               //}
+            }
+               
             html += `</div>
             <div class="prd-batch">${item.status}</div>
          </div>

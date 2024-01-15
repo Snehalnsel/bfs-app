@@ -93,7 +93,7 @@ exports.homedetails = async function (req, res) {
           _id: product._id,
 
           name: product.name,
-
+          flag: (typeof product.flag != "undefined") ? product.flag : 0, //Added By Palash 13-01-2024
           price: product.price,
 
           offer_price: product.offer_price,
@@ -132,7 +132,7 @@ exports.homedetails = async function (req, res) {
           _id: product._id,
 
           name: product.name,
-
+          flag: (typeof product.flag != "undefined") ? product.flag : 0,//Added By Palash 13-01-2024
           price: product.price,
 
           offer_price: product.offer_price,
@@ -188,7 +188,7 @@ exports.homedetails = async function (req, res) {
           _id: product._id,
 
           name: product.name,
-
+          flag: (typeof product.flag != "undefined") ? product.flag : 0,//Added By Palash 13-01-2024
           price: product.price,
 
           offer_price: product.offer_price,
@@ -377,7 +377,20 @@ exports.getTopCategories = async function (req, res) {
 
 };
 
+exports.getTopCategoriesweb = async function (req, res) {
 
+  try {
+    const topCategories = await Category.find({ priority_status: { $in: [1, 2] } });
+    return res.status(200).json({
+      status: "1",
+      message: "Top categories",
+      respdata: topCategories,
+    });
+  } catch (error) {
+    console.error('Error fetching top categories:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
 
 exports.getJustSoldProducts = async function (req, res) {
 

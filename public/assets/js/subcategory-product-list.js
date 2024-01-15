@@ -44,11 +44,13 @@ async function searchByFilter() {
             if(error_success == 'success'){
                 let htmlContent = '';
                 if (obj && obj.respdata && obj.respdata.length > 0) {
+                    console.log(obj.respdata.length);
                     htmlContent = await makeHtml(obj);
                 } else {
                     htmlContent = '<p>No products found yet.</p>';
                 }
                 $('.sortdata').html(htmlContent);
+                $('.show-count').html(`Showing ${(obj.respdata.length > 0 ? obj.respdata.length : 0)} products`);
             } else {
                 $('.sortdata').html(`No Products Found!!`);
                 //Write something for occuring the error
@@ -65,6 +67,22 @@ $(document).on('change', ".sortBy", function(e){
         searchByFilter();
     } else {
         let categoryId =$("#product_category_id").val();
+
+        if (categoryId === "whatshot") {
+            
+            categoryId = "whatshot";
+        } else if (categoryId === "justsold") {
+          
+            categoryId = "justsold";
+        } else if (categoryId === "bestDeal") {
+           
+            categoryId = "bestDeal";
+        }
+        else
+        {
+            categoryId = categoryId;
+        }
+
         let checkOption = $("#sortBy").val();
         let optionId = "";
         if(checkOption != "Choose") {
@@ -76,9 +94,8 @@ $(document).on('change', ".sortBy", function(e){
             url: `/api/websubcategoriesproductswithsort/${categoryId}/${optionId.trim()}`,
             method: 'GET',
             success: async function(data) {
-                //console.log(data);
+                console.log(data);
 
-                // Update the content of the 'sortdata' div with the received data
                 let htmlContent = '';
                 if (data && data.respdata && data.respdata.length > 0) {
                     htmlContent = await makeHtml(data);
@@ -94,6 +111,10 @@ $(document).on('change', ".sortBy", function(e){
         });
     }
 });
+
+async function clearAllAndReload() {
+    location.reload();
+  }
 async function makeHtml(data) {
     let htmlContent = ``;
     data.respdata.forEach(function(item) {
@@ -113,7 +134,8 @@ async function makeHtml(data) {
                     </div>
                     <div class="rtl-price">
                         <span>Est. Retail:</span>${item.price}
-                    </div>                 
+                    </div>
+                    <div class="prd-batch">${item.status_name}</div>                 
                 </div> 
             </div>`;
     });

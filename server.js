@@ -223,7 +223,8 @@ io.on("connection", (socket) => {
       userId: queryData.userId,
     };
     let updateData = {
-      buyerId:queryData.userId,
+      //buyerId:queryData.userId,
+      buyerId:(bidOldData.buyerId != "") ? bidOldData.buyerId : "",
       id:bidId,
       createdAt: timeMiliSeccond,
       productId: (bidOldData.productId != "") ? bidOldData.productId : "",
@@ -247,7 +248,7 @@ io.on("connection", (socket) => {
     if(allData.length > 0 ) {
       for(let newElement of allData) {
         let currUserDetails = await UserModel.findOne({_id:newElement.userId});
-        io.to(socket.id).emit("message", formatMessage(currUserDetails.name, newElement.price,username, roomName));
+        io.to(socket.id).emit("message", formatMessage(currUserDetails.name, newElement.price,newElement.userId, roomName));
       }
     }
   });

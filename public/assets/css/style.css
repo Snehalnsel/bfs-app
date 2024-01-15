@@ -112,7 +112,7 @@
     outline: none;
     text-decoration: none;  
     height: 40px;
-    width: 400px;
+    width: 470px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1592,9 +1592,10 @@
   }
   
   .bid-images {
-      height: 85px;
-      width: 65px;  
-      margin-right: 15px;    
+    height: 85px;
+    width: 65px;
+    margin-right: 15px;
+    border: none;    
   }
   
   .cart-price p {
@@ -2518,10 +2519,19 @@ section.poster-wrapper .col-md-6 {
     border: solid 1px #ebebeb;
 }
 
+.exzoom .exzoom_nav {
+    margin-top: 10px;
+    overflow: hidden;
+    position: relative;
+    left: 15px;
+    height: 110px !important;
+}
+
 .single-product-box .exzoom .exzoom_nav .exzoom_nav_inner span {
-    border-radius: 7px;
+    border-radius: 1px;
     border: solid 1px transparent;
     background: #eee;
+    height: 100px !important;
 }
 
 .single-product-box .exzoom_nav_inner span img {
@@ -2538,7 +2548,7 @@ section.poster-wrapper .col-md-6 {
     color: #e3683d !important;
     height: 40px;
     width: 30px;
-    top: -59px;
+    top: -75px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2562,7 +2572,7 @@ section.poster-wrapper .col-md-6 {
 }
 
 .exzoom_nav p.exzoom_nav_inner span {
-    width: 24% !important;
+    width: 80px !important;
     margin: 2px !important;
     padding: 5px !important;
 }
@@ -2570,7 +2580,8 @@ section.poster-wrapper .col-md-6 {
 .exzoom_nav p.exzoom_nav_inner span img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    top: inherit !important;
 }
 
 
@@ -2945,7 +2956,7 @@ button.message-send {
 }
 
 .message-box label.bid-amount i {
-    margin-right: 5px;
+    margin-right: 0px;
 }
 
 
@@ -3256,4 +3267,72 @@ p#msg-error {
 
 .step-done .date-icfo{
      color: black;
+}
+
+.single-button-group {
+    display: inline-block;
+    width: auto;
+    position: relative;
+}
+
+
+.share-linksbox {
+    position: absolute;
+    top: 15px;
+    right: 0;
+    transform: translate(50px, -10px);
+    visibility: hidden;
+    opacity: 0;
+    transition: 0.5s;
+}
+
+.share-linksbox.icon-show {
+    position: absolute;
+    top: 0px;    
+    visibility: visible;
+    opacity: 1;
+    transition: 0.5s;
+}
+
+a.slc-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    background: #3a3939;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 18px;
+    margin: 2px;
+    transition: 0.5s;
+    text-decoration: none;
+}
+a.slc-btn.wa-btn {
+    background: #14bd27;
+}
+
+a.slc-btn.tw-btn {
+    background: #00b0e7;
+}
+a.slc-btn.fb-btn {
+    background: #006cf4;
+}
+a.slc-btn.lnk-btn {
+    background: #007aae;
+}
+
+span.close-icon {
+    position: absolute;
+    right: -25px;
+    top: -15px;
+    width: 25px;
+    height: 25px;
+    background: #efeeee;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    cursor: pointer;
 }

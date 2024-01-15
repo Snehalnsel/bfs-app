@@ -16,7 +16,7 @@
             <div class="short-sidebar">                   
                <div class="filter-header">
                   <div class="flt-title">All Filters</div>
-                  <div class="flt-clear"><a href="javascript:void(0)">Clear All</a></div>
+                  <div class="flt-clear"><a href="javascript:void(0)"  onclick="clearAllAndReload()">Clear All</a></div>
                </div>
                <div class="accordion theme-accordion" id="theme-accordion">
                   <div class="card">
@@ -136,7 +136,7 @@
             <div class="main_product-wrapper ">
                <div class="top-title shorting-row">
                   <div class="product-result d-flex aling-center">
-                        <h5>Showing <%= productCount ? productCount : 0 %> products</h5>
+                        <h5 class="show-count">Showing <%= productCount ? productCount : 0 %> products</h5>
 
 
                   </div>

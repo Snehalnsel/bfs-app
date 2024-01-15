@@ -6,7 +6,7 @@ const getAllOfferHistory = async (reqData) => {
     const db = getFirestore();
     //Get all bid offer history data as a buyer/seller
     const bidsRef = await db.collection('bidOffers');
-    const snapshot  = await bidsRef.where('bidId', '==', reqData.bidId).limit(50).get();
+    const snapshot  = await bidsRef.where('bidId', '==', reqData.bidId).orderBy("createdAt", "asc").limit(50).get();
     let allaData = [];
     snapshot.forEach(doc => {
         allaData.push(doc.data());

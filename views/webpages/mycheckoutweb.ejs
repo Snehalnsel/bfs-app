@@ -1,0 +1,213 @@
+<%- include('../../public/assets/include/header'); %>
+<% console.log('Helo Checkout ');%>
+<% console.log(addressUserList);%>
+
+<section class="bids-wrapper">
+    <div class="container">     
+       <div class="bids-lists cart-wrapper">     
+       <div class="cart-list">
+ 
+          <div class="bids-row checkout-row"> 
+          <div class="checkout-top"> 
+          <div class="checkout-info">
+             <div class="ci-count"><span>1</span></div>
+             <div class="ci-content">
+                <div class="bd-title">Login</div>
+                <p>Hi, <%=user.name;%>, <%=user.email;%></p>
+             </div>
+          </div>
+          <!-- <div class="checkout-action">
+             <a href="javscript:void(0)" class="ca-edit">Change</a>
+          </div> -->
+          </div>           
+             
+          </div>
+ 
+          <div class="bids-row checkout-row"> 
+          <div class="checkout-top">
+             <div class="checkout-info">
+             <div class="ci-count"><span>2</span></div>
+             <div class="ci-content">
+                <div class="bd-title">Delivery Address</div>               
+             </div>
+          </div>
+          </div>
+          
+          <div class="checkout-tab">
+            <!--addressUserList.length > 0 || addressUserList[0].default_status ==  0 -->
+              <%if(addressUserList.length > 0 ){%>
+                <%addressUserList.forEach(function(item) {%>
+                    
+             <div class="form-check-inline">
+                <label class="tab1 select-tab" for="radio2">
+                    <div class="st-tab"><input type="radio" class="form-check-input" id="radio2" name="optradio" value="<%=item._id%>"></div>
+                    <div class="st-info" >
+                        <h6 class="active-title"> <%=item.address_name%> </h6>
+                        <p><%=item.address1%>,<%=item.street_name;%>, <%=item.city_name;%>, <%=item.state_name;%>, <%=item.pin_code;%></p>
+                    </div>
+                    <input type="hidden" name="userAddressId" id="userAddressId" value="<%=item._id%>">
+                </label>
+              </div>
+              
+              <%});%>
+              <% } else { %>
+               <form action="/api/user-new-checkout-address" method="POST">
+                   <div class="form-check-inline">
+                     <label class="tab1 select-tab" for="radio2">
+                       <div class="st-tab"><input type="radio" class="form-check-input" id="radio2" name="optradio" value="option2"></div>
+                         <div class="st-info" >
+                           <h6 class="active-title">Add a New Address</h6>            
+                            </div>
+                     </label>
+                   </div>
+                   <div class="form-box">
+                    <div class="loginform-box">
+                        <div class="row">
+                            <label class="full-label">Address Type:</label>
+                            <div class="form-check-inline">                           
+                                <label class="form-check-label">
+                                  <input type="radio" class="form-check-input addr_type" id="add_type1" name="addr_type" >Home
+                                </label>
+                              </div>
+                              <div class="form-check-inline">
+                                <label class="form-check-label">
+                                  <input type="radio" class="form-check-input addr_type" id="add_type2" name="addr_type">Office
+                                </label>
+                              </div>   
+                               <div class="form-check-inline">
+                                <label class="form-check-label">
+                                  <input type="radio" class="form-check-input addr_type" id="add_type3" name="addr_type">Other
+                                </label>
+                              </div>
+                        </div>
+                        <input type="hidden" name="addrType" id="addrType">
+                            <div class="row">
+                               <div class="col-md-12 "><input type="text" class="form-control mb-3" id="address1" placeholder="Address 1" name="address1"></div>
+                               <div class="col-md-12"><input type="text" class="form-control mb-3" id="address2" placeholder="Address 2" name="address2"></div>
+                               <div class="col-md-6"><input type="text" class="form-control mb-3" id="landmark" placeholder="Landmark" name="landmark"></div>
+                               <div class="col-md-6"><input type="text" class="form-control mb-3" id="city_name" placeholder="City / Town" name="city_name"></div>
+                               <div class="col-md-6"><input type="text" class="form-control mb-3" id="state_name" placeholder="Enter State" name="state_name"></div>
+                               <div class="col-md-6"><input type="text" class="form-control mb-3" id="pin_code" placeholder="Enter Pincode" name="pin_code"></div>
+                               <div class="col-md-12">
+                                  <div class="button-row">
+                                     <button type="submit" class="btn liginbtn">Save & Delivery Here</button>
+                                     <button type="submit" class="btn ">Cancel</button>
+                                  </div>
+                               </div>
+                            </div>                                                    
+                      </div>
+                 </div>
+                </form>
+
+              <% } %>
+
+              <div class="userOrderDetails" id="userOrderDetails">
+                <input type="hidden" id="user_id" name="user_id" value="<%=user.userId%>">
+                <input type="hidden" id="seller_id" name="seller_id" value="<%=respdata.seller_id%>">
+                <input type="hidden" id="cart_id" name="cart_id" value="<%=respdata.cart_id%>">
+                <input type="hidden" id="product_id" name="product_id" value="<%=respdata.product_id%>">
+                <input type="hidden" id="total_amt" name="total_amt" value="<%=finalPrice%>">
+                <input type="hidden" id="gst" name="gst" value="28">
+                <input type="hidden" id="product_price" name="product_price" value="<%=respdata.product_price%>">
+                <input type="hidden" id="payment_method" name="payment_method" value="0">
+              </div>
+              
+             <!-- <form action="/action_page.php">
+ 
+     <div class="form-check-inline">
+       <label class="tab1 select-tab" for="radio2">
+         <div class="st-tab"><input type="radio" class="form-check-input" id="radio2" name="optradio" value="option2"></div>
+           <div class="st-info" >
+             <h6 class="active-title">Add a New Address</h6>            
+              </div>
+       </label>
+     </div>
+     <div class="form-box">
+        <div class="loginform-box">
+                <div class="row">
+                   <div class="col-md-6 "><input type="text" class="form-control mb-3" id="" placeholder="Enter Name" name=""></div>
+                   <div class="col-md-6"><input type="text" class="form-control mb-3" id="" placeholder="Phone Number" name=""></div>
+                   <div class="col-md-6"><input type="text" class="form-control mb-3" id="" placeholder="Enter Pincode" name=""></div>
+                   <div class="col-md-6"><input type="text" class="form-control mb-3" id="" placeholder="Locality" name=""></div>
+                   <div class="col-md-12"><textarea class="form-control mb-3" placeholder="Address (area and street)"></textarea></div>
+                   <div class="col-md-6"><input type="text" class="form-control mb-3" id="" placeholder="City / District / Town" name=""></div>
+                   <div class="col-md-6"><input type="text" class="form-control mb-3" id="" placeholder="Enter State" name=""></div>
+                   <div class="col-md-6"><input type="text" class="form-control mb-3" id="" placeholder="Landmark" name=""></div>
+                   <div class="col-md-6"><input type="text" class="form-control mb-3" id="" placeholder="Alternate Phone" name=""></div>
+                   <div class="col-md-12">
+                      <div class="button-row">
+                         <button type="submit" class="btn liginbtn">Save & Delivery Here</button>
+                         <button type="submit" class="btn ">Cancel</button>
+                      </div>
+                   </div>
+                </div>                      
+                   
+          </div>
+     </div>
+             </form> -->
+
+
+          </div>
+          
+
+          </div>
+       </div> 
+
+       <div class="cart-summery">
+          <div class="summery-title">
+             <h4>Price details</h4>
+          </div>
+          <div class="c-summery-table">
+             <table class="table table-borderless">  
+                 <tbody>
+                   <tr> 
+                       <td>Price <small>(1 items)</small></td>
+                       <th><i class="fa fa-inr" aria-hidden="true"></i> <%=product_price%></th> 
+                     </tr>
+                     <tr>
+                       <td>Packing & Handling Charges</td>
+                       <th><i class="fa fa-inr" aria-hidden="true"></i> 250</th> 
+                     </tr>
+                     <tr>
+                       <td>GST<small>(18% Packing & Handling Charges)</small></td>
+                        <th><i class="fa fa-inr" aria-hidden="true"></i> <%=gst%></th> 
+                     </tr>
+                     <tr class="border-top total-table">
+                       <td><strong>Total Amount</strong></td>
+                       <th><i class="fa fa-inr" aria-hidden="true"></i>  <%=finalPrice%></th> 
+                     </tr>
+                 </tbody>
+              </table> 
+          </div>
+ 
+          <div class="summery-button">
+          <button class="btn check-out" type="button">Place Order</button>         
+         </div>
+ 
+          
+          
+       </div> 
+          
+ 
+ 
+       </div>
+ 
+        
+    </div>
+ </section>
+
+
+<%- include('../../public/assets/include/newsletter'); %>
+<%- include('../../public/assets/include/footer'); %>
+
+<script>
+    $(document).on('change','.addr_type',function(){
+      if ($(this).is(":checked")) 
+      {
+         var txtVal = $.trim($(this).parent("label").text());
+         
+      }
+      //console.log($(this).parent("label").text());
+      $('#addrType').val(txtVal);
+   });
+</script>

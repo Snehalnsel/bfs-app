@@ -1169,6 +1169,8 @@ router.post("/useredit",
   ],WebsiteController.userUpdate
 );
 
+router.post("/user-new-checkout-address",[],WebsiteController.userNewCheckOutAddressAdd);
+
 router.post("/adduseraddress",[],WebsiteController.userAddressAdd);
 
 router.get("/delete-address/:id",[],WebsiteController.deleteUserAddress);
@@ -1212,7 +1214,7 @@ router.get("/bannerlist",[],DashboardController.bannerlist);
 
 router.post("/change-profile-image-web",[],upload.array('image', 1),WebsiteController.changeProfileImgWeb);
 
-router.post("/checkout-web",WebsiteController.checkoutWeb);
+router.get("/checkout-web",WebsiteController.checkoutWeb);
 //Routes Added By Palash
 
 router.get(

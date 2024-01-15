@@ -796,28 +796,27 @@ exports.userFilter = async function (req, res, next) {
   if ((typeof conditionList != "undefined") && (objConditionList.length > 0)) {
     concatVar["status"] = { "$in": objConditionList };
   }
-  if (typeof priceList != "undefined") {
+  /*if (typeof priceList != "undefined") {
     if (priceList.length > 0) {
       priceList.forEach(function (item) {
         var priceArr = item.split("-");
-        concatVar["offer_price"] = { "$gte": priceArr[0] };
+        concatVar["offer_price"] = { "$gt": priceArr[0] };
         concatVar["offer_price"] = { "$lte": priceArr[1] };
       });
     }
   }
-  let allProductData = await Userproduct.find({ $and: [concatVar]}).sort({ offer_price: optionId });
-
-
+  let allProductData = await Userproduct.find({ $and: [concatVar]},{from:{$gte:concatVar["offer_price"]}, to:{$lt:concatVar["offer_price"]}}).sort({ offer_price: optionId });
+*/
   console.log('#######################################');
    console.log(allProductData);
-   console.log('################@@@@@@@@@@@@@@@@@@@@@@@@@#######################');
+   console.log('#######################################');
   
   //let allProductData = await Userproduct.find(concatVar).sort({ offer_price: optionId });
    
   //  console.log('*****************************************');
   //  console.log(allProductData);
   //  console.log('*****************************************');
-   //return false;
+   return false;
   
  
   const formattedUserProducts = [];
@@ -3122,37 +3121,6 @@ exports.userPlacedOrder = async function (req, res) {
      let pickup_status = '0';
      let delivery_status = '0';
 
-     /*const billingaddress = await addressBook.findOne({ user_id: seller_id });
-      if (!billingaddress) {
-         return res.status(404).json({ message: 'Seller address not found' });
-       }
-     const billing_address_id = billingaddress._id;
-     const now = new Date();
-     const currentHour = now.getHours().toString().padStart(2, '0');
-     const currentMinute = now.getMinutes().toString().padStart(2, '0');
-     const currentSecond = now.getSeconds().toString().padStart(2, '0');
-     const currentMillisecond = now.getMilliseconds().toString().padStart(3, '0');
-    // Generate the unique code using the current time components
-    const orderCode = `BFSORD${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
-    
-    const order = new Order({
-      order_code: orderCode, 
-      user_id,
-      seller_id,
-      product_id,
-      billing_address_id,
-      shipping_address_id,
-      total_price,
-      bid_price,
-      payment_method,
-      order_status,
-      gst,
-      delivery_charges,
-      discount,
-      pickup_status,
-      delivery_status,
-      added_dtime: new Date().toISOString(),
-    });*/
     // Get Shipping Address id 
     const shippingaddress = await addressBook.findOne({ user_id: seller_id });
     if (!shippingaddress) {

@@ -398,8 +398,6 @@ exports.getJustSoldProducts = async function (req, res) {
 
   const pageSize = parseInt(req.query.pageSize) || 10; // Items per page, default: 10
 
-
-
   try {
 
     const soldItemsCount = await Userproduct.countDocuments({ approval_status: 1, flag: 1 });

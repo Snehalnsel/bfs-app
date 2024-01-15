@@ -3141,7 +3141,7 @@ exports.sendotp = async function (req, res, next) {
         message: "User not found!",
         respdata: {},
       });
-    else {
+    else if(!req.body.otp){
       var otp = randNumber(1000, 2000);
 
       const mailData = {
@@ -3184,6 +3184,60 @@ exports.sendotp = async function (req, res, next) {
           }
         }
       );
+    }
+    else
+    {
+      if (user.forget_otp == req.body.otp) {
+        bcrypt.hash(req.body.newPassword, rounds, (error, hash) => {
+          bcrypt.compare(req.body.confirmPassword, hash, (error, match) => {
+            if (error) {
+              res.status(200).json({
+                status: "0",
+                message: "Error!",
+                respdata: error,
+              });
+            } else if (match) {
+              var updData = {
+                password: hash,
+                forget_otp: "0",
+              };
+              Users.findOneAndUpdate(
+                { _id: req.body.user_id },
+                { $set: updData },
+                { upsert: true },
+                function (err, doc) {
+                  if (err) {
+                    throw err;
+                  } else {
+                    Users.findOne({ _id: req.body.user_id }).then((user) => {
+                      res.status(200).json({
+                        status: "1",
+                        message: "Successfully updated! Please login with your new password",
+                        respdata: user,
+                        is_forgetpassword: true,
+                        is_changepassword: true
+                      });
+                    });
+                  }
+                }
+              );
+            } else {
+              res.status(200).json({
+                status: "0",
+                message: "New and Repeat password does not match!",
+                respdata: {},
+                is_changepassword: false
+              });
+            }
+          });
+        });
+      } else {
+        res.status(200).json({
+          status: "0",
+          message: "OTP does not match!",
+          respdata: {},
+        });
+      }
     }
   });
 };

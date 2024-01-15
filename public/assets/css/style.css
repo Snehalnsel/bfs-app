@@ -3336,3 +3336,12 @@ span.close-icon {
     font-size: 11px;
     cursor: pointer;
 }
+.checkout-tab .form-check-inline {
+    width: 100%;
+}
+.radio-label label{
+    margin-right: 15px;
+}
+.form-check-inline.radio-label {
+    margin-bottom: 15px;
+}

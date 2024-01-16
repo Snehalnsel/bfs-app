@@ -3350,3 +3350,11 @@ span.close-icon {
 .form-check-inline.radio-label {
     margin-bottom: 15px;
 }
+
+.grey-bg {
+    background: #fff9f9;
+}
+
+.diveder-part{
+    border-top: solid 1px #eee;
+}

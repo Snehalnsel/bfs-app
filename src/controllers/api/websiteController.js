@@ -2600,9 +2600,7 @@ exports.checkoutWeb = async function (req, res, next) {
           
   
         }));
-
   }
-
   }
   catch (error) {
     console.error(error);
@@ -2640,8 +2638,8 @@ exports.myOrderWeb = async (req, res) => {
 exports.myOrderDetailsWeb = async (req, res) => {
   try {
     
-    const orderlistId = req.params.id; //659fdcdf6b87dfc8438b551e
-    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : ""; //65646d41e7e0d7d6d594d920
+    const orderlistId = req.params.id; 
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : ""; 
     
     if (!orderlistId) {
       return res.status(400).json({ message: 'Order ID is missing in the request' });
@@ -2701,6 +2699,22 @@ exports.myOrderDetailsWeb = async (req, res) => {
 
     const shippingKitData = await Shippingkit.findOne({ order_id: order._id });
 
+    console.log(shippingKitData);
+    console.log("==============");
+
+    let shippingkit_details;
+
+    let shipping_user_details;
+
+    if(shippingKitData)
+    {
+       shippingkit_details = await addressBook.findById({ _id: shippingKitData.shipping_address_id });
+
+       shipping_user_details = await Users.findById({ _id: shippingKitData.buyer_id });
+    }
+
+    console.log(shippingkit_details);
+
     const orderDetails = {
       _id: order._id,
       total_price: order.total_price,
@@ -2715,7 +2729,7 @@ exports.myOrderDetailsWeb = async (req, res) => {
       user: {
         _id: order.user_id._id,
         name: order.user_id.name,
-        phone_no: req.session.user.phone_no,
+        phone_no: req.session.user.phone_no ? req.session.user.phone_no : '',
       },
       selleraddress: sellerAddress ? sellerAddress : 'No Buyer Address Found',
       product: {
@@ -2723,6 +2737,9 @@ exports.myOrderDetailsWeb = async (req, res) => {
         offer_price : productDetails ? productDetails.offer_price : 'Unknown Product',
         image: productImage ? productImage.image : 'No Image',
       },
+      shippingKitData :shippingKitData || null,
+      shippingkit_details : shippingkit_details || null,
+      shipping_user_details :shipping_user_details || null
     };
     //return false;
     res.render("webpages/myorderdetails",{

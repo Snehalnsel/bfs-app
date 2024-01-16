@@ -3336,3 +3336,8 @@ span.close-icon {
     font-size: 11px;
     cursor: pointer;
 }
+.poster-box {
+    border: solid 1px #eee;
+    border-radius: 8px;
+    overflow: hidden;
+}

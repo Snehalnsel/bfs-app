@@ -499,7 +499,12 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
       });
     }
   });*/
-  Users.findOne({ email }).then(async (user) => {
+  Users.findOne({
+    $or: [
+      { email: email },
+      { phone_no: email }
+    ]
+  }).then(async (user) => {
     if (!user)
       res.status(404).json({
         status: "error",

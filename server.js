@@ -38,7 +38,8 @@ const UserModel = require("./src/models/api/userModel");
 app.use(express.json());
 
 mongoose.set("strictQuery", true);
-mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true });
+//mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(dbURI);
 const db = mongoose.connection;
 mongoose.Promise = global.Promise;
 

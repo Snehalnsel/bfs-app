@@ -3341,3 +3341,12 @@ span.close-icon {
     border-radius: 8px;
     overflow: hidden;
 }
+.checkout-tab .form-check-inline {
+    width: 100%;
+}
+.radio-label label{
+    margin-right: 15px;
+}
+.form-check-inline.radio-label {
+    margin-bottom: 15px;
+}

@@ -1176,6 +1176,8 @@ router.post("/useredit",
   ],WebsiteController.userUpdate
 );
 
+router.post("/user-new-checkout-address",[],WebsiteController.userNewCheckOutAddressAdd);
+
 router.post("/adduseraddress",[],WebsiteController.userAddressAdd);
 
 router.get("/delete-address/:id",[],WebsiteController.deleteUserAddress);
@@ -1213,13 +1215,16 @@ router.get("/web-my-order",WebsiteController.myOrderWeb);
 
 router.get("/web-myorder-details/:id",WebsiteController.myOrderDetailsWeb);
 
-
 router.get("/bannerlist",[],DashboardController.bannerlist);
-
 
 router.post("/change-profile-image-web",[],upload.array('image', 1),WebsiteController.changeProfileImgWeb);
 
-router.post("/checkout-web",WebsiteController.checkoutWeb);
+router.get("/checkout-web",WebsiteController.checkoutWeb);
+
+router.post("/placed-order",WebsiteController.userPlacedOrder);
+
+
+
 //Routes Added By Palash
 
 router.get(
@@ -1259,4 +1264,13 @@ router.post("/user-relogin",cors(),
 router.post("/user-filter",cors(),
   WebsiteController.userFilter
 );
+
+router.get("/forgot-password",cors(),
+  WebsiteController.forgotPassword
+);
+
+router.post("/forgotpassword-sendotp",cors(),
+  WebsiteController.sendotp
+);
+
 module.exports = router;

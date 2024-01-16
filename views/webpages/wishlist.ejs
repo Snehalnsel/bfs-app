@@ -13,10 +13,10 @@
                      <% respdata.forEach(function(item) { %>
                         <div class="bids-row wishlist-row " id="<%=item._id%>">
                            <div class="br-details">
-                              <div class="bid-images"><img src="<%=item.images%>" alt="images" class="img-fluid"></div>
+                              <div class="bid-images"><a href="/api/productdeatils/<%=item.product_id%>"><img src="<%=item.images%>" alt="images" class="img-fluid"></a></div>
                               <div class="bid-info">
                                  <div class="bd-title">
-                                    <a href="javascript:void(0)">
+                                    <a href="/api/productdeatils/<%=item.product_id%>">
                                        <%=item.product_name%>
                                     </a>
                                  </div>

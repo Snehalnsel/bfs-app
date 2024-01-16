@@ -64,6 +64,9 @@ const transporter = nodemailer.createTransport({
   secure: true,
 });
 
+function randNumber(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
+}
 
 // app.use(session({
 //   secret: yourSecretKey,
@@ -796,17 +799,29 @@ exports.userFilter = async function (req, res, next) {
   if ((typeof conditionList != "undefined") && (objConditionList.length > 0)) {
     concatVar["status"] = { "$in": objConditionList };
   }
-  if (typeof priceList != "undefined") {
+  /*if (typeof priceList != "undefined") {
     if (priceList.length > 0) {
       priceList.forEach(function (item) {
-        let priceArr = item.split("-");
+        var priceArr = item.split("-");
         concatVar["offer_price"] = { "$gt": priceArr[0] };
         concatVar["offer_price"] = { "$lte": priceArr[1] };
       });
     }
   }
-  let allProductData = await Userproduct.find({ $and: [concatVar]}).sort({ offer_price: optionId });
-  //console.log(allProductData);return false;
+  let allProductData = await Userproduct.find({ $and: [concatVar]},{from:{$gte:concatVar["offer_price"]}, to:{$lt:concatVar["offer_price"]}}).sort({ offer_price: optionId });
+*/
+  console.log('#######################################');
+   console.log(allProductData);
+   console.log('#######################################');
+  
+  //let allProductData = await Userproduct.find(concatVar).sort({ offer_price: optionId });
+   
+  //  console.log('*****************************************');
+  //  console.log(allProductData);
+  //  console.log('*****************************************');
+   return false;
+  
+ 
   const formattedUserProducts = [];
   for (const userproduct of allProductData) {
 
@@ -1483,9 +1498,79 @@ exports.userUpdate = async function (req, res, next) {
   }
 };
 
+// user checkout address add
+exports.userNewCheckOutAddressAdd = async function (req, res, next) {
+  try{
+    
+    const addr_name = req.body.addrType;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        status: "0",
+        message: "Validation error!",
+        respdata: errors.array(),
+      });
+    }
+    const newAddress = new addressBook({
+      user_id: req.body.userId ? req.body.userId:req.session.user.userId,
+      street_name: req.body.address2,
+      address1: req.body.address1,
+      landmark: req.body.landmark,
+      city_name: req.body.city_name,
+      city_code: req.body.city_code,
+      state_name: req.body.state_name,
+      state_code: req.body.state_code,
+      pin_code: req.body.pin_code,
+      address_name: addr_name,
+      flag: req.body.flag,
+      created_dtime: dateTime,
+    });
+    
+    const savedAddress = await newAddress.save();
+    const user = await Users.findById(newAddress.user_id);
+    console.log("###########hgfhfhfhfh######################");
+    console.log(user);
+    const randomSuffix = Math.floor(Math.random() * 1000);
+    const pickupLocation = savedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;
+    
+    const PickupData = {
+     pickup_location: pickupLocation,
+      name: user.name,
+      email: user.email,
+      phone: user.phone_no,
+      address: savedAddress.street_name + ',' + savedAddress.address1,
+      address_2: savedAddress.landmark,
+      city: savedAddress.city_name,
+      state: savedAddress.state_name,
+      country: "India",
+      pin_code: savedAddress.pin_code
+    };
+    const shiprocketResponse = await generateSellerPickup(PickupData);
+
+    if (shiprocketResponse) {
+      savedAddress.shiprocket_address = pickupLocation;
+      savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
+      await savedAddress.save();
+      res.redirect('/api/checkout-web');
+    }    
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the Edit Profile.",
+      error: error.message,
+    });
+  }
+
+};
+
+
+
 
 exports.userAddressAdd = async function (req, res, next) {
   try {
+    
     const addr_name = req.body.addrType;
     //const address = await addressBook.findOne({ _id: req.params.id });
     const errors = validationResult(req);
@@ -2140,7 +2225,7 @@ exports.addToCart = async function (req, res, next) {
 
       setTimeout(() => {
         removeItemAfterTime(existingCart._id); // savedata._id contains the ID of the added item
-      }, 2 * 60 * 1000);
+      }, 20 * 60 * 1000);
 
       return res.status(200).json({
         message: 'Item Added to Cart',
@@ -2250,7 +2335,6 @@ const removeItemAfterTime = async (cartId) => {
     console.error('Error while removing item from cart:', error);
   }
 };
-
 
 exports.viewCartListByUserId = async function (req, res, next) {
   try {
@@ -2381,7 +2465,6 @@ exports.deleteCart = async function (req, res, next) {
   }
 };
 
-
 exports.changeProfileImgWeb = async function (req, res, next) {
   try {
 
@@ -2435,101 +2518,85 @@ exports.changeProfileImgWeb = async function (req, res, next) {
   }
 };
 
-
 exports.checkoutWeb = async function (req, res, next) {
   try {
+    
+      let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+      
+      if (isLoggedIn == "") {
+        return res.redirect("/api/registration");
+      }
+      const user_id = req.session.user.userId;
+      const existingCart = await Cart.findOne({ user_id, status: 0 });
 
-    const seller_id = req.body.data.seller_id;
-    const cart_id = req.body.data.cart_id;
-    const product_id = req.body.data.product_id;
-    const user_id = req.body.data.user_id;
-    const total_price = req.body.data.total_amt;
-    const payment_method = req.body.data.payment_method;
-    const gst = req.body.data.gst;
-    const order_status = '0';
-    const delivery_charges = '0';
-    const discount = '0';
-    const pickup_status = '0';
-    const delivery_status = '0';
+      if (!existingCart) {
+        res.render("webpages/addtocart", {
+          title: "Cart List Page",
+          message: "Cart is empty",
+          respdata: [],
+          respdata1: [],
+          user: user_id,
+          isLoggedIn: isLoggedIn,
+  
+        });
+      }else{
+        const cartList = await CartDetail.find({ cart_id: existingCart._id, status: 0 })
+          .populate({
+            path: 'product_id',
+            model: Userproduct,
+            select: 'name images',
+          })
+          .exec();
 
-    // Get Shipping Address id 
-    const shippingaddress = await addressBook.findOne({ user_id: seller_id });
-    if (!shippingaddress) {
-      return res.status(404).json({ message: 'Shipping address not found' });
-    }
-    const shipping_address_id = shippingaddress._id;
+          // Address check
+        const addressUserList = await addressBook.find({user_id: user_id });
 
-    // Get Billing Address id
-    const productdetails = await Userproduct.findById(product_id);
-    if (!productdetails) {
-      return res.status(404).json({ message: 'Billing address not found' });
-    }
-    const billing_address_id = productdetails.user_id;
-    console.log(billing_address_id);
+        const user = await Users.findById(existingCart.user_id);
+        if (!user) {
+          return res.status(404).json({ error: 'User not found' });
+        }
+        const formattedCartList = await Promise.all(cartList.map(async (cartItem) => {
+          const product = await Userproduct.findOne({ _id: cartItem.product_id._id }).populate('category_id', 'name');
+          const productImages = await Productimage.find({ product_id: cartItem.product_id._id }).limit(1);
+  
+          const finalData = {
+            _id: cartItem._id,
+            cart_id: existingCart._id,
+            quantity: cartItem.qty,
+            product_id: cartItem.product_id._id,
+            product_name: cartItem.product_id.name,
+            product_price: product.offer_price,
+            product_est_price: product.price,
+            seller_id: product.user_id,
+            category_name: product.category_id.name,
+            images: productImages.length > 0 ? productImages[0].image : null,
+            user_name: user.name,
+            added_dtime: cartItem.added_dtime,
+            status: cartItem.status,
+          };
+  
+          const product_price = finalData.product_price;
+          const gst = (product_price * 18) / 100;
+          const finalPrice = parseInt(product_price) + 250 + parseInt(gst);
+          
+          res.render("webpages/mycheckoutweb", {
+            title: "Check Out Page",
+            status: '1',
+            is_orderPlaced: 1,
+            message: "Welcome to the Checkout page!",
+            respdata: finalData,
+            product_price:product_price,
+            finalPrice:finalPrice,
+            gst:gst,
+            isLoggedIn: isLoggedIn,
+            user: req.session.user,
+            addressUserList:addressUserList,
+          });
+          
+  
+        }));
 
-    const now = new Date();
-    const currentHour = now.getHours().toString().padStart(2, '0');
-    const currentMinute = now.getMinutes().toString().padStart(2, '0');
-    const currentSecond = now.getSeconds().toString().padStart(2, '0');
-    const currentMillisecond = now.getMilliseconds().toString().padStart(3, '0');
-
-    // Generate the unique code using the current time components
-    const orderCode = `BFSORD${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
-
-    // Create value for saving data in order table
-    const order = new Order({
-      order_code: orderCode,
-      user_id,
-      cart_id,
-      seller_id,
-      product_id,
-      billing_address_id,
-      shipping_address_id,
-      total_price,
-      payment_method,
-      order_status,
-      gst,
-      delivery_charges,
-      discount,
-      pickup_status,
-      delivery_status,
-      added_dtime: new Date().toISOString(),
-    });
-
-    const savedOrder = await order.save();
-
-    if (savedOrder) {
-      const user = await Users.findById(savedOrder.user_id);
-
-      const mailData = {
-        from: smtpUser,
-        to: user.email,
-        subject: "BFS - Bid For Sale  - Order Placed Successfully",
-        text: "Server Email!",
-        html:
-          "Hey " +
-          user.name +
-          ", <br> <p>Congratulations your order is placed.please wait for some times and the delivery details you will show on the app.</p>",
-      };
-
-      transporter.sendMail(mailData, function (err, info) {
-        if (err) console.log(err);
-        else console.log(info);
-      });
-
-      const updatedProduct = await Userproduct.findOneAndUpdate(
-        { _id: product_id },
-        { $set: { flag: 1 } },
-        { new: true }
-      );
-      res.status(200).json({
-        status: "1",
-        is_orderPlaced: 1,
-        message: 'Order placed successfully',
-        order: savedOrder
-      });
-
-    }
+  }
 
   }
   catch (error) {
@@ -2541,7 +2608,6 @@ exports.checkoutWeb = async function (req, res, next) {
     });
   }
 };
-
 
 exports.myOrderWeb = async (req, res) => {
   try {
@@ -3039,4 +3105,264 @@ exports.getBestDealProductsweb = async function (req, res) {
 
   }
 
+};
+
+exports.userPlacedOrder = async function (req, res) {
+
+ try{
+     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+     let user_id = req.body.data.user_id;
+     let seller_id = req.body.data.seller_id;
+     let cart_id = req.body.data.cart_id;
+     let product_id = req.body.data.product_id;
+     let total_price = req.body.data.total_amt;
+     let payment_method = req.body.data.payment_method;
+     let gst = req.body.data.gst;
+     let order_status = '0';
+     let delivery_charges = '0';
+     let discount = '0';
+     let pickup_status = '0';
+     let delivery_status = '0';
+
+    // Get Shipping Address id 
+    const shippingaddress = await addressBook.findOne({ user_id: seller_id });
+    if (!shippingaddress) {
+      return res.status(404).json({ message: 'Shipping address not found' });
+    }
+    const shipping_address_id = shippingaddress._id;
+
+    // Get Billing Address id
+    const productdetails = await Userproduct.findById(product_id);
+    if (!productdetails) {
+      return res.status(404).json({ message: 'Billing address not found' });
+    }
+    const billing_address_id = productdetails.user_id;
+    console.log(billing_address_id);
+
+    const now = new Date();
+    const currentHour = now.getHours().toString().padStart(2, '0');
+    const currentMinute = now.getMinutes().toString().padStart(2, '0');
+    const currentSecond = now.getSeconds().toString().padStart(2, '0');
+    const currentMillisecond = now.getMilliseconds().toString().padStart(3, '0');
+
+    // Generate the unique code using the current time components
+    const orderCode = `BFSORD${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
+
+    // Create value for saving data in order table
+    const order = new Order({
+      order_code: orderCode,
+      user_id,
+      cart_id,
+      seller_id,
+      product_id,
+      billing_address_id,
+      shipping_address_id,
+      total_price,
+      payment_method,
+      order_status,
+      gst,
+      delivery_charges,
+      discount,
+      pickup_status,
+      delivery_status,
+      added_dtime: new Date().toISOString(),
+    });
+    const savedOrder = await order.save();
+
+    if (savedOrder) {
+      const user = await Users.findById(savedOrder.user_id);
+
+      const mailData = {
+        from: smtpUser,
+        to: user.email,
+        subject: "BFS - Bid For Sale  - Order Placed Successfully",
+        text: "Server Email!",
+        html:
+          "Hey " +
+          user.name +
+          ", <br> <p>Congratulations your order is placed.please wait for some times and the delivery details you will show on the app.</p>",
+      };
+
+      transporter.sendMail(mailData, function (err, info) {
+        if (err) console.log(err);
+        else console.log(info);
+      });
+
+      const updatedProduct = await Userproduct.findOneAndUpdate(
+        { _id: product_id },
+        { $set: { flag: 1 } },
+        { new: true }
+      );
+      res.status(200).json({
+        status: "1",
+        is_orderPlaced: 1,
+        message: 'Order placed successfully',
+        order: savedOrder
+      });
+    }
+ } catch (error) {
+
+  console.error('Error fetching Order Palced: ', error);
+
+  return res.status(500).json({ message: 'Internal server error' });
+
+}
+};
+
+exports.forgotPassword = async function (req, res, next) {
+
+  try {
+
+    const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : ""
+
+    var cartCount = (userId != "") ? await Cart.countDocuments({ user_id: mongoose.Types.ObjectId(userId) }) : 0;
+
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+
+    res.render("webpages/forget-password", {
+
+      title: "Home Page 123",
+
+      requrl: req.app.locals.requrl,
+
+      message: "Welcome to the Dashboard page!",
+
+      cart: cartCount,
+      isLoggedIn: isLoggedIn,
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+
+      status: "0",
+
+      message: "An error occurred while rendering the dashboard.",
+
+      error: error.message,
+
+    });
+
+  }
+
+};
+
+exports.sendotp = async function (req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(200).json({
+      status: "0",
+      message: "Validation error!",
+      respdata: errors.array(),
+    });
+  }
+
+  Users.findOne({ email: req.body.email }).then((user) => {
+    if (!user)
+      res.status(200).json({
+        status: "0",
+        message: "User not found!",
+        respdata: {},
+      });
+    else if(!req.body.otp){
+      var otp = randNumber(1000, 2000);
+
+      const mailData = {
+        from: smtpUser, 
+        to: user.email,
+        subject: "BFS - Bids For Sale - Forgot password OTP",
+        text: "Server Email!",
+        html:
+          "Hey " +
+          user.name +
+          ", <br> <p> Please use this OTP : <b>" +
+          otp +
+          "</b> to reset your password! </p>",
+      };
+
+      transporter.sendMail(mailData, function (err, info) {
+        if (err) console.log(err);
+        else console.log(info);
+      });
+
+      var updData = {
+        forget_otp: otp,
+      };
+      Users.findOneAndUpdate(
+        { _id: user._id },
+        { $set: updData },
+        { upsert: true },
+        function (err, doc) {
+          if (err) {
+            throw err;
+          } else {
+            Users.findOne({ _id: user._id }).then((user) => {
+              res.status(200).json({
+                status: "1",
+                message: "OTP sent!",
+                resdpata: user,
+                is_forgetpassword: true
+              });
+            });
+          }
+        }
+      );
+    }
+    else
+    {
+      if (user.forget_otp == req.body.otp) {
+        bcrypt.hash(req.body.newPassword, rounds, (error, hash) => {
+          bcrypt.compare(req.body.confirmPassword, hash, (error, match) => {
+            if (error) {
+              res.status(200).json({
+                status: "0",
+                message: "Error!",
+                respdata: error,
+              });
+            } else if (match) {
+              var updData = {
+                password: hash,
+                forget_otp: "0",
+              };
+              Users.findOneAndUpdate(
+                { _id: req.body.user_id },
+                { $set: updData },
+                { upsert: true },
+                function (err, doc) {
+                  if (err) {
+                    throw err;
+                  } else {
+                    Users.findOne({ _id: req.body.user_id }).then((user) => {
+                      res.status(200).json({
+                        status: "1",
+                        message: "Successfully updated! Please login with your new password",
+                        respdata: user,
+                        is_forgetpassword: true,
+                        is_changepassword: true
+                      });
+                    });
+                  }
+                }
+              );
+            } else {
+              res.status(200).json({
+                status: "0",
+                message: "New and Repeat password does not match!",
+                respdata: {},
+                is_changepassword: false
+              });
+            }
+          });
+        });
+      } else {
+        res.status(200).json({
+          status: "0",
+          message: "OTP does not match!",
+          respdata: {},
+        });
+      }
+    }
+  });
 };

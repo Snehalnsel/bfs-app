@@ -3358,3 +3358,73 @@ span.close-icon {
 .diveder-part{
     border-top: solid 1px #eee;
 }
+
+.alert-logo-item {
+    border: none;
+    width: auto;
+    height: auto;
+    text-align: center;
+}
+
+.alert-logo-item img {
+    height: auto;
+    max-width: 150px;
+}
+
+.modal-alert h2.swal2-title {
+    font-size: 15px;
+    font-weight: 400;
+}
+
+.bi-iconbox {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flx-content{
+    display: flex;
+    grid-gap: 8px;
+}
+
+.bid-alert-modal h2.swal2-title {
+    font-size: 15px;
+    font-weight: 400;
+}
+
+.bid-alert-modal button.swal2-styled {
+    color: #4a4a4a;
+    padding: 7px 20px;
+    border: solid 1px #565656;
+    background-color: transparent;
+    border-radius: 5px;
+    font-size: 14px;
+    line-height: 22px;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 500;
+    margin: 3px;
+    background: transparent;
+    transition: 0.5s;
+    min-width: 100px;
+    outline: none !important;
+    box-shadow: none!important;
+}
+
+.bid-alert-modal button.swal2-styled:hover{
+    background: #000;
+    transition: 0.5s;
+    color: #bdbdbd !important;
+    border: solid 1px #000;
+}
+
+.bid-alert-modal button.swal2-confirm {
+    border: solid 1px #e3683d !important;
+    color: #e3683d!important;
+}
+
+.bid-alert-modal button.swal2-confirm:hover {
+    background: #e3683d!important;
+    color: #fff!important;
+}
+

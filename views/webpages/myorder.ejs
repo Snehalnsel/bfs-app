@@ -141,10 +141,9 @@
     <div class="bids-row wishlist-row order-list">
         <div class="br-details">
             <div class="bid-images"><img src="${item.product.image}" alt="images" class="img-fluid"></div>
-            <div class="bid-info">
-                <div class="bd-title">
-                    <a href="/api/web-myorder-details/${item._id}">${item.product.name}</a>
-                </div>
+            <div class="bid-info bi-iconbox">
+               <div class="bid-left">
+                <div class="bd-title">${item.product.name}</div>
                 <div class="bd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>${item.total_price}</div>
                 <div class="cnbtn-group">`;
                   if(item.shippingkit_status == 1) {
@@ -159,6 +158,17 @@
                              `; 
                   }
                   hTml += `</div>
+                </div>
+                <div class="bid-right flx-content">
+                  <div class="remove-cart">
+                     <a href="/api/web-myorder-details/${item._id}"><i class="fa fa-info-circle"></i></a>  
+                   </div>
+                   <div class="remove-cart">
+                     <a href=""><i class="fa fa-trash-o"></i></a>  
+                   </div>               
+               
+                </div>
+                
                      </div>
                      </div>
                      </div></div>`;

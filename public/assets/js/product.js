@@ -149,9 +149,11 @@ $(document).on('click', ".wish-rem-button", async function (e) {
     Swal.fire({
         title: "Do you want to delete the item?",
         iconHtml: '<img src="'+ src +'">',
-        customClass: {
-            icon: 'no-border'
+        customClass: {  
+            icon: 'alert-logo-item',
+            popup: "bid-alert-modal"
         },
+        //customClass:"bid-alert-modal",
         showCancelButton: true,
         confirmButtonText: "Ok",
       }).then(async (result) => {

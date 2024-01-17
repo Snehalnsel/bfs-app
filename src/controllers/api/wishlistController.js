@@ -85,9 +85,6 @@ exports.getWishlistByUserId = async (req, res) => {
       .populate('user_id', 'name')
       .exec();
 
-      console.log(existingList);
-      console.log("--------");
-
     if (existingList.length === 0) {
       return res.status(200).json({
         message: 'Wishlist is empty',
@@ -105,14 +102,8 @@ exports.getWishlistByUserId = async (req, res) => {
               existingList: [],
             });
           }  
-
-          console.log(product);
           
           const productImages = await Productimage.find({ product_id: item.product_id }).limit(1);
-
-          console.log("--------");
-          console.log(productImages);
-
 
           return {
             _id: item._id,

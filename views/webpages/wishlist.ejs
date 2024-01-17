@@ -38,7 +38,7 @@
                               </div>
                               <div class="cart-action">
                                  <div class="remove-cart">
-                                    <a href="javascript:void(0)" class="prd-btn wish-rem-btn"
+                                    <a href="javascript:void(0)" class="prd-btn wish-rem-button"
                                        data-id="<%=item.product_id%>"><i class="fa fa-trash-o"
                                           aria-hidden="true"></i></a>
                                  </div>
@@ -58,51 +58,3 @@
 
    <%- include('../../public/assets/include/newsletter'); %>
       <%- include('../../public/assets/include/footer'); %>
-
-         <script>
-            $(document).on('click', ".wish-rem-btn", async function (e) {
-
-               let wishlistCookieAccessToken = await getCookieFunc(accessTokenVar);
-               let wishlistCookieRefreshToken = await getCookieFunc(refreshTokenVar);
-               await userReLogin(wishlistCookieAccessToken, wishlistCookieRefreshToken);
-
-               var divid = $(this).closest('.bids-row').attr('id');
-               console.log(divid);
-
-               var id = $(this).data('id');
-               $.ajax({
-                  url: '/api/remove-wishlist-web/' + id.trim(),
-                  method: 'GET',
-                  success: function (data) {
-                     if (data.success) {
-                        Swal.fire({
-                           html: data.message,
-                           confirmButtonText: "OK",
-                           customClass: { confirmButton: 'alert-box-button' }
-                        });
-                        $("#" + divid).remove();
-                        // Update the wishlist count
-                        updateWishlistCount(data);
-                     } else {
-                        Swal.fire({
-                           html: data.message,
-                           confirmButtonText: "OK",
-                           customClass: { confirmButton: 'alert-box-button', popup: 'swal2-popup' }
-                        });
-                     }
-                  },
-                  error: function (err) {
-                     console.error('Error:', err);
-                  }
-               });
-
-               function updateWishlistCount(data) {
-                  var itemCount = data.count;
-
-                  console.log(itemCount);
-
-                  $(".wishlist-count").text(`(${itemCount})`);
-               }
-
-            });
-         </script>

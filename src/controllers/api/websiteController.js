@@ -51,6 +51,7 @@ const Ordertracking = require("../../models/api/ordertrackModel");
 const Shippingkit = require("../../models/api/shippingkitModel");
 //const Ordertracking = require("../../models/api/ordertrackModel");
 const Track = require("../../models/api/trackingModel");
+const { log } = require("console");
 
 
 
@@ -776,7 +777,7 @@ exports.userRelogin = async function (req, res, next) {
 };
 
 exports.userFilter = async function (req, res, next) {
-  let { brandList, sizeList, conditionList, priceList, optionId } = req.body;
+  let { brandList, sizeList, conditionList, priceList, optionId,productcategoryId } = req.body;
   if (typeof optionId != "undefined") {
     if ((optionId == 0)) {
       optionId = 1;
@@ -801,6 +802,9 @@ exports.userFilter = async function (req, res, next) {
       concatVar["size"] = { "$in": sizeList };
     }
   //}
+  if (typeof productcategoryId != "undefined") {
+    concatVar["category_id"] = { "$in": mongoose.Types.ObjectId(productcategoryId) };
+  }
   if ((typeof conditionList != "undefined") && (objConditionList.length > 0)) {
     concatVar["status"] = { "$in": objConditionList };
   }
@@ -2135,6 +2139,8 @@ exports.removeWishlistWeb = async (req, res) => {
     const user_id = req.session.user.userId;
     const existingList = await Wishlist.findOne({ user_id, product_id });
 
+    console.log(existingList);
+    console.log(existingList);
     if (Object.keys(existingList).length == 0) {
       return res.status(404).json({
         message: 'Product is not found in the Wishlist',

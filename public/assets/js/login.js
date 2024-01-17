@@ -23,7 +23,7 @@ $(document).ready(async function(){
         },
         messages:{
             email:{
-                required:"Please enter your email.",
+                required:"Please enter your email/phone.",
                 maxlength: "You can enter maximum of 70 charecters."
             },
             password:{

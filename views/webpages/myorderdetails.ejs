@@ -1,103 +1,200 @@
 <%- include('../../public/assets/include/header'); %>
-<% console.log('VIEW PAGE');%>
-<% console.log(respdata.product.image);%>
-<section class="bids-wrapper">
-    <div class="container">
-       <div class="orderdetails-box">
-          <div class="row">
-             <div class="col-md-5">
-               <div class="br-details ob-details">
-                  <% if(respdata.product.image){%>
-                   <div class="bid-images"><img src="<%=respdata.product.image%>" alt="images" class="img-fluid"></div>
-                   <%} else {%>
-                     <div class="bid-images"><img src="" alt="images" class="img-fluid"></div>
-                   <% } %>
-                   <div class="bid-info">
-                      <div class="bd-title">
-                         <a href="order-details.php"><%=respdata.product.name;%></a>
-                      </div>
-                      <div class="bd-price">
-                         <span><i class="fa fa-inr" aria-hidden="true"></i></span>
-                         <%=respdata.product.offer_price;%>
-                      </div>                     
-                   </div>
-                </div> 
-             </div>
-             <div class="col-md-4">
-                <div class="od-box">
-                   <h5 class="short-title">Delivery Address</h5>
-                  
-                   <p><%=respdata.buyeraddress.address1;%> , <%=respdata.buyeraddress.street_name;%> , <%=respdata.buyeraddress.landmark;%>, <%=respdata.buyeraddress.city_name;%> , <%=respdata.buyeraddress.state_name;%> <%=respdata.buyeraddress.pin_code;%></p>
-                </div>
-                <div class="od-box">
-                    <h5 class="short-title">Phone number</h5>
-                    <%if(respdata.user.phone_no){%>
-                    <p><%=respdata.user.phone_no;%></p>
-                    <%} else{%>
-                     <p></p>
-                     <%}%>
-                </div>               
-             </div>
-              <div class="col-md-3">
-                <div class="od-box">
-                   <h5 class="short-title">More actions</h5>
-                   <div class="act-btn-row">
-                      <div class="act-btn">
-                         <a href="javascript:void(0)">Download Invoice</a>
-                      </div>
-                      <div class="act-btn black-btn">
-                         <a href="javascript:void(0)">Download label</a>
-                      </div>
-                   </div>                   
-                </div>                            
-             </div>
- 
-              <div class="col-md-9">
-                <div class="od-box">
-                   <h5 class="short-title">Order Tracking</h5>
-                   <div class="tracking-list">
-                      <div class="tracking-steps">
-                         <div class="steps-box step-done">
-                            <div class="steps-label">
-                               Order Confirmed
-                            </div>
-                            <div class="date-icfo">Mon, 9th Oct</div>                           
-                         </div>
-                         <div class="steps-box step-done">
-                            <div class="steps-label">
-                               Shipped
-                            </div>
-                            <div class="date-icfo">Mon, 11th Oct</div>                           
-                         </div>
-                         <div class="steps-box step-done">
-                            <div class="steps-label">
-                               Out For Delivery
-                            </div>
-                            <div class="date-icfo">Mon, 14th Oct</div>                           
-                         </div>
-                         <div class="steps-box">
-                            <div class="steps-label">
-                               Delivered
-                            </div>
-                            <div class="date-icfo">Mon, 16th Oct</div>                           
-                         </div>
-                      </div>                   
-                   </div>                 
-                </div>              
-             </div>
-             
-             <!-- <div class="col-md-3">  
-                <div class="od-box rating-part">
-                    <h5 class="short-title">Review Product</h5>
-                   <p><a href="javascript:void(0)" class="rt-link"><span><i class="fa fa-star" aria-hidden="true"></i></span> Rate & Review Product</a></p>
-                </div>
-             </div> -->
-          
-         </div>          
-       </div>       
-    </div>
- </section>
+<% console.log(respdata);%>
+<% if(respdata.shippingKitData){%>
+   <section class="bids-wrapper">
+      <div class="container">
+         <div class="orderdetails-box ">
+            <h5 class="short-title">Shipment Tracking</h5>
+            <div class="row">           
+               <div class="col-md-5">
+                  <div class="br-details ob-details">
+                     <% if(respdata.product.image){%>
+                     <div class="bid-images"><img src="<%=respdata.product.image%>" alt="images" class="img-fluid"></div>
+                     <%} else {%>
+                        <div class="bid-images"><img src="" alt="images" class="img-fluid"></div>
+                     <% } %>
+                     <div class="bid-info">
+                        <div class="bd-title">
+                           <a href="order-details.php"><%=respdata.product.name;%></a>
+                        </div>
+                        <div class="bd-price">
+                           <span><i class="fa fa-inr" aria-hidden="true"></i></span>
+                           <%=respdata.product.offer_price;%>
+                        </div>                     
+                     </div>
+                  </div> 
+               </div>
+               <div class="col-md-4">
+                  <div class="od-box">
+                     <h5 class="short-title">Delivery Address</h5>
+                     
+                     <p><%=respdata.shippingkit_details.address1;%> , <%=respdata.shippingkit_details.street_name;%> , <%=respdata.shippingkit_details.landmark;%>, <%=respdata.shippingkit_details.city_name;%> , <%=respdata.shippingkit_details.state_name;%> <%=respdata.shippingkit_details.pin_code;%></p>
+                  </div>
+                  <div class="od-box">
+                     <h5 class="short-title">Phone number</h5>
+                     <%if(respdata.shipping_user_details.phone_no){%>
+                     <p><%=respdata.shipping_user_details.phone_no;%></p>
+                     <%} else{%>
+                        <p></p>
+                        <%}%>
+                  </div>               
+               </div>
+               <div class="col-md-3">
+                  <div class="od-box">
+                     <h5 class="short-title">More actions</h5>
+                     <div class="act-btn-row">
+                        <div class="act-btn">
+                           <a href="javascript:void(0)">Download Invoice</a>
+                        </div>
+                        <div class="act-btn black-btn">
+                           <a href="javascript:void(0)">Download label</a>
+                        </div>
+                     </div>                   
+                  </div>                            
+               </div>
+   
+               <div class="col-md-9">
+                  <div class="od-box">
+                     <h5 class="short-title">Order Tracking</h5>
+                     <div class="tracking-list">
+                        <div class="tracking-steps">
+                           <div class="steps-box step-done">
+                              <div class="steps-label">
+                                 Order Confirmed
+                              </div>
+                              <div class="date-icfo">Mon, 9th Oct</div>                           
+                           </div>
+                           <div class="steps-box step-done">
+                              <div class="steps-label">
+                                 Shipped
+                              </div>
+                              <div class="date-icfo">Mon, 11th Oct</div>                           
+                           </div>
+                           <div class="steps-box step-done">
+                              <div class="steps-label">
+                                 Out For Delivery
+                              </div>
+                              <div class="date-icfo">Mon, 14th Oct</div>                           
+                           </div>
+                           <div class="steps-box">
+                              <div class="steps-label">
+                                 Delivered
+                              </div>
+                              <div class="date-icfo">Mon, 16th Oct</div>                           
+                           </div>
+                        </div>                   
+                     </div>                 
+                  </div>              
+               </div>
+               
+               <!-- <div class="col-md-3">  
+                  <div class="od-box rating-part">
+                     <h5 class="short-title">Review Product</h5>
+                     <p><a href="javascript:void(0)" class="rt-link"><span><i class="fa fa-star" aria-hidden="true"></i></span> Rate & Review Product</a></p>
+                  </div>
+               </div> -->
+            
+            </div>          
+         </div>       
+      </div>
+   </section>
+ <%}%>
+ <section class="bids-wrapper grey-bg diveder-part">
+   <div class="container">
+      <div class="orderdetails-box">
+         <div class="row">
+            <div class="col-md-5">
+              <div class="br-details ob-details">
+                 <% if(respdata.product.image){%>
+                  <div class="bid-images"><img src="<%=respdata.product.image%>" alt="images" class="img-fluid"></div>
+                  <%} else {%>
+                    <div class="bid-images"><img src="" alt="images" class="img-fluid"></div>
+                  <% } %>
+                  <div class="bid-info">
+                     <div class="bd-title">
+                        <a href="order-details.php"><%=respdata.product.name;%></a>
+                     </div>
+                     <div class="bd-price">
+                        <span><i class="fa fa-inr" aria-hidden="true"></i></span>
+                        <%=respdata.product.offer_price;%>
+                     </div>                     
+                  </div>
+               </div> 
+            </div>
+            <div class="col-md-4">
+               <div class="od-box">
+                  <h5 class="short-title">Delivery Address</h5>
+                 
+                  <p><%=respdata.buyeraddress.address1;%> , <%=respdata.buyeraddress.street_name;%> , <%=respdata.buyeraddress.landmark;%>, <%=respdata.buyeraddress.city_name;%> , <%=respdata.buyeraddress.state_name;%> <%=respdata.buyeraddress.pin_code;%></p>
+               </div>
+               <div class="od-box">
+                   <h5 class="short-title">Phone number</h5>
+                   <%if(respdata.user.phone_no){%>
+                   <p><%=respdata.user.phone_no;%></p>
+                   <%} else{%>
+                    <p></p>
+                    <%}%>
+               </div>               
+            </div>
+             <div class="col-md-3">
+               <div class="od-box">
+                  <h5 class="short-title">More actions</h5>
+                  <div class="act-btn-row">
+                     <div class="act-btn">
+                        <a href="javascript:void(0)">Download Invoice</a>
+                     </div>
+                     <div class="act-btn black-btn">
+                        <a href="javascript:void(0)">Download label</a>
+                     </div>
+                  </div>                   
+               </div>                            
+            </div>
 
+             <div class="col-md-9">
+               <div class="od-box">
+                  <h5 class="short-title">Order Tracking</h5>
+                  <div class="tracking-list">
+                     <div class="tracking-steps">
+                        <div class="steps-box step-done">
+                           <div class="steps-label">
+                              Order Confirmed
+                           </div>
+                           <div class="date-icfo">Mon, 9th Oct</div>                           
+                        </div>
+                        <div class="steps-box step-done">
+                           <div class="steps-label">
+                              Shipped
+                           </div>
+                           <div class="date-icfo">Mon, 11th Oct</div>                           
+                        </div>
+                        <div class="steps-box step-done">
+                           <div class="steps-label">
+                              Out For Delivery
+                           </div>
+                           <div class="date-icfo">Mon, 14th Oct</div>                           
+                        </div>
+                        <div class="steps-box">
+                           <div class="steps-label">
+                              Delivered
+                           </div>
+                           <div class="date-icfo">Mon, 16th Oct</div>                           
+                        </div>
+                     </div>                   
+                  </div>                 
+               </div>              
+            </div>
+            
+            <!-- <div class="col-md-3">  
+               <div class="od-box rating-part">
+                   <h5 class="short-title">Review Product</h5>
+                  <p><a href="javascript:void(0)" class="rt-link"><span><i class="fa fa-star" aria-hidden="true"></i></span> Rate & Review Product</a></p>
+               </div>
+            </div> -->
+         
+        </div>          
+      </div>       
+   </div>
+</section>
 
 
 <%- include('../../public/assets/include/footer'); %>

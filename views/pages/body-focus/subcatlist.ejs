@@ -33,8 +33,14 @@
   
                       <!-- DataTales Example -->
                       <div class="card shadow mb-4">
-                          <div class="card-header py-3">
+                          <div class="card-header ct-table-header py-3">
                               <h6 class="m-0 font-weight-bold text-primary"><%-pageName%> Details</h6>
+                              <div>
+                                <div class="search-container">                                    
+                                      <input type="text" placeholder="Search.." name="search">
+                                      <button type="submit"><i class="fa fa-search"></i></button>                                   
+                                  </div>
+                              </div>
                           </div>
                           <div class="card-body">
                             <div class="table-responsive">
@@ -68,20 +74,24 @@
                                                         <span style="color: green;">Active</span>
                                                     <% } %></td>
                                                     <td><%= value.subcategory.added_dtime %></td>
-                                                    <td>
-                                                        <a href="/edit-sub-cat/<%= value.subcategory._id %>" class="btn btn-info btn-circle btn-sm"  title="Edit">
-                                                            <i class="fas fa-pencil-alt"></i>
-                                                        </a>
-                                                        <a href="/body-focus-status/<%= value.subcategory._id %>" class="btn btn-outline-success btn-circle btn-sm" title="Status change">
-                                                            <i class="fa fa-solid fa-refresh"></i>
-                                                        </a>
-                                                        <a href="/delete-body-focus/<%= value.subcategory._id %>" class="btn btn-danger btn-circle btn-sm"  title="Delete">
-                                                            <i class="fas fa-trash"></i>
-                                                        </a>
+                                                    <td style="vertical-align: middle;">
+                                                        <div class="action-admin">
+                                                            <a href="/edit-sub-cat/<%= value.subcategory._id %>" class="btn btn-info btn-circle btn-sm"  title="Edit">
+                                                                <i class="fas fa-pencil-alt"></i>
+                                                            </a>
+                                                            <a href="/body-focus-status/<%= value.subcategory._id %>" class="btn btn-outline-success btn-circle btn-sm" title="Status change">
+                                                                <i class="fa fa-solid fa-refresh"></i>
+                                                            </a>
+                                                            <a href="/delete-body-focus/<%= value.subcategory._id %>" class="btn btn-danger btn-circle btn-sm"  title="Delete">
+                                                                <i class="fas fa-trash"></i>
+                                                            </a>
+    
+                                                            <a href="<%= value.subcategory.image %>" download="<%= value.subcategory.name %>.jpg" class="btn btn-success btn-circle btn-sm" title="Download">
+                                                                <i class="fas fa-download"></i>
+                                                            </a>
 
-                                                        <a href="<%= value.subcategory.image %>" download="<%= value.subcategory.name %>.jpg" class="btn btn-success btn-circle btn-sm" title="Download">
-                                                            <i class="fas fa-download"></i>
-                                                        </a>
+                                                        </div>
+                                                        
                                                     </td>
                                                 </tr>
                                                 <% } %>
@@ -91,11 +101,32 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <div class="table-pages">
+                                <div class="table-datainfo">
+                                    <p>Showing 1 to 10 of 87 entries</p>
+                                </div>
+                                <div class="table-pagination">
+                                    <div class="pagination">
+                                        <a href="#">&laquo;</a>
+                                        <a href="/body-focus-subcat/1">1</a>
+                                        <a href="/body-focus-subcat/2">2</a>
+                                        <a href="/body-focus-subcat/3">3</a>
+                                        <a href="/body-focus-subcat/4">4</a>
+                                        <a href="/body-focus-subcat/5">5</a>
+                                        <a href="/body-focus-subcat/6">6</a>
+                                        <a href="/body-focus-subcat/6">7</a>
+                                        <a href="/body-focus-subcat/6">8</a>
+                                        <a href="/body-focus-subcat/6">9</a>
+                    
+                                        <a href="#">&raquo;</a>
+                                      </div>
+                               </div>
+                            </div>
                           </div>
                       </div>
                 </div>
                 <!-- /.container-fluid -->
-
+                
             </div>
             <!-- End of Main Content -->
 
@@ -121,7 +152,7 @@
     <%- include('../../partials/footerJs'); %>
 
 </body>
-<script>
+<!-- <script>
     $(document).ready(function() {
       $('#dataTable').DataTable({
         "paging": true,
@@ -129,5 +160,5 @@
         "searching": true
       });
     });
-  </script>
+  </script> -->
 </html>

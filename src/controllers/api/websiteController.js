@@ -165,12 +165,11 @@ exports.productData = async function (req, res, next) {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const productId = req.params.id;
     let query = {};
-    //if (req.body.product_id) {
+  
+
     query._id = productId;
-    //}
-    console.log(productId);
-    console.log("hello");
-    console.log(isLoggedIn);
+
+
     let isProductInWishlist = "";
     if (isLoggedIn) {
       isProductInWishlist = await Wishlist.findOne({
@@ -180,21 +179,75 @@ exports.productData = async function (req, res, next) {
       console.log("product");
     }
 
-    const userproducts = await Userproduct.findById(query)
+    const categoydetails = await Userproduct.findById(query)
+      .populate('category_id', 'name')
+      .exec();
+
+      const userproducts = await Userproduct.findOne({
+        _id: productId,
+        approval_status: 1,
+        flag: 0
+      })
       .populate('brand_id', 'name')
       .populate('category_id', 'name')
       .populate('user_id', 'name')
       .populate('size_id', 'name')
       .exec();
 
+      
 
+      const userproducts1 = await Userproduct.find({ 
+        category_id: categoydetails.category_id , 
+        approval_status: 1,
+        flag: 0
+      })
+        .populate('brand_id', 'name')
+        .populate('category_id', 'name')
+        .populate('user_id', 'name')
+        .populate('size_id', 'name')
+        .exec();
+  
+        let formattedUserProducts1 = [];
+  
+        if (userproducts1) {
+            
+            for (const userproduct1 of userproducts1) {
+              const productImages1 = await Productimage.find({ product_id: userproduct1._id });
+        
+              const formattedUserProduct1 = {
+                _id: userproduct1._id,
+                name: userproduct1.name,
+                description: userproduct1.description,
+                price: userproduct1.price,
+                offer_price: userproduct1.offer_price,
+                percentage: userproduct1.percentage,
+                status: userproduct1.status,
+                flag: userproduct1.flag,
+                approval_status: userproduct1.approval_status,
+                added_dtime: userproduct1.added_dtime,
+                __v: userproduct1.__v,
+                product_images: productImages1,
+              };
+        
+              formattedUserProducts1.push(formattedUserProduct1);
+            }
+        }  
+    
+   
 
     if (!userproducts) {
-      return res.status(404).json({
-        status: "0",
-        message: "Not found!",
-        respdata: [],
+  
+      return res.render("webpages/productdetails", {
+        title: "Not Found",
+        message: "The requested product was not found.",
+        websiteUrl: process.env.SITE_URL,
+        isLoggedIn: isLoggedIn,
+        respdata: {},
+        category : categoydetails.category_id,
+        relatedProducts: formattedUserProducts1,
+        isWhislist: isProductInWishlist != null && Object.keys(isProductInWishlist).length ? true : false
       });
+
     }
 
     userproducts.hitCount = (userproducts.hitCount || 0) + 1;
@@ -227,55 +280,13 @@ exports.productData = async function (req, res, next) {
     };
 
 
-
-    const userproducts1 = await Userproduct.find({ category_id: formattedUserProduct.category_id })
-      .populate('brand_id', 'name')
-      .populate('category_id', 'name')
-      .populate('user_id', 'name')
-      .populate('size_id', 'name')
-      .exec();
-
-    if (!userproducts1 || userproducts1.length === 0) {
-      return res.status(404).json({
-        status: "0",
-        message: "Not found!",
-        respdata: [],
-      });
-    }
-
-    const formattedUserProducts1 = [];
-    for (const userproduct1 of userproducts1) {
-      const productImages1 = await Productimage.find({ product_id: userproduct1._id });
-
-      const formattedUserProduct1 = {
-        _id: userproduct1._id,
-        name: userproduct1.name,
-        description: userproduct1.description,
-        //category: userproduct1.category_id.name, 
-        // brand: userproduct1.brand_id.name, 
-        // user_id: userproduct1.user_id._id,
-        // user_name: userproduct1.user_id.name,
-        // size_id: userproduct1.size_id.name,
-        price: userproduct1.price,
-        offer_price: userproduct1.offer_price,
-        percentage: userproduct1.percentage,
-        status: userproduct1.status,
-        flag: userproduct1.flag,
-        approval_status: userproduct1.approval_status,
-        added_dtime: userproduct1.added_dtime,
-        __v: userproduct1.__v,
-        product_images: productImages1,
-      };
-
-      formattedUserProducts1.push(formattedUserProduct1);
-    }
-console.log('CHECK');
-console.log(formattedUserProduct);
+    
     res.render("webpages/productdetails", {
-      title: "Dashboard",
-      message: "Welcome to the Dashboard page!",
+      title: "Product Details",
+      message: "Welcome to the Product page!",
       respdata: formattedUserProduct,
       relatedProducts: formattedUserProducts1,
+      category : categoydetails.category_id,
       websiteUrl:process.env.SITE_URL,
       isLoggedIn: isLoggedIn,
       isWhislist: isProductInWishlist != null && Object.keys(isProductInWishlist).length ? true : false
@@ -808,15 +819,21 @@ exports.userFilter = async function (req, res, next) {
   if ((typeof conditionList != "undefined") && (objConditionList.length > 0)) {
     concatVar["status"] = { "$in": objConditionList };
   }
-  if (typeof priceList != "undefined") {
-    if (priceList.length > 0) {
-      priceList.forEach(function (item) {
-        var priceArr = item.split("-");
-        concatVar["offer_price"] = { "$gt": priceArr[0] };
-        concatVar["offer_price"] = { "$lte": priceArr[1] };
-      });
-    }
+  if (typeof priceList !== "undefined" && priceList.length > 0) {
+    const priceConditions = priceList.map(item => {
+      const priceArr = item.split("-");
+      return {
+        offer_price: {
+          $gt: parseFloat(priceArr[0]),
+          $lte: parseFloat(priceArr[1])
+        }
+      };
+    });
+  
+    concatVar['$or'] = priceConditions;
   }
+  
+
   let allProductData = await Userproduct.find({ $and: [concatVar]}).sort({ offer_price: optionId });
  
   //let allProductData = await Userproduct.find(concatVar).sort({ offer_price: optionId });  

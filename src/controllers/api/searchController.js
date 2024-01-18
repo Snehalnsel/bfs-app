@@ -642,7 +642,12 @@ exports.searchByKeyword = async function (req, res, next) {
   try {
     let reqBody = req.body;
     let searchBy = reqBody.searchBy;
-    let allProductName = await Userproduct.find({ name: { $regex: new RegExp(`${searchBy}`, 'i') } }).limit(10);
+    let allProductName = await Userproduct.find({
+      name: { $regex: new RegExp(`${searchBy}`, 'i') },
+      approval_status: 1,
+      flag: 0
+    }).limit(10);
+    
     let allBrandName = await Brand.find({ name: { $regex: new RegExp(`${searchBy}`, 'i') } }).limit(10);
     let allData = [];
     let siteUrl = process.env.SITE_URL;

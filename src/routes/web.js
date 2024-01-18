@@ -286,7 +286,7 @@ router.get("/body-focus-status/:id",cors(),BodyFocusController.statusData);
 
 //SUB CATEGORY APIS
 
-router.get("/body-focus-subcat", cors(), BodyFocusController.getSubcatData);
+router.get("/body-focus-subcat/:page", cors(), BodyFocusController.getSubcatData);
 
 router.get("/edit-sub-cat/:id", cors(), BodyFocusController.editSubCatData);
 

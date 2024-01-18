@@ -57,8 +57,18 @@ exports.getSubcatData = async function (req, res, next) {
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
 
   try {
-    await Category.ensureIndexes({ parent_id: 1 }); // Creating an index on the parent_id field
-    const subcategories = await Category.find({ parent_id: { $ne: '650444488501422c8bf24bdb' } }).exec();
+
+    const item_per_page = 150;
+
+    await Category.ensureIndexes({ parent_id: 1 }); 
+    const currentPage = req.params.page || 1;
+    const skip = (currentPage - 1) * item_per_page;
+
+    //const subcategories = await Category.find({ parent_id: { $ne: '650444488501422c8bf24bdb' } }).exec();
+    const subcategories = await Category.find({ parent_id: { $ne: '650444488501422c8bf24bdb' } })
+    .skip(skip)
+    .limit(item_per_page)
+    .exec();
     const subcategoryList = [];
 
     for (const subcategory of subcategories) {
@@ -70,6 +80,7 @@ exports.getSubcatData = async function (req, res, next) {
         parentCategoryName: parentCategoryName,
       });
     }
+
 
     res.render("pages/body-focus/subcatlist", {
       siteName: req.app.locals.siteName,

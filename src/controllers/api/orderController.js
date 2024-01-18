@@ -1151,7 +1151,16 @@ exports.cancelOrderById = async function (req, res, next) {
 
     const canceledOrder = await existingOrder.save();
 
+
     if (canceledOrder) {
+       
+      const checkingwithjhordertracking = await Ordertracking .findById(orderId);
+
+      if(checkingwithjhordertracking)
+      {
+        const checkingwithjhordertracking = await Ordertracking .findById(orderId);
+      }
+
       const shiprocketResponse = await canceleOrder(canceledOrder.shiprocket_order_id);
       
       if (shiprocketResponse.success) {

@@ -1,0 +1,83 @@
+.action-admin {
+    display: flex;
+    grid-gap: 5px;
+  }
+  .action-admin a.btn {
+    width: 25px;
+    height: 25px;
+  }
+  .action-admin a i {
+    font-size: 10px;
+  }
+  .table-pages {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table-pages .pagination a {
+    box-sizing: border-box;
+    display: flex;
+    width: 30px;
+    height: 30px;
+    text-decoration: none !important;
+    cursor: pointer;
+    color: #333 !important;
+    border: 1px solid #dbdada;
+    border-radius: 2px;
+    background: #eee;
+    align-items: center;
+    justify-content: center;
+    margin-left: 5px;
+    font-size: 13px;
+    transition: 0.5s;
+}
+.table-pages .pagination a:hover{
+    background: #000;
+    color: #fff !important;
+    transition: 0.5s;
+    border: 1px solid #000000;
+}
+
+.table-pages .pagination a.page-active{
+    background: #000;
+    color: #fff !important;
+    transition: 0.5s;
+    border: 1px solid #000000;
+}
+
+.table-datainfo p {
+    margin: 0px;
+    font-size: 13px;
+    color: #5a5a5a;
+}
+
+.ct-table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-container {
+    border: solid 1px #ddd;
+    border-radius: 30px;
+}
+
+.search-container input {
+    background: none;
+    border: none;
+    outline: none;
+    padding: 5px 12px;
+    font-size: 13px;
+    height: 38px;
+    width: 180px;
+}
+
+.search-container button {
+    background: none;
+    border: none;
+    width: 40px;
+    height: 38px;
+    font-size: 14px;
+    color: #747474;
+}

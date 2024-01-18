@@ -1162,6 +1162,7 @@ exports.cancelOrderById = async function (req, res, next) {
           status: "1",
           message: "Order canceled successfully!",
           respdata: canceledOrder,
+          is_cancelorder: true,
           shiprocketResponse: shiprocketResponse
         });
       } else {
@@ -1170,6 +1171,7 @@ exports.cancelOrderById = async function (req, res, next) {
           status: "0",
           message: "Order cancellation failed!",
           respdata: canceledOrder,
+          is_cancelorder: false,
           shiprocketResponse: shiprocketResponse
         });
       }

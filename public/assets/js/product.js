@@ -1,5 +1,6 @@
 let productId = "";
 let isLoggedIn2 = $("#userReloggedIn").val();
+
 $(document).on("click",".bidNowAmountBtn",function() {
     let bidAmount = $("#bid_amount").val();
     if(productId !== "" && bidAmount != "") {

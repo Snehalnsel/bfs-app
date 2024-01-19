@@ -164,11 +164,10 @@ exports.productData = async function (req, res, next) {
 
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const productId = req.params.id;
+    console.log(productId);
     let query = {};
-  
 
     query._id = productId;
-
 
     let isProductInWishlist = "";
     if (isLoggedIn) {
@@ -185,8 +184,7 @@ exports.productData = async function (req, res, next) {
 
       const userproducts = await Userproduct.findOne({
         _id: productId,
-        approval_status: 1,
-        flag: 0
+        approval_status: 1
       })
       .populate('brand_id', 'name')
       .populate('category_id', 'name')
@@ -194,12 +192,12 @@ exports.productData = async function (req, res, next) {
       .populate('size_id', 'name')
       .exec();
 
-      
+      console.log(userproducts);
+      console.log("product ------");
 
       const userproducts1 = await Userproduct.find({ 
         category_id: categoydetails.category_id , 
-        approval_status: 1,
-        flag: 0
+        approval_status: 1
       })
         .populate('brand_id', 'name')
         .populate('category_id', 'name')
@@ -1870,12 +1868,6 @@ exports.addNewPost = async function (req, res, next) {
         console.log(savedImage);
       });
 
-      // res.status(200).json({
-      //   status: "1",
-      //   status: "1",
-      //   message: "Product and images added!",
-      //   respdata: savedProductdata
-      // });
     }
     res.redirect('/api/my-account');
 
@@ -2566,8 +2558,12 @@ exports.checkoutWeb = async function (req, res, next) {
           })
           .exec();
 
-          // Address check
-        const addressUserList = await addressBook.find({user_id: user_id });
+        // const addressUserList = await addressBook.find({user_id: user_id });
+
+        const addressUserList = await addressBook.find({
+            user_id: user_id,
+            default_status: 0
+        });
 
         const user = await Users.findById(existingCart.user_id);
         if (!user) {
@@ -2707,13 +2703,10 @@ exports.myOrderDetailsWeb = async (req, res) => {
   //       shiprocketResponsefortracking = await trackbyaorderid(trackDetails.shiprocket_order_id);
   //     }
   // }
-    const sellerAddress = await addressBook.findOne({ user_id: order.seller_id });
-    const buyerAddress = await addressBook.findOne({ user_id: order.user_id });
+    const sellerAddress = await addressBook.findOne({ _id: order.billing_address_id});
+    const buyerAddress = await addressBook.findOne({ _id: order.shipping_address_id });
 
     const shippingKitData = await Shippingkit.findOne({ order_id: order._id });
-
-    console.log(shippingKitData);
-    console.log("==============");
 
     let shippingkit_details;
 
@@ -3158,21 +3151,30 @@ exports.userPlacedOrder = async function (req, res) {
      let discount = '0';
      let pickup_status = '0';
      let delivery_status = '0';
+     let shipping_address_id = req.body.data.addressBookId;
 
-    // Get Shipping Address id 
-    const shippingaddress = await addressBook.findOne({ user_id: seller_id });
-    if (!shippingaddress) {
-      return res.status(404).json({ message: 'Shipping address not found' });
-    }
-    const shipping_address_id = shippingaddress._id;
+    //Get Shipping Address id 
+    // const shippingaddress = await addressBook.findOne({ user_id: seller_id });
+    // if (!shippingaddress) {
+    //   return res.status(404).json({ message: 'Shipping address not found' });
+    // }
+    // const shipping_address_id = shippingaddress._id;
 
     // Get Billing Address id
-    const productdetails = await Userproduct.findById(product_id);
-    if (!productdetails) {
-      return res.status(404).json({ message: 'Billing address not found' });
+    // const productdetails = await Userproduct.findById(product_id);
+    // if (!productdetails) {
+    //   return res.status(404).json({ message: 'Billing address not found' });
+    // }
+    // const billing_address_id = productdetails.user_id;
+    // console.log(billing_address_id);
+
+    const billingaddress = await addressBook.findOne({ user_id: seller_id });
+
+    if (!billingaddress) {
+      return res.status(404).json({ message: 'Seller address not found' });
     }
-    const billing_address_id = productdetails.user_id;
-    console.log(billing_address_id);
+
+    const billing_address_id = billingaddress._id;
 
     const now = new Date();
     const currentHour = now.getHours().toString().padStart(2, '0');
@@ -3223,6 +3225,36 @@ exports.userPlacedOrder = async function (req, res) {
         else console.log(info);
       });
 
+      // const deleteCart;
+      //Delete Cart while place order
+
+        const existingCart = await Cart.findOne({ user_id, status: 0 });
+    
+        if (!existingCart) {
+          return res.status(404).json({
+            message: 'Cart not found',
+          });
+        }
+    
+        const cartDetail = await CartDetail.findOne({
+          cart_id: existingCart._id,
+          product_id,
+          status: 0,
+        });
+    
+        /*if (!cartDetail) {
+          return res.status(404).json({
+            message: 'Product not found in cart',
+          });
+        }*/
+        await cartDetail.remove();
+    
+        const cartDetailsCount = await CartDetail.countDocuments({ cart_id: existingCart._id });
+    
+        if (cartDetailsCount === 0) {
+          await existingCart.remove();
+        }
+      //Delete Cart while place order
       const updatedProduct = await Userproduct.findOneAndUpdate(
         { _id: product_id },
         { $set: { flag: 1 } },

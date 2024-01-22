@@ -1580,11 +1580,10 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
 };
 
 
-
-
 exports.userAddressAdd = async function (req, res, next) {
   try {
     
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const addr_name = req.body.addrType;
     //const address = await addressBook.findOne({ _id: req.params.id });
     const errors = validationResult(req);

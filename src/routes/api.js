@@ -1134,7 +1134,6 @@ router.post(
       }
     ),
     check("confirmpassword", "This is a required field!").not().isEmpty().trim().escape(),
-    check("confirmpassword", "This is a required field!").not().isEmpty().trim().escape(),
   ],
   WebsiteController.signin
 );
@@ -1271,6 +1270,34 @@ router.get("/forgot-password",cors(),
 
 router.post("/forgotpassword-sendotp",cors(),
   WebsiteController.sendotp
+);
+
+router.post(
+  "/resetpassword",
+  [
+    check(
+      "old_password",
+      "Password length should be 8 to 10 characters!"
+    ).isLength({
+      min: 8,
+      max: 10,
+    }),
+    check(
+      "new_password",
+      "Password length should be 8 to 10 characters!"
+    ).isLength({
+      min: 8,
+      max: 10,
+    }),
+    check(
+      "repeat_password",
+      "Password length should be 8 to 10 characters!"
+    ).isLength({
+      min: 8,
+      max: 10,
+    }),
+  ],
+  WebsiteController.changePassword
 );
 
 module.exports = router;

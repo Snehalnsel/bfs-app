@@ -18,6 +18,7 @@ $(document).on("click",".bidNowAmountBtn",function() {
     });
     }
 });
+
 $(document).on("click",".bidButton",function() {
     if(isLoggedIn2 != "") {
         productId = $(this).siblings('a').data("id");
@@ -28,6 +29,7 @@ $(document).on("click",".bidButton",function() {
         $('#login_modal').modal('show'); 
     }
 });
+
 $(document).on('click', ".buy-btn", function(e){
     if(isLoggedIn2 != "") {
        var id = $(this).data('id');
@@ -62,8 +64,6 @@ $(document).on('click', ".buy-btn", function(e){
        $('#login_modal').modal('show'); 
     }
 });
-
-
 
 $(document).on('click', ".wish-btn", async function (e) {
     if(isLoggedIn2 != "") {

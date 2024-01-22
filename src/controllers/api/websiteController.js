@@ -356,9 +356,72 @@ exports.registration = async function (req, res, next) {
   }
 };
 
+// exports.signin = async function (req, res, next) {
+//   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+//   const errors = validationResult(req);
+//   if (!errors.isEmpty()) {
+//     return res.status(400).json({
+//       status: "0",
+//       message: "Validation error!",
+//       respdata: errors.array(),
+//     });
+//   }
+
+//   bcrypt.hash(req.body.password, rounds, (error, hash) => {
+//     if (error) {
+//       res.status(400).json({
+//         status: "0",
+//         message: "Error!",
+//         respdata: error,
+//       });
+//     }
+//     else {
+
+//       Users.findOne({ email: req.body.email }).then((user) => {
+//         if (!user) {
+//           const newUser = Users({
+//             email: req.body.email,
+//             password: hash,
+//             token: "na",
+//             //title: req.body.title,
+//             name: req.body.name,
+//             phone_no: req.body.phone_no,
+//             deviceid: "na",
+//             devicename: "na",
+//             fcm_token: "na",
+//             country: "na",
+//             country_code: "na",
+//             country: "na",
+//             last_login: "na",
+//             last_logout: "na",
+//             created_dtime: dateTime,
+//             app_user_id: "na",
+//             trial_end_date: "na",
+//             image: "na",
+//           });
+
+//           newUser.save();
+//           //res.redirect('/api/home');
+//           await exports.ajaxGetUserLogin(req, res, next, req.body.email, req.body.password);
+//         }
+//         else {
+//           // res.status(400).json({
+//           //   status: "0",
+//           //   message: "User already exists!",
+//           //   respdata: {},
+//           // });
+
+//           res.redirect('/api/registration?userExists=true');
+//         }
+//       });
+//     }
+//   });
+// };
+
 exports.signin = async function (req, res, next) {
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   const errors = validationResult(req);
+  
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
@@ -367,17 +430,17 @@ exports.signin = async function (req, res, next) {
     });
   }
 
-  bcrypt.hash(req.body.password, rounds, (error, hash) => {
-    if (error) {
-      res.status(400).json({
-        status: "0",
-        message: "Error!",
-        respdata: error,
-      });
-    }
-    else {
+  try {
+    bcrypt.hash(req.body.password, rounds, async (error, hash) => {
+      if (error) {
+        res.status(400).json({
+          status: "0",
+          message: "Error!",
+          respdata: error,
+        });
+      } else {
+        const user = await Users.findOne({ email: req.body.email });
 
-      Users.findOne({ email: req.body.email }).then((user) => {
         if (!user) {
           const newUser = Users({
             email: req.body.email,
@@ -400,20 +463,57 @@ exports.signin = async function (req, res, next) {
             image: "na",
           });
 
-          newUser.save();
-          res.redirect('/api/home');
-        }
-        else {
-          res.status(400).json({
-            status: "0",
-            message: "User already exists!",
-            respdata: {},
+          await newUser.save();
+
+          const user = await Users.findOne({ email: req.body.email });
+          
+          const userToken = {
+            userId: user._id,
+            email: user.email,
+            password: user.password,
+            title: user.title,
+            name: user.name,
+            age: user.age,
+            image: user.image ? user.image:'',
+            //usertoken:user.token,
+            phone_no: user.phone_no,
+            weight: user.weight,
+            height: user.height,
+            country: user.country,
+            country_code: user.country_code,
+            country: user.country,
+            goal: user.goal,
+            hear_from: user.hear_from,
+          };
+      
+          const { accessToken, refreshToken } = await generateTokens(userToken, "");
+          return res.status(200).json({
+            status: "success",
+            message: "Successfully Registered!",
+            respdata: {
+              accessToken: accessToken,
+              accessTokenExpires: process.env.COOCKIE_ACCESS_TOKEN_EXPIRES_IN,
+              refreshToken: refreshToken,
+              refreshTokenExpires: process.env.COOCKIE_REFRESH_TOKEN_EXPIRES_IN,
+              refreshReset: true,
+            },
           });
+        } else {
+          res.redirect('/api/registration?userExists=true');
         }
-      });
-    }
-  });
+      }
+    });
+  } catch (error) {
+    console.error("An error occurred:", error);
+    res.status(500).json({
+      status: "0",
+      message: "Internal Server Error",
+      respdata: error.message || "Unknown error",
+    });
+  }
 };
+
+
 
 exports.ajaxGetUserLogin = async function (req, res, next) {
   const errors = validationResult(req);
@@ -424,91 +524,10 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   const { email, password, cookieAccessToken, cookieRefreshToken } = req.body;
   //Token generate
   let accessTokenGlobal = "";
   let refreshTokenGlobal = "";
-  /*await Users.findOne({ email }).then(async (user) => {
-    const userToken = {
-      userId: user._id,
-      email: user.email,
-      password: user.password,
-      title: user.title,
-      name: user.name,
-      age: user.age,
-      //usertoken:user.token,
-      phone_no:user.phone_no,
-      weight: user.weight,
-      height: user.height,
-      country: user.country,
-      country_code: user.country_code,
-      country: user.country,
-      goal: user.goal,
-      hear_from: user.hear_from,
-    };
-    if(cookieRefreshToken != "") {
-      //Access token validate
-      let getAccessTokenData = await tokenDecode(cookieAccessToken, process.env.ACCESS_TOKEN_PRIVATE_KEY);
-      if(!getAccessTokenData.error) {
-        if((typeof req.session.user != "undefined") && (req.session.user.userId.toString() == getAccessTokenData.tokenDetails.userId.toString())) {
-          //Do Nothing....
-          //console.log("session matched with current data");
-          res.status(200).json({
-            status: "success",
-            refreshReset:false,
-            message:"Already logged In!!"
-          });
-        } else {
-          let getRefreshTokenData = await tokenDecode(cookieRefreshToken, process.env.REFRESH_TOKEN_PRIVATE_KEY);
-          if(!getRefreshTokenData.error) {
-            if(getRefreshTokenData.tokenDetails.exp > (Date.now() / 1000)){
-              //generate access token only
-              const { accessToken, refreshToken } = await generateTokens(userToken, cookieRefreshToken);
-              accessTokenGlobal = accessToken;
-              refreshTokenGlobal = refreshToken;
-            } else {
-              //generate refresh token
-              const { accessToken, refreshToken } = await generateTokens(userToken, "");
-              accessTokenGlobal = accessToken;
-              refreshTokenGlobal = refreshToken;
-            }
-            //user data stored in session
-            req.session.user = userToken;
-            res.status(200).json({
-              status: "success",
-              refreshReset:true,
-              accessToken: accessTokenGlobal,
-              refreshToken:refreshTokenGlobal
-            });
-          } else {
-            //Do something while you will get error in refresh token
-            res.status(200).json({
-              status: "error",
-              refreshReset:false,
-              message: "Error while generating your token!"
-            });
-          }
-        }
-      } else {
-        //Do something while you will get error in access token
-        res.status(200).json({
-          status: "error",
-          refreshReset:false,
-          message: "Error while generating your token!"
-        });
-      }
-    } else {
-      //User is logging for the first time
-      const { accessToken, refreshToken } = await generateTokens(userToken, "");
-      res.status(200).json({
-        status: "success",
-        refreshReset:true,
-        accessToken: accessToken,
-        refreshToken:refreshToken
-      });
-    }
-  });*/
   Users.findOne({
     $or: [
       { email: email },
@@ -3429,6 +3448,96 @@ exports.sendotp = async function (req, res, next) {
           respdata: {},
         });
       }
+    }
+  });
+};
+
+exports.changePassword = async function (req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: "0",
+      message: "Validation error!",
+      respdata: errors.array(),
+    });
+  }
+
+  const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+  Users.findOne({ _id: userId }).then((user) => {
+    if (!user)
+      res.status(200).json({
+        status: "0",
+        message: "User not found!",
+        respdata: {},
+        is_passwordchnage: "false"
+      });
+    else { 
+     bcrypt.compare(req.body.old_password, user.password, (error, match) => {
+        if (error) {
+          res.status(200).json({
+            status: "0",
+            message: "Old password does not match!!",
+            respdata: error,
+            is_passwordchnage: "false"
+          });
+        } else if (match) {
+          bcrypt.compare(
+            req.body.new_password,
+            user.password,
+            (error, match) => {
+              if (error) {
+                res.status(200).json({
+                  status: "0",
+                  message: "Error!",
+                  respdata: {},
+                  is_passwordchnage: "false"
+                });
+              } else if (!match) {
+                bcrypt.hash(req.body.new_password, rounds, (error, hash) => {
+                  var updData = {
+                    password: hash,
+                  };
+                  Users.findOneAndUpdate(
+                    { _id: req.body.user_id },
+                    { $set: updData },
+                    { upsert: true },
+                    function (err, doc) {
+                      if (err) {
+                        throw err;
+                      } else {
+                        Users.findOne({ _id: req.body.user_id }).then(
+                          (user) => {
+                            res.status(200).json({
+                              status: "1",
+                              message: "Successfully updated!",
+                              respdata: user,
+                              is_passwordchnage: "true"
+                            });
+                          }
+                        );
+                      }
+                    }
+                  );
+                });
+              } else {
+                res.status(200).json({
+                  status: "0",
+                  message: "New password cannot be same as your Old password!",
+                  respdata: {},
+                  is_passwordchnage: "false"
+                });
+              }
+            }
+          );
+        } else {
+          res.status(200).json({
+            status: "0",
+            message: "Old password does not match!",
+            respdata: {},
+            is_passwordchnage: "false"
+          });
+        }
+      });
     }
   });
 };

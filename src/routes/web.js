@@ -288,6 +288,8 @@ router.get("/body-focus-status/:id",cors(),BodyFocusController.statusData);
 
 router.get("/body-focus-subcat/:page", cors(), BodyFocusController.getSubcatData);
 
+router.get("/sreach-subcat/:query/:page", cors(), BodyFocusController.getSubcatDataBySeach);
+
 router.get("/edit-sub-cat/:id", cors(), BodyFocusController.editSubCatData);
 
 router.post(

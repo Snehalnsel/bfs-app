@@ -850,7 +850,7 @@ exports.userFilter = async function (req, res, next) {
     concatVar['$or'] = priceConditions;
   }
   
-
+  console.log(concatVar);
   let allProductData = await Userproduct.find({ $and: [concatVar]}).sort({ offer_price: optionId });
  
   //let allProductData = await Userproduct.find(concatVar).sort({ offer_price: optionId });  
@@ -1358,11 +1358,11 @@ async function getProductDataWithSort(id, sortid) {
         _id: userproduct._id,
         name: userproduct.name,
         description: userproduct.description,
-        category: userproduct.category_id.name,
-        brand: userproduct.brand_id.name,
-        user_id: userproduct.user_id._id,
-        user_name: userproduct.user_id.name,
-        size_id: userproduct.size_id.name,
+        category: userproduct.category_id ? userproduct.category_id.name : '',
+        brand: userproduct.brand_id ? userproduct.brand_id.name : '',
+        user_id: userproduct.user_id ? userproduct.user_id._id : '',
+        user_name: userproduct.user_id ? userproduct.user_id.name : '',
+        size_id: userproduct.size_id ? userproduct.size_id.name : '',
         price: userproduct.price,
         offer_price: userproduct.offer_price,
         percentage: userproduct.percentage,
@@ -1412,10 +1412,30 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
     
     //Get All Filter Data
     //Brand List
-    const brandList = await brandModel.find({});
-    const sizeList = await sizeModel.find({});
-    const conditionList = await productconditionModel.find({});
+    // const brandList = await brandModel.find({});
+    // const sizeList = await sizeModel.find({});
+    // const conditionList = await productconditionModel.find({});
 
+
+    const userProducts = await Userproduct.find({
+      category_id : id,
+      approval_status: 1,
+      flag: 0,
+    })
+      .select('brand_id size_id status');
+    
+    const brandIds = userProducts.map(product => product.brand_id).filter(Boolean);
+    const sizeIds = userProducts.map(product => product.size_id).filter(Boolean);
+    const statusIds = userProducts.map(product => product.status).filter(Boolean);
+    
+    const brandList = await brandModel.find({ _id: { $in: brandIds } });
+    const sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
+    const conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
+    
+    console.log('Brand List:', brandList);
+    console.log('Size List:', sizeList);
+    console.log('Condition List:', conditionList);
+    
 
     res.render("webpages/subcategoryproduct",
       {
@@ -1565,8 +1585,6 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
     
     const savedAddress = await newAddress.save();
     const user = await Users.findById(newAddress.user_id);
-    console.log("###########hgfhfhfhfh######################");
-    console.log(user);
     const randomSuffix = Math.floor(Math.random() * 1000);
     const pickupLocation = savedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;
     

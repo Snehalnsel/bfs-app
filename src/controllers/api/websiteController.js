@@ -1767,7 +1767,6 @@ exports.userWisePost = async function (req, res, next) {
 exports.addPostView = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-    //console.log('Add User Post');
 
     if (isLoggedIn == "") {
       res.redirect("/api/registration");
@@ -1811,15 +1810,15 @@ exports.addNewPost = async function (req, res, next) {
 
   try {
 
-    const existingProduct = await Userproduct.findOne({ name: req.body.name });
+    // const existingProduct = await Userproduct.findOne({ name: req.body.name });
 
-    if (existingProduct) {
-      return res.status(404).json({
-        status: "0",
-        message: "Product already exists!",
-        respdata: {},
-      });
-    }
+    // if (existingProduct) {
+    //   return res.status(404).json({
+    //     status: "0",
+    //     message: "Product already exists!",
+    //     respdata: {},
+    //   });
+    // }
 
     let invoice;
     let packaging;
@@ -2091,8 +2090,9 @@ exports.addToWishlistWeb = async function (req, res, next) {
 exports.viewWishListByUserId = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-    if (!req.session.user) {
-      return res.redirect("/api/registration");
+
+    if (isLoggedIn == "") {
+      res.redirect("/api/registration");
     }
 
     const user_id = req.session.user.userId;
@@ -2252,7 +2252,7 @@ exports.addToCart = async function (req, res, next) {
 
 
       setTimeout(() => {
-        removeItemAfterTime(existingCart._id); // savedata._id contains the ID of the added item
+        removeItemAfterTime(existingCart._id); 
       }, 20 * 60 * 1000);
 
       return res.status(200).json({

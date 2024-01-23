@@ -146,7 +146,6 @@ $(document).on('click', ".wish-rem-btn", async function (e) {
 });
 
 $(document).on('click', ".wish-rem-button", async function (e) {
-    let src = "/public/assets/images/bfs-logo.png";
     Swal.fire({
         title: "Do you want to delete the item?",
         iconHtml: '<img src="'+ src +'">',

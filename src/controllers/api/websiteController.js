@@ -168,9 +168,9 @@ exports.productData = async function (req, res, next) {
     //if (req.body.product_id) {
     query._id = productId;
     //}
-    console.log(productId);
-    console.log("hello");
-    console.log(isLoggedIn);
+    // console.log(productId);
+    // console.log("hello");
+    // console.log(isLoggedIn);
     let isProductInWishlist = "";
     if (isLoggedIn) {
       isProductInWishlist = await Wishlist.findOne({
@@ -808,14 +808,18 @@ exports.userFilter = async function (req, res, next) {
   if ((typeof conditionList != "undefined") && (objConditionList.length > 0)) {
     concatVar["status"] = { "$in": objConditionList };
   }
-  if (typeof priceList != "undefined") {
-    if (priceList.length > 0) {
-      priceList.forEach(function (item) {
-        var priceArr = item.split("-");
-        concatVar["offer_price"] = { "$gt": priceArr[0] };
-        concatVar["offer_price"] = { "$lte": priceArr[1] };
-      });
-    }
+  if (typeof priceList !== "undefined" && priceList.length > 0) {
+    const priceConditions = priceList.map(item => {
+      const priceArr = item.split("-");
+      return {
+        offer_price: {
+          $gt: parseFloat(priceArr[0]),
+          $lte: parseFloat(priceArr[1])
+        }
+      };
+    });
+  
+    concatVar['$or'] = priceConditions;
   }
   let allProductData = await Userproduct.find({ $and: [concatVar]}).sort({ offer_price: optionId });
  
@@ -1250,7 +1254,7 @@ async function getProductDataWithSort(id, sortid) {
     if (id === "whatshot") {
        userproducts = await Userproduct.find({
         approval_status: 1,
-        flag: 1
+        flag: 0
     })
         .populate('brand_id', 'name')
         .populate('category_id', 'name')
@@ -1296,7 +1300,11 @@ async function getProductDataWithSort(id, sortid) {
     } else {
       categoryId = id; 
 
-       userproducts = await Userproduct.find({ category_id: id })
+       userproducts = await Userproduct.find({ 
+        category_id: id,
+        approval_status: 1,
+        flag: 0 
+      })
       .populate('brand_id', 'name')
       .populate('category_id', 'name')
       .populate('user_id', 'name')

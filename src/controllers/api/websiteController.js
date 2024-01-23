@@ -1284,7 +1284,7 @@ async function getProductDataWithSort(id, sortid) {
     if (id === "whatshot") {
        userproducts = await Userproduct.find({
         approval_status: 1,
-        flag: 1
+        flag: 0
     })
         .populate('brand_id', 'name')
         .populate('category_id', 'name')
@@ -1330,7 +1330,11 @@ async function getProductDataWithSort(id, sortid) {
     } else {
       categoryId = id; 
 
-       userproducts = await Userproduct.find({ category_id: id })
+       userproducts = await Userproduct.find({ 
+        category_id: id,
+        approval_status: 1,
+        flag: 0 
+      })
       .populate('brand_id', 'name')
       .populate('category_id', 'name')
       .populate('user_id', 'name')

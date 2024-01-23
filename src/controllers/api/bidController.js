@@ -283,7 +283,7 @@ exports.bidListProduct = async (req, res, next) => {
       let productId = element.productId;
       let productDetails = await Userproduct.findOne({_id:productId});
       let productImage = await Productimage.find({ product_id: productId }).limit(1);
-      buyerData[j]['product_details'] = productDetails;
+      buyerData[j]['product_details'] = (productDetails != null) ? productDetails: [];
       buyerData[j]['product_image'] = typeof productImage[0] != "undefined" ? productImage[0].image : "";
       j++;
     }
@@ -292,7 +292,7 @@ exports.bidListProduct = async (req, res, next) => {
       let productId = element.productId;
       let productDetails = await Userproduct.findOne({_id:productId});
       let productImage = await Productimage.find({ product_id: productId }).limit(1);
-      sellerData[i]['product_details'] = productDetails;
+      sellerData[i]['product_details'] = (productDetails != null) ? productDetails: [];
       sellerData[i]['product_image'] = typeof productImage[0] != "undefined" ? productImage[0].image : "";
       i++;
     }

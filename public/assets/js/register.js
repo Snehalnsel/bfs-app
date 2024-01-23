@@ -1,49 +1,63 @@
-let webSiteUrl = "https://localhost:3000";
-let accessTokenVar = "accessToken";
-let refreshTokenVar = "refreshToken";
-let cookieAccessToken = "";
-let cookieRefreshToken = "";
 $(document).ready(async function(){
-    cookieAccessToken = await getCookieFunc(accessTokenVar);
-    cookieRefreshToken = await getCookieFunc(refreshTokenVar);
-    $('#loginForm').validate({
+
+    $('#registerForm').validate({
         debug:false,
         errorElement:"p",
         errorClass:"errorMsgClass",
         rules:{
+            name:{
+                required:true,
+            },
             email:{
                 required:true,
-                maxlength: 70
+                maxlength: 70,
+                email: true  
             },
             password:{
                 required:true,
                 maxlength:10,
                 minlength:8
+            },
+            confirmpassword: {
+                required: true,
+                equalTo: "#password"  
+            },
+            phoneno: {
+                required: true,
+                minlength:10
             }
         },
         messages:{
+            name:{
+                required:"Please enter your full name.",
+            }, 
             email:{
-                required:"Please enter your email/phone.",
+                required:"Please enter your email.",
                 maxlength: "You can enter maximum of 70 charecters."
             },
             password:{
                 required:"Please enter password.",
                 maxlength:"You can enter maximum of 10 characters.",
                 minlength: "You can enter minimum of 8 characters.",
+            },
+            confirmPassword: {
+                equalTo: "Passwords do not match"
+            },
+            phoneno: {
+                required: "Contract number is required"
             }
         },
         submitHandler: function() {
-            // let form_data = new FormData();
-            // form_data.append("password", $('#pwd').val());
-            // form_data.append("email", $('#email').val());
+         
             $.ajax({
                 type: 'POST',
-                url:  webSiteUrl + "/api/ajax-userlogin",
+                url:  webSiteUrl + "/api/signin",
                 data: {
+                    name:$('#name').val(),
+                    phone_no: $('#phoneno').val(),
                     email: $('#email').val(),
-                    password:$('#pwd').val(),
-                    cookieAccessToken:cookieAccessToken,
-                    cookieRefreshToken:cookieRefreshToken
+                    password:$('#password').val(),
+                    confirmpassword:$('#confirmpassword').val(),
                 },
                 success: async function(obj){
                     // let obj = response.responseJSON;
@@ -85,19 +99,5 @@ $(document).ready(async function(){
             });
         }
     });
+    
 });
-const setCookeiFunc = async (name,value,days) => {
-    let now = new Date();
-    let expires="";
-    now.setTime(now.getTime()+(parseInt(days)*24*60*60*1000));
-    expires = "; expires="+now.toGMTString();
-    document.cookie = name+"="+value+expires+"; path=/";
-};
-const getCookieFunc = async (name) => {
-    let cookie = {};
-    document.cookie.split(';').forEach(function(el) {
-      let split = el.split('=');
-      cookie[split[0].trim()] = split.slice(1).join("=");
-    });
-    return (typeof cookie[name] != "undefined") ? cookie[name] : "" ;
-};

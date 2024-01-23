@@ -78,6 +78,7 @@
    </div>
    <%- include('../../public/assets/include/newsletter'); %>
    <%- include('../../public/assets/include/footer'); %>
+   
       </body>
 
       <script>
@@ -101,30 +102,21 @@
             data.orders.forEach(item => {
 
                var hTml = `<div class="cart-list wishlist-list">
-    <div class="bids-row wishlist-row order-list">
-        <div class="br-details">
-            <div class="bid-images"><img src="${item.product.image}" alt="images" class="img-fluid"></div>
-            <div class="bid-info">
-                <div class="bd-title">
-                    <a href="/api/web-myorder-details/${item._id}">${item.product.name}</a>
-                </div>
-                <div class="bd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>${item.total_price}</div>
-                <div class="cnbtn-group">`;
-                  if(item.shippingkit_status == 1) {
-                     hTml += `<p>Shipping kit has already been bought.</p>`;
-                  } else {
-                     hTml += `
-                        <p>Please Choose Either Option To Confirm Your Order.</p>
-                        <div class="cg-row">
-                           <a href="javascript:void(0)" data-toggle="modal" data-target="#short-modal" class="acb-btn rv-btn buy-shipping-kit" data-orderid="${item._id}">Buy Shipping Kit</a>
-                           <a href="javascript:void(0)" class="acb-btn  grey-btn">Don't Buy Shipping Kit</a>
-                        </div>
-                             `; 
-                  }
-                  hTml += `</div>
+        <div class="bids-row wishlist-row order-list" >
+              <div class="br-details">
+                  <div class="bid-images"><img src="${item.product.image}" alt="images" class="img-fluid"></div>
+                  <div class="bid-info">
+                     <div class="bd-title">
+                        <a href="/api/web-myorder-details/${item._id}">${item.product.name}</a>
                      </div>
-                     </div>
-                     </div></div>`;
+                     <div class="bd-price">
+                        <span><i class="fa fa-inr" aria-hidden="true"></i></span>
+                        ${item.total_price}
+                     </div>                     
+                  </div>
+              </div>
+              </div>
+              </div>`;
                $("#buyers-tab").append(hTml);
             });
 
@@ -146,30 +138,46 @@
          function populateSellerHtml(data) {
             data.orders.forEach(item => {
 
-               var hTml = `<div class="cart-list wishlist-list">
-        <div class="bids-row wishlist-row order-list" >
-              <div class="br-details">
-                  <div class="bid-images"><img src="${item.product.image}" alt="images" class="img-fluid"></div>
-                  <div class="bid-info">
-                     <div class="bd-title">
-                        <a href="/api/web-myorder-details/${item._id}">${item.product.name}</a>
+               var hTml = `<div class="cart-list wishlist-list" data-orderid="${item._id}">
+    <div class="bids-row wishlist-row order-list">
+        <div class="br-details">
+            <div class="bid-images"><img src="${item.product.image}" alt="images" class="img-fluid"></div>
+            <div class="bid-info bi-iconbox">
+               <div class="bid-left">
+                <div class="bd-title">${item.product.name}</div>
+                <div class="bd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>${item.total_price}</div>
+                <div class="cnbtn-group">`;
+                  if(item.shippingkit_status == 1) {
+                     hTml += `<p>Shipping kit has already been bought.</p>`;
+                  } else {
+                     hTml += `
+                        <p>Please Choose Either Option To Confirm Your Order.</p>
+                        <div class="cg-row">
+                           <a href="javascript:void(0)" data-toggle="modal" data-target="#short-modal" class="acb-btn rv-btn buy-shipping-kit" data-orderid="${item._id}">Buy Shipping Kit</a>
+                           <a href="javascript:void(0)" class="acb-btn  grey-btn">Don't Buy Shipping Kit</a>
+                        </div>
+                             `; 
+                  }
+                  hTml += `</div>
+                </div>
+                <div class="bid-right flx-content">
+                  <div class="remove-cart">
+                     <a href="/api/web-myorder-details/${item._id}"><i class="fa fa-info-circle"></i></a>  
+                   </div>
+                   <div class="remove-cart">
+                     <a href="javascript:void(0)" id="erase" class ="remove-order"><i class="fa fa-trash-o"></i></a>  
+                   </div>               
+               
+                </div>
+                
                      </div>
-                     <div class="bd-price">
-                        <span><i class="fa fa-inr" aria-hidden="true"></i></span>
-                        ${item.total_price}
-                     </div>                     
-                  </div>
-              </div>
-              </div>
-              </div>`;
+                     </div>
+                     </div></div>`;
                $("#viewers-tab").append(hTml);
             });
          }
          $(document).on('click', '.buy-shipping-kit', function () {
             var orderId = $(this).data('orderid');
-            // var existingUrl = "/api/get-shipmentkitweb/";
-            // var finalUrl = existingUrl + orderId;
-            // $(".short-modal .buy-modal a.acb-btn").attr("href", finalUrl);
             $(".short-modal .buy-modal a.acb-btn").attr("data-orderid", orderId);
             $(".cg-row").attr("id", orderId);
             $('#short-modal').modal('show');
@@ -189,7 +197,7 @@
                            confirmButtonText: "OK",
                            customClass: { confirmButton: 'alert-box-button' }
                         });
-                        $("#"+orderId).siblings("p").text("sdfsdfesdf");
+                        $("#"+orderId).siblings("p").text("Shipping kit has already been bought");
                         $("#"+orderId).hide();
                         //location.reload();
                      } else {
@@ -205,5 +213,6 @@
                   }
             });
          });
-
       </script>
+
+      <script src="/public/assets/js/order.js"></script>

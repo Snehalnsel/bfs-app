@@ -961,6 +961,7 @@ exports.getOrdersBySeller = async (req, res) => {
     if (!orders || orders.length === 0) {
       return res.status(404).json({ message: 'No orders found for this seller' });
     }
+    
 
     const ordersWithProductDetails = [];
 
@@ -969,8 +970,19 @@ exports.getOrdersBySeller = async (req, res) => {
       const productId = order.product_id.toString();
       const productImage = await Productimage.find({ product_id: productId }).limit(1);
 
+      const shipdetails = await Ordertracking.find({ order_id: order._id });
+
+      let shipping_details = {}; 
+      
+
+      if (typeof shipdetails !="undefined" && shipdetails.length > 0) {
+          shipping_details = await Track.find({ _id: shipdetails[0].tracking_id });
+      }
+
+      console.log(shipping_details);
+
       // Check if there's any ShippingKit data for this order
-      const shippingKitData = await Shippingkit.findOne({ order_id: order._id });
+      //const shippingKitData = await Shippingkit.findOne({ order_id: order._id });
 
       const orderDetails = {
         _id: order._id,
@@ -984,7 +996,7 @@ exports.getOrdersBySeller = async (req, res) => {
           name: productDetails.length ? productDetails[0].name : 'Unknown Product',
           image: productImage.length ? productImage[0].image : 'No Image',
         },
-        shippingKit: shippingKitData || null, // Include ShippingKit data if available, otherwise null
+        shippingkit_status: (Object.keys(shipping_details).length > 0) ? shipping_details[0].shippingkit_status : 2, 
       };
 
       ordersWithProductDetails.push(orderDetails);
@@ -1139,7 +1151,16 @@ exports.cancelOrderById = async function (req, res, next) {
 
     const canceledOrder = await existingOrder.save();
 
+
     if (canceledOrder) {
+       
+      const checkingwithjhordertracking = await Ordertracking .findById(orderId);
+
+      if(checkingwithjhordertracking)
+      {
+        const checkingwithjhordertracking = await Ordertracking .findById(orderId);
+      }
+
       const shiprocketResponse = await canceleOrder(canceledOrder.shiprocket_order_id);
       
       if (shiprocketResponse.success) {
@@ -1150,6 +1171,7 @@ exports.cancelOrderById = async function (req, res, next) {
           status: "1",
           message: "Order canceled successfully!",
           respdata: canceledOrder,
+          is_cancelorder: true,
           shiprocketResponse: shiprocketResponse
         });
       } else {
@@ -1158,6 +1180,7 @@ exports.cancelOrderById = async function (req, res, next) {
           status: "0",
           message: "Order cancellation failed!",
           respdata: canceledOrder,
+          is_cancelorder: false,
           shiprocketResponse: shiprocketResponse
         });
       }

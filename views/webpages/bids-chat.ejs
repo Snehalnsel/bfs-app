@@ -19,22 +19,24 @@
                      <div class="bids-chatbox">
                         <div class="bids-productbox">
                            <h6 class="buyer-heading">Buyer</h6>  
-                           <% for(let i=0; i<buyerData.length; i++) {%>                                                    
-                              <div class="br-details clickOnProduct" id="<%=buyerData[i].id %>">
-                                 <div class="bid-images"><img src="<%=buyerData[i].product_image %>" alt="images" class="img-fluid"></div>
-                                 <div class="bid-info">
-                                    <div class="bd-title"><%=buyerData[i].product_details.name %></div>
-                                    <div class="bd-price">
-                                       <span><i class="fa fa-inr" aria-hidden="true"></i></span>
-                                       <%=buyerData[i].product_details.price %>
-                                    </div>
-                                    <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i> <%=buyerData[i].product_details.offer_price %></div>
-                                    <div class="bidding-box">
-                                       <div class="highlight-title">Bid Price</div>
-                                       <div class="bidding-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%= buyerData[i].currentOffer.price%></div>
+                           <% for(let i=0; i<buyerData.length; i++) {%> 
+                              <%if(buyerData[i].product_details.length > 0) {%>                                                   
+                                 <div class="br-details clickOnProduct" id="<%=buyerData[i].id %>">
+                                    <div class="bid-images"><img src="<%=buyerData[i].product_image %>" alt="images" class="img-fluid"></div>
+                                    <div class="bid-info">
+                                       <div class="bd-title"><%=buyerData[i].product_details.name %></div>
+                                       <div class="bd-price">
+                                          <span><i class="fa fa-inr" aria-hidden="true"></i></span>
+                                          <%=buyerData[i].product_details.price %>
+                                       </div>
+                                       <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i> <%=buyerData[i].product_details.offer_price %></div>
+                                       <div class="bidding-box">
+                                          <div class="highlight-title">Bid Price</div>
+                                          <div class="bidding-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%= buyerData[i].currentOffer.price%></div>
+                                       </div>
                                     </div>
                                  </div>
-                              </div>
+                              <% } %>
                            <% } %>
 
                            <h6 class="buyer-heading">Seller</h6>

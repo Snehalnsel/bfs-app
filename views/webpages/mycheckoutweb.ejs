@@ -58,7 +58,7 @@
                       </div>
                </label>
              </div>
-             <%if(addressUserList.length > 0){%>
+             <%//if(addressUserList.length == ''){%>
              <div class="address-form-open" style="display:none;">
                <form action="/api/user-new-checkout-address" method="POST">
                    <div class="form-box">
@@ -96,7 +96,7 @@
                  </div>
                 </form>
              </div>
-             <%}%>
+             <% //}%>
               <div class="userOrderDetails" id="userOrderDetails">
                 <input type="hidden" id="user_id" name="user_id" value="<%=user.userId%>">
                 <input type="hidden" id="seller_id" name="seller_id" value="<%=respdata.seller_id%>">
@@ -119,7 +119,7 @@
                  <tbody>
                    <tr> 
                        <td>Price <small>(1 items)</small></td>
-                       <th><i class="fa fa-inr" aria-hidden="true"></i> <%=product_price%></th> 
+                       <th><i class="fa fa-inr" aria-hidden="true"></i><%=product_price%></th> 
                      </tr>
                      <tr>
                        <td>Packing & Handling Charges</td>
@@ -127,11 +127,11 @@
                      </tr>
                      <tr>
                        <td>GST<small>(18% Packing & Handling Charges)</small></td>
-                        <th><i class="fa fa-inr" aria-hidden="true"></i> <%=gst%></th> 
+                        <th><i class="fa fa-inr" aria-hidden="true"></i><%=gst%></th> 
                      </tr>
                      <tr class="border-top total-table">
                        <td><strong>Total Amount</strong></td>
-                       <th><i class="fa fa-inr" aria-hidden="true"></i>  <%=finalPrice%></th> 
+                       <th><i class="fa fa-inr" aria-hidden="true"></i><%=finalPrice%></th> 
                      </tr>
                  </tbody>
               </table> 
@@ -144,12 +144,11 @@
     </div>
  </section>
 
-
 <%- include('../../public/assets/include/newsletter'); %>
 <%- include('../../public/assets/include/footer'); %>
 
 <script>
-   // Get address type
+ 
     $(document).on('change','.addr_type',function(){
       if ($(this).is(":checked")) 
       {
@@ -158,7 +157,6 @@
       $('#addrType').val(txtVal);
    });
 
-   // Address hide show
    $(document).on('click','.address-hide-show',function(){
       $('.address-form-open').show();
       $('.check-out').prop('disabled', true);
@@ -171,7 +169,12 @@
       $('.check-out').prop('disabled', false);     
    }); 
 
-   // Placed Order
+   // let selectedCheckboxValue;
+
+   // $(document).on('change', '.checkbox-select', function () {
+   //    selectedCheckboxValue = $(this).val();
+   // });
+
    $(document).on("click", ".check-out", async function(e) {
       e.preventDefault();
       let formData = {
@@ -186,12 +189,14 @@
         addressBookId: $('#userAddressId').val()
       };
 
+    
+
     let addToCartreCookieAccessToken = await getCookieFunc(accessTokenVar);
     let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
     await userReLogin(addToCartreCookieAccessToken, addToCartreCookieRefreshToken);
     $.ajax({
         type: 'POST',
-        url: '/api/placed-order', // URL to submit the form data to (process.php in this case)
+        url: '/api/placed-order', 
         data: { data: formData },
         dataType: "json",
         success: function(response) {
@@ -212,4 +217,5 @@
         }
       });
    });  
+
 </script>

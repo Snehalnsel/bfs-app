@@ -286,7 +286,9 @@ router.get("/body-focus-status/:id",cors(),BodyFocusController.statusData);
 
 //SUB CATEGORY APIS
 
-router.get("/body-focus-subcat", cors(), BodyFocusController.getSubcatData);
+router.get("/body-focus-subcat/:page", cors(), BodyFocusController.getSubcatData);
+
+router.get("/sreach-subcat/:query/:page", cors(), BodyFocusController.getSubcatDataBySearches);
 
 router.get("/edit-sub-cat/:id", cors(), BodyFocusController.editSubCatData);
 
@@ -297,8 +299,6 @@ router.post(
   upload.single('image'),
   BodyFocusController.updateSubCatData
 );
-
-
 
 router.get(
   "/delete-body-focus/:id",

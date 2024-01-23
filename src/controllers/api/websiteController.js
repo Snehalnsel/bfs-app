@@ -51,6 +51,7 @@ const Ordertracking = require("../../models/api/ordertrackModel");
 const Shippingkit = require("../../models/api/shippingkitModel");
 //const Ordertracking = require("../../models/api/ordertrackModel");
 const Track = require("../../models/api/trackingModel");
+const { log } = require("console");
 
 
 
@@ -163,13 +164,11 @@ exports.productData = async function (req, res, next) {
 
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const productId = req.params.id;
-    let query = {};
-    //if (req.body.product_id) {
-    query._id = productId;
-    //}
     console.log(productId);
-    console.log("hello");
-    console.log(isLoggedIn);
+    let query = {};
+
+    query._id = productId;
+
     let isProductInWishlist = "";
     if (isLoggedIn) {
       isProductInWishlist = await Wishlist.findOne({
@@ -179,21 +178,74 @@ exports.productData = async function (req, res, next) {
       console.log("product");
     }
 
-    const userproducts = await Userproduct.findById(query)
+    const categoydetails = await Userproduct.findById(query)
+      .populate('category_id', 'name')
+      .exec();
+
+      const userproducts = await Userproduct.findOne({
+        _id: productId,
+        approval_status: 1
+      })
       .populate('brand_id', 'name')
       .populate('category_id', 'name')
       .populate('user_id', 'name')
       .populate('size_id', 'name')
       .exec();
 
+      console.log(userproducts);
+      console.log("product ------");
 
+      const userproducts1 = await Userproduct.find({ 
+        category_id: categoydetails.category_id , 
+        approval_status: 1
+      })
+        .populate('brand_id', 'name')
+        .populate('category_id', 'name')
+        .populate('user_id', 'name')
+        .populate('size_id', 'name')
+        .exec();
+  
+        let formattedUserProducts1 = [];
+  
+        if (userproducts1) {
+            
+            for (const userproduct1 of userproducts1) {
+              const productImages1 = await Productimage.find({ product_id: userproduct1._id });
+        
+              const formattedUserProduct1 = {
+                _id: userproduct1._id,
+                name: userproduct1.name,
+                description: userproduct1.description,
+                price: userproduct1.price,
+                offer_price: userproduct1.offer_price,
+                percentage: userproduct1.percentage,
+                status: userproduct1.status,
+                flag: userproduct1.flag,
+                approval_status: userproduct1.approval_status,
+                added_dtime: userproduct1.added_dtime,
+                __v: userproduct1.__v,
+                product_images: productImages1,
+              };
+        
+              formattedUserProducts1.push(formattedUserProduct1);
+            }
+        }  
+    
+   
 
     if (!userproducts) {
-      return res.status(404).json({
-        status: "0",
-        message: "Not found!",
-        respdata: [],
+  
+      return res.render("webpages/productdetails", {
+        title: "Not Found",
+        message: "The requested product was not found.",
+        websiteUrl: process.env.SITE_URL,
+        isLoggedIn: isLoggedIn,
+        respdata: {},
+        category : categoydetails.category_id,
+        relatedProducts: formattedUserProducts1,
+        isWhislist: isProductInWishlist != null && Object.keys(isProductInWishlist).length ? true : false
       });
+
     }
 
     userproducts.hitCount = (userproducts.hitCount || 0) + 1;
@@ -226,55 +278,13 @@ exports.productData = async function (req, res, next) {
     };
 
 
-
-    const userproducts1 = await Userproduct.find({ category_id: formattedUserProduct.category_id })
-      .populate('brand_id', 'name')
-      .populate('category_id', 'name')
-      .populate('user_id', 'name')
-      .populate('size_id', 'name')
-      .exec();
-
-    if (!userproducts1 || userproducts1.length === 0) {
-      return res.status(404).json({
-        status: "0",
-        message: "Not found!",
-        respdata: [],
-      });
-    }
-
-    const formattedUserProducts1 = [];
-    for (const userproduct1 of userproducts1) {
-      const productImages1 = await Productimage.find({ product_id: userproduct1._id });
-
-      const formattedUserProduct1 = {
-        _id: userproduct1._id,
-        name: userproduct1.name,
-        description: userproduct1.description,
-        //category: userproduct1.category_id.name, 
-        // brand: userproduct1.brand_id.name, 
-        // user_id: userproduct1.user_id._id,
-        // user_name: userproduct1.user_id.name,
-        // size_id: userproduct1.size_id.name,
-        price: userproduct1.price,
-        offer_price: userproduct1.offer_price,
-        percentage: userproduct1.percentage,
-        status: userproduct1.status,
-        flag: userproduct1.flag,
-        approval_status: userproduct1.approval_status,
-        added_dtime: userproduct1.added_dtime,
-        __v: userproduct1.__v,
-        product_images: productImages1,
-      };
-
-      formattedUserProducts1.push(formattedUserProduct1);
-    }
-console.log('CHECK');
-console.log(formattedUserProduct);
+    
     res.render("webpages/productdetails", {
-      title: "Dashboard",
-      message: "Welcome to the Dashboard page!",
+      title: "Product Details",
+      message: "Welcome to the Product page!",
       respdata: formattedUserProduct,
       relatedProducts: formattedUserProducts1,
+      category : categoydetails.category_id,
       websiteUrl:process.env.SITE_URL,
       isLoggedIn: isLoggedIn,
       isWhislist: isProductInWishlist != null && Object.keys(isProductInWishlist).length ? true : false
@@ -346,9 +356,72 @@ exports.registration = async function (req, res, next) {
   }
 };
 
+// exports.signin = async function (req, res, next) {
+//   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+//   const errors = validationResult(req);
+//   if (!errors.isEmpty()) {
+//     return res.status(400).json({
+//       status: "0",
+//       message: "Validation error!",
+//       respdata: errors.array(),
+//     });
+//   }
+
+//   bcrypt.hash(req.body.password, rounds, (error, hash) => {
+//     if (error) {
+//       res.status(400).json({
+//         status: "0",
+//         message: "Error!",
+//         respdata: error,
+//       });
+//     }
+//     else {
+
+//       Users.findOne({ email: req.body.email }).then((user) => {
+//         if (!user) {
+//           const newUser = Users({
+//             email: req.body.email,
+//             password: hash,
+//             token: "na",
+//             //title: req.body.title,
+//             name: req.body.name,
+//             phone_no: req.body.phone_no,
+//             deviceid: "na",
+//             devicename: "na",
+//             fcm_token: "na",
+//             country: "na",
+//             country_code: "na",
+//             country: "na",
+//             last_login: "na",
+//             last_logout: "na",
+//             created_dtime: dateTime,
+//             app_user_id: "na",
+//             trial_end_date: "na",
+//             image: "na",
+//           });
+
+//           newUser.save();
+//           //res.redirect('/api/home');
+//           await exports.ajaxGetUserLogin(req, res, next, req.body.email, req.body.password);
+//         }
+//         else {
+//           // res.status(400).json({
+//           //   status: "0",
+//           //   message: "User already exists!",
+//           //   respdata: {},
+//           // });
+
+//           res.redirect('/api/registration?userExists=true');
+//         }
+//       });
+//     }
+//   });
+// };
+
 exports.signin = async function (req, res, next) {
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   const errors = validationResult(req);
+  
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
@@ -357,17 +430,17 @@ exports.signin = async function (req, res, next) {
     });
   }
 
-  bcrypt.hash(req.body.password, rounds, (error, hash) => {
-    if (error) {
-      res.status(400).json({
-        status: "0",
-        message: "Error!",
-        respdata: error,
-      });
-    }
-    else {
+  try {
+    bcrypt.hash(req.body.password, rounds, async (error, hash) => {
+      if (error) {
+        res.status(400).json({
+          status: "0",
+          message: "Error!",
+          respdata: error,
+        });
+      } else {
+        const user = await Users.findOne({ email: req.body.email });
 
-      Users.findOne({ email: req.body.email }).then((user) => {
         if (!user) {
           const newUser = Users({
             email: req.body.email,
@@ -390,20 +463,57 @@ exports.signin = async function (req, res, next) {
             image: "na",
           });
 
-          newUser.save();
-          res.redirect('/api/home');
-        }
-        else {
-          res.status(400).json({
-            status: "0",
-            message: "User already exists!",
-            respdata: {},
+          await newUser.save();
+
+          const user = await Users.findOne({ email: req.body.email });
+          
+          const userToken = {
+            userId: user._id,
+            email: user.email,
+            password: user.password,
+            title: user.title,
+            name: user.name,
+            age: user.age,
+            image: user.image ? user.image:'',
+            //usertoken:user.token,
+            phone_no: user.phone_no,
+            weight: user.weight,
+            height: user.height,
+            country: user.country,
+            country_code: user.country_code,
+            country: user.country,
+            goal: user.goal,
+            hear_from: user.hear_from,
+          };
+      
+          const { accessToken, refreshToken } = await generateTokens(userToken, "");
+          return res.status(200).json({
+            status: "success",
+            message: "Successfully Registered!",
+            respdata: {
+              accessToken: accessToken,
+              accessTokenExpires: process.env.COOCKIE_ACCESS_TOKEN_EXPIRES_IN,
+              refreshToken: refreshToken,
+              refreshTokenExpires: process.env.COOCKIE_REFRESH_TOKEN_EXPIRES_IN,
+              refreshReset: true,
+            },
           });
+        } else {
+          res.redirect('/api/registration?userExists=true');
         }
-      });
-    }
-  });
+      }
+    });
+  } catch (error) {
+    console.error("An error occurred:", error);
+    res.status(500).json({
+      status: "0",
+      message: "Internal Server Error",
+      respdata: error.message || "Unknown error",
+    });
+  }
 };
+
+
 
 exports.ajaxGetUserLogin = async function (req, res, next) {
   const errors = validationResult(req);
@@ -414,92 +524,16 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   const { email, password, cookieAccessToken, cookieRefreshToken } = req.body;
   //Token generate
   let accessTokenGlobal = "";
   let refreshTokenGlobal = "";
-  /*await Users.findOne({ email }).then(async (user) => {
-    const userToken = {
-      userId: user._id,
-      email: user.email,
-      password: user.password,
-      title: user.title,
-      name: user.name,
-      age: user.age,
-      //usertoken:user.token,
-      phone_no:user.phone_no,
-      weight: user.weight,
-      height: user.height,
-      country: user.country,
-      country_code: user.country_code,
-      country: user.country,
-      goal: user.goal,
-      hear_from: user.hear_from,
-    };
-    if(cookieRefreshToken != "") {
-      //Access token validate
-      let getAccessTokenData = await tokenDecode(cookieAccessToken, process.env.ACCESS_TOKEN_PRIVATE_KEY);
-      if(!getAccessTokenData.error) {
-        if((typeof req.session.user != "undefined") && (req.session.user.userId.toString() == getAccessTokenData.tokenDetails.userId.toString())) {
-          //Do Nothing....
-          //console.log("session matched with current data");
-          res.status(200).json({
-            status: "success",
-            refreshReset:false,
-            message:"Already logged In!!"
-          });
-        } else {
-          let getRefreshTokenData = await tokenDecode(cookieRefreshToken, process.env.REFRESH_TOKEN_PRIVATE_KEY);
-          if(!getRefreshTokenData.error) {
-            if(getRefreshTokenData.tokenDetails.exp > (Date.now() / 1000)){
-              //generate access token only
-              const { accessToken, refreshToken } = await generateTokens(userToken, cookieRefreshToken);
-              accessTokenGlobal = accessToken;
-              refreshTokenGlobal = refreshToken;
-            } else {
-              //generate refresh token
-              const { accessToken, refreshToken } = await generateTokens(userToken, "");
-              accessTokenGlobal = accessToken;
-              refreshTokenGlobal = refreshToken;
-            }
-            //user data stored in session
-            req.session.user = userToken;
-            res.status(200).json({
-              status: "success",
-              refreshReset:true,
-              accessToken: accessTokenGlobal,
-              refreshToken:refreshTokenGlobal
-            });
-          } else {
-            //Do something while you will get error in refresh token
-            res.status(200).json({
-              status: "error",
-              refreshReset:false,
-              message: "Error while generating your token!"
-            });
-          }
-        }
-      } else {
-        //Do something while you will get error in access token
-        res.status(200).json({
-          status: "error",
-          refreshReset:false,
-          message: "Error while generating your token!"
-        });
-      }
-    } else {
-      //User is logging for the first time
-      const { accessToken, refreshToken } = await generateTokens(userToken, "");
-      res.status(200).json({
-        status: "success",
-        refreshReset:true,
-        accessToken: accessToken,
-        refreshToken:refreshToken
-      });
-    }
-  });*/
-  Users.findOne({ email }).then(async (user) => {
+  Users.findOne({
+    $or: [
+      { email: email },
+      { phone_no: email }
+    ]
+  }).then(async (user) => {
     if (!user)
       res.status(404).json({
         status: "error",
@@ -771,7 +805,7 @@ exports.userRelogin = async function (req, res, next) {
 };
 
 exports.userFilter = async function (req, res, next) {
-  let { brandList, sizeList, conditionList, priceList, optionId } = req.body;
+  let { brandList, sizeList, conditionList, priceList, optionId,productcategoryId } = req.body;
   if (typeof optionId != "undefined") {
     if ((optionId == 0)) {
       optionId = 1;
@@ -796,37 +830,31 @@ exports.userFilter = async function (req, res, next) {
       concatVar["size"] = { "$in": sizeList };
     }
   //}
+  if (typeof productcategoryId != "undefined") {
+    concatVar["category_id"] = { "$in": mongoose.Types.ObjectId(productcategoryId) };
+  }
   if ((typeof conditionList != "undefined") && (objConditionList.length > 0)) {
     concatVar["status"] = { "$in": objConditionList };
   }
-
-  /*if (typeof priceList != "undefined") {
-    if (priceList.length > 0) {
-      priceList.forEach(function (item) {
-        var priceArr = item.split("-");
-        concatVar["offer_price"] = { "$gt": priceArr[0] };
-        concatVar["offer_price"] = { "$lte": priceArr[1] };
-      });
-    }
-  }
-  let allProductData = await Userproduct.find({ $and: [concatVar]}).sort({ offer_price: optionId });*/
-
   if (typeof priceList !== "undefined" && priceList.length > 0) {
-    priceList.forEach(function (item) {
-      concatVar["offer_price"] = {
-        "$gte": parseFloat(item[0].split("-")[0]),
-        "$lte": parseFloat(item[0].split("-")[1])
+    const priceConditions = priceList.map(item => {
+      const priceArr = item.split("-");
+      return {
+        offer_price: {
+          $gt: parseFloat(priceArr[0]),
+          $lte: parseFloat(priceArr[1])
+        }
       };
     });
+  
+    concatVar['$or'] = priceConditions;
   }
   
+
   let allProductData = await Userproduct.find({ $and: [concatVar]}).sort({ offer_price: optionId });
-
-  //  console.log('#######################################');
-  //  console.log(allProductData);
-  //  console.log('#######################################');  
-   //return false;
-
+ 
+  //let allProductData = await Userproduct.find(concatVar).sort({ offer_price: optionId });  
+ 
   const formattedUserProducts = [];
   for (const userproduct of allProductData) {
 
@@ -1256,7 +1284,7 @@ async function getProductDataWithSort(id, sortid) {
     if (id === "whatshot") {
        userproducts = await Userproduct.find({
         approval_status: 1,
-        flag: 1
+        flag: 0
     })
         .populate('brand_id', 'name')
         .populate('category_id', 'name')
@@ -1302,7 +1330,11 @@ async function getProductDataWithSort(id, sortid) {
     } else {
       categoryId = id; 
 
-       userproducts = await Userproduct.find({ category_id: id })
+       userproducts = await Userproduct.find({ 
+        category_id: id,
+        approval_status: 1,
+        flag: 0 
+      })
       .populate('brand_id', 'name')
       .populate('category_id', 'name')
       .populate('user_id', 'name')
@@ -1571,11 +1603,10 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
 };
 
 
-
-
 exports.userAddressAdd = async function (req, res, next) {
   try {
     
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const addr_name = req.body.addrType;
     //const address = await addressBook.findOne({ _id: req.params.id });
     const errors = validationResult(req);
@@ -1740,7 +1771,6 @@ exports.userWisePost = async function (req, res, next) {
 exports.addPostView = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-    //console.log('Add User Post');
 
     if (isLoggedIn == "") {
       res.redirect("/api/registration");
@@ -1784,15 +1814,15 @@ exports.addNewPost = async function (req, res, next) {
 
   try {
 
-    const existingProduct = await Userproduct.findOne({ name: req.body.name });
+    // const existingProduct = await Userproduct.findOne({ name: req.body.name });
 
-    if (existingProduct) {
-      return res.status(404).json({
-        status: "0",
-        message: "Product already exists!",
-        respdata: {},
-      });
-    }
+    // if (existingProduct) {
+    //   return res.status(404).json({
+    //     status: "0",
+    //     message: "Product already exists!",
+    //     respdata: {},
+    //   });
+    // }
 
     let invoice;
     let packaging;
@@ -1859,12 +1889,6 @@ exports.addNewPost = async function (req, res, next) {
         console.log(savedImage);
       });
 
-      // res.status(200).json({
-      //   status: "1",
-      //   status: "1",
-      //   message: "Product and images added!",
-      //   respdata: savedProductdata
-      // });
     }
     res.redirect('/api/my-account');
 
@@ -2070,8 +2094,9 @@ exports.addToWishlistWeb = async function (req, res, next) {
 exports.viewWishListByUserId = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-    if (!req.session.user) {
-      return res.redirect("/api/registration");
+
+    if (isLoggedIn == "") {
+      res.redirect("/api/registration");
     }
 
     const user_id = req.session.user.userId;
@@ -2145,6 +2170,8 @@ exports.removeWishlistWeb = async (req, res) => {
     const user_id = req.session.user.userId;
     const existingList = await Wishlist.findOne({ user_id, product_id });
 
+    console.log(existingList);
+    console.log(existingList);
     if (Object.keys(existingList).length == 0) {
       return res.status(404).json({
         message: 'Product is not found in the Wishlist',
@@ -2229,7 +2256,7 @@ exports.addToCart = async function (req, res, next) {
 
 
       setTimeout(() => {
-        removeItemAfterTime(existingCart._id); // savedata._id contains the ID of the added item
+        removeItemAfterTime(existingCart._id); 
       }, 20 * 60 * 1000);
 
       return res.status(200).json({
@@ -2553,8 +2580,12 @@ exports.checkoutWeb = async function (req, res, next) {
           })
           .exec();
 
-          // Address check
-        const addressUserList = await addressBook.find({user_id: user_id });
+        // const addressUserList = await addressBook.find({user_id: user_id });
+
+        const addressUserList = await addressBook.find({
+            user_id: user_id,
+            default_status: 0
+        });
 
         const user = await Users.findById(existingCart.user_id);
         if (!user) {
@@ -2600,9 +2631,7 @@ exports.checkoutWeb = async function (req, res, next) {
           
   
         }));
-
   }
-
   }
   catch (error) {
     console.error(error);
@@ -2640,8 +2669,8 @@ exports.myOrderWeb = async (req, res) => {
 exports.myOrderDetailsWeb = async (req, res) => {
   try {
     
-    const orderlistId = req.params.id; //659fdcdf6b87dfc8438b551e
-    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : ""; //65646d41e7e0d7d6d594d920
+    const orderlistId = req.params.id; 
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : ""; 
     
     if (!orderlistId) {
       return res.status(400).json({ message: 'Order ID is missing in the request' });
@@ -2696,10 +2725,23 @@ exports.myOrderDetailsWeb = async (req, res) => {
   //       shiprocketResponsefortracking = await trackbyaorderid(trackDetails.shiprocket_order_id);
   //     }
   // }
-    const sellerAddress = await addressBook.findOne({ user_id: order.seller_id });
-    const buyerAddress = await addressBook.findOne({ user_id: order.user_id });
+    const sellerAddress = await addressBook.findOne({ _id: order.billing_address_id});
+    const buyerAddress = await addressBook.findOne({ _id: order.shipping_address_id });
 
     const shippingKitData = await Shippingkit.findOne({ order_id: order._id });
+
+    let shippingkit_details;
+
+    let shipping_user_details;
+
+    if(shippingKitData)
+    {
+       shippingkit_details = await addressBook.findById({ _id: shippingKitData.shipping_address_id });
+
+       shipping_user_details = await Users.findById({ _id: shippingKitData.buyer_id });
+    }
+
+    console.log(shippingkit_details);
 
     const orderDetails = {
       _id: order._id,
@@ -2715,7 +2757,7 @@ exports.myOrderDetailsWeb = async (req, res) => {
       user: {
         _id: order.user_id._id,
         name: order.user_id.name,
-        phone_no: req.session.user.phone_no,
+        phone_no: req.session.user.phone_no ? req.session.user.phone_no : '',
       },
       selleraddress: sellerAddress ? sellerAddress : 'No Buyer Address Found',
       product: {
@@ -2723,6 +2765,9 @@ exports.myOrderDetailsWeb = async (req, res) => {
         offer_price : productDetails ? productDetails.offer_price : 'Unknown Product',
         image: productImage ? productImage.image : 'No Image',
       },
+      shippingKitData :shippingKitData || null,
+      shippingkit_details : shippingkit_details || null,
+      shipping_user_details :shipping_user_details || null
     };
     //return false;
     res.render("webpages/myorderdetails",{
@@ -3128,21 +3173,30 @@ exports.userPlacedOrder = async function (req, res) {
      let discount = '0';
      let pickup_status = '0';
      let delivery_status = '0';
+     let shipping_address_id = req.body.data.addressBookId;
 
-    // Get Shipping Address id 
-    const shippingaddress = await addressBook.findOne({ user_id: seller_id });
-    if (!shippingaddress) {
-      return res.status(404).json({ message: 'Shipping address not found' });
-    }
-    const shipping_address_id = shippingaddress._id;
+    //Get Shipping Address id 
+    // const shippingaddress = await addressBook.findOne({ user_id: seller_id });
+    // if (!shippingaddress) {
+    //   return res.status(404).json({ message: 'Shipping address not found' });
+    // }
+    // const shipping_address_id = shippingaddress._id;
 
     // Get Billing Address id
-    const productdetails = await Userproduct.findById(product_id);
-    if (!productdetails) {
-      return res.status(404).json({ message: 'Billing address not found' });
+    // const productdetails = await Userproduct.findById(product_id);
+    // if (!productdetails) {
+    //   return res.status(404).json({ message: 'Billing address not found' });
+    // }
+    // const billing_address_id = productdetails.user_id;
+    // console.log(billing_address_id);
+
+    const billingaddress = await addressBook.findOne({ user_id: seller_id });
+
+    if (!billingaddress) {
+      return res.status(404).json({ message: 'Seller address not found' });
     }
-    const billing_address_id = productdetails.user_id;
-    console.log(billing_address_id);
+
+    const billing_address_id = billingaddress._id;
 
     const now = new Date();
     const currentHour = now.getHours().toString().padStart(2, '0');
@@ -3193,6 +3247,36 @@ exports.userPlacedOrder = async function (req, res) {
         else console.log(info);
       });
 
+      // const deleteCart;
+      //Delete Cart while place order
+
+        const existingCart = await Cart.findOne({ user_id, status: 0 });
+    
+        if (!existingCart) {
+          return res.status(404).json({
+            message: 'Cart not found',
+          });
+        }
+    
+        const cartDetail = await CartDetail.findOne({
+          cart_id: existingCart._id,
+          product_id,
+          status: 0,
+        });
+    
+        /*if (!cartDetail) {
+          return res.status(404).json({
+            message: 'Product not found in cart',
+          });
+        }*/
+        await cartDetail.remove();
+    
+        const cartDetailsCount = await CartDetail.countDocuments({ cart_id: existingCart._id });
+    
+        if (cartDetailsCount === 0) {
+          await existingCart.remove();
+        }
+      //Delete Cart while place order
       const updatedProduct = await Userproduct.findOneAndUpdate(
         { _id: product_id },
         { $set: { flag: 1 } },
@@ -3368,6 +3452,96 @@ exports.sendotp = async function (req, res, next) {
           respdata: {},
         });
       }
+    }
+  });
+};
+
+exports.changePassword = async function (req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: "0",
+      message: "Validation error!",
+      respdata: errors.array(),
+    });
+  }
+
+  const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+  Users.findOne({ _id: userId }).then((user) => {
+    if (!user)
+      res.status(200).json({
+        status: "0",
+        message: "User not found!",
+        respdata: {},
+        is_passwordchnage: "false"
+      });
+    else { 
+     bcrypt.compare(req.body.old_password, user.password, (error, match) => {
+        if (error) {
+          res.status(200).json({
+            status: "0",
+            message: "Old password does not match!!",
+            respdata: error,
+            is_passwordchnage: "false"
+          });
+        } else if (match) {
+          bcrypt.compare(
+            req.body.new_password,
+            user.password,
+            (error, match) => {
+              if (error) {
+                res.status(200).json({
+                  status: "0",
+                  message: "Error!",
+                  respdata: {},
+                  is_passwordchnage: "false"
+                });
+              } else if (!match) {
+                bcrypt.hash(req.body.new_password, rounds, (error, hash) => {
+                  var updData = {
+                    password: hash,
+                  };
+                  Users.findOneAndUpdate(
+                    { _id: req.body.user_id },
+                    { $set: updData },
+                    { upsert: true },
+                    function (err, doc) {
+                      if (err) {
+                        throw err;
+                      } else {
+                        Users.findOne({ _id: req.body.user_id }).then(
+                          (user) => {
+                            res.status(200).json({
+                              status: "1",
+                              message: "Successfully updated!",
+                              respdata: user,
+                              is_passwordchnage: "true"
+                            });
+                          }
+                        );
+                      }
+                    }
+                  );
+                });
+              } else {
+                res.status(200).json({
+                  status: "0",
+                  message: "New password cannot be same as your Old password!",
+                  respdata: {},
+                  is_passwordchnage: "false"
+                });
+              }
+            }
+          );
+        } else {
+          res.status(200).json({
+            status: "0",
+            message: "Old password does not match!",
+            respdata: {},
+            is_passwordchnage: "false"
+          });
+        }
+      });
     }
   });
 };

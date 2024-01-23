@@ -13,6 +13,7 @@ async function searchByFilter() {
     let conditionList = [];
     let priceList = [];
     let optionId = $("#sortBy").val();
+    let productcategoryId = $("#product_category_id").val();
     //get all selected brand name
     $(".searchByBrand:checked").each(function() {
         brandList.push($(this).data("id"));
@@ -37,7 +38,8 @@ async function searchByFilter() {
             sizeList:sizeList,
             conditionList:conditionList,
             priceList:priceList,
-            optionId:optionId
+            optionId:optionId,
+            productcategoryId:productcategoryId
         },
         success: async function(obj){
             let error_success = obj.status;

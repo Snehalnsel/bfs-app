@@ -799,6 +799,7 @@ exports.userFilter = async function (req, res, next) {
   if ((typeof conditionList != "undefined") && (objConditionList.length > 0)) {
     concatVar["status"] = { "$in": objConditionList };
   }
+
   /*if (typeof priceList != "undefined") {
     if (priceList.length > 0) {
       priceList.forEach(function (item) {
@@ -808,20 +809,24 @@ exports.userFilter = async function (req, res, next) {
       });
     }
   }
-  let allProductData = await Userproduct.find({ $and: [concatVar]},{from:{$gte:concatVar["offer_price"]}, to:{$lt:concatVar["offer_price"]}}).sort({ offer_price: optionId });
-*/
-  console.log('#######################################');
-   console.log(allProductData);
-   console.log('#######################################');
+  let allProductData = await Userproduct.find({ $and: [concatVar]}).sort({ offer_price: optionId });*/
+
+  if (typeof priceList !== "undefined" && priceList.length > 0) {
+    priceList.forEach(function (item) {
+      concatVar["offer_price"] = {
+        "$gte": parseFloat(item[0].split("-")[0]),
+        "$lte": parseFloat(item[0].split("-")[1])
+      };
+    });
+  }
   
-  //let allProductData = await Userproduct.find(concatVar).sort({ offer_price: optionId });
-   
-  //  console.log('*****************************************');
+  let allProductData = await Userproduct.find({ $and: [concatVar]}).sort({ offer_price: optionId });
+
+  //  console.log('#######################################');
   //  console.log(allProductData);
-  //  console.log('*****************************************');
-   return false;
-  
- 
+  //  console.log('#######################################');  
+   //return false;
+
   const formattedUserProducts = [];
   for (const userproduct of allProductData) {
 

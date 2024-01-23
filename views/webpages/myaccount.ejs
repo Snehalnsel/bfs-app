@@ -154,31 +154,31 @@
              
           </div> 
  
-          <div class="dashboard-infobox mt-50">
+          <div class="dashboard-infobox mt-50" >
              <div class="dashboard-title-arrow mb-25">
-                <h4 class="di-title mr-25">Change Password</h4>              
+                <h4 class="di-title mr-25" id="changePasswordLink">Change Password <i class="fa fa-angle-down" style="font-size:24px"></i> </h4>              
              </div>
              
  
-             <div class="dsh-shortbox">
-                 <form>
+             <div class="dsh-shortbox" id="changePasswordForm" style="display: none;">
+                 <form id="resetpasswordfrom">
                    <div class="div-row">
                       <div class="div-12">
                          <label>Enter Old Password:</label>
-                         <input type="Password" name="" class="ds-form-control">
+                         <input type="Password" name="oldpassword" class="ds-form-control oldpassword">
                       </div>
  
                       <div class="div-12">
                          <label>Enter New Password:</label>
-                         <input type="Password" name="" class="ds-form-control">
+                         <input type="Password" name="newpassword" id="newpassword" class="ds-form-control newpassword">
                       </div>
  
                       <div class="div-12">
                          <label>Confirm New Password:</label>
-                         <input type="Password" name="" class="ds-form-control">
+                         <input type="Password" name="cnewpassword" id="cnewpassword" class="ds-form-control cnewpassword">
                       </div>
                       <div class="div-12">
-                         <input type="submit" name="" class="ds-form-control" value="Save">
+                         <input type="submit" name="resetpassord" class="ds-form-control" value="Save">
                       </div>
                    </div>
                 </form>
@@ -193,3 +193,4 @@
    <%- include('../../public/assets/include/newsletter'); %>
       <%- include('../../public/assets/include/footer'); %>
 </body>
+<script src="/public/assets/js/myaccount.js"></script>

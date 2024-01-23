@@ -78,6 +78,7 @@
    </div>
    <%- include('../../public/assets/include/newsletter'); %>
    <%- include('../../public/assets/include/footer'); %>
+   
       </body>
 
       <script>
@@ -137,7 +138,7 @@
          function populateSellerHtml(data) {
             data.orders.forEach(item => {
 
-               var hTml = `<div class="cart-list wishlist-list">
+               var hTml = `<div class="cart-list wishlist-list" data-orderid="${item._id}">
     <div class="bids-row wishlist-row order-list">
         <div class="br-details">
             <div class="bid-images"><img src="${item.product.image}" alt="images" class="img-fluid"></div>
@@ -164,7 +165,7 @@
                      <a href="/api/web-myorder-details/${item._id}"><i class="fa fa-info-circle"></i></a>  
                    </div>
                    <div class="remove-cart">
-                     <a href=""><i class="fa fa-trash-o"></i></a>  
+                     <a href="javascript:void(0)" id="erase" class ="remove-order"><i class="fa fa-trash-o"></i></a>  
                    </div>               
                
                 </div>
@@ -177,9 +178,6 @@
          }
          $(document).on('click', '.buy-shipping-kit', function () {
             var orderId = $(this).data('orderid');
-            // var existingUrl = "/api/get-shipmentkitweb/";
-            // var finalUrl = existingUrl + orderId;
-            // $(".short-modal .buy-modal a.acb-btn").attr("href", finalUrl);
             $(".short-modal .buy-modal a.acb-btn").attr("data-orderid", orderId);
             $(".cg-row").attr("id", orderId);
             $('#short-modal').modal('show');
@@ -215,5 +213,6 @@
                   }
             });
          });
-
       </script>
+
+      <script src="/public/assets/js/order.js"></script>

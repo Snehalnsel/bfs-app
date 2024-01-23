@@ -3,7 +3,7 @@ $(document).ready(function(){
         let searchBy = $(".search_by").val();
         if(searchBy != "") {
             $.ajax({
-                url: '/api/search-by-keyword', // Request to get the search result
+                url: '/api/search-by-keyword',
                 data: {searchBy:searchBy},
                 method: 'POST',
                 success: function(data) {
@@ -12,7 +12,6 @@ $(document).ready(function(){
                         let html = ``;
                         for(let i = 0;i<allData.length;i++) {
                             html += `<li><a href="`+data.siteUrl+allData[i].link+`">`+allData[i].name+`</a></li>`;
-                            //console.log("html", allData[i].link);
                         }
                         $(".allSearchResult").html(html);
                     }

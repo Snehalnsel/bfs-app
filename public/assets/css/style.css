@@ -3428,3 +3428,7 @@ span.close-icon {
     color: #fff!important;
 }
 
+.required {
+    color: red; /* or any other color */
+    margin-left: 5px; /* adjust as needed */
+}

@@ -91,7 +91,7 @@
                       <div class="post-imagebox">
                          <div class="upload-post full-post-image">
                             <h6 class="add-image-heading">+Add Image</h6>
-                            <input type="file" name="image" id="imgInp" />
+                            <input type="file" name="image" id="imgInp" required />
                             <div class="alt_image"></div>
                          </div>
                          <div class="upload-post full-post-image">
@@ -117,8 +117,8 @@
                       </div>
                    </div> 
                       <div class="div-12">
-                         <label>Product Name</label>                        
-                          <input type="type" name="name" class="ds-form-control" placeholder="Product Name">
+                         <label>Product Name <span class="required">*</span></label>                        
+                          <input type="type" name="name" class="ds-form-control" placeholder="Product Name" required>
                       </div>
  
                       <div class="div-12">
@@ -127,34 +127,35 @@
                       </div>
  
                       <div class="div-6">
-                         <label>Product Category</label>
+                         <label>Product Category <span class="required">*</span></label>
                         <!-- <select class="ds-form-control" name="product_cate">-->
                         <!-- <option >Select Category</option>-->
                         <!-- <% //subcate.forEach(function(subcatitems){%>-->
                         <!--  <option value="<%//=subcatitems._id%>"><%//=subcatitems.name%></option>-->
                         <!--  <% //}); %>-->
                         <!--</select>-->
-                        <input type="type" name="product_cate" class="ds-form-control" placeholder="Enter Category">
+                        <input type="type" name="product_cate" class="ds-form-control" placeholder="Enter Category" required>
                       </div>
  
                       <div class="div-6">
-                         <label>Product Brand</label>
-                         <input type="type" name="brand" class="ds-form-control" placeholder="Enter Brand">
+                         <label>Product Brand <span class="required">*</span></label>
+                         <input type="type" name="brand" class="ds-form-control" placeholder="Enter Brand" required>
                       </div>
  
                       <div class="div-6">
-                         <label>Product Condition</label>
-                         <select class="ds-form-control" name="product_condition">
-                         <option >Select Condition</option>
-                         <% productcondition.forEach(function(item){%>
-                          <option value="<%=item._id%>"><%=item.name%></option>
-                         <% }); %>
+                        <label for="productCondition">Product Condition <span class="required">*</span></label>
+                        <select class="ds-form-control" name="product_condition" id="productCondition" required>
+                            <option value="" disabled selected>Select Condition</option>
+                            <% productcondition.forEach(function(item) { %>
+                                <option value="<%= item._id %>"><%= item.name %></option>
+                            <% }); %>
                         </select>
-                      </div>
+                    </div>
+                    
  
                       <div class="div-6">
-                         <label>Product Size</label>
-                         <input type="type" name="size" class="ds-form-control" placeholder="Product Size">
+                         <label>Product Size <span class="required">*</span></label>
+                         <input type="type" name="size" class="ds-form-control" placeholder="Product Size" required>
                       </div>
  
                       <div class="div-6">
@@ -195,13 +196,13 @@
                       </div>
                       
                       <div class="div-6">
-                         <label>Price</label>
-                        <input type="type" name="price" class="ds-form-control" placeholder="Price">
+                         <label>Price <span class="required">*</span></label>
+                        <input type="type" name="price" class="ds-form-control" placeholder="Price" required>
                       </div>
  
                       <div class="div-6">
-                         <label>Offer Price</label>
-                        <input type="type" name="offer_price" class="ds-form-control" placeholder="Offer Price">
+                         <label>Offer Price <span class="required">*</span></label>
+                        <input type="type" name="offer_price" class="ds-form-control" placeholder="Offer Price" required>
                       </div>
                       
                      
@@ -218,7 +219,7 @@
     </div>
  </section>
 
-<!-- <%- include('../../public/assets/include/newsletter'); %> -->
+<%- include('../../public/assets/include/newsletter'); %>
 <%- include('../../public/assets/include/footer'); %>
 </body>
 <script src="/public/assets/js/myaccount.js"></script>

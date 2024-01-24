@@ -8,7 +8,6 @@ const model = mongoose.Schema({
   },
   description: {
     type: String,
-    required: true,
   },
   category_id: {
     type: mongoose.Schema.Types.ObjectId,

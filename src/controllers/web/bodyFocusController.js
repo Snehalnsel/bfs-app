@@ -197,7 +197,7 @@ exports.getSubcatDataBySearches = async function (req, res, next) {
     // Search for subcategories
     const subcategories = await Category.find({ 
       parent_id: { $ne: '650444488501422c8bf24bdb' },
-      name: { $regex: new RegExp(`${query}`, 'i') } // Adding search criteria
+      name: { $regex: new RegExp(`${query}`, 'i') }
     })
     .skip(skip)
     .limit(item_per_page)
@@ -216,6 +216,7 @@ exports.getSubcatDataBySearches = async function (req, res, next) {
     }
 
     console.log(subcategoryList);
+    console.log("=================");
 
     return {
       siteName: req.app.locals.siteName,

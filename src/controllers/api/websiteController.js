@@ -1359,10 +1359,10 @@ async function getProductDataWithSort(id, sortid) {
         name: userproduct.name,
         description: userproduct.description,
         category: userproduct.category_id.name,
-        brand: userproduct.brand_id.name,
-        user_id: userproduct.user_id._id,
-        user_name: userproduct.user_id.name,
-        size_id: userproduct.size_id.name,
+        brand: userproduct.brand_id ? userproduct.brand_id.name : '',
+        user_id: userproduct.user_id?. _id || '', 
+        user_name: userproduct.user_id ? userproduct.user_id.name : '', // Check if user_id is not null
+        size_id: userproduct.size_id ? userproduct.size_id.name : '',
         price: userproduct.price,
         offer_price: userproduct.offer_price,
         percentage: userproduct.percentage,
@@ -1405,16 +1405,43 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
     const sortid = req.params.sortid || 0;
 
     const data = await getProductDataWithSort(id, sortid);
+
     const formattedUserProducts = data.respdata;
+    
     const productCount = formattedUserProducts.length;
 
     const categoryName = await Category.find({ _id: id}).populate('name');
     
     //Get All Filter Data
     //Brand List
-    const brandList = await brandModel.find({});
-    const sizeList = await sizeModel.find({});
-    const conditionList = await productconditionModel.find({});
+    // const brandList = await brandModel.find({});
+    // const sizeList = await sizeModel.find({});
+    // const conditionList = await productconditionModel.find({});
+  
+
+    const userProducts = await Userproduct.find({
+      category_id : id,
+      approval_status: 1,
+      flag: 0,
+    })
+    .select('brand_id size_id status');
+
+    console.log(userProducts);
+    
+    const brandIds = userProducts.map(product => product.brand_id).filter(Boolean);
+    const sizeIds = userProducts.map(product => product.size_id).filter(Boolean);
+    const statusIds = userProducts.map(product => product.status).filter(Boolean);
+    
+    const brandList = await brandModel.find({ _id: { $in: brandIds } });
+    const sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
+    const conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
+    
+    console.log('Brand List:', brandList);
+    console.log('Size List:', sizeList);
+    console.log('Condition List:', conditionList);
+    
+    
+    
 
 
     res.render("webpages/subcategoryproduct",

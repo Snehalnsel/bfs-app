@@ -1117,9 +1117,7 @@ exports.addAddress = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
-    console.log('**************** HI EDIT Address**************');
-    console.log(userData);
-    console.log("Edit Address");
+   
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -1131,11 +1129,6 @@ exports.addAddress = async function (req, res, next) {
 
     const address = await addressBook.findOne({ user_id: userData.userId });
     var add = address;
-
-    console.log('Address....');
-    console.log(address);
-
-
 
     res.render("webpages/edit-address", {
       title: "Edit Address",
@@ -1988,8 +1981,6 @@ exports.signOut = async function (req, res, next) {
 };
 
 
-
-// // User wise Post edit
 exports.editUserWisePost = async function (req, res, next) {
 
   try {
@@ -1999,10 +1990,6 @@ exports.editUserWisePost = async function (req, res, next) {
 
     const parentCategoryId = "650444488501422c8bf24bdb";
     const categoriesWithoutParentId = await Category.find({ parent_id: { $ne: parentCategoryId } });
-
-    //console.log('Product Category');
-    //console.log(categoriesWithoutParentId);
-
 
     const product = await Userproduct.findById(req.params.id);
 
@@ -2014,9 +2001,6 @@ exports.editUserWisePost = async function (req, res, next) {
       });
     }
 
-    //  console.log('Product');
-    //  console.log(product);
-
     const productImages = await Productimage.find({ product_id: req.params.id });
 
     const productDetails = {
@@ -2024,25 +2008,15 @@ exports.editUserWisePost = async function (req, res, next) {
       images: productImages,
     };
 
-    console.log('Formated_User_Products');
-    console.log(productDetails);
-
-
-    // if(formattedUserProducts)
-    // {
     res.render("webpages/editmypost", {
       title: "My Post",
       message: "Welcome to the My Post page!",
       respdata: productDetails,
-      //productimg: productImg, 
       userData: req.session.user,
       productcondition: productConditions,
       subcate: categoriesWithoutParentId,
       isLoggedIn: isLoggedIn,
     });
-    // }
-
-
 
   } catch (error) {
     console.error(error);

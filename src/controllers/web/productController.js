@@ -136,10 +136,7 @@ const upload = multer({ dest: 'public/images/' });
 exports.getData = function (req, res, next) {
   var pageName = "Product List";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-  
-  console.log('Hii User');
-  console.log(req.session.user);
-//return false;
+
   Userproduct.aggregate([
     {
       $lookup: {
@@ -237,8 +234,9 @@ exports.getData = function (req, res, next) {
       return res.status(500).json({ error: 'An error occurred' });
     }
 
-    console.log(productList);
-
+    // console.log("Hello Product********************");
+    // console.log(productList);
+    // return false;
     res.render("pages/product/list", {
       siteName: req.app.locals.siteName,
       pageName: pageName,

@@ -2109,6 +2109,10 @@
   .short-box {
       padding: 25px;
   }
+
+  .top-title .short-box {
+    padding: 5px;
+}
   
   .userimage-edit input#file {
       display: none;
@@ -2396,12 +2400,6 @@
 }
  .product_Slider .slick-prev:before {
     content: "\f104";
-}
-
-
-section.poster-wrapper .col-md-6 {
-    padding-left: 5px;
-    padding-right: 5px;
 }
 
 .product_Slider .slick-prev, .product_Slider .slick-next{
@@ -2716,8 +2714,9 @@ a.acb-btn {
 }
 
 .header-bottom .ctg_Slider  .slider-item {
-    min-width: 100px;
-    width: auto;
+    min-width: 65px;
+    width: auto !important;
+    padding: 0px 3px;
 }
 
 .product_Slider .slick-track {
@@ -3427,7 +3426,12 @@ span.close-icon {
     background: #e3683d!important;
     color: #fff!important;
 }
-
+.pdt-80{
+    padding-top: 80px;
+}
+.pdb-80{
+    padding-bottom: 80px;
+}
 .required {
     color: red; /* or any other color */
     margin-left: 5px; /* adjust as needed */

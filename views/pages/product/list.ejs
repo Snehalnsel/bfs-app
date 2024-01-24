@@ -106,11 +106,16 @@
                               </td>
                               <td>
                                 <%= value.size && value.size.length> 0 ? value.size[0].name : 'Size not found' %>
-                              </td>
-                              
+                              </td>  
+                              <% if(value.user){%>                            
                               <td>
-                                <%= value.user.name !='' ? value.user.name : 'User not found' %>
-                              </td>
+                                <%=value.user.name;%>
+                              </td> 
+                              <%} else{%>  
+                                <td>
+                                  User Not Found!
+                                </td>  
+                              <%}%>                        
                               <td>
                                 <%= value.productCondition && value.productCondition.length> 0 ? value.productCondition[0].name : 'Condition not found' %>
                               </td>

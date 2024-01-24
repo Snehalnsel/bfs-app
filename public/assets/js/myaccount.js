@@ -75,5 +75,22 @@ $(document).ready(async function(){
             });
         }
     });
+
+    //addPostForm
+    function readURL(input)
+    {       
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var previewHtml = '<img src="' + e.target.result + '" />';
+          $(input).siblings('.alt_image').html(previewHtml);
+          $(input).siblings('.add-image-heading').hide();
+        }
+            reader.readAsDataURL(input.files[0]);
+      }        
+    }
     
+    $(document).on('change','#imgInp',function(){
+        readURL(this);
+    });    
 });

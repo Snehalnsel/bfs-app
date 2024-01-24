@@ -149,8 +149,6 @@ exports.getSubcatDataBySearches = async function (req, res, next) {
         parent_id: { $ne: '650444488501422c8bf24bdb' },
         name:{'$regex' : `${sreach_product}`, '$options' : 'i'}
         })
-        .skip(skip)
-        .limit(item_per_page)
         .exec();
 
         for (const subcategory of subcategories) {
@@ -174,8 +172,6 @@ exports.getSubcatDataBySearches = async function (req, res, next) {
         parent_id: '650444488501422c8bf24bdb',
         name:{'$regex' : `${sreach_product}`, '$options' : 'i'}
       })
-      .skip(skip)
-      .limit(item_per_page)
       .exec();
 
       

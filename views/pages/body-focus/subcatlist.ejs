@@ -54,7 +54,7 @@
                                                     <th>Description</th>
                                                     <th>Category Type</th>
                                                     <th>Image</th>
-                                                    <th>Status</th>
+                                                    <!-- <th>Status</th> -->
                                                     <th>Created On</th>
                                                     <th>Action</th>
                                                 </tr>
@@ -81,13 +81,7 @@
                                                                 </td>
                                                                 <td><img src="<%= value.subcategory.image %>"
                                                                         style="height: 40px;"></td>
-                                                                <td>
-                                                                    <% if (value.status===0) { %>
-                                                                        <span style="color: blue;">Inactive</span>
-                                                                        <% } else if (value.status===1) { %>
-                                                                            <span style="color: green;">Active</span>
-                                                                            <% } %>
-                                                                </td>
+                                                       
                                                                 <td>
                                                                     <%= value.subcategory.added_dtime %>
                                                                 </td>

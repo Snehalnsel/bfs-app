@@ -3426,11 +3426,13 @@ span.close-icon {
     background: #e3683d!important;
     color: #fff!important;
 }
-
 .pdt-80{
     padding-top: 80px;
 }
 .pdb-80{
     padding-bottom: 80px;
 }
-
+.required {
+    color: red; /* or any other color */
+    margin-left: 5px; /* adjust as needed */
+}

@@ -54,122 +54,103 @@
              </div>
              
              <div class="dsh-shortbox">
-                 <%  console.log(respdata); %>
-                <form action="/api/updatepostdata" method="post" enctype="multipart/form-data">
-                    
+                <form action="/api/updatepostdata" method="post" enctype="multipart/form-data">                    
                    <div class="div-row">
-                   <div class="div-12">
-                      <div class="post-imagebox">
-                          <% respdata.images.forEach(function(img){%>
-                            <% console.log('Hello'); console.log(img.length); %>
-                         <div class="upload-post full-post-image">
-                            <h6>+Add Image</h6>
-                            <img src="<%=img.image%>">
-                            <input type="file" name="image" />
-                         </div>
-                         <!-- <div class="upload-post full-post-image">
-                            <h6>+Add Image</h6>
-                             <input type="file" name="image" />
-                             <img src="<%=img.image%>">
-                         </div>
-                         <div class="upload-post full-post-image">
-                             <h6>+Add Image</h6>
-                             <input type="file" name="image" />
-                         </div> 
-                          <div class="upload-post full-post-image">
-                             <h6>+Add Image</h6>
-                             <input type="file" name="image" />
-                         </div> 
-                          <div class="upload-post full-post-image">
-                             <h6>+Add Image</h6>
-                             <input type="file" name="image" />
-                         </div> -->
-                         <% });%>                      
-                      </div>
-                   </div> 
-                      <div class="div-12">
-                         <label>Product Name</label>                        
-                          <input type="type" name="name" value="<%=respdata.name%>" class="ds-form-control" placeholder="Product Name">
-                      </div>
- 
+                     <div class="div-12">
+                        <div class="post-imagebox">
+                           <% respdata.images.forEach(function(img, index) { %>
+                              <div class="upload-post full-post-image">
+                                  <img src="<%= img.image %>" style="width:50%; height:80%;">
+                                  <input type="file" name="image" />
+                              </div>
+                           <% }); %>
+                       
+                           <% for(let i = respdata.images.length; i < 5; i++) { %>
+                              <div class="upload-post full-post-image">
+                                  <h6>+Add Image</h6>
+                                  <input type="file" name="image" />
+                              </div>
+                           <% } %>                
+                        </div>
+                     </div> 
+                     <div class="div-12">
+                        <label>Product Name <span class="required">*</span></label>                        
+                         <input type="type" name="name" value="<%=respdata.name%>" class="ds-form-control" required placeholder="Product Name">
+                     </div> 
                       <div class="div-12">
                          <label>Product Description</label>                        
                          <!-- <textarea class="ds-form-control" value="<%=respdata.description%>" name="description" placeholder="Enter Message"></textarea> -->
                          <input type="type" name="description" value="<%=respdata.description%>" class="ds-form-control" placeholder="Product description">
                         </div>
  
+                        <div class="div-6">
+                           <label for="productCategory">Product Category <span class="required">*</span></label>
+                           <select class="ds-form-control" name="product_cate" id="productCategory" required>
+                               <option value="" disabled selected>Select Category</option>
+                               <% subcate.forEach(function(subcatitems) { %>
+                                   <option value="<%= subcatitems._id %>"><%= subcatitems.name %></option>
+                               <% }); %>
+                           </select>
+                       </div>
+                       
+ 
                       <div class="div-6">
-                         <label>Product Category</label>
-                         <select class="ds-form-control" name="product_cate">
-                         <option >Select Category</option>
-                         <% subcate.forEach(function(subcatitems){%> 
-                          <option value="<%=subcatitems._id%>"><%=subcatitems.name%></option>
-                           <% }); %>
+                         <label>Product Brand <span class="required">*</span></label>
+                         <input type="type" name="brand" value="<%=respdata.brand%>" class="ds-form-control" placeholder="Enter Brand" required>
+                      </div>
+
+                      <div class="div-6">
+                        <label for="productCondition">Product Condition <span class="required">*</span></label>
+                        <select class="ds-form-control" name="product_condition" id="productCondition" required>
+                            <option value="" disabled selected>Select Condition</option>
+                            <% productcondition.forEach(function(item) { %>
+                                <option value="<%= item._id %>"><%= item.name %></option>
+                            <% }); %>
                         </select>
-                      </div>
+                    </div>
+                    
  
                       <div class="div-6">
-                         <label>Product Brand</label>
-                         <input type="type" name="brand" value="<%=respdata.brand%>" class="ds-form-control" placeholder="Enter Brand">
-                      </div>
- 
-                      <div class="div-6">
-                         <label>Product Condition</label>
-                         <select class="ds-form-control" name="product_condition">
-                         <option >Select Condition</option>
-                         <% productcondition.forEach(function(item){%>
-                          <option value="<%=item._id%>"><%=item.name%></option>
-                         <% }); %>
-                        </select>
-                      </div>
- 
-                      <div class="div-6">
-                         <label>Product Size</label>
-                         <input type="type" name="size" value="<%=respdata.size%>" class="ds-form-control" placeholder="Product Size">
+                         <label>Product Size <span class="required">*</span></label>
+                         <input type="type" name="size" value="<%=respdata.size%>" class="ds-form-control" placeholder="Product Size" required>
                       </div>
  
                       <div class="div-6">
                          <label>Original Invoice</label>
                          <label class="switch ">
-                           <input type="checkbox" name="original_invoice" value="<%=respdata.original_invoice%>" >
+                           <input type="checkbox" name="original_invoice" value="<%=respdata.original_invoice%>">
                              <span class="tg-slider round"></span>
-                         </label>
-                         
-                      </div>
- 
+                         </label>                        
+                      </div> 
                       <div class="div-6">
                          <label>Original Packaging</label>
                         <label class="switch ">
                            <input type="checkbox" name="original_package" value="<%=respdata.original_package%>">
                              <span class="tg-slider round"></span>
                          </label>
+                      </div> 
+                      <div class="div-6">
+                         <label>Price <span class="required">*</span></label>
+                        <input type="type" name="price" value="<%=respdata.price%>" class="ds-form-control" placeholder="Price" required>
                       </div>
  
                       <div class="div-6">
-                         <label>Price</label>
-                        <input type="type" name="price" value="<%=respdata.price%>" class="ds-form-control" placeholder="Price">
-                      </div>
- 
-                      <div class="div-6">
-                         <label>Offer Price</label>
-                        <input type="type" name="offer_price" value="<%=respdata.offer_price%>" class="ds-form-control" placeholder="Offer Price">
+                         <label>Offer Price <span class="required">*</span></label>
+                        <input type="type" name="offer_price" value="<%=respdata.offer_price%>" class="ds-form-control" placeholder="Offer Price" required>
                       </div>
                       
                      
                       <div class="div-12">
-                         <input type="submit" name="" class="ds-form-control userpost-btn" value="Post Your Product">
+                         <input type="submit" name="" class="ds-form-control userpost-btn" value="Post Your Product" required>
                       </div>
-                   </div>
-                   
-                </form>
-                
-             </div>
-             
+                   </div>                  
+                </form>                
+             </div>             
           </div>
        </div>
     </div>
  </section>
 
-<!-- <%- include('../../public/assets/include/newsletter'); %> -->
+ <%- include('../../public/assets/include/newsletter'); %> 
 <%- include('../../public/assets/include/footer'); %>
 </body>

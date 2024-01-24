@@ -216,6 +216,7 @@ exports.getSubcatDataBySearches = async function (req, res, next) {
     }
 
     console.log(subcategoryList);
+    console.log("=================");
 
     return {
       siteName: req.app.locals.siteName,

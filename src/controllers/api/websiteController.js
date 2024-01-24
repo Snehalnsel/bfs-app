@@ -823,11 +823,11 @@ exports.userFilter = async function (req, res, next) {
     });
   }
   if (typeof brandList != "undefined") {
-    concatVar["brand"] = { "$in": brandList };
+    concatVar["brand_id"] = { "$in": brandList };
   }
   //if(typeof brandList != "undefined" && concatVar.length > 0) {
     if (typeof sizeList != "undefined") {
-      concatVar["size"] = { "$in": sizeList };
+      concatVar["size_id"] = { "$in": sizeList };
     }
   //}
   if (typeof productcategoryId != "undefined") {
@@ -1453,7 +1453,6 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
         isLoggedIn: isLoggedIn
 
       });
-
 
   }
   catch (error) {

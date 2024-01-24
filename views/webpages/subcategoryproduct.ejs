@@ -30,7 +30,7 @@
                                  <ul class="list-group">
                                     <% brandList.forEach(function(item) { %>
                                        <li class="single-list">                  
-                                          <input type="checkbox" id="" class="chkfield filterByChecked searchByBrand" data-id="<%=item.name%>" value="">
+                                          <input type="checkbox" id="" class="chkfield filterByChecked searchByBrand" data-id="<%=item._id%>" value="">
                                           <label class="label-check" for="incbox1"><%=item.name%></label>                  
                                        </li>
                                     <% }) %>                               
@@ -51,7 +51,7 @@
                                  <ul class="list-group">
                                     <% sizeList.forEach(function(item) { %>
                                        <li class="single-list">                  
-                                          <input type="checkbox" data-id="<%=item.name%>" class="chkfield filterByChecked searchBySize" value="">
+                                          <input type="checkbox" data-id="<%=item._id%>" class="chkfield filterByChecked searchBySize" value="">
                                           <label class="label-check" for="incboxx1"><%=item.name%></label>                  
                                        </li>
                                     <% }) %>  

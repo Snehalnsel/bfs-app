@@ -60,22 +60,23 @@
              </div>
              <%//if(addressUserList.length == ''){%>
              <div class="address-form-open" style="display:none;">
-               <form action="/api/user-new-checkout-address" method="POST">
+               <form action="/api/user-new-checkout-address" method="POST" onsubmit="setAddressType()">
                    <div class="form-box">
                     <div class="loginform-box">
                         <div class="">
                             <label class="full-label" >Address Type:</label>
-                            <div class="form-check-inline radio-label" >                           
-                                <label class="form-check-label ">
-                                  <input type="radio" class="form-check-input addr_type" id="add_type1" name="addr_type" checked>Home
-                                </label>
-                                <label class="form-check-label">
-                                 <input type="radio" class="form-check-input addr_type" id="add_type2" name="addr_type">Office
-                               </label>
-                               <label class="form-check-label">
-                                 <input type="radio" class="form-check-input addr_type" id="add_type3" name="addr_type">Other
-                               </label>
-                              </div>
+                            <div class="form-check-inline radio-label">
+                              <label class="form-check-label">
+                                  <input type="radio" class="form-check-input addr_type" id="add_type1" name="addr_type" value="Home" checked>Home
+                              </label>
+                              <label class="form-check-label">
+                                  <input type="radio" class="form-check-input addr_type" id="add_type2" name="addr_type" value="Office">Office
+                              </label>
+                              <label class="form-check-label">
+                                  <input type="radio" class="form-check-input addr_type" id="add_type3" name="addr_type" value="Other">Other
+                              </label>
+                          </div>
+                              <input type="hidden" name="addrType" id="addrType">
                         </div>
                         <input type="hidden" name="addrType" id="addrType">
                         <div class="row">
@@ -149,13 +150,21 @@
 
 <script>
  
-    $(document).on('change','.addr_type',function(){
-      if ($(this).is(":checked")) 
-      {
-         var txtVal = $.trim($(this).parent("label").text());   
-      }      
-      $('#addrType').val(txtVal);
-   });
+   //  $(document).on('change','.addr_type',function(){
+   //    if ($(this).is(":checked")) 
+   //    {
+   //       var txtVal = $.trim($(this).parent("label").text());   
+   //    }      
+   //    $('#addrType').val(txtVal);
+   // });
+
+
+   function setAddressType() {
+        var selectedAddrType = document.querySelector('input[name="addr_type"]:checked');
+        if (selectedAddrType) {
+            document.getElementById('addrType').value = selectedAddrType.value;
+        }
+    }
 
    $(document).on('click','.address-hide-show',function(){
       $('.address-form-open').show();

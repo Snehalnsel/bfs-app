@@ -38,9 +38,23 @@
                                     <h6 class="m-0 font-weight-bold text-primary"><%-pageName%> Details</h6>
                                     <div>
                                         <div class="search-container">
-                                            <input type="text" placeholder="Search.." id="searchInput"
+                                            <!-- <input type="text" placeholder="Search.." id="searchInput"
                                                 class="search_by" name="search">
-                                            <button type="submit"><i class="fa fa-search"></i></button>
+                                            <button type="submit"><i class="fa fa-search"></i></button> -->
+                                            <form>
+                                                <div class="searchlist-rowbox">
+                                                   <div class="fld-part">             
+                                                    <select id="categorySelect" class="custom-select sr-field" required>
+                                                        <option selected>Select Category</option>
+                                                        <option value="name">Name</option>
+                                                        <option value="category">Category</option>
+                                                    </select>
+                                                    
+                                                      <input type="text" placeholder="Product Name"  id="productNameInput" class="sr-field"> 
+                                                   </div>
+                                                   <div class="sb-box"><button type="button" onclick="searchNow()" placeholder="Submit" class="sr-button">Search Now</button></div>
+                                                </div>
+                                             </form>
                                         </div>
                                     </div>
                                 </div>
@@ -55,11 +69,11 @@
                                                     <th>Category Type</th>
                                                     <th>Image</th>
                                                     <!-- <th>Status</th> -->
-                                                    <th>Created On</th>
+                                                    <!-- <th>Created On</th> -->
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody class="sublist">
                                                 <% if(respdata.list){ %>
 
                                                     <% respdata.list.forEach(function(value, index) { %>
@@ -82,9 +96,6 @@
                                                                 <td><img src="<%= value.subcategory.image %>"
                                                                         style="height: 40px;"></td>
                                                        
-                                                                <td>
-                                                                    <%= value.subcategory.added_dtime %>
-                                                                </td>
                                                                 <td style="vertical-align: middle;">
                                                                     <div class="action-admin">
                                                                         <a href="/edit-sub-cat/<%= value.subcategory._id %>"
@@ -215,29 +226,86 @@
 </html>
 <script>
 
-    const searchInput = document.getElementById('searchInput');
-    const resultsContainer = document.getElementById('results');
+function searchNow() {
+    var selectedCategory = $('#categorySelect').val();
+    var productName = $('#productNameInput').val();
 
-    searchInput.addEventListener('keyup', function (event) {
-        console.log(searchInput.value);
+    console.log(selectedCategory);
+    console.log(productName);
 
+    $.ajax({
+        url: '/sreach-subcat/' + selectedCategory + '/' + productName + '/1',
+        type: 'GET',
+        success: function (response) {
+            console.log(response);
 
-            const query = searchInput.value.trim();
+            // Check if there is data in the response
+            if (response.respdata && response.respdata.list) {
+                // Get the tbody element
+                var tbody = $('.sublist');
 
-            const page = 1;
+                // Clear the existing content of tbody
+                tbody.empty();
 
-            fetch('https://localhost:3000/sreach-subcat/'+query+'/'+page)
-                .then(response => response.json())
-                .then(data => {
-                    console.log(res);
-                  
-                })
-                .catch(error => {
-                  
-                    console.error('Error:', error);
+                // Iterate over the list in the response and append new rows to tbody
+                response.respdata.list.forEach(function (value, index) {
+                    // Add a condition to hide the rows you don't want
+                    if (value.subcategory.parent_id != '650444488501422c8bf24bdb') {
+                        // Append a new row to tbody
+                        tbody.append(`
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${value.subcategory.name}</td>
+                                <td>${value.subcategory.description}</td>
+                                <td>${value.parentCategoryName !== '' ? value.parentCategoryName : 'Not Yet Set'}</td>
+                                <td><img src="${value.subcategory.image}" style="height: 40px;"></td>
+                                <td style="vertical-align: middle;">
+                                    <div class="action-admin">
+                                        <!-- Add your action buttons here -->
+                                    </div>
+                                </td>
+                            </tr>
+                        `);
+                    }
                 });
-        
-    });
 
+                  // Update pagination information
+                  updatePagination(response.totalPages, response.currentPage);
+            }
+        },
+        error: function (error) {
+            console.error('Error:', error);
+        }
+    });
+}
+
+function updatePagination(totalPages, currentPage) {
+    // Get the pagination container element
+    var paginationContainer = $('.table-pagination');
+
+    // Clear existing pagination content
+    paginationContainer.empty();
+
+    // Add the pagination HTML based on the response data
+    paginationContainer.append(`
+        <ul class="pagination">
+            <!-- Your pagination logic here -->
+        </ul>
+    `);
+
+    // Iterate to add page links
+    for (let i = 1; i <= totalPages; i++) {
+        paginationContainer.find('.pagination').append(`
+            <li>
+                <a href="/body-focus-subcat/${i}" class="${i === parseInt(currentPage) ? 'active' : ''}">
+                    ${i}
+                </a>
+            </li>
+        `);
+    }
+}
+
+// Trigger the initial searchNow function, e.g., on page load
+searchNow();
 
 </script>

@@ -288,7 +288,7 @@ router.get("/body-focus-status/:id",cors(),BodyFocusController.statusData);
 
 router.get("/body-focus-subcat/:page", cors(), BodyFocusController.getSubcatData);
 
-router.get("/sreach-subcat/:query/:page", cors(), BodyFocusController.getSubcatDataBySearches);
+router.get("/sreach-subcat/:sreach_category/:sreach_product/:page", cors(), BodyFocusController.getSubcatDataBySearches);
 
 router.get("/edit-sub-cat/:id", cors(), BodyFocusController.editSubCatData);
 

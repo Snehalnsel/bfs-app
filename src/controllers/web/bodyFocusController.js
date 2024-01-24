@@ -24,6 +24,7 @@ const multer = require("multer");
 const upload = multer({ dest: 'public/images/' }); 
 var ObjectId = require("mongodb").ObjectId;
 const { exit } = require("process");
+const { log } = require("console");
 
 //methods
 exports.getData = async function (req, res, next) {
@@ -85,6 +86,7 @@ exports.getSubcatData = async function (req, res, next) {
       });
     }
 
+    // console.log(subcategoryList);
 
     res.render("pages/body-focus/subcatlist", {
       siteName: req.app.locals.siteName,
@@ -115,110 +117,95 @@ exports.getSubcatData = async function (req, res, next) {
   }
 };
 
-// exports.getSubcatDataBySeach = async function (req, res, next) {
-
-//   console.log(req.params.query);
-//   return;
-//   var pageName = "Sub Category";
-//   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-
-//   try {
-
-//     const item_per_page = 10;
-
-//     const query = req.params.query;
-//     await Category.ensureIndexes({ parent_id: 1 }); 
-//     const currentPage = req.params.page || 1;
-//     const skip = (currentPage - 1) * item_per_page;
-
-//     const totalSubcategoriesCount = await Category.countDocuments({
-//       parent_id: { $ne: '650444488501422c8bf24bdb' }
-//     });
-
-//     //const subcategories = await Category.find({ parent_id: { $ne: '650444488501422c8bf24bdb' } }).exec();
-//     const subcategories = await Category.find({ parent_id: { $ne: '650444488501422c8bf24bdb' } })
-//     .skip(skip)
-//     .limit(item_per_page)
-//     .exec();
-//     const subcategoryList = [];
-
-//     for (const subcategory of subcategories) {
-//       const parentCategory = await Category.findOne({ _id: subcategory.parent_id }).exec();
-//       const parentCategoryName = parentCategory ? parentCategory.name : '';
-
-//       subcategoryList.push({
-//         subcategory: subcategory,
-//         parentCategoryName: parentCategoryName,
-//       });
-//     }
-
-//     return {
-//       siteName: req.app.locals.siteName,
-//       pageName: pageName,
-//       pageTitle: pageTitle,
-//       userFullName: req.session.user.name,
-//       userImage: req.session.user.image_url,
-//       userEmail: req.session.user.email,
-//       year: moment().format("YYYY"),
-//       requrl: req.app.locals.requrl,
-//       status: 0,
-//       message: "found!",
-//       respdata: {
-//         list: subcategoryList,
-//       },
-//       totalSubcategoriesCount: totalSubcategoriesCount,
-//       skip: skip, 
-//       item_per_page:item_per_page,
-//       currentPage :currentPage
-//     };
-//   } catch (error) {
-//     console.error(error);
-//     return {
-//       status: '0',
-//       message: 'An error occurred while fetching products with matching parent_id.',
-//       error: error.message,
-//     };
-//   }
-// };
-
-
 exports.getSubcatDataBySearches = async function (req, res, next) {
   var pageName = "Sub Category";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
 
   try {
-    const item_per_page = 10;
+    const item_per_page = 40;
 
-    const query = req.params.query;
+    const sreach_category = req.params.sreach_category;
+    const sreach_product = req.params.sreach_product;
+
+    //const sreach_product = product.trim();
+      // name: { $regex: new RegExp(`^${'Aquarium'}`, 'i') }
+
     await Category.ensureIndexes({ parent_id: 1 }); 
     const currentPage = req.params.page || 1;
     const skip = (currentPage - 1) * item_per_page;
 
-    // Search for subcategories
-    const subcategories = await Category.find({ 
-      parent_id: { $ne: '650444488501422c8bf24bdb' },
-      name: { $regex: new RegExp(`${query}`, 'i') }
-    })
-    .skip(skip)
-    .limit(item_per_page)
-    .exec();
+     let subcategories;
+     let totalSubcategoriesCount;
+     let subcategoryList = [];
+    if (sreach_category == "name")
+    {
 
-    const subcategoryList = [];
+      totalSubcategoriesCount = await Category.find({ 
+        parent_id: { $ne: '650444488501422c8bf24bdb' },
+        name:{'$regex' : `${sreach_product}`, '$options' : 'i'}
+        });
 
-    for (const subcategory of subcategories) {
-      const parentCategory = await Category.findOne({ _id: subcategory.parent_id }).exec();
-      const parentCategoryName = parentCategory ? parentCategory.name : '';
+       subcategories = await Category.find({ 
+        parent_id: { $ne: '650444488501422c8bf24bdb' },
+        name:{'$regex' : `${sreach_product}`, '$options' : 'i'}
+        })
+        .skip(skip)
+        .limit(item_per_page)
+        .exec();
 
-      subcategoryList.push({
-        subcategory: subcategory,
-        parentCategoryName: parentCategoryName,
+        for (const subcategory of subcategories) {
+          const parentCategory = await Category.findOne({ _id: subcategory.parent_id }).exec();
+          const parentCategoryName = parentCategory ? parentCategory.name : '';
+    
+          subcategoryList.push({
+            subcategory: subcategory,
+            parentCategoryName: parentCategoryName,
+          });
+        }
+    }
+    else
+    {
+      totalSubcategoriesCount =  await Category.find({
+        parent_id: '650444488501422c8bf24bdb',
+        name:{'$regex' : `${sreach_product}`, '$options' : 'i'}
       });
+
+      const collection = await Category.find({
+        parent_id: '650444488501422c8bf24bdb',
+        name:{'$regex' : `${sreach_product}`, '$options' : 'i'}
+      })
+      .skip(skip)
+      .limit(item_per_page)
+      .exec();
+
+      
+      for(let element of collection)
+      {
+       
+        const childCategory = await Category.find({ parent_id: element._id }).exec();
+
+        console.log(childCategory);
+        
+
+        // subcategoryList.push({
+        //   parentCategoryName: element.name,
+        //   subcategory: childCategory,
+        // });
+
+        subcategoryList.push(
+          ...childCategory.map(subcategory => ({
+              parentCategoryName: element.name,
+              subcategory: subcategory,
+          }))
+      );
+        
+      }
     }
 
     console.log(subcategoryList);
-    console.log("=================");
+    // return;
 
-    return {
+    return res.status(200).json({
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
@@ -232,11 +219,12 @@ exports.getSubcatDataBySearches = async function (req, res, next) {
       respdata: {
         list: subcategoryList,
       },
-      totalSubcategoriesCount: subcategories.length, 
+      totalSubcategoriesCount: totalSubcategoriesCount,
       skip: skip, 
       item_per_page: item_per_page,
       currentPage: currentPage
-    };
+    });
+
   } catch (error) {
     console.error(error);
     return {

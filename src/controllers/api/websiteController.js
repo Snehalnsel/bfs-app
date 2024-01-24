@@ -1071,6 +1071,8 @@ exports.myAccount = async function (req, res, next) {
       var userData = req.session.user;
 
       const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId) });
+
+      console.log(address);
       res.render("webpages/myaccount", {
         title: "My Account",
         message: "Welcome to the privacy policy page!",

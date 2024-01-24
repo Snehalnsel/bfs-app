@@ -83,3 +83,63 @@
     font-size: 14px;
     color: #747474;
 }
+
+.searchlist-rowbox {
+    display: flex;
+    justify-content: space-between;
+}
+
+.searchlist-rowbox .fld-part {
+    width: calc(100% - 150px);
+    display: flex;
+    justify-content: space-between;
+    grid-gap: 10px;
+}
+
+.searchlist-rowbox .fld-part .sr-field {
+    border: solid 1px #ddd;
+    height: 42px;
+    width: 50%;
+    padding: 6px 12px;
+    font-size: 14px;
+    color: #141414;
+    outline: none !important;
+    box-shadow: none !important;
+    border-radius: 5px;
+}
+.searchlist-rowbox .fld-part .sr-field::placeholder{
+    color: #141414; 
+}
+
+.searchlist-rowbox .sr-button {
+    width: 140px;
+    background: #e3683d;
+    border-radius: 0px;
+    height: 42px;
+    color: #fff;
+    font-weight: 500;
+    border-radius: 5px;
+    outline: none;
+}
+
+@media screen and (max-width: 767px) {
+.searchlist-rowbox {
+    flex-wrap: wrap;
+}
+.searchlist-rowbox .fld-part {
+    width: 100%;
+    grid-gap: 0px;
+}
+
+.searchlist-rowbox .fld-part {   
+    grid-gap: 0px;
+    flex-wrap: wrap;
+}
+
+.searchlist-rowbox .fld-part .sr-field {   
+    width: 100%;
+    margin-bottom: 10px;    
+}
+
+
+}

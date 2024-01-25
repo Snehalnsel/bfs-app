@@ -139,8 +139,7 @@ exports.getSubcatDataBySearches = async function (req, res, next) {
      let subcategoryList = [];
     if (sreach_category == "name")
     {
-
-      totalSubcategoriesCount = await Category.find({ 
+      totalSubcategoriesCount = await Category.countDocuments({ 
         parent_id: { $ne: '650444488501422c8bf24bdb' },
         name:{'$regex' : `${sreach_product}`, '$options' : 'i'}
         });
@@ -149,6 +148,8 @@ exports.getSubcatDataBySearches = async function (req, res, next) {
         parent_id: { $ne: '650444488501422c8bf24bdb' },
         name:{'$regex' : `${sreach_product}`, '$options' : 'i'}
         })
+        .skip(skip)
+        .limit(item_per_page)
         .exec();
 
         for (const subcategory of subcategories) {
@@ -163,25 +164,19 @@ exports.getSubcatDataBySearches = async function (req, res, next) {
     }
     else
     {
-      totalSubcategoriesCount =  await Category.find({
-        parent_id: '650444488501422c8bf24bdb',
-        name:{'$regex' : `${sreach_product}`, '$options' : 'i'}
-      });
-
+      
       const collection = await Category.find({
         parent_id: '650444488501422c8bf24bdb',
         name:{'$regex' : `${sreach_product}`, '$options' : 'i'}
       })
+      .skip(skip)
+      .limit(item_per_page)
       .exec();
 
       
       for(let element of collection)
       {
-       
-        const childCategory = await Category.find({ parent_id: element._id }).exec();
-
-        console.log(childCategory);
-        
+       const childCategory = await Category.find({ parent_id: element._id }).exec();
 
         // subcategoryList.push({
         //   parentCategoryName: element.name,
@@ -196,9 +191,13 @@ exports.getSubcatDataBySearches = async function (req, res, next) {
       );
         
       }
+
+       totalSubcategoriesCount = subcategoryList.length;
+
     }
 
-    console.log(subcategoryList);
+    console.log(totalSubcategoriesCount);
+    console.log("subcategories count");
     // return;
 
     return res.status(200).json({
@@ -217,8 +216,8 @@ exports.getSubcatDataBySearches = async function (req, res, next) {
       },
       totalSubcategoriesCount: totalSubcategoriesCount,
       skip: skip, 
-      item_per_page: item_per_page,
-      currentPage: currentPage
+      item_per_page:item_per_page,
+      currentPage :currentPage
     });
 
   } catch (error) {

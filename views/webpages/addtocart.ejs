@@ -1,10 +1,8 @@
 <%- include('../../public/assets/include/header'); %>
-
+<% if(respdata != ''){ %>  
 <section class="bids-wrapper">
-    <div class="container">  
-          
-       <div class="bids-lists cart-wrapper"> 
-         <% if(respdata != ''){ %>   
+    <div class="container"> 
+       <div class="bids-lists cart-wrapper">
        <div class="cart-list">
          <form id="orderPlace"> 
             <input type="hidden" id="user_id" name="user_id" value="<%=user%>">
@@ -78,13 +76,22 @@
          </div> 
           
 
-       </div> 
-       <% } else { %>
-         <div>Cart is Empty</div>
+       </div>
+      </div>        
+   </div>
+</section> 
+       <% } else { %>        
+         <section class="bids-wrapper empty-content ">
+            <div class="container">
+              <div class="ec-box">
+                 <h6>Cart is Empty</h6>
+                 <p>There in nothing in your Cart.Let's add some items</p>
+                 <a href="/api/webSubCategories" class="bc-btn">Continue To Shopping</a>
+              </div> 
+            </div>
+           </section> 
        <% } %>    
-    </div>        
-    </div>
- </section>
+    
 
 <%- include('../../public/assets/include/newsletter'); %>
 <%- include('../../public/assets/include/footer'); %>

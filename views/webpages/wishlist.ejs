@@ -1,6 +1,7 @@
 <%- include('../../public/assets/include/header'); %>
-
-   <section class="bids-wrapper">
+<% if (respdata && respdata.length> 0) { %>
+   <% respdata.forEach(function(item) { %>
+   <section class="bids-wrapper ">
       <div class="container">
          <div class="title-box title-with-count">
             <h1>My Wishlist</h1>
@@ -8,12 +9,12 @@
          </div>
          <div class="bids-lists cart-wrapper">
             <% console.log(respdata);%>
-               <div class="cart-list wishlist-list">
-                  <% if (respdata && respdata.length> 0) { %>
-                     <% respdata.forEach(function(item) { %>
+               <div class="cart-list wishlist-list ">
+                 
                         <div class="bids-row wishlist-row " id="<%=item._id%>">
                            <div class="br-details">
-                              <div class="bid-images"><a href="/api/productdeatils/<%=item.product_id%>"><img src="<%=item.images%>" alt="images" class="img-fluid"></a></div>
+                              <div class="bid-images"><a href="/api/productdeatils/<%=item.product_id%>"><img
+                                       src="<%=item.images%>" alt="images" class="img-fluid"></a></div>
                               <div class="bid-info">
                                  <div class="bd-title">
                                     <a href="/api/productdeatils/<%=item.product_id%>">
@@ -46,15 +47,24 @@
                            </div>
 
                         </div>
-                        <% }); %>
-                           <% } else { %>
-                              <p>No products found in the Wishlist.</p>
-                              <% } %>
+                        
 
                </div>
          </div>
       </div>
    </section>
+   <% }); %>
+                           <% } else { %>
+                              <section class="bids-wrapper empty-content ">
+                               <div class="container">
+                                 <div class="ec-box">
+                                    <h6>Wishlist</h6>
+                                    <p>There in no Product in wishlist</p>
+                                    <a href="/api/webSubCategories" class="bc-btn">Continue To Shopping</a>
+                                 </div> 
+                               </div>
+                              </section>   
+                              <% } %>
 
    <%- include('../../public/assets/include/newsletter'); %>
       <%- include('../../public/assets/include/footer'); %>

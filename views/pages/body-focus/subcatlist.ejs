@@ -213,16 +213,6 @@
         <%- include('../../partials/footerJs'); %>
 
 </body>
-<!-- <script>
-    $(document).ready(function() {
-      $('#dataTable').DataTable({
-        "paging": true,
-        "ordering": true,
-        "searching": true
-      });
-    });
-  </script> -->
-
 </html>
 <script>
 
@@ -239,19 +229,15 @@ function searchNow() {
         success: function (response) {
             console.log(response);
 
-            // Check if there is data in the response
             if (response.respdata && response.respdata.list) {
-                // Get the tbody element
+            
                 var tbody = $('.sublist');
 
-                // Clear the existing content of tbody
                 tbody.empty();
 
-                // Iterate over the list in the response and append new rows to tbody
                 response.respdata.list.forEach(function (value, index) {
-                    // Add a condition to hide the rows you don't want
                     if (value.subcategory.parent_id != '650444488501422c8bf24bdb') {
-                        // Append a new row to tbody
+                      
                         tbody.append(`
                             <tr>
                                 <td>${index + 1}</td>
@@ -260,50 +246,87 @@ function searchNow() {
                                 <td>${value.parentCategoryName !== '' ? value.parentCategoryName : 'Not Yet Set'}</td>
                                 <td><img src="${value.subcategory.image}" style="height: 40px;"></td>
                                 <td style="vertical-align: middle;">
-                                    <div class="action-admin">
-                                        <!-- Add your action buttons here -->
-                                    </div>
-                                </td>
+                                <div class="action-admin">
+                                    <a href="/edit-sub-cat/${value.subcategory._id}" class="btn btn-info btn-circle btn-sm" title="Edit">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                    <a href="/body-focus-status/${value.subcategory._id}" class="btn btn-outline-success btn-circle btn-sm" title="Status change">
+                                        <i class="fa fa-solid fa-refresh"></i>
+                                    </a>
+                                    <a href="/delete-body-focus/${value.subcategory._id}" class="btn btn-danger btn-circle btn-sm" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                    <a href="${value.subcategory.image}" download="${value.subcategory.name}.jpg" class="btn btn-success btn-circle btn-sm" title="Download">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                </div>
+                            </td>
                             </tr>
                         `);
+
+                         // Update pagination information
+                         updatePagination(response.totalPages, response.currentPage);
+
                     }
                 });
 
-                  // Update pagination information
-                  updatePagination(response.totalPages, response.currentPage);
+              
             }
         },
         error: function (error) {
             console.error('Error:', error);
         }
     });
+
 }
 
 function updatePagination(totalPages, currentPage) {
-    // Get the pagination container element
-    var paginationContainer = $('.table-pagination');
+    const itemsPerPage = 6;
+    const pagesPerBlock = 6;
+    const currentBlock = Math.ceil(currentPage / pagesPerBlock);
+    const startPage = (currentBlock - 1) * pagesPerBlock + 1;
+    const endPage = Math.min(startPage + pagesPerBlock - 1, totalPages);
 
-    // Clear existing pagination content
+    const paginationContainer = $('.pagination');
     paginationContainer.empty();
 
-    // Add the pagination HTML based on the response data
-    paginationContainer.append(`
-        <ul class="pagination">
-            <!-- Your pagination logic here -->
-        </ul>
-    `);
+    if (startPage > 1) {
+        paginationContainer.append(`
+            <li><a href="#" data-page="${startPage - 1}">&laquo;</a></li>
+        `);
+    }
 
-    // Iterate to add page links
-    for (let i = 1; i <= totalPages; i++) {
-        paginationContainer.find('.pagination').append(`
-            <li>
-                <a href="/body-focus-subcat/${i}" class="${i === parseInt(currentPage) ? 'active' : ''}">
-                    ${i}
-                </a>
+    for (let i = startPage; i <= endPage; i++) {
+        paginationContainer.append(`
+            <li class="${i === currentPage ? 'active' : ''}">
+                <a href="#" data-page="${i}">${i}</a>
             </li>
         `);
     }
+
+    if (endPage < totalPages) {
+        paginationContainer.append(`
+            <li><a href="#" data-page="${endPage + 1}">&raquo;</a></li>
+        `);
+    }
+
+    const pageInformationContainer = $('.table-datainfo');
+    pageInformationContainer.empty();
+
+    pageInformationContainer.append(`
+        <p>Showing ${currentPage * itemsPerPage + 1} to ${Math.min(
+            currentPage * itemsPerPage + itemsPerPage,
+            totalPages * itemsPerPage
+        )} of ${totalPages * itemsPerPage} entries</p>
+    `);
+
+    paginationContainer.find('a').on('click', function (event) {
+        event.preventDefault();
+        const clickedPage = parseInt($(this).data('page'));
+        searchNow(clickedPage);
+    });
 }
+
 
 // Trigger the initial searchNow function, e.g., on page load
 searchNow();

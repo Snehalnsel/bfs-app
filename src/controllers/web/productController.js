@@ -234,9 +234,6 @@ exports.getData = function (req, res, next) {
       return res.status(500).json({ error: 'An error occurred' });
     }
 
-    // console.log("Hello Product********************");
-    // console.log(productList);
-    // return false;
     res.render("pages/product/list", {
       siteName: req.app.locals.siteName,
       pageName: pageName,
@@ -285,9 +282,7 @@ exports.detailsData = async function (req, res, next) {
 
       const parentCategory = await Category.findById(CategoryDetails.parent_id);
     }
-   
-
-
+  
     const productImages = await Productimage.find({ product_id: productId });
     const brandList = await Brand.find();
     const categoryList = await Category.find({ parent_id: '650444488501422c8bf24bdb' });

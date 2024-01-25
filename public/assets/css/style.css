@@ -3436,3 +3436,70 @@ span.close-icon {
     color: red; /* or any other color */
     margin-left: 5px; /* adjust as needed */
 }
+
+.ec-box {
+    text-align: center;
+    padding: 35px;
+}
+
+.ec-box h6 {
+    font-size: 22px;
+    margin-bottom: 15px;
+    font-weight: 600;
+    color: #484848;
+    text-transform: capitalize;
+}
+
+.ec-box p {
+    font-size: 14px;
+    color: #000;
+    line-height: 24px;
+    font-weight: 400;
+}
+
+.ec-box a.bc-btn {
+    padding: 10px 20px;
+    border: solid 1px #e3683d;
+    border-radius: 5px;
+    font-size: 14px;
+    line-height: 25px;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 600;
+    margin: 3px;
+    transition: 0.5s;
+    background: #e3683d;
+    color: #fff!important;
+    margin-top: 15px;
+    display: inline-block;
+}
+
+.ec-box a.bc-btn:hover {
+    background: #000;
+    transition: 0.5s;
+    color: #bdbdbd !important;
+    border: solid 1px #000;
+}
+
+.empty-content {
+    background: #fffbfb;
+    border-top: solid 1px #efefef;
+}
+
+
+.filter-shorting .short-dropdown select {
+    color: #1e1e1e;
+    font-size: 14px;
+    border: none;
+    padding: 5px 8px;
+    min-width: 140px;
+    outline: none !important;
+    line-height: 24px;
+    box-shadow: none !important;
+    background: #eee !important;    
+    border-right: solid 8px #eee !important;
+}
+
+.filter-shorting {
+    padding-right: 3px;
+}

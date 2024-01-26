@@ -53,27 +53,99 @@ exports.getData = async function (req, res, next) {
 };
 
 
-exports.getSubcatData = async function (req, res, next) {
+// exports.getSubcatData = async function (req, res, next) {
+//   var pageName = "Sub Category";
+//   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+
+//   try {
+
+//     const item_per_page = 40;
+
+//     await Category.ensureIndexes({ parent_id: 1 }); 
+//     const currentPage = req.params.page || 1;
+//     const skip = (currentPage - 1) * item_per_page;
+
+//     const totalSubcategoriesCount = await Category.countDocuments({
+//       parent_id: { $ne: '650444488501422c8bf24bdb' }
+//     });
+
+//     //const subcategories = await Category.find({ parent_id: { $ne: '650444488501422c8bf24bdb' } }).exec();
+//     const subcategories = await Category.find({ parent_id: { $ne: '650444488501422c8bf24bdb' } })
+//     .skip(skip)
+//     .limit(item_per_page)
+//     .exec();
+//     const subcategoryList = [];
+
+//     for (const subcategory of subcategories) {
+//       const parentCategory = await Category.findOne({ _id: subcategory.parent_id }).exec();
+//       const parentCategoryName = parentCategory ? parentCategory.name : '';
+
+//       subcategoryList.push({
+//         subcategory: subcategory,
+//         parentCategoryName: parentCategoryName,
+//       });
+//     }
+
+//     // console.log(subcategoryList);
+
+//     res.render("pages/body-focus/subcatlist", {
+//       siteName: req.app.locals.siteName,
+//       pageName: pageName,
+//       pageTitle: pageTitle,
+//       userFullName: req.session.user.name,
+//       userImage: req.session.user.image_url,
+//       userEmail: req.session.user.email,
+//       year: moment().format("YYYY"),
+//       requrl: req.app.locals.requrl,
+//       status: 0,
+//       message: "found!",
+//       respdata: {
+//         list: subcategoryList,
+//       },
+//       totalSubcategoriesCount: totalSubcategoriesCount,
+//       skip: skip, 
+//       item_per_page:item_per_page,
+//       currentPage :currentPage
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({
+//       status: "0",
+//       message: "An error occurred while fetching the Sub Category data.",
+//       respdata: {},
+//     });
+//   }
+// };
+
+
+exports.getSubcatData = async function (page,searchType, searchValue, req, res, next) {
   var pageName = "Sub Category";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
 
   try {
-
     const item_per_page = 40;
-
     await Category.ensureIndexes({ parent_id: 1 }); 
-    const currentPage = req.params.page || 1;
+    const currentPage = page || 1;
     const skip = (currentPage - 1) * item_per_page;
 
-    const totalSubcategoriesCount = await Category.countDocuments({
-      parent_id: { $ne: '650444488501422c8bf24bdb' }
-    });
 
-    //const subcategories = await Category.find({ parent_id: { $ne: '650444488501422c8bf24bdb' } }).exec();
-    const subcategories = await Category.find({ parent_id: { $ne: '650444488501422c8bf24bdb' } })
-    .skip(skip)
-    .limit(item_per_page)
-    .exec();
+    const query = { parent_id: { $ne: '650444488501422c8bf24bdb' } };
+    if (searchType && searchValue) {
+      query[searchType] = searchValue;
+      if (searchType === 'name') {
+        query.name = { $regex: `${searchValue}`, $options: 'i' };
+      }
+    }
+
+     console.log(query);
+    const totalSubcategoriesCount = await Category.countDocuments(query);
+    const subcategories = await Category.find(query)
+      .skip(skip)
+      .limit(item_per_page)
+      .exec();
+
+      console.log(subcategories);
+
     const subcategoryList = [];
 
     for (const subcategory of subcategories) {
@@ -86,7 +158,6 @@ exports.getSubcatData = async function (req, res, next) {
       });
     }
 
-    // console.log(subcategoryList);
 
     res.render("pages/body-focus/subcatlist", {
       siteName: req.app.locals.siteName,
@@ -103,9 +174,11 @@ exports.getSubcatData = async function (req, res, next) {
         list: subcategoryList,
       },
       totalSubcategoriesCount: totalSubcategoriesCount,
-      skip: skip, 
-      item_per_page:item_per_page,
-      currentPage :currentPage
+      skip: skip,
+      item_per_page: item_per_page,
+      currentPage: currentPage,
+      searchType:searchType ? searchType : '',
+      searchValue:searchValue ? searchValue : ''
     });
   } catch (error) {
     console.error(error);
@@ -115,7 +188,7 @@ exports.getSubcatData = async function (req, res, next) {
       respdata: {},
     });
   }
-};
+}
 
 exports.getSubcatDataBySearches = async function (req, res, next) {
   var pageName = "Sub Category";
@@ -195,9 +268,6 @@ exports.getSubcatDataBySearches = async function (req, res, next) {
        totalSubcategoriesCount = subcategoryList.length;
 
     }
-
-    console.log(totalSubcategoriesCount);
-    console.log("subcategories count");
     // return;
 
     return res.status(200).json({

@@ -164,7 +164,7 @@ router.post(
       .isEmpty()
       .trim()
       .escape(),
-      check("pwd", "This is a required field!")
+    check("pwd", "This is a required field!")
       .not()
       .isEmpty()
       .trim()
@@ -203,7 +203,7 @@ router.get("/delete-admin-users/:user_id", cors(), AdminUserController.deleteDat
 // );
 
 //app users
-router.get("/app-users", cors(),AppusersController.getData);
+router.get("/app-users", cors(), AppusersController.getData);
 router.get("/add-app-users", cors(), AppusersController.addData);
 
 
@@ -280,13 +280,20 @@ router.get("/edit-body-focus/:id", cors(), BodyFocusController.editData);
 
 router.post('/update-body-focus', cors(), [], upload.single('image'), BodyFocusController.updateData);
 
-router.get("/body-focus-statu-change/:id",cors(),BodyFocusController.updateStatusData);
+router.get("/body-focus-statu-change/:id", cors(), BodyFocusController.updateStatusData);
 
-router.get("/body-focus-status/:id",cors(),BodyFocusController.statusData);
+router.get("/body-focus-status/:id", cors(), BodyFocusController.statusData);
 
 //SUB CATEGORY APIS
 
-router.get("/body-focus-subcat/:page", cors(), BodyFocusController.getSubcatData);
+// router.get("/body-focus-subcat/:page", cors(), BodyFocusController.getSubcatData);
+
+router.get("/body-focus-subcat", cors(), (req, res) => {
+  const page = req.query.page;
+  const searchType = req.query.searchType;
+  const searchValue = req.query.searchValue;
+  BodyFocusController.getSubcatData(page, searchType, searchValue, req, res);
+});
 
 router.get("/sreach-subcat/:sreach_category/:sreach_product/:page", cors(), BodyFocusController.getSubcatDataBySearches);
 
@@ -336,11 +343,11 @@ router.post(
   BrandController.updateData
 );
 
-router.get("/brand-statu-change/:id",cors(),BrandController.updateStatusData);
+router.get("/brand-statu-change/:id", cors(), BrandController.updateStatusData);
 
 router.get(
   "/delete-brand/:id",
-  [],BrandController.deleteData
+  [], BrandController.deleteData
 );
 //SIZE MASTER
 
@@ -352,10 +359,10 @@ router.post(
   cors(),
   [
     check("size_name", "This is a required field!")
-    .not()
-    .isEmpty()
-    .trim()
-    .escape(),
+      .not()
+      .isEmpty()
+      .trim()
+      .escape(),
   ],
   SizeController.createData
 );
@@ -369,9 +376,9 @@ router.post(
 //   SizeController.updateData
 // );
 
-router.get("/size-status-change/:id",cors(),SizeController.updateStatusData);
+router.get("/size-status-change/:id", cors(), SizeController.updateStatusData);
 
-router.get("/delete-size/:id", cors(),SizeController.deleteData);
+router.get("/delete-size/:id", cors(), SizeController.deleteData);
 
 //CATEGORY BRAND SIZE MASTER
 
@@ -382,21 +389,21 @@ router.post(
   "/create-catbrand",
   cors(),
   [
-       check("category_id", "This is a required field!")
-    .not()
-    .isEmpty()
-    .trim()
-    .escape(),
+    check("category_id", "This is a required field!")
+      .not()
+      .isEmpty()
+      .trim()
+      .escape(),
     check("brand_id", "This is a required field!")
-    .not()
-    .isEmpty()
-    .trim()
-    .escape(),
+      .not()
+      .isEmpty()
+      .trim()
+      .escape(),
     check("size_id", "This is a required field!")
-    .not()
-    .isEmpty()
-    .trim()
-    .escape(),
+      .not()
+      .isEmpty()
+      .trim()
+      .escape(),
   ],
   CatsizeController.createData
 );
@@ -404,7 +411,7 @@ router.post(
 router.get("/editdetails/:id", cors(), CatsizeController.editData);
 router.post("/updatedata", cors(), CatsizeController.updateData);
 
-router.get("/productsize-status-change/:id",cors(),CatsizeController.updateStatusData);
+router.get("/productsize-status-change/:id", cors(), CatsizeController.updateStatusData);
 
 router.get("/deleteproductsize/:id", cors(), CatsizeController.deleteData);
 
@@ -413,8 +420,8 @@ router.get("/productlist", cors(), ProductController.getData);
 router.get("/productdetails/:id", cors(), ProductController.detailsData);
 router.post("/updateproductdetails", cors(), upload.array('images[]'), ProductController.updatedetailsData);
 
-router.get("/status-change/:id",cors(),ProductController.updateStatusData);
-router.get("/delete-product/:id", cors(),ProductController.deleteData);
+router.get("/status-change/:id", cors(), ProductController.updateStatusData);
+router.get("/delete-product/:id", cors(), ProductController.deleteData);
 
 //app settings
 router.get("/app-settings", cors(), AppSettingController.getData);
@@ -430,29 +437,29 @@ router.post(
 );
 
 router.get("/app-details/:id", cors(), AppSettingController.editData);
-router.post("/update-app-details", cors(),AppSettingController.updateData);
-router.get("/delete-appsettings/:id", cors(),AppSettingController.deleteData);
+router.post("/update-app-details", cors(), AppSettingController.updateData);
+router.get("/delete-appsettings/:id", cors(), AppSettingController.deleteData);
 
 //Bid Management
 router.get("/bid-listing", cors(), BidController.getData);
 router.get("/biddetails/:id", cors(), BidController.detailsData);
-router.post("/updatebiddetails", cors(),[check("bid_id", "This is a required field!").not().isEmpty().trim().escape(),], BidController.updatedetailsData);
-router.get("/delete-biddetails/:id", cors(),BidController.deleteData);
+router.post("/updatebiddetails", cors(), [check("bid_id", "This is a required field!").not().isEmpty().trim().escape(),], BidController.updatedetailsData);
+router.get("/delete-biddetails/:id", cors(), BidController.deleteData);
 
 //Order Management
 router.get("/orderlist", cors(), OrderController.getOrderList);
 router.get("/orderdetails/:id", cors(), OrderController.getOrderDetails);
-router.post("/update-orderdetails",cors(),[],OrderController.updateData);
+router.post("/update-orderdetails", cors(), [], OrderController.updateData);
 router.get("/shipmentdetails/:id", cors(), OrderController.getShipmentList);
-router.get("/delete-orderdetails/:id", cors(),OrderController.deleteData);
-router.get("/orderplace/:id", cors(),OrderController.orderplaced);
+router.get("/delete-orderdetails/:id", cors(), OrderController.deleteData);
+router.get("/orderplace/:id", cors(), OrderController.orderplaced);
 // router.get("/generateawb/:id", cors(),OrderController.getAWBnoById);
 router.get("/generateawb/:id/:courier_company_id", cors(), OrderController.getAWBnoById);
-router.get("/generatelabel/:id", cors(),OrderController.getGenerateLabel);
-router.get("/generateinvoice/:id", cors(),OrderController.getGenerateInvoice);
-router.get("/check-Couriresserviceability/:id", cors(),OrderController.getCourierServiceability);
-router.get("/check-schedule/:id", cors(),OrderController.getList);
-router.get("/schedule-pickup/:id", cors(),OrderController.getShipmentPickup);
+router.get("/generatelabel/:id", cors(), OrderController.getGenerateLabel);
+router.get("/generateinvoice/:id", cors(), OrderController.getGenerateInvoice);
+router.get("/check-Couriresserviceability/:id", cors(), OrderController.getCourierServiceability);
+router.get("/check-schedule/:id", cors(), OrderController.getList);
+router.get("/schedule-pickup/:id", cors(), OrderController.getShipmentPickup);
 
 
 //Product Condition
@@ -464,18 +471,18 @@ router.post(
   [],
   ProductconditionController.createData
 );
-router.get("/productcondition-status-change/:id",cors(),ProductconditionController.updateStatusData);
+router.get("/productcondition-status-change/:id", cors(), ProductconditionController.updateStatusData);
 router.get("/edit-productcondition/:id", cors(), ProductconditionController.editData);
-router.post("/updateproductcondition", cors(),[], ProductconditionController.updateData);
-router.get("/delete-productcondition-status/:id", cors(),ProductconditionController.deleteData);
+router.post("/updateproductcondition", cors(), [], ProductconditionController.updateData);
+router.get("/delete-productcondition-status/:id", cors(), ProductconditionController.deleteData);
 
 //HUB LIST
 
 router.get("/hublist", cors(), HubController.getData);
 router.get("/add-hubdata", cors(), HubController.addData);
-router.post("/create-hubdata",cors(),[],HubController.createData);
+router.post("/create-hubdata", cors(), [], HubController.createData);
 router.get("/edit-hubdata/:id", cors(), HubController.editData);
-router.get("/hub-status-change/:id",cors(),HubController.updateStatusData);
+router.get("/hub-status-change/:id", cors(), HubController.updateStatusData);
 
 // Best Deal Master (Add List)
 
@@ -486,10 +493,10 @@ router.post(
   cors(),
   [
     check("size_name", "This is a required field!")
-    .not()
-    .isEmpty()
-    .trim()
-    .escape(),
+      .not()
+      .isEmpty()
+      .trim()
+      .escape(),
   ],
   BestDealController.createData
 );
@@ -503,10 +510,10 @@ router.post(
   cors(),
   [
     check("shipping_name", "This is a required field!")
-    .not()
-    .isEmpty()
-    .trim()
-    .escape(),
+      .not()
+      .isEmpty()
+      .trim()
+      .escape(),
   ],
   ShippingchargesController.createData
 );
@@ -515,13 +522,13 @@ router.post(
 router.get("/shippingkitlist", cors(), ShippingkitController.getOrderList);
 router.get("/shippingkitdetails/:id", cors(), ShippingkitController.getShipmentKit);
 router.get("/hubselect/:id", cors(), ShippingkitController.getHublist);
-router.post("/add-hubaddress",cors(),[],ShippingkitController.updateData);
-router.get("/shipmentplace/:id", cors(),ShippingkitController.kitorderplaced);
-router.get("/couriresserviceability/:id", cors(),ShippingkitController.checkCourierServiceability);
+router.post("/add-hubaddress", cors(), [], ShippingkitController.updateData);
+router.get("/shipmentplace/:id", cors(), ShippingkitController.kitorderplaced);
+router.get("/couriresserviceability/:id", cors(), ShippingkitController.checkCourierServiceability);
 router.get("/generateawbforkit/:id/:courier_company_id", cors(), ShippingkitController.getAWBnoById);
-router.get("/generatelabelforkit/:id", cors(),ShippingkitController.getGenerateLabelforkit);
-router.get("/generateinvoiceforkit/:id", cors(),ShippingkitController.getGenerateInvoiceforkit);
-router.get("/schedule-pickupforkit/:id", cors(),ShippingkitController.getShipmentPickup);
+router.get("/generatelabelforkit/:id", cors(), ShippingkitController.getGenerateLabelforkit);
+router.get("/generateinvoiceforkit/:id", cors(), ShippingkitController.getGenerateInvoiceforkit);
+router.get("/schedule-pickupforkit/:id", cors(), ShippingkitController.getShipmentPickup);
 
 
 //Cart Remove Time
@@ -534,7 +541,7 @@ router.post(
   CartremoveController.createData
 );
 router.get("/carttime-details/:id", cors(), CartremoveController.editData);
-router.post("/update-carttime", cors(),CartremoveController.updateData);
+router.post("/update-carttime", cors(), CartremoveController.updateData);
 
 
 //Banner
@@ -547,8 +554,8 @@ router.post(
   BannerController.createData
 );
 router.get("/banner/:id", cors(), BannerController.editData);
-router.post("/update-banner", cors(),upload.single('image'),BannerController.updateData);
-router.get("/delete-banner/:id", cors(),BannerController.deleteData);
-router.get("/banner-status-change/:id",cors(),BannerController.updateStatusData);
+router.post("/update-banner", cors(), upload.single('image'), BannerController.updateData);
+router.get("/delete-banner/:id", cors(), BannerController.deleteData);
+router.get("/banner-status-change/:id", cors(), BannerController.updateStatusData);
 
 module.exports = router;

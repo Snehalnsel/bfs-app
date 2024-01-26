@@ -6,7 +6,6 @@
 </head>
 
 <body id="page-top">
-
     <!-- Page Wrapper -->
     <div id="wrapper">
 
@@ -22,7 +21,7 @@
 
                     <!-- Topbar -->
                     <%- include('../../partials/header', {siteName: siteName, userFullName: userFullName, userImage:
-                        userImage}); %>
+                        userImage,searchValue: searchValue,searchType: searchType}); %>
                         <!-- End of Topbar -->
 
                         <!-- Begin Page Content -->
@@ -43,18 +42,22 @@
                                             <button type="submit"><i class="fa fa-search"></i></button> -->
                                             <form>
                                                 <div class="searchlist-rowbox">
-                                                   <div class="fld-part">             
-                                                    <select id="categorySelect" class="custom-select sr-field" required>
-                                                        <option selected>Select Category</option>
-                                                        <option value="name">Name</option>
-                                                        <option value="category">Category</option>
-                                                    </select>
-                                                    
-                                                      <input type="text" placeholder="Product Name"  id="productNameInput" class="sr-field"> 
-                                                   </div>
-                                                   <div class="sb-box"><button type="button" onclick="searchNow()" placeholder="Submit" class="sr-button">Search Now</button></div>
+                                                    <div class="fld-part">
+                                                        <select id="categorySelect" class="custom-select sr-field"
+                                                            required>
+                                                            <option selected>Select Category</option>
+                                                            <option value="name">Name</option>
+                                                            <option value="category">Category</option>
+                                                        </select>
+
+                                                        <input type="text" placeholder="Product Name"
+                                                            id="productNameInput" class="sr-field">
+                                                    </div>
+                                                    <div class="sb-box"><button type="button" onclick="searchNow()"
+                                                            placeholder="Submit" class="sr-button">Search Now</button>
+                                                    </div>
                                                 </div>
-                                             </form>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -95,7 +98,7 @@
                                                                 </td>
                                                                 <td><img src="<%= value.subcategory.image %>"
                                                                         style="height: 40px;"></td>
-                                                       
+
                                                                 <td style="vertical-align: middle;">
                                                                     <div class="action-admin">
                                                                         <a href="/edit-sub-cat/<%= value.subcategory._id %>"
@@ -154,17 +157,16 @@
 
                                                                     <ul class="pagination">
                                                                         <% if (startPage> 1) { %>
-                                                                            <li><a
-                                                                                    href="/body-focus-subcat/<%= startPage - 1 %>">&laquo;</a>
-                                                                            </li>
+                                                                          <li>
+                                                                            <a href="/body-focus-subcat?page=<%= startPage - 1 %><% if (searchType && searchValue) { %>&searchType=<%= searchType %>&searchValue=<%= searchValue %><% } %>">&laquo;</a>
+                                                                          </li>
                                                                             <% } %>
 
                                                                                 <% for (let i=startPage; i <=endPage;
                                                                                     i++) { %>
                                                                                     <li>
-                                                                                        <a href="/body-focus-subcat/<%= i %>"
-                                                                                            class=<%=i===parseInt(currentPage)
-                                                                                            ? "active" : "''" %>>
+                                                                                        <a href="/body-focus-subcat?page=<%= i %><% if (searchType && searchValue) { %>&searchType=<%= searchType %>&searchValue=<%= searchValue %><% } %>">
+                                                                                            class="<%= i === parseInt(currentPage) ? 'active' : '' %>">
                                                                                             <%= i %>
                                                                                         </a>
                                                                                     </li>
@@ -173,7 +175,7 @@
                                                                                         <% if (endPage < totalPages) {
                                                                                             %>
                                                                                             <li><a
-                                                                                                    href="/body-focus-subcat/<%= endPage + 1 %>">&raquo;</a>
+                                                                                                    href="/body-focus-subcat?page=<%= endPage + 1 %><% if (searchType && searchValue) { %>&searchType=<%= searchType %>&searchValue=<%= searchValue %><% } %>">&raquo;</a>
                                                                                             </li>
                                                                                             <% } %>
                                                                     </ul>
@@ -213,122 +215,76 @@
         <%- include('../../partials/footerJs'); %>
 
 </body>
+
 </html>
 <script>
 
-function searchNow() {
-    var selectedCategory = $('#categorySelect').val();
-    var productName = $('#productNameInput').val();
-
-    console.log(selectedCategory);
-    console.log(productName);
-
-    $.ajax({
-        url: '/sreach-subcat/' + selectedCategory + '/' + productName + '/1',
-        type: 'GET',
-        success: function (response) {
-            console.log(response);
-
-            if (response.respdata && response.respdata.list) {
-            
-                var tbody = $('.sublist');
-
-                tbody.empty();
-
-                response.respdata.list.forEach(function (value, index) {
-                    if (value.subcategory.parent_id != '650444488501422c8bf24bdb') {
-                      
-                        tbody.append(`
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td>${value.subcategory.name}</td>
-                                <td>${value.subcategory.description}</td>
-                                <td>${value.parentCategoryName !== '' ? value.parentCategoryName : 'Not Yet Set'}</td>
-                                <td><img src="${value.subcategory.image}" style="height: 40px;"></td>
-                                <td style="vertical-align: middle;">
-                                <div class="action-admin">
-                                    <a href="/edit-sub-cat/${value.subcategory._id}" class="btn btn-info btn-circle btn-sm" title="Edit">
-                                        <i class="fas fa-pencil-alt"></i>
-                                    </a>
-                                    <a href="/body-focus-status/${value.subcategory._id}" class="btn btn-outline-success btn-circle btn-sm" title="Status change">
-                                        <i class="fa fa-solid fa-refresh"></i>
-                                    </a>
-                                    <a href="/delete-body-focus/${value.subcategory._id}" class="btn btn-danger btn-circle btn-sm" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                    <a href="${value.subcategory.image}" download="${value.subcategory.name}.jpg" class="btn btn-success btn-circle btn-sm" title="Download">
-                                        <i class="fas fa-download"></i>
-                                    </a>
-                                </div>
-                            </td>
-                            </tr>
-                        `);
-
-                         // Update pagination information
-                         updatePagination(response.totalPages, response.currentPage);
-
-                    }
-                });
-
-              
-            }
-        },
-        error: function (error) {
-            console.error('Error:', error);
+    function searchNow() {
+        var selectedCategory = $('#categorySelect').val();
+        var productName = $('#productNameInput').val();
+        var page = 1;
+        // window.location.href = '/body-focus-subcat?page='+page+'productName='+productName+'selectedCategory='+selectedCategory'if
+        let url = '/body-focus-subcat?';
+        if(page && !isNaN(page)){
+            url = url+'page='+page;
         }
-    });
+        if(selectedCategory && (selectedCategory !=='')){
+            url = url+'&searchType='+selectedCategory;
+        }
+        if(productName && (productName !=='')){
+            url = url+'&searchValue='+productName;
+        }
+        window.location.href = url;
 
-}
+        $.ajax({
+            url: `/body-focus-subcat`,
+            type: 'GET',
+            data: {
+                page: page,
+                searchType: selectedCategory,
+                searchValue: productName,
+            },
+            success: function (response) {
+                console.log("hi");
+                console.log(response);
+            },
+            error: function (error) {
+                console.error('Error:', error);
+            }
+        });
 
-function updatePagination(totalPages, currentPage) {
-    const itemsPerPage = 6;
-    const pagesPerBlock = 6;
-    const currentBlock = Math.ceil(currentPage / pagesPerBlock);
-    const startPage = (currentBlock - 1) * pagesPerBlock + 1;
-    const endPage = Math.min(startPage + pagesPerBlock - 1, totalPages);
-
-    const paginationContainer = $('.pagination');
-    paginationContainer.empty();
-
-    if (startPage > 1) {
-        paginationContainer.append(`
-            <li><a href="#" data-page="${startPage - 1}">&laquo;</a></li>
-        `);
     }
 
-    for (let i = startPage; i <= endPage; i++) {
-        paginationContainer.append(`
-            <li class="${i === currentPage ? 'active' : ''}">
-                <a href="#" data-page="${i}">${i}</a>
-            </li>
-        `);
+
+
+
+
+    function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
 
-    if (endPage < totalPages) {
-        paginationContainer.append(`
-            <li><a href="#" data-page="${endPage + 1}">&raquo;</a></li>
-        `);
+    // Usage
+    var page = getParameterByName('page');
+    var searchType = getParameterByName('searchType');
+    var searchValue = getParameterByName('searchValue');
+
+    if (searchType) {
+        $('#categorySelect').val(searchType);
     }
 
-    const pageInformationContainer = $('.table-datainfo');
-    pageInformationContainer.empty();
+    if (searchValue) {
+        $('#productNameInput').val(searchValue);
+    }
 
-    pageInformationContainer.append(`
-        <p>Showing ${currentPage * itemsPerPage + 1} to ${Math.min(
-            currentPage * itemsPerPage + itemsPerPage,
-            totalPages * itemsPerPage
-        )} of ${totalPages * itemsPerPage} entries</p>
-    `);
-
-    paginationContainer.find('a').on('click', function (event) {
-        event.preventDefault();
-        const clickedPage = parseInt($(this).data('page'));
-        searchNow(clickedPage);
-    });
-}
-
-
-// Trigger the initial searchNow function, e.g., on page load
-searchNow();
+    // Log the values to the console (you can do further processing here)
+    console.log('Page:', page);
+    console.log('Search Type:', searchType);
+    console.log('Search Value:', searchValue);
 
 </script>

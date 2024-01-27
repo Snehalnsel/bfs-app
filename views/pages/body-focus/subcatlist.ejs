@@ -73,7 +73,7 @@
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
-                                            <tbody class="sublist">
+                                            <tbody class="sublist category-listtable">
                                                 <% if(respdata.list){ %>
 
                                                     <% respdata.list.forEach(function(value, index) { %>
@@ -134,7 +134,7 @@
                                     </div>
                                     <!-- ... existing code ... -->
 
-                                    <div class="table-pages">
+                                    <div class="table-pages dsb-table-pagination">
                                         <div class="table-datainfo">
                                             <p>Showing <%= skip + 1 %> to <%= Math.min(skip + item_per_page,
                                                         totalSubcategoriesCount) %> of <%= totalSubcategoriesCount %>
@@ -264,7 +264,6 @@ function searchNow() {
                             </tr>
                         `);
 
-                         // Update pagination information
                          updatePagination(response.totalPages, response.currentPage);
 
                     }

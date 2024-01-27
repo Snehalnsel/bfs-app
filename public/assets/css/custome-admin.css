@@ -122,6 +122,25 @@
     outline: none;
 }
 
+.dsb-table-pagination ul.pagination {
+    margin: 0px;
+}
+
+.dsb-table-pagination ul.pagination a.active {
+    background: #000;
+    color: #fff !important;
+    transition: 0.5s;
+    border: 1px solid #000000;
+}
+
+tbody.category-listtable{
+    max-height: 400px !important;
+    overflow: auto !important;
+    height: auto !important;
+    display: table-caption;
+    width: 100% !important;
+}
+
 @media screen and (max-width: 767px) {
 .searchlist-rowbox {
     flex-wrap: wrap;

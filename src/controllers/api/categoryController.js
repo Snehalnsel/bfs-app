@@ -703,6 +703,9 @@ exports.getAllSubcategoriesWithProducts = async function (req, res, next) {
           product_ids: 1,
         },
       },
+      {
+        $sort: { name: 1 } // Sort by name in ascending order
+      }
     ]);
 
     if (!subcategoriesWithProducts || subcategoriesWithProducts.length === 0) {

@@ -378,9 +378,9 @@ exports.getTopCategories = async function (req, res) {
 };
 
 exports.getTopCategoriesweb = async function (req, res) {
-
   try {
-    const topCategories = await Category.find({ priority_status: { $in: [1, 2] } });
+    const topCategories = await Category.find({ priority_status: { $in: [1, 2] } }) .sort({ name: 1 }); 
+
     return res.status(200).json({
       status: "1",
       message: "Top categories",

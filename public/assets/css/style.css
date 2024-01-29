@@ -2848,8 +2848,18 @@ a.edit_link {
 }
 
 .chat-messages {
-   padding: 25px;
+    padding: 25px;
     max-height: 300px;
+    min-height: 280px;
+    overflow: auto;
+}
+
+.bib-box {
+    margin-bottom: 10px;
+}
+
+.bs-group {
+    height: 150px;
     overflow: auto;
 }
 

@@ -1,12 +1,15 @@
 <%- include('../../public/assets/include/header'); %>
+
 <% if (respdata && respdata.length> 0) { %>
-   <% respdata.forEach(function(item) { %>
    <section class="bids-wrapper ">
       <div class="container">
+       
          <div class="title-box title-with-count">
             <h1>My Wishlist</h1>
             <span class="wishlist-count">(<%= itemCount %>)</span>
          </div>
+
+            <% respdata.forEach(function(item) { %>
          <div class="bids-lists cart-wrapper">
             <% console.log(respdata);%>
                <div class="cart-list wishlist-list ">
@@ -51,20 +54,25 @@
 
                </div>
          </div>
+         <% }); %>
       </div>
-   </section>
-   <% }); %>
-                           <% } else { %>
-                              <section class="bids-wrapper empty-content ">
-                               <div class="container">
-                                 <div class="ec-box">
-                                    <h6>Wishlist</h6>
-                                    <p>There in no Product in wishlist</p>
-                                    <a href="/api/webSubCategories" class="bc-btn">Continue To Shopping</a>
-                                 </div> 
+   </section> 
+                        
+   <% } else { %>
+      <section class="empty-content ">
+                               <div class="container ">
+                                 <div class="">
+                                    <div class="ec-box ">
+                                       <h6>Wishlist</h6>
+                                       <p>There in no Product in wishlist</p>
+                                       <a href="/api/webSubCategories" class="bc-btn">Continue To Shopping</a>
+                                    </div> 
+                                 </div>
                                </div>
-                              </section>   
+                              
                               <% } %>
+
+                           </section>   
 
    <%- include('../../public/assets/include/newsletter'); %>
       <%- include('../../public/assets/include/footer'); %>

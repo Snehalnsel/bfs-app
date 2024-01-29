@@ -136,8 +136,7 @@
 tbody.category-listtable{
     max-height: 400px !important;
     overflow: auto !important;
-    height: auto !important;
-    display: table-caption;
+    height: auto !important;   
     width: 100% !important;
 }
 

@@ -85,10 +85,10 @@
                   </div>
                   <div class="card">
                      <div class="card-header">                           
-                        <button class="accordion-button " type="button" data-toggle="collapse" data-target="#card3" aria-expanded="true" aria-controls="card2">Price Range</button>
+                        <button class="accordion-button collapsed " type="button" data-toggle="collapse" data-target="#card3" aria-expanded="true" aria-controls="card2">Price Range</button>
                      </div>
 
-                     <div id="card3" class="collapse " data-parent="#theme-accordion">
+                     <!-- <div id="card3" class="collapse " data-parent="#theme-accordion">
                         <div class="card-body">
                            <div class="filter-list">
                               <ul class="list-group">
@@ -127,7 +127,31 @@
                               </ul>                             
                            </div>
                         </div>
-                     </div>
+                     </div> -->
+                     <div id="card3" class="collapse " data-parent="#theme-accordion">
+                        <div class="card-body">
+                           <div class="price-rangebox">
+                              <div class="price-input">
+                                 <div class="field">
+                                    <span>Min</span>
+                                    <input type="number" class="input-min" value="0">
+                                 </div>
+                                 <div class="separator">-</div>
+                                 <div class="field">
+                                    <span>Max</span>
+                                    <input type="number" class="input-max" value="7500">
+                                 </div>
+                              </div>
+                              <div class="slider">
+                                 <div class="progress"></div>
+                              </div>
+                              <div class="range-input">
+                                 <input type="range" class="range-min" min="0" max="10000" value="0" step="100">
+                                 <input type="range" class="range-max" min="0" max="10000" value="7500" step="100">
+                              </div>
+                          </div>
+                        </div>
+                      </div>
                   </div>
                </div>                             
             </div>

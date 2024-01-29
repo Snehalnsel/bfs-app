@@ -65,19 +65,6 @@ nav.nav-link ul li a {
 .theme-logo {
     width: 120px;
 }
-.header-bottom .ctg_Slider {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-}
-.header-bottom .ctg_Slider .slick-list.draggable {
-    width: 100%;
-}
-.header-bottom .ctg_Slider .slick-track {
-    display: flex !important;
-    justify-content: space-between !important;
-    width: 100% !important;
-}
 
 }
 

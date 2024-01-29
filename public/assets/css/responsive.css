@@ -1,3 +1,53 @@
+@media screen and (min-width:1921px) {
+    nav.nav-link ul li a {
+    font-size: 18px;    
+    padding: 5px 12px;
+    text-decoration: none;
+    line-height: 24px;
+    transition: 0.5s;
+}
+
+
+}
+
+
+@media screen and (min-width:1400px) {
+/*    .header-bottom .ctg_Slider .slider-item {
+    min-width: 110px;
+    width: auto !important;
+    padding: 0px 3px;
+}*/
+.sld-iconbox h6 {
+    font-size: 16px;
+}
+
+.sld-iconbox {
+    padding: 5px 10px;   
+}
+
+
+.buy-sell-link ul li a {
+    font-weight: bold;
+    font-size: 16px;    
+    line-height: 26px;   
+    padding: 5px 30px;   
+}
+.header-bottom .ctg_Slider {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+.header-bottom .ctg_Slider .slick-list.draggable {
+    width: 100%;
+}
+.header-bottom .ctg_Slider .slick-track {
+    display: flex !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+}
+
+}
+
 @media screen and (max-width: 1299px) {
 .search-block .search-box {
     width: 400px;

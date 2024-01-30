@@ -8,7 +8,7 @@ $(document).ready(async function(){
             name:{
                 required:true,
             },
-            email:{
+            remail:{
                 required:true,
                 maxlength: 70,
                 email: true  
@@ -31,7 +31,7 @@ $(document).ready(async function(){
             name:{
                 required:"Please enter your full name.",
             }, 
-            email:{
+            remail:{
                 required:"Please enter your email.",
                 maxlength: "You can enter maximum of 70 charecters."
             },
@@ -55,7 +55,7 @@ $(document).ready(async function(){
                 data: {
                     name:$('#name').val(),
                     phone_no: $('#phoneno').val(),
-                    email: $('#email').val(),
+                    email: $('#remail').val(),
                     password:$('#password').val(),
                     confirmpassword:$('#confirmpassword').val(),
                 },

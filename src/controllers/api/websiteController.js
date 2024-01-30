@@ -574,7 +574,7 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
               const mailData = {
                 from: smtpUser,
                 to: user.email,
-                subject: "Bid For Sale  - Welcome Email",
+                subject: "Welcome to Bid For Sale!",
                 text: "Server Email!",
                 html:loginHtmlContent,
               };

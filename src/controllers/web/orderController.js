@@ -831,22 +831,25 @@ exports.deleteData = async function (req, res, next) {
       });
     }
 
-    await Order.deleteOne(
+    // await Order.deleteOne(
+    //   { _id: req.params.id },
+    //   { w: "majority", wtimeout: 100 }
+    // );
+    await Order.updateOne(
       { _id: req.params.id },
+      { $set: { delete_status: 1 } },
       { w: "majority", wtimeout: 100 }
     );
-
 
     const productIdToUpdateFlag = order.product_id;
 
-    await Order.deleteOne(
-      { _id: req.params.id },
-      { w: "majority", wtimeout: 100 }
-    );
-
+    // await Order.deleteOne(
+    //   { _id: req.params.id },
+    //   { w: "majority", wtimeout: 100 }
+    // );
 
     await Userproduct.updateOne(
-      { _id: productIdToUpdateFlag }, // Use the appropriate field to match the product in your Userproduct model
+      { _id: productIdToUpdateFlag }, 
       { $set: { flag: 0 } }
     );
 

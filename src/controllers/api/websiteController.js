@@ -342,11 +342,15 @@ exports.registration = async function (req, res, next) {
   try {
     // console.log("Registration");
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-    res.render("webpages/registration", {
-      title: "Registration",
-      message: "Welcome to the privacy policy page!",
-      isLoggedIn: isLoggedIn,
-    });
+    if (isLoggedIn == "") {
+      res.render("webpages/registration", {
+        title: "Registration",
+        message: "Welcome to the privacy policy page!",
+        isLoggedIn: isLoggedIn,
+      });
+    } else {
+      res.redirect('/api/my-account');
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -572,11 +576,12 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
               });
             } else {
               const mailData = {
-                from: smtpUser,
+                from: "Bid For Sale! <"+smtpUser+">",
                 to: user.email,
                 subject: "Welcome to Bid For Sale!",
-                text: "Server Email!",
-                html:loginHtmlContent,
+                name:"Bid For Sale!",
+                text:"welocome",
+                html:loginHtmlContent
               };
 
               transporter.sendMail(mailData, function (err, info) {

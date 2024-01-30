@@ -1146,6 +1146,7 @@ exports.cancelOrderById = async function (req, res, next) {
     }
     
     existingOrder.delete_status = '1';
+    existingOrder.delete_by = '2';
 
     existingOrder.updated_dtime = new Date().toISOString();
 
@@ -1154,18 +1155,20 @@ exports.cancelOrderById = async function (req, res, next) {
 
     if (canceledOrder) {
        
-      const checkingwithjhordertracking = await Ordertracking .findById(orderId);
+      // const checkingwithehordertracking = await Ordertracking .find({order_id : orderId});
 
-      if(checkingwithjhordertracking)
-      {
-        const checkingwithjhordertracking = await Ordertracking .findById(orderId);
-      }
+      // let checkingwithordertracking;
 
-      const shiprocketResponse = await canceleOrder(canceledOrder.shiprocket_order_id);
+      // if(checkingwithehordertracking)
+      // {
+      //   checkingwithordertracking = await Ordertracking .find(orderId);
+      // }
+
+      // const shiprocketResponse = await canceleOrder(canceledOrder.shiprocket_order_id);
       
-      if (shiprocketResponse.success) {
+      // if (shiprocketResponse.success) {
         
-        await Order.findByIdAndDelete(orderId);
+        //await Order.findByIdAndDelete(orderId);
         
         res.status(200).json({
           status: "1",
@@ -1184,7 +1187,69 @@ exports.cancelOrderById = async function (req, res, next) {
           shiprocketResponse: shiprocketResponse
         });
       }
+    // }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: "0",
+      message: "Error!",
+      respdata: error,
+    });
+  }
+};
+
+
+exports.cancelOrderByBuyer = async function (req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: "0",
+      message: "Validation error!",
+      respdata: errors.array(),
+    });
+  }
+
+  try {
+    const orderId = req.params.order_id;
+    const existingOrder = await Order.findById(orderId);
+    if (!existingOrder) {
+      return res.status(404).json({
+        status: "0",
+        message: "Order not found!",
+        respdata: {},
+      });
     }
+    existingOrder.delete_status = '1';
+    existingOrder.delete_by = '3';
+    existingOrder.updated_dtime = new Date().toISOString();
+    const canceledOrder = await existingOrder.save();
+    if (canceledOrder) {        
+      // res.render("webpages/myorderdetails",{
+      //   title: "Wish List Page",
+      //   message: "Welcome to the Wish List page!",
+      //   respdata: orderDetails,
+      //   //respdata1: orderlistId,
+      //   isLoggedIn: isLoggedIn,
+      // });
+  
+      let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+
+        res.render("webpages/myorder", {
+          title: "Wish List Page",
+          message: "Welcome to the Wish List page!",
+          respdata: req.session.user,
+          isLoggedIn: isLoggedIn,
+        });
+        
+      } else {
+        
+        res.status(400).json({
+          status: "0",
+          message: "Order cancellation failed!",
+          respdata: canceledOrder,
+          is_cancelorder: false,
+        });
+      }
   } catch (error) {
     console.error(error);
     res.status(500).json({

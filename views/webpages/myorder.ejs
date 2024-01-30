@@ -102,7 +102,7 @@
             data.orders.forEach(item => {
 
                var hTml = `<div class="cart-list wishlist-list">
-        <div class="bids-row wishlist-row order-list" >
+        <div class="bids-row wishlist-row " >
               <div class="br-details">
                   <div class="bid-images"><img src="${item.product.image}" alt="images" class="img-fluid"></div>
                   <div class="bid-info">
@@ -112,9 +112,24 @@
                      <div class="bd-price">
                         <span><i class="fa fa-inr" aria-hidden="true"></i></span>
                         ${item.total_price}
-                     </div>                     
+                     </div>                                         
                   </div>
-              </div>
+                </div>
+
+                <div class="br-results ">                                            
+                              <div class="cart-action d-flex">
+                                 <div class="remove-cart">
+                                    <a href="/api/web-myorder-details/${item._id}" class="prd-btn wish-rem-button"
+                                       data-id=""><i class="fa fa-eye" aria-hidden="true"></i></a>
+                                 </div>
+                                 <div class="remove-cart">
+                                    <a href="/api/cancelorderbybuyer/${item._id}" class="prd-btn wish-rem-button"
+                                       data-id=""><i class="fa fa-trash-o"
+                                          aria-hidden="true"></i></a>
+                                 </div>
+                              </div>
+                           </div>
+               
               </div>
               </div>`;
                $("#buyers-tab").append(hTml);

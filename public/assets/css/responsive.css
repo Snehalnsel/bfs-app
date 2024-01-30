@@ -1,7 +1,42 @@
-@media screen and (max-width: 1299px) {
-.search-block .search-box {
-    width: 400px;
+@media screen and (min-width:1921px) {
+    nav.nav-link ul li a {
+    font-size: 18px;    
+    padding: 5px 12px;    
 }
+
+
+}
+
+
+@media screen and (min-width:1400px) {
+/*    .header-bottom .ctg_Slider .slider-item {
+    min-width: 110px;
+    width: auto !important;
+    padding: 0px 3px;
+}*/
+.sld-iconbox h6 {
+    font-size: 16px;
+}
+
+.sld-iconbox {
+    padding: 5px 10px;   
+}
+
+
+.buy-sell-link ul li a {
+    font-weight: bold;
+    font-size: 16px;    
+    line-height: 26px;   
+    padding: 5px 30px;   
+}
+
+
+}
+
+@media screen and (max-width: 1299px) {
+/*.search-block .search-box {
+    width: 400px;
+}*/
 nav.nav-link ul li a {
     font-size: 14px;   
     padding: 5px 6px;   
@@ -15,6 +50,20 @@ nav.nav-link ul li a {
 }
 .pib-box i {   
     font-size: 15px;
+}
+.sld-iconbox {
+    padding: 1px;    
+}
+.sld-iconbox h6 {
+    font-size: 12px;
+}
+.header-info {
+    width: calc(100% - 120px);
+    padding-left: 10px;
+}
+
+.theme-logo {
+    width: 120px;
 }
 
 }

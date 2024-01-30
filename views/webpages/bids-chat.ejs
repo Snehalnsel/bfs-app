@@ -6,101 +6,100 @@
    <link rel="stylesheet" href="../../public/assets/css/chat.css" />
 </head>
 <body>
-   
-      <section class="bids-wrapper">
-                  <div class="container">
-                     <div class="breadcum-product">
-                        <ul>
-                           <li><a href="/api/home">Home</a></li>
-                           <li><a href="/api/my-account">My Account</a></li>
-                           <li>My Bids</li>
-                        </ul>
-                     </div>
-                     <div class="bids-chatbox">
-                        <div class="bids-productbox">
-                           <div class="bib-box">
-                              <h6 class="buyer-heading">Buyer</h6>
-                              <div class="bs-group">   
-                                 <% if(buyerData.length > 0) {%>                           
-                                    <% for(let i=0; i<buyerData.length; i++) {%> 
-                                       <%if(buyerData[i].product_details.length > 0) {%>                                                   
-                                          <div class="br-details clickOnProduct" id="<%=buyerData[i].id %>">
-                                             <div class="bid-images"><img src="<%=buyerData[i].product_image %>" alt="images" class="img-fluid"></div>
-                                             <div class="bid-info">
-                                                <div class="bd-title"><%=buyerData[i].product_details.name %></div>
-                                                <div class="bd-price">
-                                                   <span><i class="fa fa-inr" aria-hidden="true"></i></span>
-                                                   <%=buyerData[i].product_details.price %>
-                                                </div>
-                                                <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i> <%=buyerData[i].product_details.offer_price %></div>
-                                                <div class="bidding-box">
-                                                   <div class="highlight-title">Bid Price</div>
-                                                   <div class="bidding-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%= buyerData[i].currentOffer.price%></div>
-                                                </div>
-                                             </div>
-                                          </div>
-                                       <% } %>
-                                    <% } %>
-                                 <% } else { %>
-                                    <p>No Reccords Yet!</p>
-                                 <% } %>
+   <section class="bids-wrapper">
+      <div class="container">
+         <div class="breadcum-product">
+            <ul>
+               <li><a href="/api/home">Home</a></li>
+               <li><a href="/api/my-account">My Account</a></li>
+               <li>My Bids</li>
+            </ul>
+         </div>
+         <div class="bids-chatbox">
+            <div class="bids-productbox">
+               <div class="bib-box">
+                  <h6 class="buyer-heading">Buyer</h6>
+                  <div class="bs-group">   
+                     <% if(buyerData.length > 0) {%>                           
+                        <% for(let i=0; i<buyerData.length; i++) {%> 
+                           <%if(buyerData[i].product_details.length > 0) {%>                                                   
+                              <div class="br-details clickOnProduct" id="<%=buyerData[i].id %>">
+                                 <div class="bid-images"><img src="<%=buyerData[i].product_image %>" alt="images" class="img-fluid"></div>
+                                 <div class="bid-info">
+                                    <div class="bd-title"><%=buyerData[i].product_details.name %></div>
+                                    <div class="bd-price">
+                                       <span><i class="fa fa-inr" aria-hidden="true"></i></span>
+                                       <%=buyerData[i].product_details.price %>
+                                    </div>
+                                    <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i> <%=buyerData[i].product_details.offer_price %></div>
+                                    <div class="bidding-box">
+                                       <div class="highlight-title">Bid Price</div>
+                                       <div class="bidding-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%= buyerData[i].currentOffer.price%></div>
+                                    </div>
+                                 </div>
                               </div>
-                           </div>
-
-                           <div class="bib-box">
-                              <h6 class="buyer-heading">Seller</h6>
-                              <div class="bs-group">      
-                                 <% if(sellerData.length > 0) {%>                          
-                                    <% for(let i=0; i<sellerData.length; i++) {%>                             
-                                       <div class="br-details clickOnProduct" id="<%=sellerData[i].id %>">
-                                          <div class="bid-images"><img src="<%=sellerData[i].product_image %>" alt="images" class="img-fluid"></div>
-                                          <div class="bid-info">
-                                             <div class="bd-title"><%=sellerData[i].product_details.name %></div>
-                                             <div class="bd-price">
-                                                <span><i class="fa fa-inr" aria-hidden="true"></i></span>
-                                                <%=sellerData[i].product_details.price %>
-                                             </div>
-                                             <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i> <%=sellerData[i].product_details.price %></div>
-                                             <div class="bidding-box">
-                                                <div class="highlight-title">Bid Price</div>
-                                                <div class="bidding-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%= sellerData[i].currentOffer.price%></div>
-                                             </div>
-                                          </div>
-                                       </div>
-                                    <% } %>
-                                 <% } else { %>
-                                    <p>No Reccords Yet!</p>
-                                 <% } %>
-                              </div>
-                           </div>
-
-                          
-                          
-                        </div>
-
-                        <div class="chatbid-box">
-                           <div class="chat-title">Enter Your Price</div>
-                           <div class="chat-messages">
-                           </div>
-                           <div class="chat-input-holder">  
-                              <form id="chat-form"> 
-                                 <div class="chat-field">
-                                    <input id="msg" type="number"name="msg" placeholder="Enter Amount" class="chat-input sendMessageField" required autocomplete="off"/>
-                                 </div>                                 
-                                 <button class="btn message-send sendMessageButton">Send</button>
-                              </form>
-                           </div>
-                           <div class="action-botton-group">
-                              <ul class="resultlist">
-                                 <li><a href="javascript:void(0)" class="chatbox-btn" id="reBidButton">Re Bid</a></li>
-                                 <!--<li><a href="javascript:void(0)" class="chatbox-btn" id="acceptButton">Accept</a></li>
-                                 <li><a href="javascript:void(0)" class="chatbox-btn black-btn" id="withdrawButton">Withdraw</a></li>-->
-                              </ul>
-                           </div>
-                        </div>
-                     </div>
+                           <% } %>
+                        <% } %>
+                     <% } else { %>
+                        <p>No Reccords Yet!</p>
+                     <% } %>
                   </div>
-               </section>
+               </div>
+
+               <div class="bib-box">
+                  <h6 class="buyer-heading">Seller</h6>
+                  <div class="bs-group">      
+                     <% if(sellerData.length > 0) {%>                          
+                        <% for(let i=0; i<sellerData.length; i++) {%>                             
+                           <div class="br-details clickOnProduct" id="<%=sellerData[i].id %>">
+                              <div class="bid-images"><img src="<%=sellerData[i].product_image %>" alt="images" class="img-fluid"></div>
+                              <div class="bid-info">
+                                 <div class="bd-title"><%=sellerData[i].product_details.name %></div>
+                                 <div class="bd-price">
+                                    <span><i class="fa fa-inr" aria-hidden="true"></i></span>
+                                    <%=sellerData[i].product_details.price %>
+                                 </div>
+                                 <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i> <%=sellerData[i].product_details.price %></div>
+                                 <div class="bidding-box">
+                                    <div class="highlight-title">Bid Price</div>
+                                    <div class="bidding-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%= sellerData[i].currentOffer.price%></div>
+                                 </div>
+                              </div>
+                           </div>
+                        <% } %>
+                     <% } else { %>
+                        <p>No Reccords Yet!</p>
+                     <% } %>
+                  </div>
+               </div>
+
+              
+              
+            </div>
+
+            <div class="chatbid-box">
+               <div class="chat-title">Enter Your Price</div>
+               <div class="chat-messages">
+               </div>
+               <div class="chat-input-holder">  
+                  <form id="chat-form"> 
+                     <div class="chat-field">
+                        <input id="msg" type="number"name="msg" placeholder="Enter Amount" class="chat-input sendMessageField" required autocomplete="off"/>
+                     </div>                                 
+                     <button class="btn message-send sendMessageButton">Send</button>
+                  </form>
+               </div>
+               <div class="action-botton-group">
+                  <ul class="resultlist">
+                     <li><a href="javascript:void(0)" class="chatbox-btn" id="reBidButton">Re Bid</a></li>
+                     <!--<li><a href="javascript:void(0)" class="chatbox-btn" id="acceptButton">Accept</a></li>
+                     <li><a href="javascript:void(0)" class="chatbox-btn black-btn" id="withdrawButton">Withdraw</a></li>-->
+                  </ul>
+               </div>
+            </div>
+         </div>
+      </div>
+   </section>
    <input type="hidden" name="userId" id="userId" value="<%=userId%>" />  
   <%- include('../../public/assets/include/newsletter'); %>
   <%- include('../../public/assets/include/footer'); %>

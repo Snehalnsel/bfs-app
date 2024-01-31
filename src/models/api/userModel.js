@@ -26,15 +26,12 @@ const model = mongoose.Schema({
   },
   deviceid: {
     type: String,
-    required: true,
   },
   devicename: {
     type: String,
-    required: true,
   },
   fcm_token: {
     type: String,
-    required: true,
   },
   country: {
     type: String,

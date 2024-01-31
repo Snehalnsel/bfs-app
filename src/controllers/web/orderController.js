@@ -811,6 +811,60 @@ exports.getShipmentList = function (req, res, next) {
 };
 
 
+// exports.deleteData = async function (req, res, next) {
+//   try {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       return res.status(400).json({
+//         status: "0",
+//         message: "Validation error!",
+//         respdata: errors.array(),
+//       });
+//     }
+
+//     const order = await Order.findOne({ _id: req.params.id });
+//     if (!order) {
+//       return res.status(404).json({
+//         status: "0",
+//         message: "Not found!",
+//         respdata: {},
+//       });
+//     }
+
+//     // await Order.deleteOne(
+//     //   { _id: req.params.id },
+//     //   { w: "majority", wtimeout: 100 }
+//     // );
+//     await Order.updateOne(
+//       { _id: req.params.id },
+//       { $set: { delete_status: 1 } },
+//       { $set: { delete_by: 1 } },
+//       { w: "majority", wtimeout: 100 }
+//     );
+
+//     const productIdToUpdateFlag = order.product_id;
+
+//     // await Order.deleteOne(
+//     //   { _id: req.params.id },
+//     //   { w: "majority", wtimeout: 100 }
+//     // );
+
+//     await Userproduct.updateOne(
+//       { _id: productIdToUpdateFlag }, 
+//       { $set: { flag: 0 } }
+//     );
+
+//     res.redirect("/orderlist");
+//   } catch (error) {
+
+//     return res.status(500).json({
+//       status: "0",
+//       message: "Error occurred while deleting the category!",
+//       respdata: error.message,
+//     });
+//   }
+// };
+
 exports.deleteData = async function (req, res, next) {
   try {
     const errors = validationResult(req);
@@ -831,28 +885,21 @@ exports.deleteData = async function (req, res, next) {
       });
     }
 
-    await Order.deleteOne(
+    await Order.updateOne(
       { _id: req.params.id },
+      { $set: { delete_status: 1, delete_by: 1 } }, 
       { w: "majority", wtimeout: 100 }
     );
-
 
     const productIdToUpdateFlag = order.product_id;
 
-    await Order.deleteOne(
-      { _id: req.params.id },
-      { w: "majority", wtimeout: 100 }
-    );
-
-
     await Userproduct.updateOne(
-      { _id: productIdToUpdateFlag }, // Use the appropriate field to match the product in your Userproduct model
+      { _id: productIdToUpdateFlag }, 
       { $set: { flag: 0 } }
     );
 
     res.redirect("/orderlist");
   } catch (error) {
-
     return res.status(500).json({
       status: "0",
       message: "Error occurred while deleting the category!",
@@ -860,7 +907,6 @@ exports.deleteData = async function (req, res, next) {
     });
   }
 };
-
 
 // const orderId = req.params.id;
 
@@ -1147,12 +1193,6 @@ exports.getAWBnoById = async function (req, res, next) {
 
 
 const sendEmailWithAttachment = async (receiverEmail, labelUrl,invoiceUrl) => {
-//  transporter.sendMail(mailData, function (err, info) {
-//                 if (err) console.log(err);
-//                 else console.log(info);
-//               });
-
-
 const mailData = {
   from: smtpUser,
   to: receiverEmail,

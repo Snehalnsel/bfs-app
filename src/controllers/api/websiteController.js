@@ -58,12 +58,12 @@ const { log } = require("console");
 
 const transporter = nodemailer.createTransport({
   port: 465,
-  host: "mail.bidforsale.com",
+  host: "bidforsale.com",
   auth: {
     user: smtpUser,
     pass: "India_2023",
   },
-  secure: true,
+  //secure: true,
 });
 
 function randNumber(min, max) {
@@ -847,18 +847,27 @@ exports.userFilter = async function (req, res, next) {
   if ((typeof conditionList != "undefined") && (objConditionList.length > 0)) {
     concatVar["status"] = { "$in": objConditionList };
   }
-  if (typeof priceList !== "undefined" && priceList.length > 0) {
-    const priceConditions = priceList.map(item => {
-      const priceArr = item.split("-");
-      return {
-        offer_price: {
-          $gt: parseFloat(priceArr[0]),
-          $lte: parseFloat(priceArr[1])
-        }
-      };
-    });
+  if (priceList && typeof priceList !== "undefined" && priceList !='') {
+
+    let [min, max] = priceList.split('-').map(Number);
+    const priceConditions= {
+      offer_price: {
+        $gt: parseFloat(max),
+        $lte: parseFloat(min)
+      }
+    };
+
+    // const priceConditions = priceList.map(item => {
+    //   const priceArr = item.split("-");
+    //   return {
+    //     offer_price: {
+    //       $gt: parseFloat(priceArr[0]),
+    //       $lte: parseFloat(priceArr[1])
+    //     }
+    //   };
+    // });
   
-    concatVar['$or'] = priceConditions;
+    concatVar['$and'] = priceConditions;
   }
   
   console.log(concatVar);
@@ -961,7 +970,7 @@ exports.getUserLogin = async function (req, res, next) {
               });
             } else {
               const mailData = {
-                from: smtpUser,
+                from: "Bid For Sale! <"+smtpUser+">",
                 to: user.email,
                 subject: "BFS - Bid For Sale  - Welcome Email",
                 text: "Server Email!",
@@ -2059,7 +2068,7 @@ exports.addToWishlistWeb = async function (req, res, next) {
     const existingList = await Wishlist.findOne({ user_id, product_id, status: 0 });
     if (existingList) {
       return res.status(200).json({
-        message: 'Item already added to your favorite successfully',
+        message: 'The product has been added to your wishlist.',
         wishlist: existingList,
         success: true,
         is_wishlisted: true
@@ -2122,11 +2131,12 @@ exports.viewWishListByUserId = async function (req, res, next) {
       });
     } else {
       const formattedList = await Promise.all(existingList.map(async (item) => {
-        console.log(item.product_id);
+        // console.log(item.product_id);
         const product = await Userproduct.findOne({ _id: item.product_id }).populate('category_id', 'name');
 
 
         console.log(product);
+        console.log("-==========");
         const productImages = await Productimage.find({ product_id: item.product_id }).limit(1);
 
         const date = moment(item.added_dtime);
@@ -2147,6 +2157,7 @@ exports.viewWishListByUserId = async function (req, res, next) {
         };
       }));
 
+      console.log(formattedList);
       const count = formattedList.length;
 
       res.render("webpages/wishlist", {
@@ -2189,7 +2200,7 @@ exports.removeWishlistWeb = async (req, res) => {
       await existingList.remove();
       const count = await Wishlist.countDocuments({ user_id });
       return res.status(200).json({
-        message: 'Product removed from Wishlist successfully',
+        message: 'The product has been removed from your wishlist',
         success: true,
         count: count
       });
@@ -3238,7 +3249,7 @@ exports.userPlacedOrder = async function (req, res) {
       const user = await Users.findById(savedOrder.user_id);
 
       const mailData = {
-        from: smtpUser,
+        from: "Bid For Sale! <"+smtpUser+">",
         to: user.email,
         subject: "BFS - Bid For Sale  - Order Placed Successfully",
         text: "Server Email!",
@@ -3365,7 +3376,7 @@ exports.sendotp = async function (req, res, next) {
       var otp = randNumber(1000, 2000);
 
       const mailData = {
-        from: smtpUser, 
+        from: "Bid For Sale! <"+smtpUser+">", 
         to: user.email,
         subject: "BFS - Bids For Sale - Forgot password OTP",
         text: "Server Email!",

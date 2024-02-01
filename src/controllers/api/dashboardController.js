@@ -340,41 +340,21 @@ exports.getWhatsHotProducts = async function (req, res) {
     console.error('Error fetching what\'s hot products:', error);
 
     return res.status(500).json({ message: 'Internal server error' });
-
   }
-
 };
 
-
-
-
-
 exports.getTopCategories = async function (req, res) {
-
   try {
-
-    const topCategories = await Category.find({ priority_status: 1 });
-
-
-
+    const topCategories = await Category.find({ priority_status: 1 }).sort({ name: 1 });
     return res.status(200).json({
-
       status: "1",
-
       message: "Top categories",
-
       respdata: topCategories,
-
     });
-
   } catch (error) {
-
     console.error('Error fetching top categories:', error);
-
     return res.status(500).json({ message: 'Internal server error' });
-
   }
-
 };
 
 exports.getTopCategoriesweb = async function (req, res) {

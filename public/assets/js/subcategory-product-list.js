@@ -6,12 +6,21 @@ $(document).ready(async function() {
             location.reload();
         }
     });
+
+    $(document).on("input change", ".input-min, .range-min, .input-max, .range-max", async function() {
+        const max = $('.input-max').val();
+        const min = $('.input-min').val();
+        let priceList = min+ '-'+max;
+     
+        searchByFilter(priceList)
+    });
+
+ 
 });
-async function searchByFilter() {
+async function searchByFilter(priceList='') {
     let brandList = [];
     let sizeList = [];
     let conditionList = [];
-    let priceList = [];
     let optionId = $("#sortBy").val();
     let productcategoryId = $("#product_category_id").val();
     //get all selected brand name
@@ -27,9 +36,9 @@ async function searchByFilter() {
         conditionList.push($(this).data("id"));
     });
     //get all price
-    $(".searchByPrice:checked").each(function() {
-        priceList.push($(this).data("id"));
-    });
+    // $(".searchByPrice:checked").each(function() {
+    //     priceList.push($(this).data("id"));
+    // });
     $.ajax({
         type: 'POST',
         url:  webSiteUrl + "/api/user-filter",
@@ -37,7 +46,7 @@ async function searchByFilter() {
             brandList:brandList,
             sizeList:sizeList,
             conditionList:conditionList,
-            priceList:priceList,
+            priceList:priceList ? priceList : null,
             optionId:optionId,
             productcategoryId:productcategoryId
         },

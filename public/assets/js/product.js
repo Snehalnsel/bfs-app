@@ -147,7 +147,7 @@ $(document).on('click', ".wish-rem-btn", async function (e) {
 
 $(document).on('click', ".wish-rem-button", async function (e) {
     Swal.fire({
-        title: "Do you want to delete the item?",
+        title: "Do you want to remove this product from your wishlist?",
         iconHtml: '<img src="'+ src +'">',
         customClass: {  
             icon: 'alert-logo-item',

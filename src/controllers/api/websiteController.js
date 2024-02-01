@@ -38,7 +38,8 @@ const Cart = require('../../models/api/cartModel');
 const CartDetail = require('../../models/api/cartdetailsModel');
 const Order = require("../../models/api/orderModel");
 const Banner = require("../../models/api/bannerModel");
-const smtpUser = "sneha.lnsel@gmail.com";
+//const smtpUser = "sneha.lnsel@gmail.com";
+const smtpUser = "hello@bidforsale.com";
 const nodemailer = require("nodemailer");
 const app = express();
 const generateTokens = require("../../utils/generateTokens");
@@ -57,10 +58,10 @@ const { log } = require("console");
 
 const transporter = nodemailer.createTransport({
   port: 465,
-  host: "smtp.gmail.com",
+  host: "mail.bidforsale.com",
   auth: {
     user: smtpUser,
-    pass: "iysxkkaexpkmfagh",
+    pass: "India_2023",
   },
   secure: true,
 });
@@ -341,11 +342,15 @@ exports.registration = async function (req, res, next) {
   try {
     // console.log("Registration");
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-    res.render("webpages/registration", {
-      title: "Registration",
-      message: "Welcome to the privacy policy page!",
-      isLoggedIn: isLoggedIn,
-    });
+    if (isLoggedIn == "") {
+      res.render("webpages/registration", {
+        title: "Registration",
+        message: "Welcome to the privacy policy page!",
+        isLoggedIn: isLoggedIn,
+      });
+    } else {
+      res.redirect('/api/my-account');
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -559,6 +564,9 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
           // user.devicename = devicename;
           // user.fcm_token = fcm_token;
 
+          const loginHtmlPath = 'views/webpages/mailbody.html';  
+          const loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+
           user.save(async (err) => {
             if (err) {
               res.status(400).json({
@@ -568,38 +576,41 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
               });
             } else {
               const mailData = {
-                from: smtpUser,
+                from: "Bid For Sale! <"+smtpUser+">",
                 to: user.email,
-                subject: "BFS - Bid For Sale  - Welcome Email",
-                text: "Server Email!",
-                html:
-                  "Hey " +
-                  user.name +
-                  ", <br> <p>Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items </p>",
+                subject: "Welcome to Bid For Sale!",
+                name:"Bid For Sale!",
+                text:"welocome",
+                html:loginHtmlContent
               };
+
               transporter.sendMail(mailData, function (err, info) {
                 if (err) console.log(err);
                 else console.log(info);
               });
 
+              //html:
+              // "Hey " +
+              // user.name +
+              // ", <br> <p>Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items </p>",
               // const msg = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
 
-              const whatsappMessage = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
-              const userPhoneNo = "+917044289770";
+              // const whatsappMessage = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
+              // const userPhoneNo = "+917044289770";
 
-              twilioClient.messages.create({
-                body: whatsappMessage,
-                // From: 'whatsapp:+12565734549',
-                // to: 'whatsapp:+918116730275'
-                from: 'whatsapp:+14155238886',
-                to: 'whatsapp:+917044289770'
-              })
-                .then((message) => {
-                  console.log(`WhatsApp message sent with SID: ${message.sid}`);
-                })
-                .catch((error) => {
-                  console.error(`Error sending WhatsApp message: ${error.message}`);
-                });
+              // twilioClient.messages.create({
+              //   body: whatsappMessage,
+              //   // From: 'whatsapp:+12565734549',
+              //   // to: 'whatsapp:+918116730275'
+              //   from: 'whatsapp:+14155238886',
+              //   to: 'whatsapp:+917044289770'
+              // })
+              //   .then((message) => {
+              //     console.log(`WhatsApp message sent with SID: ${message.sid}`);
+              //   })
+              //   .catch((error) => {
+              //     console.error(`Error sending WhatsApp message: ${error.message}`);
+              //   });
               const userToken = {
                 userId: user._id,
                 email: user.email,

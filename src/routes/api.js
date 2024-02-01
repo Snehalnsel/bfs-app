@@ -930,6 +930,11 @@ router.post(
   OrderController.cancelOrderById
 );
 
+router.get(
+  "/cancelorderbybuyer/:order_id",
+  OrderController.cancelOrderByBuyer
+);
+
 
 router.post(
   "/orderlist",

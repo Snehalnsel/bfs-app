@@ -106,7 +106,6 @@ router.post(
       .isLength({ min: 10, max: 30 }),
     check("password", "Password length should be 8 to 10 characters").isLength({
       min: 8,
-      max: 10,
     }),
   ],
   UsersController.getLogin

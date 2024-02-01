@@ -143,7 +143,8 @@
       max-width: 100%;
   }
   .theme_header {
-      padding: 15px 0px;
+     padding: 15px 0px;
+    border-bottom: solid 1px #cecece;
   }
   
   .buy-sell-link ul {
@@ -3462,7 +3463,6 @@ span.close-icon {
     margin-bottom: 15px;
     font-weight: 600;
     color: #484848;
-    text-transform: capitalize;
 }
 
 .ec-box p {

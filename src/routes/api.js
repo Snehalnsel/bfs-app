@@ -1278,6 +1278,10 @@ router.post("/forgotpassword-sendotp",cors(),
   WebsiteController.sendotp
 );
 
+router.get("/forgotpassword123",
+  WebsiteController.sendotp
+);
+
 router.post(
   "/resetpassword",
   [

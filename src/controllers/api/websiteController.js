@@ -847,31 +847,54 @@ exports.userFilter = async function (req, res, next) {
   if ((typeof conditionList != "undefined") && (objConditionList.length > 0)) {
     concatVar["status"] = { "$in": objConditionList };
   }
-  if (priceList && typeof priceList !== "undefined" && priceList !='') {
+  // if (priceList && typeof priceList !== "undefined" && priceList !='') {
 
+  //   let [min, max] = priceList.split('-').map(Number);
+  //   const priceConditions= {
+  //     offer_price: {
+  //       $gt: parseFloat(min),
+  //       $lte: parseFloat(max)
+  //     }
+  //   };
+
+  //     // Check if concatVar already has an $and array
+  //     if (concatVar.$and) {
+  //       concatVar.$and.push(priceConditions);
+  //   } else {
+  //       // Create a new $and array
+  //       concatVar.$and = [priceConditions];
+  //   }
+
+
+  
+  //   concatVar['$and'] = priceConditions;
+  // }
+  
+  // console.log(concatVar);
+  // let allProductData = await Userproduct.find({ $and: concatVar}).sort({ offer_price: optionId });
+
+
+  if (priceList && typeof priceList !== "undefined" && priceList !== '') {
     let [min, max] = priceList.split('-').map(Number);
-    const priceConditions= {
-      offer_price: {
-        $gt: parseFloat(max),
-        $lte: parseFloat(min)
-      }
+    const priceConditions = {
+        offer_price: {
+            $gt: parseFloat(min),
+            $lte: parseFloat(max)
+        }
     };
 
-    // const priceConditions = priceList.map(item => {
-    //   const priceArr = item.split("-");
-    //   return {
-    //     offer_price: {
-    //       $gt: parseFloat(priceArr[0]),
-    //       $lte: parseFloat(priceArr[1])
-    //     }
-    //   };
-    // });
-  
-    concatVar['$and'] = priceConditions;
-  }
-  
-  console.log(concatVar);
-  let allProductData = await Userproduct.find({ $and: [concatVar]}).sort({ offer_price: optionId });
+    // Check if concatVar already has an $and array
+    if (concatVar.$and) {
+        concatVar.$and.push(priceConditions);
+    } else {
+        // Create a new $and array
+        concatVar.$and = [priceConditions];
+    }
+}
+
+console.log(concatVar);
+let allProductData = await Userproduct.find(concatVar).sort({ offer_price: optionId });
+
  
   //let allProductData = await Userproduct.find(concatVar).sort({ offer_price: optionId });  
  
@@ -1357,9 +1380,6 @@ async function getProductDataWithSort(id, sortid) {
       .sort(sortCriteria)
       .exec();
     }
-
-
-
     const formattedUserProducts = [];
 
     for (const userproduct of userproducts) {
@@ -1367,7 +1387,6 @@ async function getProductDataWithSort(id, sortid) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
 
       const productCondition = await Productcondition.findById(userproduct.status);
-
 
       const formattedUserProduct = {
         _id: userproduct._id,
@@ -3356,6 +3375,13 @@ exports.forgotPassword = async function (req, res, next) {
 };
 
 exports.sendotp = async function (req, res, next) {
+  // let info = await transporter.sendMail({
+  //   from:'"Palash" <hello@bidforsale.com>',
+  //   to:"sneha.lnsel@gmail.com",
+  //   subject: "Hiii",
+  //   html:"<p>Hello!!</p>"
+  // });
+  // console.log(info);return false;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(200).json({

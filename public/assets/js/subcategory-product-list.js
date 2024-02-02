@@ -69,12 +69,12 @@ async function searchByFilter(priceList='') {
         },
         error: function(response){
             $('.sortdata').html(`No Products Found!!`);
-            //Error while filter
         }
     });
 }
 $(document).on('change', ".sortBy", function(e){
-    if( $('.filterByChecked').is(':checked') ){
+
+    if( $('.filterByChecked').is(':checked') || ($('.input-max').val() && $('.input-min').val())){
         searchByFilter();
     } else {
         let categoryId =$("#product_category_id").val();

@@ -3356,13 +3356,6 @@ exports.forgotPassword = async function (req, res, next) {
 };
 
 exports.sendotp = async function (req, res, next) {
-  let info = await transporter.sendMail({
-    from:'"Palash" <hello@bidforsale.com>',
-    to:"palashsamanta.lnsel@gmail.com",
-    subject: "Hiii",
-    html:"<p>Hello!!</p>"
-  });
-  console.log(info);return false;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(200).json({

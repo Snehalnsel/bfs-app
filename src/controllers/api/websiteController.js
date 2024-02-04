@@ -816,7 +816,7 @@ exports.userRelogin = async function (req, res, next) {
 };
 
 exports.userFilter = async function (req, res, next) {
-  let { brandList, sizeList, conditionList, priceList, optionId,productcategoryId } = req.body;
+  let { brandList, sizeList, conditionList, priceList, optionId,productcategoryId,pageNo } = req.body;
   if (typeof optionId != "undefined") {
     if ((optionId == 0)) {
       optionId = 1;
@@ -826,6 +826,11 @@ exports.userFilter = async function (req, res, next) {
   } else {
     optionId = 1;
   }
+
+  const page = pageNo || 1; 
+  const pageSize = 8;  
+  const skip = (page - 1) * pageSize;
+
   let concatVar = {};
   let objConditionList = [];
   if ((typeof conditionList != "undefined") && (conditionList.length > 0)) {
@@ -883,20 +888,23 @@ exports.userFilter = async function (req, res, next) {
         }
     };
 
-    // Check if concatVar already has an $and array
     if (concatVar.$and) {
         concatVar.$and.push(priceConditions);
     } else {
-        // Create a new $and array
         concatVar.$and = [priceConditions];
     }
 }
 
 console.log(concatVar);
-let allProductData = await Userproduct.find(concatVar).sort({ offer_price: optionId });
+// let totalProduct = await Userproduct.find(concatVar).sort({ offer_price: optionId });
+let totalProduct = await Userproduct.countDocuments(concatVar);
+
 
  
-  //let allProductData = await Userproduct.find(concatVar).sort({ offer_price: optionId });  
+let allProductData = await Userproduct.find(concatVar)
+.sort({ offer_price: optionId })
+.skip(skip)
+.limit(pageSize); 
  
   const formattedUserProducts = [];
   for (const userproduct of allProductData) {
@@ -927,6 +935,11 @@ let allProductData = await Userproduct.find(concatVar).sort({ offer_price: optio
     formattedUserProducts.push(formattedUserProduct);
   }
 
+  const totalPages = Math.ceil(totalProduct / pageSize);
+
+  console.log("totalPages",totalPages);
+  console.log("totalProduct",totalProduct);
+  console.log("pageSize",pageSize);
   const userProductsCount = formattedUserProducts.length;
 
   if (formattedUserProducts.length > 0) {
@@ -934,7 +947,11 @@ let allProductData = await Userproduct.find(concatVar).sort({ offer_price: optio
       status: 'success',
       message: 'Success search result',
       respdata: formattedUserProducts,
-      userProductsCount:userProductsCount
+      productCount:userProductsCount,
+      totalPages:totalPages,
+        currentPage: page,
+        pageSize: pageSize, 
+        webUrl:'user-filter'
     });
   } else {
     res.status(200).json({
@@ -1302,7 +1319,7 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
   }
 };
 
-async function getProductDataWithSort(id, sortid) {
+async function getProductDataWithSort(id, sortid,page, pageSize) {
   try {
 
     let categoryId;
@@ -1317,6 +1334,7 @@ async function getProductDataWithSort(id, sortid) {
       sortCriteria = { offer_price: 1 };
     }
 
+    const skip = (page - 1) * pageSize;
     let userproducts = [];
   
     if (id === "whatshot") {
@@ -1412,11 +1430,30 @@ async function getProductDataWithSort(id, sortid) {
       formattedUserProducts.push(formattedUserProduct);
     }
 
+    const paginatedData = formattedUserProducts.slice(skip, skip + pageSize);
+
+    const productCount = formattedUserProducts.length;
+
+
+    const totalPages = Math.ceil(productCount / pageSize);
+
+    const currentPage = parseInt(page);
+
+    // return {
+    //   status: '1', productCount: productCount,
+    //   message: 'Success',
+    //   respdata: paginatedData,
+     
+    //   //isLoggedIn: isLoggedIn,
+    // };
+
     return {
       status: '1',
+      productCount: productCount,
+      totalPages: totalPages,
+      currentPage: currentPage,
       message: 'Success',
-      respdata: formattedUserProducts,
-      //isLoggedIn: isLoggedIn,
+      respdata: paginatedData,
     };
 
   }
@@ -1430,19 +1467,25 @@ async function getProductDataWithSort(id, sortid) {
   }
 }
 
-exports.getSubCategoriesProducts = async function (req, res, next) {
+exports.getSubCategoriesProducts = async function (page,req, res, next) {
   try {
 
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const id = req.params.id;
+    console.log("id is that",id);
+    const pageno = page || 1; 
+    const pageSize = 8;  
 
     const sortid = req.params.sortid || 0;
 
-    const data = await getProductDataWithSort(id, sortid);
+    const data = await getProductDataWithSort(id,sortid,pageno, pageSize);
 
     const formattedUserProducts = data.respdata;
     
     const productCount = formattedUserProducts.length;
+
+    const totalPages = data.totalPages;
+    const currentPage = data.currentPage;
 
     const categoryName = await Category.find({ _id: id}).populate('name');
     
@@ -1451,15 +1494,13 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
     // const brandList = await brandModel.find({});
     // const sizeList = await sizeModel.find({});
     // const conditionList = await productconditionModel.find({});
-
-
     const userProducts = await Userproduct.find({
       category_id : id,
       approval_status: 1,
       flag: 0,
     })
       .select('brand_id size_id status');
-    
+
     const brandIds = userProducts.map(product => product.brand_id).filter(Boolean);
     const sizeIds = userProducts.map(product => product.size_id).filter(Boolean);
     const statusIds = userProducts.map(product => product.status).filter(Boolean);
@@ -1468,9 +1509,10 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
     const sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
     const conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
     
-    console.log('Brand List:', brandList);
-    console.log('Size List:', sizeList);
-    console.log('Condition List:', conditionList);
+    console.log('productCount', productCount);
+    console.log('totalPages', totalPages);
+    console.log('currentPage', currentPage);
+    console.log('pageSize', pageSize);
     
 
     res.render("webpages/subcategoryproduct",
@@ -1484,31 +1526,33 @@ exports.getSubCategoriesProducts = async function (req, res, next) {
         categoryName:categoryName,
         conditionList: conditionList,
         productCount:productCount,
+        totalPages: totalPages,
+        currentPage: currentPage,
+        pageSize: pageSize, 
         isLoggedIn: isLoggedIn
-
       });
 
   }
   catch (error) {
     console.error('Error fetching products with matching parent_id:', error);
-    return res.status(500).json({
+    return{
       status: '0',
       message: 'An error occurred while fetching products with matching parent_id.',
       error: error.message,
-    });
+    };
   }
 };
 
 
-exports.getSubCategoriesProductswithSort = async function (req, res, next) {
+exports.getSubCategoriesProductswithSort = async function (page,req, res, next) {
 
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   const id = req.params.id;
-
   const sortid = req.params.sortid || 0;
+  const pageno = page || 1; 
+  const pageSize = 8;
 
-
-  const data = await getProductDataWithSort(id, sortid);
+  const data = await getProductDataWithSort(id,sortid,pageno, pageSize);
   const formattedUserProducts = data.respdata;
   const productCount = formattedUserProducts.length;
 
@@ -1959,6 +2003,123 @@ exports.addNewPost = async function (req, res, next) {
 };
 
 
+exports.updatePostData = async function (req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: "0",
+      message: "Validation error!",
+      respdata: errors.array(),
+    });
+  }
+
+  try {
+
+    console.log(req.body);
+    console.log(req.files.length);
+    return;
+    const productId = req.body.productid;
+
+    const existingProduct = await Userproduct.findById(productId);
+
+    if (!existingProduct) {
+      return res.status(404).json({
+        status: "0",
+        message: "Product not found!",
+        respdata: {},
+      });
+    }
+
+    existingProduct.category_id = req.body.category_id || existingProduct.category_id;
+    existingProduct.user_id = req.body.user_id || existingProduct.user_id;
+    if(req.body.brand)
+    {
+      existingProduct.brand = ((req.body.brand || existingProduct.brand) ?? null);
+    }
+    if(req.body.size)
+    {
+      existingProduct.size = ((req.body.size || existingProduct.size) ?? null);
+    }
+    
+    existingProduct.brand_id = ((req.body.brand_id || existingProduct.brand_id) ?? null);
+    existingProduct.size_id = ((req.body.size_id || existingProduct.size_id) ?? null);
+    existingProduct.name = req.body.name || existingProduct.name;
+    existingProduct.description = req.body.description || existingProduct.description;
+    existingProduct.status = req.body.status || existingProduct.status;
+    existingProduct.price = req.body.price || existingProduct.price;
+    existingProduct.offer_price = req.body.offerprice || existingProduct.offer_price;
+    existingProduct.percentage = req.body.percentage || existingProduct.percentage;
+
+    const newProduct = new Userproduct({
+      category_id: req.body.category_id,
+      user_id: req.body.user_id,
+      brand: req.body.brand,
+      size: req.body.size,
+      name: req.body.name,
+      description: req.body.description,
+      status: req.body.status,
+      price: req.body.price,
+      offer_price: req.body.offerprice,
+      reseller_price: req.body.reseller_price,
+      percentage:  req.body.percentage,
+      original_invoice:  req.body.original_invoice,
+      original_packaging:  req.body.original_packaging,
+      added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"), 
+    });
+
+    existingProduct.updated_dtime = moment().format("YYYY-MM-DD HH:mm:ss");
+
+    if (req.files && req.files.length > 0) {
+    
+      await Productimage.deleteMany({ product_id: existingProduct._id });
+
+      const imageUrls = [];
+      const requrl = url.format({
+        protocol: req.protocol,
+        host: req.get("host"),
+      });
+
+      for (const file of req.files) {
+        const imageUrl = requrl + "/public/images/" + file.filename;
+
+        const productImageDetail = new Productimage({
+          product_id: existingProduct._id,
+          category_id: existingProduct.category_id,
+          user_id: existingProduct.user_id,
+          brand_id: existingProduct.brand_id,
+          image: imageUrl,
+          added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
+        });
+
+        const savedImage = await productImageDetail.save();
+      }
+    }
+
+    const updatedProduct = await existingProduct.save();
+
+    // Fetch image details for the updated product
+    const productImages = await Productimage.find({ product_id: updatedProduct._id });
+
+    const productDetails = {
+      ...updatedProduct.toObject(),
+      images: productImages,
+    };
+
+      res.redirect('/api/my-account');
+
+
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the Add Post.",
+      error: error.message,
+    });
+  }
+
+};
+
 exports.signOut = async function (req, res, next) {
   //const banner = await Banner.find({ status: 1 });
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -2032,7 +2193,8 @@ exports.editUserWisePost = async function (req, res, next) {
     const parentCategoryId = "650444488501422c8bf24bdb";
     const categoriesWithoutParentId = await Category.find({ parent_id: { $ne: parentCategoryId } });
 
-    const product = await Userproduct.findById(req.params.id);
+    const productId = req.params.id;
+    const product = await Userproduct.findById(productId);
 
     if (!product) {
       return res.status(404).json({
@@ -2056,6 +2218,7 @@ exports.editUserWisePost = async function (req, res, next) {
       userData: req.session.user,
       productcondition: productConditions,
       subcate: categoriesWithoutParentId,
+      productId: productId,
       isLoggedIn: isLoggedIn,
     });
 
@@ -2137,9 +2300,7 @@ exports.viewWishListByUserId = async function (req, res, next) {
     const existingList = await Wishlist.find({ user_id: isLoggedIn })
       .populate('user_id', 'name')
       .exec();
-
-    console.log(existingList);
-
+  
     if (existingList.length === 0) {
       res.render("webpages/wishlist", {
         title: "Wish List Page",
@@ -2147,33 +2308,38 @@ exports.viewWishListByUserId = async function (req, res, next) {
         respdata: [],
         isLoggedIn: isLoggedIn,
         itemCount: 0,
+        websiteUrl: process.env.SITE_URL,
       });
     } else {
       const formattedList = await Promise.all(existingList.map(async (item) => {
-        // console.log(item.product_id);
+        console.log(item.product_id);
         const product = await Userproduct.findOne({ _id: item.product_id }).populate('category_id', 'name');
+        if(product)
+        {
+          const productImages = await Productimage.find({ product_id: item.product_id }).limit(1);
 
-
-        console.log(product);
-        console.log("-==========");
-        const productImages = await Productimage.find({ product_id: item.product_id }).limit(1);
-
-        const date = moment(item.added_dtime);
-        const addedDate = date.format('DD/MM/YYYY');
-
-        return {
-          _id: item._id,
-          user_id: item.user_id._id,
-          user_name: item.user_id.name,
-          product_id: item.product_id,
-          product_name: product.name,
-          product_price: product.price,
-          category_name: product.category_id.name,
-          images: productImages[0].image,
-          status: item.status,
-          added_dtime: addedDate,
-          __v: item.__v,
-        };
+          //const date = moment(item.added_dtime);
+          const date = moment(item.added_dtime, 'YYYY-MM-DDTHH:mm:ssZ');
+  
+          const addedDate = date.format('DD/MM/YYYY');
+  
+          const category_name = product.category_id ? product.category_id.name : 'Uncategorized';
+  
+          return {
+            _id: item._id,
+            user_id: item.user_id._id,
+            user_name: item.user_id.name,
+            product_id: item.product_id,
+            product_name: product.name,
+            product_price: product.price,
+            category_name: product.category_id ? product.category_id.name :'',
+            images: productImages[0].image,
+            status: item.status,
+            added_dtime: addedDate,
+            __v: item.__v,
+          };
+        }
+        
       }));
 
       console.log(formattedList);
@@ -2185,6 +2351,7 @@ exports.viewWishListByUserId = async function (req, res, next) {
         respdata: formattedList,
         isLoggedIn: isLoggedIn,
         itemCount: formattedList.length,
+        websiteUrl: process.env.SITE_URL,
       });
     }
   } catch (error) {
@@ -3444,6 +3611,7 @@ exports.sendotp = async function (req, res, next) {
     }
     else
     {
+      console.log("chaange password");
       if (user.forget_otp == req.body.otp) {
         bcrypt.hash(req.body.newPassword, rounds, (error, hash) => {
           bcrypt.compare(req.body.confirmPassword, hash, (error, match) => {
@@ -3459,14 +3627,14 @@ exports.sendotp = async function (req, res, next) {
                 forget_otp: "0",
               };
               Users.findOneAndUpdate(
-                { _id: req.body.user_id },
+                { email: req.body.email },
                 { $set: updData },
                 { upsert: true },
                 function (err, doc) {
                   if (err) {
                     throw err;
                   } else {
-                    Users.findOne({ _id: req.body.user_id }).then((user) => {
+                    Users.findOne({ email: req.body.email }).then((user) => {
                       res.status(200).json({
                         status: "1",
                         message: "Successfully updated! Please login with your new password",

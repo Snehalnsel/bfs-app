@@ -280,6 +280,8 @@ const storage = multer.diskStorage({
 
 // const upload = multer({ storage: storage });
 const upload = multer({ storage: storage, limits: { files: 5 } });
+const firstSetUpload = multer({ storage: storage, limits: { files: 5 } }).array('firstSetFiles', 5);
+const secondSetUpload = multer({ storage: storage, limits: { files: 5 } }).array('secondSetFiles', 5);
 
 router.post(
   "/add-category",
@@ -1166,9 +1168,16 @@ router.get("/add-address",[],WebsiteController.addAddress);
 router.get("/webSubCategories", WebsiteController.getParentCategories);
 router.get("/subcategory",CategoryController.getAllSubcategoriesWithProducts);
 // router.get("/websubcategories/:id",[],WebsiteController.getSubCategoriesWithMatchingParentId);
-router.get("/websubcategoriesproducts/:id",[],WebsiteController.getSubCategoriesProducts);
-router.get("/websubcategoriesproductswithsort/:id/:sortid",[],WebsiteController.getSubCategoriesProductswithSort);
 
+router.get("/websubcategoriesproducts/:id", cors(), (req, res) => {
+  const page = req.query.page;
+  WebsiteController.getSubCategoriesProducts(page, req, res);
+});
+
+router.get("/websubcategoriesproductswithsort/:id/:sortid", cors(), (req, res) => {
+  const page = req.query.page;
+  WebsiteController.getSubCategoriesProductswithSort(page, req, res);
+});
 // Profile Edit API's
 router.post("/useredit",
     [
@@ -1194,7 +1203,7 @@ router.post("/addnewpost",[], upload.array('image', 5),WebsiteController.addNewP
 
 router.get("/edit-mypost/:id",[],WebsiteController.editUserWisePost);
 
-// router.post("/updatepostdata",[],WebsiteController.updatePostData);
+router.post("/updatepostdata",[],upload.array('image', 5),WebsiteController.updatePostData);
 
 // Add To cart 
 router.post("/addtocart/:id",[],WebsiteController.addToCart);

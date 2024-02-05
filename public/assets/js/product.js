@@ -178,9 +178,12 @@ $(document).on('click', ".wish-rem-button", async function (e) {
                         customClass: { confirmButton: 'alert-box-button' }
                     });
                     $("#" + divid).remove();
+                    if(data.count == 0)
+                    {
+                        // window.reload();
+                        location.reload();
+                    }
                     updateWishlistCount(data);
-                    //Edited By Palash 17-01-2024
-                    //location.reload();
                 } else {
                     Swal.fire({
                         html: data.message,
@@ -199,11 +202,10 @@ $(document).on('click', ".wish-rem-button", async function (e) {
 
 function updateWishlistCount(data) {
     var itemCount = data.count;
-    //console.log(itemCount);
     $(".wishlist-count").text(`(${itemCount})`);
 }
 
-$(document).on('click', ".share-product-icon", async function (e) {
+$(document).on('click', "#share-product-icon", async function (e) {
     $(".share-linksbox").addClass("icon-show");
 });
 $(document).on('click', ".slc-btn", async function (e) {
@@ -213,6 +215,21 @@ $(document).on('click', ".slc-btn", async function (e) {
 $(document).on('click', ".close-icon", async function (e) {
     $(".share-linksbox").removeClass("icon-show");
 });
+
+$(document).on('click', "#share-product-icon-wish", async function (e) {
+    var index = $(this).data('index');
+    $(this).closest(".cart-list").find(".share-linksbox").addClass("icon-show");
+    console.log("Clicked on share icon for item with index: " + index);
+});
+
+$(document).on('click', ".slc-btn-wish", async function (e) {
+    $(this).closest(".cart-list").find(".share-linksbox").removeClass("icon-show");
+});
+
+$(document).on('click', ".close-icon", async function (e) {
+    $(this).closest(".cart-list").find(".share-linksbox").removeClass("icon-show");
+});
+
 
 const rangeInput = document.querySelectorAll(".range-input input"),
 priceInput = document.querySelectorAll(".price-input input"),

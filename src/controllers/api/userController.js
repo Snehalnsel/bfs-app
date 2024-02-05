@@ -26,25 +26,36 @@ var ObjectId = require("mongodb").ObjectId;
 const url = require("url");
 const nodemailer = require("nodemailer");
 // const smtpUser = "snigdho.lnsel@gmail.com";onaonfajcxjjwoow
-const smtpUser = "sneha.lnsel@gmail.com";
+// const smtpUser = "sneha.lnsel@gmail.com";
+const smtpUser = "hello@bidforsale.com";
 
 const accountSid = 'ACa1b71e8226f3a243196beeee233311a9';
 const authToken = 'ea9a24bf2a9ca43a95b991c9c471ba93';
 const twilioClient = new twilio(accountSid, authToken);
 
+// const transporter = nodemailer.createTransport({
+//   port: 587,
+//   host: "smtp.gmail.com",
+//   auth: {
+//     user: smtpUser,
+//     pass: "iysxkkaexpkmfagh",
+//   },
+//   secure: false, // Setting 'secure' to false
+//   tls: {
+//     rejectUnauthorized: false, // Avoids specifying a TLS version
+//   },
+// });
+
+
 const transporter = nodemailer.createTransport({
-  port: 587,
-  host: "smtp.gmail.com",
+  port: 465,
+  host: "bidforsale.com",
   auth: {
     user: smtpUser,
-    pass: "iysxkkaexpkmfagh",
+    pass: "India_2023",
   },
-  secure: false, // Setting 'secure' to false
-  tls: {
-    rejectUnauthorized: false, // Avoids specifying a TLS version
-  },
+  secure: true,
 });
-
 
 
 
@@ -354,16 +365,29 @@ exports.getLogin = async function (req, res, next) {
                 respdata: err,
               });
             } else {
+              // const mailData = {
+              //   from: smtpUser,
+              //   to: user.email,
+              //   subject: "BFS - Bid For Sale  - Welcome Email",
+              //   text: "Server Email!",
+              //   html:
+              //     "Hey " +
+              //     user.name +
+              //     ", <br> <p>Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items </p>",
+              // };
+
+              const loginHtmlPath = 'views/webpages/mailbody.html';  
+              const loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+
               const mailData = {
-                from: smtpUser,
+                from: "Bid For Sale! <"+smtpUser+">",
                 to: user.email,
-                subject: "BFS - Bid For Sale  - Welcome Email",
-                text: "Server Email!",
-                html:
-                  "Hey " +
-                  user.name +
-                  ", <br> <p>Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items </p>",
+                subject: "Welcome to Bid For Sale!",
+                name:"Bid For Sale!",
+                text:"welocome",
+                html:loginHtmlContent
               };
+
 
               transporter.sendMail(mailData, function (err, info) {
                 if (err) console.log(err);
@@ -713,7 +737,7 @@ exports.forgotPassword = async function (req, res, next) {
       var otp = randNumber(1000, 2000);
     
       const mailData = {
-        from: smtpUser, 
+        from: "Bid For Sale! <"+smtpUser+">", 
         to: user.email,
         subject: "BFS - Bids For Sale - Forgot password OTP",
         text: "Server Email!",

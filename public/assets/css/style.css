@@ -143,7 +143,8 @@
       max-width: 100%;
   }
   .theme_header {
-      padding: 15px 0px;
+     padding: 15px 0px;
+    border-bottom: solid 1px #cecece;
   }
   
   .buy-sell-link ul {
@@ -3333,6 +3334,35 @@ a.slc-btn.fb-btn {
     background: #006cf4;
 }
 a.slc-btn.lnk-btn {
+    background: #007aae;
+}
+
+
+a.slc-btn-wish {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    background: #3a3939;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 18px;
+    margin: 2px;
+    transition: 0.5s;
+    text-decoration: none;
+}
+a.slc-btn-wish.wa-btn {
+    background: #14bd27;
+}
+
+a.slc-btn-wish.tw-btn {
+    background: #00b0e7;
+}
+a.slc-btn-wish.fb-btn {
+    background: #006cf4;
+}
+a.slc-btn-wish.lnk-btn {
     background: #007aae;
 }
 

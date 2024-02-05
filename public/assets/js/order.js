@@ -4,7 +4,7 @@ let isLoggedIn3 = $("#userReloggedIn").val();
 $(document).on('click', ".remove-order", async function (e) {
     let src = "/public/assets/images/bfs-logo.png";
     Swal.fire({
-        title: "Do you want to delete the item?",
+        title: "Do you want to delete the order?",
         iconHtml: '<img src="'+ src +'">',
         customClass: {  
             icon: 'alert-logo-item',

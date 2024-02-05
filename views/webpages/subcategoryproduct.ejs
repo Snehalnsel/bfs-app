@@ -191,7 +191,7 @@
                  
                  <% }); %>
                  <% if (totalPages){ %>
-               <div class="pagination">
+               <div class="pagination custome-pagination">
                      <% for (let i = 1; i <= totalPages; i++) { %>
                         <a href="/api/websubcategoriesproducts/<%= product_category_id %>?page=<%= i %>" class="<%= (i === currentPage) ? 'active' : '' %>"><%= i %></a>
                      <% } %>

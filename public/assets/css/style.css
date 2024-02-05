@@ -3659,3 +3659,40 @@ span.close-icon {
     justify-content: space-between !important;
     width: 100% !important;
 }
+
+.custome-pagination {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding-top: 15px;
+}
+
+.pagination.custome-pagination a {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    background: #ddd;
+    border:none;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 15px;
+    margin-right: 8px;
+    transition: 0.5s;
+}
+.pagination.custome-pagination a:hover {
+    background: #000;
+    color: #fff !important;
+    transition: 0.5s;
+    border: 1px solid #000000;
+}
+
+.pagination.custome-pagination a.active{
+    background: #000;
+    color: #fff !important;
+    transition: 0.5s;
+    border: 1px solid #000000;
+}

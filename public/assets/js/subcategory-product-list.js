@@ -17,13 +17,13 @@ $(document).ready(async function () {
 
 
 });
-async function searchByFilter(priceList = '') {
+async function searchByFilter(priceList = '',pageId = '') {
     let brandList = [];
     let sizeList = [];
     let conditionList = [];
     let optionId = $("#sortBy").val();
     let productcategoryId = $("#product_category_id").val();
-    let pageNo;
+    let pageNo = (pageId != "") ? pageId : 1;
     //get all selected brand name
     $(".searchByBrand:checked").each(function () {
         brandList.push($(this).data("id"));
@@ -50,20 +50,20 @@ async function searchByFilter(priceList = '') {
             priceList: priceList ? priceList : null,
             optionId: optionId,
             productcategoryId: productcategoryId,
-            pageNo: pageNo ? pageNo : 1
+            pageNo: pageNo
         },
         success: async function (obj) {
             let error_success = obj.status;
             if (error_success == 'success') {
                 let htmlContent = '';
                 if (obj && obj.respdata && obj.respdata.length > 0) {
-                    console.log(obj.respdata.length);
+                    // console.log(obj.respdata.length);
                     let totalPages = obj.totalPages;
                     let currentPage = obj.currentPage;
                     let categoryId = productcategoryId;
                     let webUrl = obj.webUrl;
                     htmlContent = await makeHtml(obj, totalPages, currentPage, categoryId, webUrl, brandList, sizeList, conditionList, priceList,optionId);
-                    console.log(htmlContent)
+                    // console.log(htmlContent)
                 } else {
                     htmlContent = '<p>No products found yet.</p>';
                 }
@@ -85,18 +85,13 @@ $(document).on('change', ".sortBy", function (e) {
         searchByFilter();
     } else {
         let categoryId = $("#product_category_id").val();
-
         if (categoryId === "whatshot") {
-
             categoryId = "whatshot";
         } else if (categoryId === "justsold") {
-
             categoryId = "justsold";
         } else if (categoryId === "bestDeal") {
-
             categoryId = "bestDeal";
-        }
-        else {
+        } else {
             categoryId = categoryId;
         }
 
@@ -111,7 +106,7 @@ $(document).on('change', ".sortBy", function (e) {
             url: `/api/websubcategoriesproductswithsort/${categoryId}/${optionId.trim()}`,
             method: 'GET',
             success: async function (data) {
-                console.log(data);
+                // console.log(data);
 
                 //data, totalPages, currentPage, product_category_id
                 let htmlContent = '';
@@ -133,6 +128,14 @@ $(document).on('change', ".sortBy", function (e) {
 async function clearAllAndReload() {
     location.reload();
 }
+
+$(document).on('click', ".ajax_pagination", function (e) {
+    let pageId = $(this).data("id");
+    const max = $('.input-max').val();
+    const min = $('.input-min').val();
+    let priceList = min + '-' + max;
+    searchByFilter(priceList,pageId)
+});
 
 async function makeHtml(data,totalPages, currentPage, categoryId, webUrl, brandList, sizeList, conditionList, priceList,optionId) {
     let htmlContent = ``;
@@ -166,9 +169,9 @@ async function makeHtml(data,totalPages, currentPage, categoryId, webUrl, brandL
     // }
     // htmlContent += `</div>`;
 
-    htmlContent += `<div class="pagination">`;
+    htmlContent += `<div class="pagination custome-pagination">`;
     for (let i = 1; i <= totalPages; i++) {
-        htmlContent += `<a href="/api/${webUrl}/${categoryId}?pageNo=${i}&brandList=${brandList}&sizeList=${sizeList}&conditionList=${conditionList}&priceList=${priceList}&optionId=${optionId}" class="${(i === currentPage) ? 'active' : ''}">${i}</a>`;
+        htmlContent += `<a class="ajax_pagination" data-id="${i}" href="javascript:void(0)">${i}</a>`;
     }
     htmlContent += `</div>`;
 

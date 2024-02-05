@@ -904,7 +904,7 @@ let totalProduct = await Userproduct.countDocuments(concatVar);
 let allProductData = await Userproduct.find(concatVar)
 .sort({ offer_price: optionId })
 .skip(skip)
-.limit(pageSize); 
+.limit(pageSize);
  
   const formattedUserProducts = [];
   for (const userproduct of allProductData) {
@@ -949,9 +949,9 @@ let allProductData = await Userproduct.find(concatVar)
       respdata: formattedUserProducts,
       productCount:userProductsCount,
       totalPages:totalPages,
-        currentPage: page,
-        pageSize: pageSize, 
-        webUrl:'user-filter'
+      currentPage: page,
+      pageSize: pageSize, 
+      webUrl:'user-filter'
     });
   } else {
     res.status(200).json({

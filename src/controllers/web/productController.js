@@ -254,6 +254,8 @@ exports.getData = function (req, res, next) {
 
 
 exports.detailsData = async function (req, res, next) {
+
+  
   var pageName = "Product Details";
   var pageTitle = req.app.locals.siteName + " - " + pageName;
 
@@ -315,6 +317,7 @@ exports.detailsData = async function (req, res, next) {
       productCondition: productcondition,
       productImages: productImages,
       parentCategory: productdetails.hasOwnProperty("category_id") ? parentCategory : null,
+      
     });
   } catch (error) {
     console.error(error);

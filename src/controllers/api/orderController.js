@@ -31,29 +31,30 @@ const Shippingkit = require("../../models/api/shippingkitModel");
 const nodemailer = require("nodemailer");
 // const axios = require('axios');
 // const bodyParser = require('body-parser'); 
-const smtpUser = "sneha.lnsel@gmail.com";
+//const smtpUser = "sneha.lnsel@gmail.com";
+const smtpUser = "hello@bidforsale.com";
 
 // const transporter = nodemailer.createTransport({
-//   port: 465, 
+//   port: 587,
 //   host: "smtp.gmail.com",
 //   auth: {
 //     user: smtpUser,
 //     pass: "iysxkkaexpkmfagh",
 //   },
-//   secure: true,
+//   secure: false, // Setting 'secure' to false
+//   tls: {
+//     rejectUnauthorized: false, // Avoids specifying a TLS version
+//   },
 // });
 
 const transporter = nodemailer.createTransport({
-  port: 587,
-  host: "smtp.gmail.com",
+  port: 465,
+  host: "bidforsale.com",
   auth: {
     user: smtpUser,
-    pass: "iysxkkaexpkmfagh",
+    pass: "India_2023",
   },
-  secure: false, // Setting 'secure' to false
-  tls: {
-    rejectUnauthorized: false, // Avoids specifying a TLS version
-  },
+  secure: true,
 });
 
 

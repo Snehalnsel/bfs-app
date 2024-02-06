@@ -61,16 +61,17 @@
                             <% respdata.images.forEach(function(img, index) { %>
                                 <div class="upload-post full-post-image">
                                     <img src="<%= img.image %>" style="width:50%; height:80%;">
-                                    <input type="file" name="image" />
+                                    <input type="file"  name="img<%= index %>" />
                                 </div>
                             <% }); %>
                            
                             <% for(let i = respdata.images.length; i < 5; i++) { %>
-                                <div class="upload-post full-post-image">
-                                    <h6>+Add Image</h6>
-                                    <input type="file" name="image" />
-                                </div>
-                            <% } %>
+                              <div class="upload-post full-post-image">
+                                  <h6>+Add Image</h6>
+                                  <input type="file" name="img<%= i %>" />
+                              </div>
+                          <% } %>
+                          
                         </div>
                     </div>
                      <div class="div-12">productId
@@ -87,11 +88,11 @@
                         <div class="div-6">
                            <label for="productCategory">Product Category <span class="required">*</span></label>
                            <% if(respdata.category_id) { %>
-                              <select class="ds-form-control" name="product_cate" id="productCategory" required>
+                              <select class="ds-form-control" name="category_id" id="category_id" required>
                                  <option value="" disabled selected>Select Category</option>
                                  <% subcate.forEach(function(subcatitems) { %>
                                     <option value="<%= subcatitems._id %>"  <%=(respdata &&
-                                       respdata.category_id.equals(value._id)) ? 'selected' : ''
+                                       respdata.category_id.equals(subcatitems._id)) ? 'selected' : ''
                                        %>><%= subcatitems.name %></option>
                                  <% }); %>
                               </select>
@@ -103,12 +104,23 @@
  
                       <div class="div-6">
                          <label>Product Brand <span class="required">*</span></label>
-                         <input type="type" name="brand" value="<%=respdata.brand%>" class="ds-form-control" placeholder="Enter Brand" required>
-                      </div>
+                         <% if(respdata.brand_id) { %>
+                           <select class="ds-form-control" name="brand_id" id="brand_id" required>
+                              <option value="" disabled selected>Select Category</option>
+                              <% brands.forEach(function(brand) { %>
+                                 <option value="<%= brand._id %>"  <%=(respdata &&
+                                    respdata.brand_id.equals(brand._id)) ? 'selected' : ''
+                                    %>><%= brand.name %></option>
+                              <% }); %>
+                           </select>
+                         <% }else { %>
+                           <input type="type" name="brand" value="<%=respdata.brand%>" class="ds-form-control" placeholder="Enter Brand" required>
+                         <% } %>
+                        </div>
 
                       <div class="div-6">
                         <label for="productCondition">Product Condition <span class="required">*</span></label>
-                        <select class="ds-form-control" name="product_condition" id="productCondition" required>
+                        <select class="ds-form-control" name="status" id="status" required>
                             <option value="" disabled selected>Select Condition</option>
                             <% productcondition.forEach(function(item) { %>
                                 <option value="<%= item._id %>"  <%=(respdata &&
@@ -121,8 +133,19 @@
  
                       <div class="div-6">
                          <label>Product Size <span class="required">*</span></label>
-                         <input type="type" name="size" value="<%=respdata.size%>" class="ds-form-control" placeholder="Product Size" required>
-                      </div>
+                         <% if(respdata.size_id) { %>
+                           <select class="ds-form-control" name="size_id" id="size_id" required>
+                              <option value="" disabled selected>Select Category</option>
+                              <% productsize.forEach(function(size) { %>
+                                 <option value="<%= size._id %>"  <%=(respdata &&
+                                    respdata.size_id.equals(size._id)) ? 'selected' : ''
+                                    %>><%= size.name %></option>
+                              <% }); %>
+                           </select>
+                         <% }else { %>
+                           <input type="type" name="size" value="<%=respdata.size%>" class="ds-form-control" placeholder="Product Size" required>
+                         <% } %>
+                        </div>
  
                       <div class="div-6">
                          <label>Original Invoice</label>

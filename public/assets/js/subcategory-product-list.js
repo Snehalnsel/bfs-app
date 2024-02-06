@@ -1,13 +1,24 @@
 $(document).ready(async function () {
     $(document).on("click", ".filterByChecked", async function () {
+        const max = $('.input-max').val();
+        const min = $('.input-min').val();
+        let priceList = min + '-' + max;
         if ($('.filterByChecked').is(':checked')) {
-            searchByFilter();
+            searchByFilter(priceList);
         } else {
-            location.reload();
+            location.reload(priceList);
         }
     });
 
-    $(document).on("input change", ".input-min, .range-min, .input-max, .range-max", async function () {
+    $(document).on("mouseup",".price_range_filter", async function () {
+        const max = $('.input-max').val();
+        const min = $('.input-min').val();
+        let priceList = min + '-' + max;
+
+        searchByFilter(priceList)
+    });
+
+    $(document).on("onch",".price_range_input", async function () {
         const max = $('.input-max').val();
         const min = $('.input-min').val();
         let priceList = min + '-' + max;
@@ -24,6 +35,7 @@ async function searchByFilter(priceList = '',pageId = '') {
     let optionId = $("#sortBy").val();
     let productcategoryId = $("#product_category_id").val();
     let pageNo = (pageId != "") ? pageId : 1;
+
     //get all selected brand name
     $(".searchByBrand:checked").each(function () {
         brandList.push($(this).data("id"));
@@ -40,6 +52,8 @@ async function searchByFilter(priceList = '',pageId = '') {
     // $(".searchByPrice:checked").each(function() {
     //     priceList.push($(this).data("id"));
     // });
+
+
     $.ajax({
         type: 'POST',
         url: webSiteUrl + "/api/user-filter",
@@ -71,11 +85,13 @@ async function searchByFilter(priceList = '',pageId = '') {
                 $('.show-count').html(`Showing ${(obj.respdata.length > 0 ? obj.respdata.length : 0)} products`);
             } else {
                 $('.sortdata').html(`No Products Found!!`);
+                $('.show-count').html(`Showing 0 product`);
                 //Write something for occuring the error
             }
         },
         error: function (response) {
             $('.sortdata').html(`No Products Found!!`);
+            $('.show-count').html(`Showing 0 product`);
         }
     });
 }

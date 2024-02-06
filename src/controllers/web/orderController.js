@@ -38,20 +38,18 @@ var crypto = require("crypto");
 var randId = crypto.randomBytes(20).toString("hex");
 const multer = require("multer");
 const upload = multer({ dest: 'public/images/' });
-const smtpUser = "sneha.lnsel@gmail.com";
+const smtpUser = "hello@bidforsale.com";
 
 const transporter = nodemailer.createTransport({
-  port: 587,
-  host: "smtp.gmail.com",
+  port: 465,
+  host: "bidforsale.com",
   auth: {
     user: smtpUser,
-    pass: "iysxkkaexpkmfagh",
+    pass: "India_2023",
   },
-  secure: false, // Setting 'secure' to false
-  tls: {
-    rejectUnauthorized: false, // Avoids specifying a TLS version
-  },
+  secure: true,
 });
+
 
 // const email = 'cs@jalanbuilders.com';
 // const shipPassword = 'Sweetu@2501';

@@ -32,14 +32,14 @@ const AddressBook = require("../../models/api/addressbookModel");
 const nodemailer = require("nodemailer");
 // const axios = require('axios');
 // const bodyParser = require('body-parser'); 
-const smtpUser = "sneha.lnsel@gmail.com";
+const smtpUser = "hello@bidforsale.com";
 
 const transporter = nodemailer.createTransport({
-  port: 465, 
-  host: "smtp.gmail.com",
+  port: 465,
+  host: "bidforsale.com",
   auth: {
     user: smtpUser,
-    pass: "iysxkkaexpkmfagh",
+    pass: "India_2023",
   },
   secure: true,
 });

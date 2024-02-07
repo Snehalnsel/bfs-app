@@ -1514,7 +1514,7 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
         }
       ]);
 
-      console.log("results",result);
+      // console.log("results",result);
 
     const brandIds = userProducts.map(product => product.brand_id).filter(Boolean);
     const sizeIds = userProducts.map(product => product.size_id).filter(Boolean);
@@ -1545,8 +1545,8 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
         currentPage: currentPage,
         pageSize: pageSize, 
         isLoggedIn: isLoggedIn,
-        maxvalue: result[0].maxPrice,
-        minvalue: result[0].minPrice
+        // maxvalue: result[0].maxPrice,
+        // minvalue: result[0].minPrice
       });
 
   }

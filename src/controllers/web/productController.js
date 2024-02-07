@@ -230,7 +230,7 @@ exports.getData = function (req, res, next) {
       },
     },
     {
-      $limit: 20 // Limit to the first 20 documents
+      $limit: 20 
     }
   ]).exec(function (error, productList) {
     if (error) {

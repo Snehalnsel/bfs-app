@@ -6,10 +6,9 @@ $(document).ready(async function () {
         if ($('.filterByChecked').is(':checked')) {
             searchByFilter(priceList);
         } else {
-            location.reload(priceList);
+            //location.reload(priceList);
         }
     });
-
     $(document).on("mouseup",".price_range_filter", async function () {
         const max = $('.input-max').val();
         const min = $('.input-min').val();
@@ -17,7 +16,6 @@ $(document).ready(async function () {
 
         searchByFilter(priceList)
     });
-
     $(document).on("onch",".price_range_input", async function () {
         const max = $('.input-max').val();
         const min = $('.input-min').val();
@@ -25,8 +23,6 @@ $(document).ready(async function () {
 
         searchByFilter(priceList)
     });
-
-
 });
 async function searchByFilter(priceList = '',pageId = '') {
     let brandList = [];
@@ -36,24 +32,18 @@ async function searchByFilter(priceList = '',pageId = '') {
     let productcategoryId = $("#product_category_id").val();
     let pageNo = (pageId != "") ? pageId : 1;
 
-    //get all selected brand name
     $(".searchByBrand:checked").each(function () {
         brandList.push($(this).data("id"));
     });
-    //get all selected size
+   
     $(".searchBySize:checked").each(function () {
         sizeList.push($(this).data("id"));
     });
-    //get all condition
+ 
     $(".searchByCondition:checked").each(function () {
         conditionList.push($(this).data("id"));
     });
-    //get all price
-    // $(".searchByPrice:checked").each(function() {
-    //     priceList.push($(this).data("id"));
-    // });
-
-
+   
     $.ajax({
         type: 'POST',
         url: webSiteUrl + "/api/user-filter",
@@ -86,7 +76,6 @@ async function searchByFilter(priceList = '',pageId = '') {
             } else {
                 $('.sortdata').html(`No Products Found!!`);
                 $('.show-count').html(`Showing 0 product`);
-                //Write something for occuring the error
             }
         },
         error: function (response) {
@@ -122,16 +111,12 @@ $(document).on('change', ".sortBy", function (e) {
             url: `/api/websubcategoriesproductswithsort/${categoryId}/${optionId.trim()}`,
             method: 'GET',
             success: async function (data) {
-                // console.log(data);
-
-                //data, totalPages, currentPage, product_category_id
                 let htmlContent = '';
                 if (data && data.respdata && data.respdata.length > 0) {
                     htmlContent = await makeHtml(data);
                 } else {
                     htmlContent = '<p>No products found yet.</p>';
                 }
-
                 $('.sortdata').html(htmlContent);
             },
             error: function (err) {
@@ -140,11 +125,9 @@ $(document).on('change', ".sortBy", function (e) {
         });
     }
 });
-
 async function clearAllAndReload() {
     location.reload();
 }
-
 $(document).on('click', ".ajax_pagination", function (e) {
     let pageId = $(this).data("id");
     const max = $('.input-max').val();
@@ -152,7 +135,6 @@ $(document).on('click', ".ajax_pagination", function (e) {
     let priceList = min + '-' + max;
     searchByFilter(priceList,pageId)
 });
-
 async function makeHtml(data,totalPages, currentPage, categoryId, webUrl, brandList, sizeList, conditionList, priceList,optionId) {
     let htmlContent = ``;
     data.respdata.forEach(function (item) {
@@ -184,13 +166,10 @@ async function makeHtml(data,totalPages, currentPage, categoryId, webUrl, brandL
     //     htmlContent += `<a href="/api/${webUrl}/${product_category_id}?page=${i}" class="${(i === currentPage) ? 'active' : ''}">${i}</a>`;
     // }
     // htmlContent += `</div>`;
-
     htmlContent += `<div class="pagination custome-pagination">`;
     for (let i = 1; i <= totalPages; i++) {
         htmlContent += `<a class="ajax_pagination" data-id="${i}" href="javascript:void(0)">${i}</a>`;
     }
     htmlContent += `</div>`;
-
-
     return htmlContent;
 }

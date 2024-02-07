@@ -828,11 +828,9 @@ exports.userFilter = async function (req, res, next) {
   } else {
     optionId = 1;
   }
-
   const page = pageNo || 1; 
   const pageSize = 8;  
   const skip = (page - 1) * pageSize;
-
   let concatVar = {};
   let objConditionList = [];
   if ((typeof conditionList != "undefined") && (conditionList.length > 0)) {
@@ -843,11 +841,9 @@ exports.userFilter = async function (req, res, next) {
   if (typeof brandList != "undefined") {
     concatVar["brand_id"] = { "$in": brandList };
   }
-  //if(typeof brandList != "undefined" && concatVar.length > 0) {
     if (typeof sizeList != "undefined") {
       concatVar["size_id"] = { "$in": sizeList };
     }
-  //}
   if (typeof productcategoryId != "undefined") {
     concatVar["category_id"] = { "$in": mongoose.Types.ObjectId(productcategoryId) };
   }
@@ -901,8 +897,6 @@ console.log(concatVar);
 // let totalProduct = await Userproduct.find(concatVar).sort({ offer_price: optionId });
 let totalProduct = await Userproduct.countDocuments(concatVar);
 
-
- 
 let allProductData = await Userproduct.find(concatVar)
 .sort({ offer_price: optionId })
 .skip(skip)
@@ -953,7 +947,8 @@ let allProductData = await Userproduct.find(concatVar)
       totalPages:totalPages,
       currentPage: page,
       pageSize: pageSize, 
-      webUrl:'user-filter'
+      webUrl:'user-filter',
+      totalProduct:totalProduct
     });
   } else {
     res.status(200).json({
@@ -1610,7 +1605,6 @@ exports.userUpdate = async function (req, res, next) {
 
 exports.userNewCheckOutAddressAdd = async function (req, res, next) {
   try{
-    
     const addr_name = req.body.addrType;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -1634,12 +1628,10 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
       flag: req.body.flag,
       created_dtime: dateTime,
     });
-    
     const savedAddress = await newAddress.save();
     const user = await Users.findById(newAddress.user_id);
     const randomSuffix = Math.floor(Math.random() * 1000);
-    const pickupLocation = savedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;
-    
+    const pickupLocation = savedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;  
     const PickupData = {
      pickup_location: pickupLocation,
       name: user.name,
@@ -1653,14 +1645,12 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
       pin_code: savedAddress.pin_code
     };
     const shiprocketResponse = await generateSellerPickup(PickupData);
-
     if (shiprocketResponse) {
       savedAddress.shiprocket_address = pickupLocation;
       savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
       await savedAddress.save();
       res.redirect('/api/checkout-web');
     }    
-
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -1671,7 +1661,6 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
   }
 
 };
-
 
 exports.userAddressAdd = async function (req, res, next) {
   try {
@@ -1757,7 +1746,6 @@ exports.deleteUserAddress = async function (req, res, next) {
   }
 };
 exports.userWisePost = async function (req, res, next) {
-
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -1822,15 +1810,12 @@ exports.userWisePost = async function (req, res, next) {
 exports.addPostView = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-
     if (isLoggedIn == "") {
       res.redirect("/api/registration");
     }
     const productConditions = await Productcondition.find();
-
     const parentCategoryId = "650444488501422c8bf24bdb";
     const categoriesWithoutParentId = await Category.find({ parent_id: { $ne: parentCategoryId } });
-
     res.render("webpages/addmypost", {
       title: "My Account",
       message: "Welcome to the Add Post page!",
@@ -1838,9 +1823,7 @@ exports.addPostView = async function (req, res, next) {
       productcondition: productConditions,
       subcate: categoriesWithoutParentId,
       isLoggedIn: isLoggedIn,
-
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -1849,10 +1832,7 @@ exports.addPostView = async function (req, res, next) {
       error: error.message,
     });
   }
-
 };
-
-// New Post Add
 exports.addNewPost = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -1862,36 +1842,21 @@ exports.addNewPost = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   try {
-
-    // const existingProduct = await Userproduct.findOne({ name: req.body.name });
-
-    // if (existingProduct) {
-    //   return res.status(404).json({
-    //     status: "0",
-    //     message: "Product already exists!",
-    //     respdata: {},
-    //   });
-    // }
-
     let invoice;
     let packaging;
-
     if (req.body.original_invoice == 'on' || req.body.original_invoice != '') {
       invoice = '1';
     }
     else {
       invoice = '0';
     }
-
     if (req.body.original_packaging == 'on' || req.body.original_packaging != '') {
       packaging = '1';
     }
     else {
       packaging = '0';
     }
-
     const newProduct = new Userproduct({
       category: req.body.product_cate,
       user_id: req.session.user.userId,
@@ -1912,39 +1877,26 @@ exports.addNewPost = async function (req, res, next) {
       original_packaging: packaging,
       added_dtime: moment().tz('Asia/Kolkata').format("YYYY-MM-DD HH:mm:ss"),
     });
-
     const savedProductdata = await newProduct.save();
-
     const requrl = url.format({
       protocol: req.protocol,
       host: req.get("host"),
     });
-
     const imageUrls = [];
     if (req.files && req.files.length > 0) {
       const imageDetails = [];
-
       req.files.forEach(async (file) => {
         const imageUrl = requrl + "/public/images/" + file.filename;
-
         const productimageDetail = new Productimage({
           product_id: savedProductdata._id,
-          //category_id: req.body.product_cate,
           user_id: req.session.user.userId,
-          //brand: brand,
           image: imageUrl,
           added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
         });
-
         const savedImage = productimageDetail.save();
-        console.log(savedImage);
       });
-
     }
     res.redirect('/api/my-account');
-
-
-
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -1953,10 +1905,7 @@ exports.addNewPost = async function (req, res, next) {
       error: error.message,
     });
   }
-
 };
-
-
 exports.updatePostData = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -1966,14 +1915,9 @@ exports.updatePostData = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   try {
-
-console.log(req.files);
     const productId = req.body.productid;
-
     const existingProduct = await Userproduct.findById(productId);
-
     if (!existingProduct) {
       return res.status(404).json({
         status: "0",
@@ -1981,7 +1925,6 @@ console.log(req.files);
         respdata: {},
       });
     }
-
     existingProduct.category_id = req.body.category_id || existingProduct.category_id;
     existingProduct.user_id = req.body.user_id || existingProduct.user_id;
     if(req.body.brand)
@@ -1992,7 +1935,6 @@ console.log(req.files);
     {
       existingProduct.size = ((req.body.size || existingProduct.size) ?? null);
     }
-    
     existingProduct.brand_id = ((req.body.brand_id || existingProduct.brand_id) ?? null);
     existingProduct.size_id = ((req.body.size_id || existingProduct.size_id) ?? null);
     existingProduct.name = req.body.name || existingProduct.name;
@@ -2001,7 +1943,6 @@ console.log(req.files);
     existingProduct.price = req.body.price || existingProduct.price;
     existingProduct.offer_price = req.body.offer_price || existingProduct.offer_price;
     existingProduct.percentage = req.body.percentage || existingProduct.percentage;
-
     const newProduct = new Userproduct({
       category_id: req.body.category_id,
       user_id: req.body.user_id,
@@ -2018,9 +1959,7 @@ console.log(req.files);
       original_packaging:  req.body.original_packaging,
       added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"), 
     });
-
     existingProduct.updated_dtime = moment().format("YYYY-MM-DD HH:mm:ss");
-
     // if (req.files && req.files.length > 0) {
     
     //   // await Productimage.deleteMany({ product_id: existingProduct._id });
@@ -2046,22 +1985,16 @@ console.log(req.files);
     //     const savedImage = await productImageDetail.save();
     //   }
     // }
-
     if (req.files && Object.keys(req.files).length > 0) {
       
         const requrl = url.format({
         protocol: req.protocol,
         host: req.get("host"),
       });
-
-      // Iterate through uploaded files
       for (const fieldName in req.files) {
         const files = req.files[fieldName];
         for (const file of files) {
-          // Construct image URL
           const imageUrl = `${requrl}/public/images/${file.filename}`;
-
-          // Save image URL to database
           const productImageDetail = new Productimage({
             product_id: existingProduct._id,
             category_id: existingProduct.category_id,
@@ -2070,27 +2003,17 @@ console.log(req.files);
             image: imageUrl,
             added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
           });
-
           await productImageDetail.save();
         }
       }
     }
-
-
     const updatedProduct = await existingProduct.save();
-
-    // Fetch image details for the updated product
     const productImages = await Productimage.find({ product_id: updatedProduct._id });
-
     const productDetails = {
       ...updatedProduct.toObject(),
       images: productImages,
     };
-
       res.redirect('/api/my-account');
-
-
-
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -2099,7 +2022,6 @@ console.log(req.files);
       error: error.message,
     });
   }
-
 };
 
 exports.signOut = async function (req, res, next) {
@@ -2135,7 +2057,6 @@ exports.signOut = async function (req, res, next) {
                     respdata: {},
                   });
                 }
-
                 res.status(200).json({
                     status: "success",                 
                     message: "Sign out!",

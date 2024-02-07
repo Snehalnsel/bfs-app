@@ -82,7 +82,7 @@ async function searchByFilter(priceList = '',pageId = '') {
                     htmlContent = '<p>No products found yet.</p>';
                 }
                 $('.sortdata').html(htmlContent);
-                $('.show-count').html(`Showing ${(obj.respdata.length > 0 ? obj.respdata.length : 0)} products`);
+                $('.show-count').html(`Showing ${(obj.respdata.length > 0 ? obj.respdata.length : 0)} products of  ${(obj.totalProduct > 0 ? obj.totalProduct : 0)}`);
             } else {
                 $('.sortdata').html(`No Products Found!!`);
                 $('.show-count').html(`Showing 0 product`);

@@ -2985,6 +2985,8 @@ exports.myOrderDetailsWeb = async (req, res) => {
       total_price: order.total_price,
       payment_method: order.payment_method,
       order_status: order.order_status,
+      delete_by: order.delete_by,
+      delete_status: order.delete_status,
       gst: order.gst,
       seller: {
         _id: order.seller_id._id,

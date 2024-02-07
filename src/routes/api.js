@@ -925,10 +925,6 @@ router.post(
 
 router.post(
   "/cancel-order",
-  auth.isAuthorized, 
-  [
-    check("order_id", "This is a required field!").not().isEmpty(),
-  ],
   OrderController.cancelOrderById
 );
 

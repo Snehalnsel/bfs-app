@@ -929,6 +929,8 @@ exports.getOrderListByUser = async (req, res) => {
         gst: order.gst,
         seller_id: order.seller_id,
         user_id: order.user_id,
+        delete_by: order.delete_by,
+        delete_status: order.delete_status,
         product: {
           name: productDetails.length ? productDetails[0].name : 'Unknown Product',
           image: productImage.length ? productImage[0].image : 'No Image',
@@ -993,6 +995,8 @@ exports.getOrdersBySeller = async (req, res) => {
         gst: order.gst,
         seller_id: order.seller_id,
         user_id: order.user_id,
+        delete_by: order.delete_by,
+        delete_status: order.delete_status,
         product: {
           name: productDetails.length ? productDetails[0].name : 'Unknown Product',
           image: productImage.length ? productImage[0].image : 'No Image',
@@ -1130,70 +1134,42 @@ exports.cancelOrderById = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   try {
-    const orderId = req.body.order_id;
-
+    const orderId = req.body.orderid;
+    const deleteby = req.body.deleteby;
     const existingOrder = await Order.findById(orderId);
-
-    console.log(orderId);
-
     if (!existingOrder) {
       return res.status(404).json({
         status: "0",
         message: "Order not found!",
         respdata: {},
+        is_cancelorder: true,
       });
     }
-    
     existingOrder.delete_status = '1';
-    existingOrder.delete_by = '2';
-
+    existingOrder.delete_by = deleteby;
     existingOrder.updated_dtime = new Date().toISOString();
-
     const canceledOrder = await existingOrder.save();
-
-
     if (canceledOrder) {
-       
-      // const checkingwithehordertracking = await Ordertracking .find({order_id : orderId});
-
-      // let checkingwithordertracking;
-
-      // if(checkingwithehordertracking)
-      // {
-      //   checkingwithordertracking = await Ordertracking .find(orderId);
-      // }
-
-      // const shiprocketResponse = await canceleOrder(canceledOrder.shiprocket_order_id);
-      
-      // if (shiprocketResponse.success) {
-        
-        //await Order.findByIdAndDelete(orderId);
-        
-        res.status(200).json({
+        return res.status(200).json({
           status: "1",
           message: "Order canceled successfully!",
           respdata: canceledOrder,
           is_cancelorder: true,
-          shiprocketResponse: shiprocketResponse
         });
       } else {
-        
-        res.status(400).json({
+        return res.status(400).json({
           status: "0",
           message: "Order cancellation failed!",
           respdata: canceledOrder,
           is_cancelorder: false,
-          shiprocketResponse: shiprocketResponse
         });
       }
-    // }
   } catch (error) {
     console.error(error);
-    res.status(500).json({
+    return res.status(500).json({
       status: "0",
-      message: "Error!",
+      message: "Order cancellation failed!",
       respdata: error,
     });
   }

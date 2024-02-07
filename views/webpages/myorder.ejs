@@ -101,7 +101,7 @@
 
             data.orders.forEach(item => {
 
-               var hTml = `<div class="cart-list wishlist-list">
+               var hTml = `<div class="cart-list wishlist-list" data-orderid="${item._id}" data-userby="3">
         <div class="bids-row wishlist-row " >
               <div class="br-details">
                   <div class="bid-images"><img src="${item.product.image}" alt="images" class="img-fluid"></div>
@@ -121,12 +121,36 @@
                                  <div class="remove-cart">
                                     <a href="/api/web-myorder-details/${item._id}" class="prd-btn wish-rem-button"
                                        data-id=""><i class="fa fa-eye" aria-hidden="true"></i></a>
-                                 </div>
-                                 <div class="remove-cart">
-                                    <a href="#" class="prd-btn remove-order"
-                                       data-id=""><i class="fa fa-trash-o"
-                                          aria-hidden="true"></i></a>
-                                 </div>
+                                 </div>`;
+                                 if(item.delete_status == 0) {
+                                    hTml += `
+                                       <div class="remove-cart">
+                                          <a href="#" class="prd-btn remove-order"
+                                             data-id="${item._id}" ><i class="fa fa-trash-o"
+                                                aria-hidden="true"></i></a>
+                                       </div>`;
+                                    }
+                                    else if(item.delete_status == 1){
+                                       if(item.delete_by == 1) {
+                                          hTml += `
+                                          <div class="remove-cart">
+                                             <span style="color: blue;">Canceled By Admin</span>
+                                          </div>`;
+                                       }
+                                       else if(item.delete_by == 2) {
+                                          hTml += `
+                                          <div class="remove-cart">
+                                             <span style="color: rgb(5, 15, 73);">Canceled By Seller</span>
+                                          </div>`;
+                                       }
+                                       else if(item.delete_by == 3) {
+                                          hTml += `
+                                          <div class="remove-cart">
+                                             <span style="color: rgb(45, 144, 226);">Canceled By You</span>
+                                          </div>`;
+                                       }
+                                    }
+                                    hTml += `    
                               </div>
                            </div>
                
@@ -153,7 +177,7 @@
          function populateSellerHtml(data) {
             data.orders.forEach(item => {
 
-               var hTml = `<div class="cart-list wishlist-list" data-orderid="${item._id}">
+               var hTml = `<div class="cart-list wishlist-list" data-orderid="${item._id}" data-userby="2">
     <div class="bids-row wishlist-row order-list">
         <div class="br-details">
             <div class="bid-images"><img src="${item.product.image}" alt="images" class="img-fluid"></div>
@@ -164,7 +188,7 @@
                 <div class="cnbtn-group">`;
                   if(item.shippingkit_status == 1) {
                      hTml += `<p>Shipping kit has already been bought.</p>`;
-                  } else {
+                  } else if(item.delete_status == 0) {
                      hTml += `
                         <p>Please Choose Either Option To Confirm Your Order.</p>
                         <div class="cg-row">
@@ -178,13 +202,35 @@
                 <div class="bid-right flx-content">
                   <div class="remove-cart">
                      <a href="/api/web-myorder-details/${item._id}"><i class="fa fa-info-circle"></i></a>  
-                   </div>
+                   </div>`;
+                   if(item.delete_status == 0) {
+                     hTml += `
                    <div class="remove-cart">
                      <a href="javascript:void(0)" id="erase" class ="remove-order"><i class="fa fa-trash-o"></i></a>  
-                   </div>               
-               
+                   </div> `;
+                  }
+                  else if(item.delete_status == 1){
+                        if(item.delete_by == 1) {
+                              hTml += `
+                                       <div class="remove-cart">
+                                             <span style="color: blue;">Canceled By Admin</span>
+                                          </div>`;
+                              }
+                              else if(item.delete_by == 2) {
+                                          hTml += `
+                                          <div class="remove-cart">
+                                             <span style="color: rgb(5, 15, 73);">Canceled By Seller</span>
+                                          </div>`;
+                              }
+                              else if(item.delete_by == 3) {
+                                          hTml += `
+                                          <div class="remove-cart">
+                                             <span style="color: rgb(45, 144, 226);">Canceled By You</span>
+                                          </div>`;
+                                       }
+                  }           
+                  hTml += `
                 </div>
-                
                      </div>
                      </div>
                      </div></div>`;
@@ -214,7 +260,6 @@
                         });
                         $("#"+orderId).siblings("p").text("Shipping kit has already been bought");
                         $("#"+orderId).hide();
-                        //location.reload();
                      } else {
                         Swal.fire({
                            html: data.message,

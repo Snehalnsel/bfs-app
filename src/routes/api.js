@@ -925,10 +925,6 @@ router.post(
 
 router.post(
   "/cancel-order",
-  auth.isAuthorized, 
-  [
-    check("order_id", "This is a required field!").not().isEmpty(),
-  ],
   OrderController.cancelOrderById
 );
 
@@ -1203,7 +1199,17 @@ router.post("/addnewpost",[], upload.array('image', 5),WebsiteController.addNewP
 
 router.get("/edit-mypost/:id",[],WebsiteController.editUserWisePost);
 
-router.post("/updatepostdata",[],upload.array('image', 5),WebsiteController.updatePostData);
+// router.post("/updatepostdata",[],upload.fields([{
+//   name: 'img0', maxCount: 1
+// }, {
+//   name: 'img1', maxCount: 1
+// },{
+//   name: 'img2', maxCount: 1
+// },{
+//   name: 'img3', maxCount: 1
+// },{
+//   name: 'img4', maxCount: 1
+// },]),WebsiteController.updatePostData);
 
 // Add To cart 
 router.post("/addtocart/:id",[],WebsiteController.addToCart);

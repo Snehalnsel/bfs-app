@@ -38,6 +38,8 @@ const Cart = require('../../models/api/cartModel');
 const CartDetail = require('../../models/api/cartdetailsModel');
 const Order = require("../../models/api/orderModel");
 const Banner = require("../../models/api/bannerModel");
+const Brand = require("../../models/api/brandModel");
+const Size = require("../../models/api/sizeModel");
 //const smtpUser = "sneha.lnsel@gmail.com";
 const smtpUser = "hello@bidforsale.com";
 const nodemailer = require("nodemailer");
@@ -52,7 +54,7 @@ const Ordertracking = require("../../models/api/ordertrackModel");
 const Shippingkit = require("../../models/api/shippingkitModel");
 //const Ordertracking = require("../../models/api/ordertrackModel");
 const Track = require("../../models/api/trackingModel");
-const { log } = require("console");
+const { log, Console } = require("console");
 
 
 
@@ -1164,6 +1166,7 @@ exports.editProfile = async function (req, res, next) {
       message: "Welcome to the Edit Profile page!",
       respdata: req.session.user,
       isLoggedIn: isLoggedIn,
+      userData:userData
     });
   } catch (error) {
     console.error(error);
@@ -1488,18 +1491,32 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
     const currentPage = data.currentPage;
 
     const categoryName = await Category.find({ _id: id}).populate('name');
-    
-    //Get All Filter Data
-    //Brand List
-    // const brandList = await brandModel.find({});
-    // const sizeList = await sizeModel.find({});
-    // const conditionList = await productconditionModel.find({});
+
     const userProducts = await Userproduct.find({
       category_id : id,
       approval_status: 1,
       flag: 0,
     })
       .select('brand_id size_id status');
+
+      const result = await Userproduct.aggregate([
+        {
+          $match: {
+            category_id:  mongoose.Types.ObjectId(id),
+            approval_status: 1,
+            flag: 0
+          }
+        },
+        {
+          $group: {
+            _id: id,
+            maxPrice: { $max: "$offer_price" },
+            minPrice: { $min: "$offer_price" }
+          }
+        }
+      ]);
+
+      // console.log("results",result);
 
     const brandIds = userProducts.map(product => product.brand_id).filter(Boolean);
     const sizeIds = userProducts.map(product => product.size_id).filter(Boolean);
@@ -1509,10 +1526,10 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
     const sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
     const conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
     
-    console.log('productCount', productCount);
-    console.log('totalPages', totalPages);
-    console.log('currentPage', currentPage);
-    console.log('pageSize', pageSize);
+    // console.log('productCount', productCount);
+    // console.log('totalPages', totalPages);
+    // console.log('currentPage', currentPage);
+    // console.log('pageSize', pageSize);
     
 
     res.render("webpages/subcategoryproduct",
@@ -1529,7 +1546,9 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
         totalPages: totalPages,
         currentPage: currentPage,
         pageSize: pageSize, 
-        isLoggedIn: isLoggedIn
+        isLoggedIn: isLoggedIn,
+        maxvalue: result[0].maxPrice,
+        minvalue: result[0].minPrice
       });
 
   }
@@ -2015,9 +2034,7 @@ exports.updatePostData = async function (req, res, next) {
 
   try {
 
-    console.log(req.body);
-    console.log(req.files.length);
-    return;
+console.log(req.files);
     const productId = req.body.productid;
 
     const existingProduct = await Userproduct.findById(productId);
@@ -2047,7 +2064,7 @@ exports.updatePostData = async function (req, res, next) {
     existingProduct.description = req.body.description || existingProduct.description;
     existingProduct.status = req.body.status || existingProduct.status;
     existingProduct.price = req.body.price || existingProduct.price;
-    existingProduct.offer_price = req.body.offerprice || existingProduct.offer_price;
+    existingProduct.offer_price = req.body.offer_price || existingProduct.offer_price;
     existingProduct.percentage = req.body.percentage || existingProduct.percentage;
 
     const newProduct = new Userproduct({
@@ -2069,31 +2086,61 @@ exports.updatePostData = async function (req, res, next) {
 
     existingProduct.updated_dtime = moment().format("YYYY-MM-DD HH:mm:ss");
 
-    if (req.files && req.files.length > 0) {
+    // if (req.files && req.files.length > 0) {
     
-      await Productimage.deleteMany({ product_id: existingProduct._id });
+    //   // await Productimage.deleteMany({ product_id: existingProduct._id });
 
-      const imageUrls = [];
-      const requrl = url.format({
+    //   const imageUrls = [];
+    //   const requrl = url.format({
+    //     protocol: req.protocol,
+    //     host: req.get("host"),
+    //   });
+
+    //   for (const file of req.files) {
+    //     const imageUrl = requrl + "/public/images/" + file.filename;
+
+    //     const productImageDetail = new Productimage({
+    //       product_id: existingProduct._id,
+    //       category_id: existingProduct.category_id,
+    //       user_id: existingProduct.user_id,
+    //       brand_id: existingProduct.brand_id,
+    //       image: imageUrl,
+    //       added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
+    //     });
+
+    //     const savedImage = await productImageDetail.save();
+    //   }
+    // }
+
+    if (req.files && Object.keys(req.files).length > 0) {
+      
+        const requrl = url.format({
         protocol: req.protocol,
         host: req.get("host"),
       });
 
-      for (const file of req.files) {
-        const imageUrl = requrl + "/public/images/" + file.filename;
+      // Iterate through uploaded files
+      for (const fieldName in req.files) {
+        const files = req.files[fieldName];
+        for (const file of files) {
+          // Construct image URL
+          const imageUrl = `${requrl}/public/images/${file.filename}`;
 
-        const productImageDetail = new Productimage({
-          product_id: existingProduct._id,
-          category_id: existingProduct.category_id,
-          user_id: existingProduct.user_id,
-          brand_id: existingProduct.brand_id,
-          image: imageUrl,
-          added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
-        });
+          // Save image URL to database
+          const productImageDetail = new Productimage({
+            product_id: existingProduct._id,
+            category_id: existingProduct.category_id,
+            user_id: existingProduct.user_id,
+            brand_id: existingProduct.brand_id,
+            image: imageUrl,
+            added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
+          });
 
-        const savedImage = await productImageDetail.save();
+          await productImageDetail.save();
+        }
       }
     }
+
 
     const updatedProduct = await existingProduct.save();
 
@@ -2192,6 +2239,8 @@ exports.editUserWisePost = async function (req, res, next) {
 
     const parentCategoryId = "650444488501422c8bf24bdb";
     const categoriesWithoutParentId = await Category.find({ parent_id: { $ne: parentCategoryId } });
+     const brands = await Brand.find({ status: 1 });
+     const productsize = await Size.find();
 
     const productId = req.params.id;
     const product = await Userproduct.findById(productId);
@@ -2219,6 +2268,8 @@ exports.editUserWisePost = async function (req, res, next) {
       productcondition: productConditions,
       subcate: categoriesWithoutParentId,
       productId: productId,
+      brands:brands,
+      productsize:productsize,
       isLoggedIn: isLoggedIn,
     });
 
@@ -2951,6 +3002,8 @@ exports.myOrderDetailsWeb = async (req, res) => {
       total_price: order.total_price,
       payment_method: order.payment_method,
       order_status: order.order_status,
+      delete_by: order.delete_by,
+      delete_status: order.delete_status,
       gst: order.gst,
       seller: {
         _id: order.seller_id._id,

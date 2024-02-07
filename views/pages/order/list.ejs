@@ -182,10 +182,12 @@
                                                             </td> -->
                                                             <td>
                                                                 <% if(value.billing_address && value.billing_address[0] && value.shipping_address && value.shipping_address[0]) {%>
-                                                                    <a href="/orderdetails/<%= value._id %>"
-                                                                        class="btn btn-info btn-circle btn-sm" title="Edit">
-                                                                        <i class="fas fa-pencil-alt"></i>
-                                                                    </a>
+                                                                    <% if(value.delete_status == 0) {%>
+                                                                        <a href="/orderdetails/<%= value._id %>"
+                                                                            class="btn btn-info btn-circle btn-sm" title="Edit">
+                                                                            <i class="fas fa-pencil-alt"></i>
+                                                                        </a>
+                                                                    <% } %>  
                                                                 <% } %>  
                                                                 
                                                                 <% if(value.delete_status == 0) {%>
@@ -193,12 +195,12 @@
                                                                         <i class="fas fa-trash"></i>
                                                                     </a>
                                                                 <% }else{ %>
-                                                                    
-                                                                    <% if(value.delete_status == 1) {%>
+                                                                 
+                                                                    <% if(value.delete_by == 1) {%>
                                                                         <span style="color: blue;">Canceled By Admin</span>
-                                                                    <% } else if(value.delete_status == 2) {%>
+                                                                    <% } else if(value.delete_by == 2) {%>
                                                                         <span style="color: rgb(5, 15, 73);">Canceled By Seller</span>
-                                                                    <% } else { %>   
+                                                                    <% } else if(value.delete_by == 3){ %>   
                                                                         <span style="color: rgb(45, 144, 226);">Canceled By Buyer</span>
                                                                     <% } %>   
                                                                 <% } %>  

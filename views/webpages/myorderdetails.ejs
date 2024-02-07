@@ -134,7 +134,18 @@
                    <%} else{%>
                     <p></p>
                     <%}%>
-               </div>               
+               </div> 
+               <div class="od-box">
+                  <%if(respdata.delete_status == 1 ){%>
+                     <%if(respdata.delete_by == 1 ){%>
+                        <h5 class="short-title" style="color: blue;">Order Deleted BY Admin</h5>
+                     <%} else if (respdata.delete_by == 2){%>
+                        <h5 class="short-title" style="color: rgb(5, 15, 73);">Order Deleted BY Seller</h5>
+                     <%} else if(respdata.delete_by == 3){%>
+                        <h5 class="short-title" style="color: rgb(45, 144, 226);">Order Deleted BY Buyer</h5>
+                     <%}%>
+                  <%}%>
+              </div>                 
             </div>
              <div class="col-md-3">
                <div class="od-box">

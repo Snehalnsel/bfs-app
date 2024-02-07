@@ -1490,18 +1490,31 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
     const currentPage = data.currentPage;
 
     const categoryName = await Category.find({ _id: id}).populate('name');
-    
-    //Get All Filter Data
-    //Brand List
-    // const brandList = await brandModel.find({});
-    // const sizeList = await sizeModel.find({});
-    // const conditionList = await productconditionModel.find({});
+
     const userProducts = await Userproduct.find({
       category_id : id,
       approval_status: 1,
       flag: 0,
     })
       .select('brand_id size_id status');
+
+      const result = await Userproduct.aggregate([
+        {
+          $match: {
+            category_id:  mongoose.Types.ObjectId(id),
+            approval_status: 1,
+            flag: 0
+          }
+        },
+        {
+          $group: {
+            maxPrice: { $max: "$offer_price" },
+            minPrice: { $min: "$offer_price" }
+          }
+        }
+      ]);
+
+      console.log("results",result);
 
     const brandIds = userProducts.map(product => product.brand_id).filter(Boolean);
     const sizeIds = userProducts.map(product => product.size_id).filter(Boolean);
@@ -1511,10 +1524,10 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
     const sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
     const conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
     
-    console.log('productCount', productCount);
-    console.log('totalPages', totalPages);
-    console.log('currentPage', currentPage);
-    console.log('pageSize', pageSize);
+    // console.log('productCount', productCount);
+    // console.log('totalPages', totalPages);
+    // console.log('currentPage', currentPage);
+    // console.log('pageSize', pageSize);
     
 
     res.render("webpages/subcategoryproduct",
@@ -1531,7 +1544,9 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
         totalPages: totalPages,
         currentPage: currentPage,
         pageSize: pageSize, 
-        isLoggedIn: isLoggedIn
+        isLoggedIn: isLoggedIn,
+        maxvalue: result[0].maxPrice,
+        minvalue: result[0].minPrice
       });
 
   }

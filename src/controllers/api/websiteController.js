@@ -1322,11 +1322,9 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
   }
 };
 
-async function getProductDataWithSort(id, sortid,page, pageSize) {
+async function getProductDataWithSort(id, sortid, page, pageSize) {
   try {
-
     let categoryId;
-
     let sortCriteria = {};
 
     if (sortid == 0) {
@@ -1338,58 +1336,53 @@ async function getProductDataWithSort(id, sortid,page, pageSize) {
     }
 
     const skip = (page - 1) * pageSize;
+
     let userproducts = [];
-  
+
     if (id === "whatshot") {
-       userproducts = await Userproduct.find({
+      userproducts = await Userproduct.find({
         approval_status: 1,
         flag: 0
-    })
-        .populate('brand_id', 'name')
-        .populate('category_id', 'name')
-        .populate('user_id', 'name')
-        .populate('size_id', 'name')
-        .sort([
-            sortCriteria,
-            { hitCount: -1 }
-        ])
-        .exec();
-    
-  
+      })
+      .populate('brand_id', 'name')
+      .populate('category_id', 'name')
+      .populate('user_id', 'name')
+      .populate('size_id', 'name')
+      .sort([sortCriteria, { hitCount: -1 }])
+      .exec();
+
     } else if (id === "justsold") {
-       userproducts = await Userproduct.find({
+      userproducts = await Userproduct.find({
         approval_status: 1,
         flag: 1
-    })
-        .populate('brand_id', 'name')
-        .populate('category_id', 'name')
-        .populate('user_id', 'name')
-        .populate('size_id', 'name')
-        .sort(sortCriteria)
-        .exec();
-    
+      })
+      .populate('brand_id', 'name')
+      .populate('category_id', 'name')
+      .populate('user_id', 'name')
+      .populate('size_id', 'name')
+      .sort(sortCriteria)
+      .exec();
+
     } else if (id === "bestDeal") {
-
       const appSettings = await Appsettings.findOne();
-
       const percentageFilter = parseInt(appSettings.best_deal);
-  
-       userproducts = await Userproduct.find({
+
+      userproducts = await Userproduct.find({
         percentage: { $gte: percentageFilter },
         approval_status: 1,
         flag: 0
-    })
-        .populate('brand_id', 'name')
-        .populate('category_id', 'name')
-        .populate('user_id', 'name')
-        .populate('size_id', 'name')
-        .sort(sortCriteria)
-        .exec();
-    
-    } else {
-      categoryId = id; 
+      })
+      .populate('brand_id', 'name')
+      .populate('category_id', 'name')
+      .populate('user_id', 'name')
+      .populate('size_id', 'name')
+      .sort(sortCriteria)
+      .exec();
 
-       userproducts = await Userproduct.find({ 
+    } else {
+      categoryId = id;
+
+      userproducts = await Userproduct.find({ 
         category_id: id,
         approval_status: 1,
         flag: 0 
@@ -1401,12 +1394,11 @@ async function getProductDataWithSort(id, sortid,page, pageSize) {
       .sort(sortCriteria)
       .exec();
     }
+
     const formattedUserProducts = [];
 
     for (const userproduct of userproducts) {
-
       const productImages = await Productimage.find({ product_id: userproduct._id });
-
       const productCondition = await Productcondition.findById(userproduct.status);
 
       const formattedUserProduct = {
@@ -1434,21 +1426,9 @@ async function getProductDataWithSort(id, sortid,page, pageSize) {
     }
 
     const paginatedData = formattedUserProducts.slice(skip, skip + pageSize);
-
     const productCount = formattedUserProducts.length;
-
-
     const totalPages = Math.ceil(productCount / pageSize);
-
     const currentPage = parseInt(page);
-
-    // return {
-    //   status: '1', productCount: productCount,
-    //   message: 'Success',
-    //   respdata: paginatedData,
-     
-    //   //isLoggedIn: isLoggedIn,
-    // };
 
     return {
       status: '1',
@@ -1458,9 +1438,7 @@ async function getProductDataWithSort(id, sortid,page, pageSize) {
       message: 'Success',
       respdata: paginatedData,
     };
-
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Error fetching products with matching parent_id:', error);
     return {
       status: '0',
@@ -1469,6 +1447,7 @@ async function getProductDataWithSort(id, sortid,page, pageSize) {
     };
   }
 }
+
 
 exports.getSubCategoriesProducts = async function (page,req, res, next) {
   try {
@@ -1483,9 +1462,11 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
 
     const data = await getProductDataWithSort(id,sortid,pageno, pageSize);
 
+    const productCount = data.productCount; 
+
     const formattedUserProducts = data.respdata;
     
-    const productCount = formattedUserProducts.length;
+    const filterproductCount = formattedUserProducts.length;
 
     const totalPages = data.totalPages;
     const currentPage = data.currentPage;
@@ -1515,23 +1496,12 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
           }
         }
       ]);
-
-      // console.log("results",result);
-
     const brandIds = userProducts.map(product => product.brand_id).filter(Boolean);
     const sizeIds = userProducts.map(product => product.size_id).filter(Boolean);
     const statusIds = userProducts.map(product => product.status).filter(Boolean);
-    
     const brandList = await brandModel.find({ _id: { $in: brandIds } });
     const sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
     const conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
-    
-    // console.log('productCount', productCount);
-    // console.log('totalPages', totalPages);
-    // console.log('currentPage', currentPage);
-    // console.log('pageSize', pageSize);
-    
-
     res.render("webpages/subcategoryproduct",
       {
         title: "Product Sub Categories",
@@ -1543,6 +1513,7 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
         categoryName:categoryName,
         conditionList: conditionList,
         productCount:productCount,
+        filterproductCount:filterproductCount,
         totalPages: totalPages,
         currentPage: currentPage,
         pageSize: pageSize, 
@@ -1561,8 +1532,6 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
     };
   }
 };
-
-
 exports.getSubCategoriesProductswithSort = async function (page,req, res, next) {
 
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -1587,10 +1556,8 @@ console.log("product changes");
 
 };
 
-
 exports.userUpdate = async function (req, res, next) {
   try {
-
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -1609,20 +1576,17 @@ exports.userUpdate = async function (req, res, next) {
         respdata: {},
       });
     }
-
     const updData = {
       name: req.body.name,
       email: req.body.email,
       phone_no: req.body.phone_no,
       created_dtime: dateTime,
     };
-
     const updatedUser = await Users.findOneAndUpdate(
       { _id: user._id },
       { $set: updData },
-      { upsert: true, new: true } // Use new: true to get the updated document
+      { upsert: true, new: true } 
     );
-
     if (!updatedUser) {
       return res.status(500).json({
         status: "0",
@@ -1630,19 +1594,10 @@ exports.userUpdate = async function (req, res, next) {
         respdata: {},
       });
     }
-
     req.session.user.name = updatedUser.name;
     req.session.user.email = updatedUser.email;
     req.session.user.phone_no = updatedUser.phone_no;
-
     res.redirect("/api/my-account");
-
-    // res.status(200).json({
-    //   status: "1",
-    //   message: "Successfully updated!",
-    //   respdata: updatedUser,
-    // });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -1653,7 +1608,6 @@ exports.userUpdate = async function (req, res, next) {
   }
 };
 
-// user checkout address add
 exports.userNewCheckOutAddressAdd = async function (req, res, next) {
   try{
     
@@ -1721,10 +1675,8 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
 
 exports.userAddressAdd = async function (req, res, next) {
   try {
-    
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const addr_name = req.body.addrType;
-    //const address = await addressBook.findOne({ _id: req.params.id });
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -1733,7 +1685,6 @@ exports.userAddressAdd = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
-
     const newAddress = new addressBook({
       user_id: req.body.userId,
       street_name: req.body.address2,
@@ -1748,12 +1699,10 @@ exports.userAddressAdd = async function (req, res, next) {
       flag: req.body.flag,
       created_dtime: dateTime,
     });
-
     const savedAddress = await newAddress.save();
     const user = await Users.findById(newAddress.user_id);
     const randomSuffix = Math.floor(Math.random() * 1000);
     const pickupLocation = savedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;
-
     const PickupData = {
       pickup_location: pickupLocation,
       name: user.name,
@@ -1767,7 +1716,6 @@ exports.userAddressAdd = async function (req, res, next) {
       pin_code: savedAddress.pin_code
     };
     const shiprocketResponse = await generateSellerPickup(PickupData);
-
     if (shiprocketResponse) {
       savedAddress.shiprocket_address = pickupLocation;
       savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
@@ -1783,7 +1731,6 @@ exports.userAddressAdd = async function (req, res, next) {
     });
   }
 };
-
 exports.deleteUserAddress = async function (req, res, next) {
   try {
     addbook_id = req.params.id;
@@ -1809,8 +1756,6 @@ exports.deleteUserAddress = async function (req, res, next) {
     });
   }
 };
-
-// My Post
 exports.userWisePost = async function (req, res, next) {
 
   const errors = validationResult(req);
@@ -1822,7 +1767,6 @@ exports.userWisePost = async function (req, res, next) {
     });
   }
   try {
-
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
     const userproducts = await Userproduct.find({ user_id: req.params.id })
@@ -1831,22 +1775,16 @@ exports.userWisePost = async function (req, res, next) {
       .populate('user_id', 'name', { optional: true })
       .populate('size_id', 'name', { optional: true })
       .exec();
-
     const formattedUserProducts = [];
-
     for (const userproduct of userproducts) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
-
       const formattedUserProduct = {
         _id: userproduct._id,
         name: userproduct.name,
         description: userproduct.description,
-        //category: userproduct.category_id.name, 
         brand: userproduct.brand_id ? userproduct.brand_id.name : '',
-        //brand_id: userproduct.brand_id._id, 
         user_id: userproduct.user_id._id,
         user_name: userproduct.user_id.name,
-        //size: userproduct.size_id.name,
         size_id: userproduct.size_id ? userproduct.size_id.name : '',
         price: userproduct.price,
         offer_price: userproduct.offer_price,
@@ -1860,10 +1798,8 @@ exports.userWisePost = async function (req, res, next) {
         __v: userproduct.__v,
         product_images: productImages,
       };
-
       formattedUserProducts.push(formattedUserProduct);
     }
-
     if (formattedUserProducts) {
       res.render("webpages/mypost", {
         title: "My Post",
@@ -1873,7 +1809,6 @@ exports.userWisePost = async function (req, res, next) {
         isLoggedIn: isLoggedIn,
       });
     }
-
   } catch (error) {
     console.error(error);
     res.status(500).json({

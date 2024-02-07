@@ -1166,6 +1166,7 @@ exports.editProfile = async function (req, res, next) {
       message: "Welcome to the Edit Profile page!",
       respdata: req.session.user,
       isLoggedIn: isLoggedIn,
+      userData:userData
     });
   } catch (error) {
     console.error(error);

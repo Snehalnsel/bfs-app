@@ -78,11 +78,11 @@ $(document).on('click', ".wish-btn", async function (e) {
             method: 'POST',
             success: function (data) {
                 if (data.is_wishlisted) {
-                // Swal.fire({
-                //     html: data.message,
-                //     confirmButtonText: "OK",
-                //     customClass: { confirmButton: 'alert-box-button' }
-                // });
+                Swal.fire({
+                    html: data.message,
+                    confirmButtonText: "OK",
+                    customClass: { confirmButton: 'alert-box-button' }
+                });
                 $(".wish-btn").addClass("wish-rem-btn").find("i").removeClass("fa fa-heart-o").addClass("fa fa-heart");
                 setTimeout(() => {
                     $(".wish-rem-btn").removeClass("wish-btn");

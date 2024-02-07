@@ -1509,6 +1509,7 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
         },
         {
           $group: {
+            _id: id,
             maxPrice: { $max: "$offer_price" },
             minPrice: { $min: "$offer_price" }
           }
@@ -1546,8 +1547,8 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
         currentPage: currentPage,
         pageSize: pageSize, 
         isLoggedIn: isLoggedIn,
-        // maxvalue: result[0].maxPrice,
-        // minvalue: result[0].minPrice
+        maxvalue: result[0].maxPrice,
+        minvalue: result[0].minPrice
       });
 
   }

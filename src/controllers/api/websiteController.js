@@ -828,11 +828,9 @@ exports.userFilter = async function (req, res, next) {
   } else {
     optionId = 1;
   }
-
   const page = pageNo || 1; 
   const pageSize = 8;  
   const skip = (page - 1) * pageSize;
-
   let concatVar = {};
   let objConditionList = [];
   if ((typeof conditionList != "undefined") && (conditionList.length > 0)) {
@@ -843,11 +841,9 @@ exports.userFilter = async function (req, res, next) {
   if (typeof brandList != "undefined") {
     concatVar["brand_id"] = { "$in": brandList };
   }
-  //if(typeof brandList != "undefined" && concatVar.length > 0) {
     if (typeof sizeList != "undefined") {
       concatVar["size_id"] = { "$in": sizeList };
     }
-  //}
   if (typeof productcategoryId != "undefined") {
     concatVar["category_id"] = { "$in": mongoose.Types.ObjectId(productcategoryId) };
   }
@@ -901,8 +897,6 @@ console.log(concatVar);
 // let totalProduct = await Userproduct.find(concatVar).sort({ offer_price: optionId });
 let totalProduct = await Userproduct.countDocuments(concatVar);
 
-
- 
 let allProductData = await Userproduct.find(concatVar)
 .sort({ offer_price: optionId })
 .skip(skip)
@@ -953,7 +947,8 @@ let allProductData = await Userproduct.find(concatVar)
       totalPages:totalPages,
       currentPage: page,
       pageSize: pageSize, 
-      webUrl:'user-filter'
+      webUrl:'user-filter',
+      totalProduct:totalProduct
     });
   } else {
     res.status(200).json({
@@ -1322,11 +1317,9 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
   }
 };
 
-async function getProductDataWithSort(id, sortid,page, pageSize) {
+async function getProductDataWithSort(id, sortid, page, pageSize) {
   try {
-
     let categoryId;
-
     let sortCriteria = {};
 
     if (sortid == 0) {
@@ -1338,58 +1331,53 @@ async function getProductDataWithSort(id, sortid,page, pageSize) {
     }
 
     const skip = (page - 1) * pageSize;
+
     let userproducts = [];
-  
+
     if (id === "whatshot") {
-       userproducts = await Userproduct.find({
+      userproducts = await Userproduct.find({
         approval_status: 1,
         flag: 0
-    })
-        .populate('brand_id', 'name')
-        .populate('category_id', 'name')
-        .populate('user_id', 'name')
-        .populate('size_id', 'name')
-        .sort([
-            sortCriteria,
-            { hitCount: -1 }
-        ])
-        .exec();
-    
-  
+      })
+      .populate('brand_id', 'name')
+      .populate('category_id', 'name')
+      .populate('user_id', 'name')
+      .populate('size_id', 'name')
+      .sort([sortCriteria, { hitCount: -1 }])
+      .exec();
+
     } else if (id === "justsold") {
-       userproducts = await Userproduct.find({
+      userproducts = await Userproduct.find({
         approval_status: 1,
         flag: 1
-    })
-        .populate('brand_id', 'name')
-        .populate('category_id', 'name')
-        .populate('user_id', 'name')
-        .populate('size_id', 'name')
-        .sort(sortCriteria)
-        .exec();
-    
+      })
+      .populate('brand_id', 'name')
+      .populate('category_id', 'name')
+      .populate('user_id', 'name')
+      .populate('size_id', 'name')
+      .sort(sortCriteria)
+      .exec();
+
     } else if (id === "bestDeal") {
-
       const appSettings = await Appsettings.findOne();
-
       const percentageFilter = parseInt(appSettings.best_deal);
-  
-       userproducts = await Userproduct.find({
+
+      userproducts = await Userproduct.find({
         percentage: { $gte: percentageFilter },
         approval_status: 1,
         flag: 0
-    })
-        .populate('brand_id', 'name')
-        .populate('category_id', 'name')
-        .populate('user_id', 'name')
-        .populate('size_id', 'name')
-        .sort(sortCriteria)
-        .exec();
-    
-    } else {
-      categoryId = id; 
+      })
+      .populate('brand_id', 'name')
+      .populate('category_id', 'name')
+      .populate('user_id', 'name')
+      .populate('size_id', 'name')
+      .sort(sortCriteria)
+      .exec();
 
-       userproducts = await Userproduct.find({ 
+    } else {
+      categoryId = id;
+
+      userproducts = await Userproduct.find({ 
         category_id: id,
         approval_status: 1,
         flag: 0 
@@ -1401,12 +1389,11 @@ async function getProductDataWithSort(id, sortid,page, pageSize) {
       .sort(sortCriteria)
       .exec();
     }
+
     const formattedUserProducts = [];
 
     for (const userproduct of userproducts) {
-
       const productImages = await Productimage.find({ product_id: userproduct._id });
-
       const productCondition = await Productcondition.findById(userproduct.status);
 
       const formattedUserProduct = {
@@ -1434,21 +1421,9 @@ async function getProductDataWithSort(id, sortid,page, pageSize) {
     }
 
     const paginatedData = formattedUserProducts.slice(skip, skip + pageSize);
-
     const productCount = formattedUserProducts.length;
-
-
     const totalPages = Math.ceil(productCount / pageSize);
-
     const currentPage = parseInt(page);
-
-    // return {
-    //   status: '1', productCount: productCount,
-    //   message: 'Success',
-    //   respdata: paginatedData,
-     
-    //   //isLoggedIn: isLoggedIn,
-    // };
 
     return {
       status: '1',
@@ -1458,9 +1433,7 @@ async function getProductDataWithSort(id, sortid,page, pageSize) {
       message: 'Success',
       respdata: paginatedData,
     };
-
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Error fetching products with matching parent_id:', error);
     return {
       status: '0',
@@ -1469,6 +1442,7 @@ async function getProductDataWithSort(id, sortid,page, pageSize) {
     };
   }
 }
+
 
 exports.getSubCategoriesProducts = async function (page,req, res, next) {
   try {
@@ -1483,9 +1457,11 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
 
     const data = await getProductDataWithSort(id,sortid,pageno, pageSize);
 
+    const productCount = data.productCount; 
+
     const formattedUserProducts = data.respdata;
     
-    const productCount = formattedUserProducts.length;
+    const filterproductCount = formattedUserProducts.length;
 
     const totalPages = data.totalPages;
     const currentPage = data.currentPage;
@@ -1515,23 +1491,12 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
           }
         }
       ]);
-
-      // console.log("results",result);
-
     const brandIds = userProducts.map(product => product.brand_id).filter(Boolean);
     const sizeIds = userProducts.map(product => product.size_id).filter(Boolean);
     const statusIds = userProducts.map(product => product.status).filter(Boolean);
-    
     const brandList = await brandModel.find({ _id: { $in: brandIds } });
     const sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
     const conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
-    
-    // console.log('productCount', productCount);
-    // console.log('totalPages', totalPages);
-    // console.log('currentPage', currentPage);
-    // console.log('pageSize', pageSize);
-    
-
     res.render("webpages/subcategoryproduct",
       {
         title: "Product Sub Categories",
@@ -1543,6 +1508,7 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
         categoryName:categoryName,
         conditionList: conditionList,
         productCount:productCount,
+        filterproductCount:filterproductCount,
         totalPages: totalPages,
         currentPage: currentPage,
         pageSize: pageSize, 
@@ -1561,8 +1527,6 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
     };
   }
 };
-
-
 exports.getSubCategoriesProductswithSort = async function (page,req, res, next) {
 
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -1587,10 +1551,8 @@ console.log("product changes");
 
 };
 
-
 exports.userUpdate = async function (req, res, next) {
   try {
-
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -1609,20 +1571,17 @@ exports.userUpdate = async function (req, res, next) {
         respdata: {},
       });
     }
-
     const updData = {
       name: req.body.name,
       email: req.body.email,
       phone_no: req.body.phone_no,
       created_dtime: dateTime,
     };
-
     const updatedUser = await Users.findOneAndUpdate(
       { _id: user._id },
       { $set: updData },
-      { upsert: true, new: true } // Use new: true to get the updated document
+      { upsert: true, new: true } 
     );
-
     if (!updatedUser) {
       return res.status(500).json({
         status: "0",
@@ -1630,19 +1589,10 @@ exports.userUpdate = async function (req, res, next) {
         respdata: {},
       });
     }
-
     req.session.user.name = updatedUser.name;
     req.session.user.email = updatedUser.email;
     req.session.user.phone_no = updatedUser.phone_no;
-
     res.redirect("/api/my-account");
-
-    // res.status(200).json({
-    //   status: "1",
-    //   message: "Successfully updated!",
-    //   respdata: updatedUser,
-    // });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -1653,10 +1603,8 @@ exports.userUpdate = async function (req, res, next) {
   }
 };
 
-// user checkout address add
 exports.userNewCheckOutAddressAdd = async function (req, res, next) {
   try{
-    
     const addr_name = req.body.addrType;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -1680,12 +1628,10 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
       flag: req.body.flag,
       created_dtime: dateTime,
     });
-    
     const savedAddress = await newAddress.save();
     const user = await Users.findById(newAddress.user_id);
     const randomSuffix = Math.floor(Math.random() * 1000);
-    const pickupLocation = savedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;
-    
+    const pickupLocation = savedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;  
     const PickupData = {
      pickup_location: pickupLocation,
       name: user.name,
@@ -1699,14 +1645,12 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
       pin_code: savedAddress.pin_code
     };
     const shiprocketResponse = await generateSellerPickup(PickupData);
-
     if (shiprocketResponse) {
       savedAddress.shiprocket_address = pickupLocation;
       savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
       await savedAddress.save();
       res.redirect('/api/checkout-web');
     }    
-
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -1718,13 +1662,10 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
 
 };
 
-
 exports.userAddressAdd = async function (req, res, next) {
   try {
-    
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const addr_name = req.body.addrType;
-    //const address = await addressBook.findOne({ _id: req.params.id });
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -1733,7 +1674,6 @@ exports.userAddressAdd = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
-
     const newAddress = new addressBook({
       user_id: req.body.userId,
       street_name: req.body.address2,
@@ -1748,12 +1688,10 @@ exports.userAddressAdd = async function (req, res, next) {
       flag: req.body.flag,
       created_dtime: dateTime,
     });
-
     const savedAddress = await newAddress.save();
     const user = await Users.findById(newAddress.user_id);
     const randomSuffix = Math.floor(Math.random() * 1000);
     const pickupLocation = savedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;
-
     const PickupData = {
       pickup_location: pickupLocation,
       name: user.name,
@@ -1767,7 +1705,6 @@ exports.userAddressAdd = async function (req, res, next) {
       pin_code: savedAddress.pin_code
     };
     const shiprocketResponse = await generateSellerPickup(PickupData);
-
     if (shiprocketResponse) {
       savedAddress.shiprocket_address = pickupLocation;
       savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
@@ -1783,7 +1720,6 @@ exports.userAddressAdd = async function (req, res, next) {
     });
   }
 };
-
 exports.deleteUserAddress = async function (req, res, next) {
   try {
     addbook_id = req.params.id;
@@ -1809,10 +1745,7 @@ exports.deleteUserAddress = async function (req, res, next) {
     });
   }
 };
-
-// My Post
 exports.userWisePost = async function (req, res, next) {
-
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -1822,7 +1755,6 @@ exports.userWisePost = async function (req, res, next) {
     });
   }
   try {
-
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
     const userproducts = await Userproduct.find({ user_id: req.params.id })
@@ -1831,22 +1763,16 @@ exports.userWisePost = async function (req, res, next) {
       .populate('user_id', 'name', { optional: true })
       .populate('size_id', 'name', { optional: true })
       .exec();
-
     const formattedUserProducts = [];
-
     for (const userproduct of userproducts) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
-
       const formattedUserProduct = {
         _id: userproduct._id,
         name: userproduct.name,
         description: userproduct.description,
-        //category: userproduct.category_id.name, 
         brand: userproduct.brand_id ? userproduct.brand_id.name : '',
-        //brand_id: userproduct.brand_id._id, 
         user_id: userproduct.user_id._id,
         user_name: userproduct.user_id.name,
-        //size: userproduct.size_id.name,
         size_id: userproduct.size_id ? userproduct.size_id.name : '',
         price: userproduct.price,
         offer_price: userproduct.offer_price,
@@ -1860,10 +1786,8 @@ exports.userWisePost = async function (req, res, next) {
         __v: userproduct.__v,
         product_images: productImages,
       };
-
       formattedUserProducts.push(formattedUserProduct);
     }
-
     if (formattedUserProducts) {
       res.render("webpages/mypost", {
         title: "My Post",
@@ -1873,7 +1797,6 @@ exports.userWisePost = async function (req, res, next) {
         isLoggedIn: isLoggedIn,
       });
     }
-
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -1887,15 +1810,12 @@ exports.userWisePost = async function (req, res, next) {
 exports.addPostView = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-
     if (isLoggedIn == "") {
       res.redirect("/api/registration");
     }
     const productConditions = await Productcondition.find();
-
     const parentCategoryId = "650444488501422c8bf24bdb";
     const categoriesWithoutParentId = await Category.find({ parent_id: { $ne: parentCategoryId } });
-
     res.render("webpages/addmypost", {
       title: "My Account",
       message: "Welcome to the Add Post page!",
@@ -1903,9 +1823,7 @@ exports.addPostView = async function (req, res, next) {
       productcondition: productConditions,
       subcate: categoriesWithoutParentId,
       isLoggedIn: isLoggedIn,
-
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -1914,10 +1832,7 @@ exports.addPostView = async function (req, res, next) {
       error: error.message,
     });
   }
-
 };
-
-// New Post Add
 exports.addNewPost = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -1927,36 +1842,21 @@ exports.addNewPost = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   try {
-
-    // const existingProduct = await Userproduct.findOne({ name: req.body.name });
-
-    // if (existingProduct) {
-    //   return res.status(404).json({
-    //     status: "0",
-    //     message: "Product already exists!",
-    //     respdata: {},
-    //   });
-    // }
-
     let invoice;
     let packaging;
-
     if (req.body.original_invoice == 'on' || req.body.original_invoice != '') {
       invoice = '1';
     }
     else {
       invoice = '0';
     }
-
     if (req.body.original_packaging == 'on' || req.body.original_packaging != '') {
       packaging = '1';
     }
     else {
       packaging = '0';
     }
-
     const newProduct = new Userproduct({
       category: req.body.product_cate,
       user_id: req.session.user.userId,
@@ -1977,39 +1877,26 @@ exports.addNewPost = async function (req, res, next) {
       original_packaging: packaging,
       added_dtime: moment().tz('Asia/Kolkata').format("YYYY-MM-DD HH:mm:ss"),
     });
-
     const savedProductdata = await newProduct.save();
-
     const requrl = url.format({
       protocol: req.protocol,
       host: req.get("host"),
     });
-
     const imageUrls = [];
     if (req.files && req.files.length > 0) {
       const imageDetails = [];
-
       req.files.forEach(async (file) => {
         const imageUrl = requrl + "/public/images/" + file.filename;
-
         const productimageDetail = new Productimage({
           product_id: savedProductdata._id,
-          //category_id: req.body.product_cate,
           user_id: req.session.user.userId,
-          //brand: brand,
           image: imageUrl,
           added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
         });
-
         const savedImage = productimageDetail.save();
-        console.log(savedImage);
       });
-
     }
     res.redirect('/api/my-account');
-
-
-
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -2018,10 +1905,7 @@ exports.addNewPost = async function (req, res, next) {
       error: error.message,
     });
   }
-
 };
-
-
 exports.updatePostData = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -2031,14 +1915,9 @@ exports.updatePostData = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   try {
-
-console.log(req.files);
     const productId = req.body.productid;
-
     const existingProduct = await Userproduct.findById(productId);
-
     if (!existingProduct) {
       return res.status(404).json({
         status: "0",
@@ -2046,7 +1925,6 @@ console.log(req.files);
         respdata: {},
       });
     }
-
     existingProduct.category_id = req.body.category_id || existingProduct.category_id;
     existingProduct.user_id = req.body.user_id || existingProduct.user_id;
     if(req.body.brand)
@@ -2057,7 +1935,6 @@ console.log(req.files);
     {
       existingProduct.size = ((req.body.size || existingProduct.size) ?? null);
     }
-    
     existingProduct.brand_id = ((req.body.brand_id || existingProduct.brand_id) ?? null);
     existingProduct.size_id = ((req.body.size_id || existingProduct.size_id) ?? null);
     existingProduct.name = req.body.name || existingProduct.name;
@@ -2066,7 +1943,6 @@ console.log(req.files);
     existingProduct.price = req.body.price || existingProduct.price;
     existingProduct.offer_price = req.body.offer_price || existingProduct.offer_price;
     existingProduct.percentage = req.body.percentage || existingProduct.percentage;
-
     const newProduct = new Userproduct({
       category_id: req.body.category_id,
       user_id: req.body.user_id,
@@ -2083,9 +1959,7 @@ console.log(req.files);
       original_packaging:  req.body.original_packaging,
       added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"), 
     });
-
     existingProduct.updated_dtime = moment().format("YYYY-MM-DD HH:mm:ss");
-
     // if (req.files && req.files.length > 0) {
     
     //   // await Productimage.deleteMany({ product_id: existingProduct._id });
@@ -2111,22 +1985,16 @@ console.log(req.files);
     //     const savedImage = await productImageDetail.save();
     //   }
     // }
-
     if (req.files && Object.keys(req.files).length > 0) {
       
         const requrl = url.format({
         protocol: req.protocol,
         host: req.get("host"),
       });
-
-      // Iterate through uploaded files
       for (const fieldName in req.files) {
         const files = req.files[fieldName];
         for (const file of files) {
-          // Construct image URL
           const imageUrl = `${requrl}/public/images/${file.filename}`;
-
-          // Save image URL to database
           const productImageDetail = new Productimage({
             product_id: existingProduct._id,
             category_id: existingProduct.category_id,
@@ -2135,27 +2003,17 @@ console.log(req.files);
             image: imageUrl,
             added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
           });
-
           await productImageDetail.save();
         }
       }
     }
-
-
     const updatedProduct = await existingProduct.save();
-
-    // Fetch image details for the updated product
     const productImages = await Productimage.find({ product_id: updatedProduct._id });
-
     const productDetails = {
       ...updatedProduct.toObject(),
       images: productImages,
     };
-
       res.redirect('/api/my-account');
-
-
-
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -2164,7 +2022,6 @@ console.log(req.files);
       error: error.message,
     });
   }
-
 };
 
 exports.signOut = async function (req, res, next) {
@@ -2200,7 +2057,6 @@ exports.signOut = async function (req, res, next) {
                     respdata: {},
                   });
                 }
-
                 res.status(200).json({
                     status: "success",                 
                     message: "Sign out!",

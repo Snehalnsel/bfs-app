@@ -2219,7 +2219,6 @@ exports.viewWishListByUserId = async function (req, res, next) {
       });
     } else {
       const formattedList = await Promise.all(existingList.map(async (item) => {
-        console.log(item.product_id);
         const product = await Userproduct.findOne({ _id: item.product_id }).populate('category_id', 'name');
         if(product)
         {
@@ -2249,7 +2248,6 @@ exports.viewWishListByUserId = async function (req, res, next) {
         
       }));
 
-      console.log(formattedList);
       const count = formattedList.length;
 
       res.render("webpages/wishlist", {

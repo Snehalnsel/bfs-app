@@ -229,9 +229,6 @@ exports.getData = function (req, res, next) {
         preserveNullAndEmptyArrays: true,
       },
     },
-    {
-      //$limit: 20 // Limit to the first 20 documents
-    }
   ]).exec(function (error, productList) {
     if (error) {
       return res.status(500).json({ error: 'An error occurred' });

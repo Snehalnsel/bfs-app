@@ -41,7 +41,7 @@ exports.getBrandList = async function (req, res, next) {
 
     res.status(200).json({ status: "1", brand_list: brands });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({
       status: "0",
       message: "Internal server error",
@@ -52,7 +52,7 @@ exports.getBrandList = async function (req, res, next) {
 
 
 exports.addData = async function (req, res, next) {
-    console.log('req.body:', req.body);
+    //console.log('req.body:', req.body);
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

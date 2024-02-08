@@ -94,9 +94,6 @@ exports.createData = async function (req, res, next) {
         name: req.body.size_name,
         added_dtime: dateTime,
       });
-
-      console.log(newSize);
-
       newSize
         .save()
         .then((size) => {
@@ -164,7 +161,6 @@ exports.updateStatusData = async function (req, res, next) {
           res.redirect("/size"); // You can change this URL as needed
         })
         .catch((error) => {
-          console.error(error);
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the size status.",
@@ -173,7 +169,6 @@ exports.updateStatusData = async function (req, res, next) {
         });
     })
     .catch((error) => {
-      console.error(error);
       return res.status(500).json({
         status: "0",
         message: "An error occurred while finding the size.",

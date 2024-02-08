@@ -53,7 +53,6 @@ function generateToken(email, password) {
         const token = responseBody.token;
         resolve(token);
       } else {
-        console.error('Error:', response.body);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -62,16 +61,12 @@ function generateToken(email, password) {
 
 async function generateSellerPickup(data) {
   try {
-    console.log("Calling generateToken");
     const token = await generateToken(email, shipPassword);
 
     if (!token) {
-      console.error('Token not available. Call generateToken first.');
+      //console.error('Token not available. Call generateToken first.');
       return Promise.reject('Token not available. Call generateToken first.');
     }
-
-    console.log('Token:', token);
-
     const options = {
       method: 'POST',
       url: baseUrl + '/settings/company/addpickup',
@@ -88,16 +83,13 @@ async function generateSellerPickup(data) {
           reject(error);
         } else if (response.statusCode === 200) {
           const responseBody = JSON.parse(body);
-          console.log('Response from Shiprocket:', responseBody);
           resolve(responseBody);
         } else {
-          console.error('Error in generateSellerPickup:', response.body);
           reject(new Error(`Error in generateSellerPickup: ${response.statusCode}`));
         }
       });
     });
   } catch (error) {
-    console.error('Error in generateSellerPickup:', error);
     return Promise.reject(error);
   }
 }
@@ -154,14 +146,7 @@ exports.createData = async function (req, res, next) {
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
 
   try {
-    console.log(req.body);
-    const hub = await Hub.findOne({ hub_name : req.body.hub_name });
-
-    console.log('HUB');
-    console.log(hub);
-    
-    
-    
+    const hub = await Hub.findOne({ hub_name : req.body.hub_name }); 
     if (hub) {
       res.render("pages/hublist/create", {
         status: 0,
@@ -177,9 +162,6 @@ exports.createData = async function (req, res, next) {
         respdata: {},
       });
     } else {
-      console.log('req.body:', req.body);
-      console.log(req.body.street_name);
-
       const newAddress = new Hub({
         name: req.body.name,
         phone_no: req.body.phone_no,
@@ -194,15 +176,10 @@ exports.createData = async function (req, res, next) {
         hub_name: req.body.hub_name,
         created_dtime: dateTime,
       });
-      
-
-      console.log(newAddress);
-
       const savedAddress = await newAddress.save();
 
       if(savedAddress)
       {
-        console.log(savedAddress.hub_name);
         const PickupData = {
           pickup_location: "BFS" + ' - ' + savedAddress.hub_name,
           name: "Pratiik Jalan",
@@ -215,12 +192,7 @@ exports.createData = async function (req, res, next) {
           country: "India",
           pin_code: savedAddress.pin_code
         };
-        console.log(PickupData);
-  
-        const shiprocketResponse = await generateSellerPickup(PickupData);
-  
-        console.log(shiprocketResponse);
-  
+        const shiprocketResponse = await generateSellerPickup(PickupData);  
         if (shiprocketResponse) {
           savedAddress.shiprocket_address = "BFS" + ' - ' + savedAddress.hub_name;
           savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
@@ -290,7 +262,6 @@ exports.updateStatusData = async function (req, res, next) {
           res.redirect("/hublist");
         })
         .catch((error) => {
-          console.error(error);
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the size status.",
@@ -299,7 +270,6 @@ exports.updateStatusData = async function (req, res, next) {
         });
     })
     .catch((error) => {
-      console.error(error);
       return res.status(500).json({
         status: "0",
         message: "An error occurred while finding the size.",
@@ -317,7 +287,6 @@ exports.editData = async function (req, res, next) {
   const hub_id = mongoose.Types.ObjectId(req.params.id);
 
   Hub.findOne({ _id: hub_id }).then((hub) => {
-    console.log(hub);
     res.render("pages/hublist/edit", {
       status: 1,
       siteName: req.app.locals.siteName,
@@ -373,7 +342,6 @@ exports.updateData = async function (req, res, next) {
       res.redirect("/productlist");
     }
   }).catch((err) => {
-    console.error(err);
     res.status(500).json({
       status: "0",
       message: "An error occurred while updating the product.",

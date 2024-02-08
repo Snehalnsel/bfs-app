@@ -147,7 +147,6 @@ exports.getData = async function (req, res, next) {
             });
           })
           .catch((error) => {
-            console.log(error);
             res.render("pages/app-users/create", {
               status: 0,
               pageName: pageName,
@@ -201,15 +200,8 @@ exports.getData = async function (req, res, next) {
           message: "Validation error!",
           respdata: errors.array(),
         });
-      }
-  
-      console.log(req.body);
-      console.log(req.params.user_id);
-  
+      }  
       const user = await Users.findOne({ _id: req.params.user_id });
-  
-      console.log(user);
-  
       if (!user) {
         return res.status(404).json({
           status: "0",
@@ -252,7 +244,6 @@ exports.getData = async function (req, res, next) {
 
       res.redirect("/app-users"); 
     } catch (error) {
-      console.error(error);
       res.status(500).json({
         status: "0",
         message: "An error occurred while updating the user!",

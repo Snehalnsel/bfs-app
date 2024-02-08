@@ -235,7 +235,7 @@ exports.homedetails = async function (req, res) {
 
   } catch (error) {
 
-    console.error('Error fetching best deal and whats hot products with images:', error);
+    //console.error('Error fetching best deal and whats hot products with images:', error);
 
     res.status(500).json({ message: 'Internal server error' });
 
@@ -337,44 +337,24 @@ exports.getWhatsHotProducts = async function (req, res) {
 
   } catch (error) {
 
-    console.error('Error fetching what\'s hot products:', error);
+    //console.error('Error fetching what\'s hot products:', error);
 
     return res.status(500).json({ message: 'Internal server error' });
-
   }
-
 };
 
-
-
-
-
 exports.getTopCategories = async function (req, res) {
-
   try {
-
-    const topCategories = await Category.find({ priority_status: 1 });
-
-
-
+    const topCategories = await Category.find({ priority_status: 1 }).sort({ name: 1 });
     return res.status(200).json({
-
       status: "1",
-
       message: "Top categories",
-
       respdata: topCategories,
-
     });
-
   } catch (error) {
-
-    console.error('Error fetching top categories:', error);
-
+    //console.error('Error fetching top categories:', error);
     return res.status(500).json({ message: 'Internal server error' });
-
   }
-
 };
 
 exports.getTopCategoriesweb = async function (req, res) {
@@ -387,7 +367,7 @@ exports.getTopCategoriesweb = async function (req, res) {
       respdata: topCategories,
     });
   } catch (error) {
-    console.error('Error fetching top categories:', error);
+    //console.error('Error fetching top categories:', error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
@@ -480,7 +460,7 @@ exports.getJustSoldProducts = async function (req, res) {
 
   } catch (error) {
 
-    console.error('Error fetching just sold products:', error);
+    //console.error('Error fetching just sold products:', error);
 
     return res.status(500).json({ message: 'Internal server error' });
 
@@ -682,7 +662,7 @@ exports.getData = async function (req, res, next) {
 
   } catch (error) {
 
-    console.error(error);
+    //console.error(error);
 
     res.status(500).json({
 
@@ -722,7 +702,7 @@ exports.bannerlist = async function (req, res) {
 
   } catch (error) {
 
-    console.error('Error fetching top categories:', error);
+    //console.error('Error fetching top categories:', error);
 
     return res.status(500).json({ message: 'Internal server error' });
 
@@ -745,7 +725,7 @@ exports.getHeaderData = async function (req, res, next) {
          });
   } catch (error) {
 
-    console.error(error);
+    //console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the dashboard.",

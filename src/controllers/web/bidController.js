@@ -94,10 +94,8 @@ exports.getData = function (req, res, next) {
     },
   ]).exec(function (error, bidList) {
     if (error) {
-      console.error(error);
       res.status(500).json({ error: 'An error occurred' });
     } else {
-      // console.log(bidList);
       res.render("pages/bid-management/list", {
         siteName: req.app.locals.siteName,
         pageName: pageName,
@@ -134,17 +132,13 @@ exports.detailsData = function (req, res, next) {
       if (!bidDetails) {
         return res.status(404).json({ error: 'Bid not found' });
       }
-      console.log(bidDetails);
       Userproduct.findOne({ _id: bidDetails.product_id })
         .then((productDetails) => {
           if (!productDetails) {
             return res.status(404).json({ error: 'Product not found' });
           }
-
-          console.log(productDetails);
           Productimage.findOne({ product_id: productDetails._id })
             .then((productImage) => {
-              console.log(productImage);
               res.render("pages/bid-management/edit", {
                 status: 1,
                 siteName: req.app.locals.siteName,
@@ -164,17 +158,14 @@ exports.detailsData = function (req, res, next) {
               });
             })
             .catch((error) => {
-              console.error(error);
               res.status(500).json({ error: 'An error occurred while fetching the product image' });
             });
         })
-        .catch((error) => {
-          console.error(error);
+        .catch((error) => {;
           res.status(500).json({ error: 'An error occurred while fetching product details' });
         });
     })
     .catch((error) => {
-      console.error(error);
       res.status(500).json({ error: 'An error occurred while fetching bid details' });
     });
 };
@@ -225,7 +216,6 @@ exports.updatedetailsData = async function (req, res, next) {
     
     res.redirect("/bid-listing");
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while updating bid!",

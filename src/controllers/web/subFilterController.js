@@ -31,7 +31,6 @@ exports.getData = async function (req, res, next) {
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
 
   SubCategory.find().sort({ _id: -1 }).then((subcat) => {
-    console.log(subcat);
     res.render("pages/sub-filter/list", {
       siteName: req.app.locals.siteName,
       pageName: pageName,

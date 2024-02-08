@@ -94,9 +94,6 @@ exports.createData = async function (req, res, next) {
         name: req.body.time,
         added_dtime: dateTime,
       });
-
-      console.log(newSize);
-
       newSize
         .save()
         .then((size) => {

@@ -108,10 +108,6 @@ const upload = multer({ dest: 'public/images/' });
 //     if (error) {
 //       return res.status(500).json({ error: 'An error occurred' });
 //     }
-
-//     console.log(productList);
-    
-
 //     res.render("pages/product/list", {
 //       siteName: req.app.locals.siteName,
 //       pageName: pageName,
@@ -254,6 +250,8 @@ exports.getData = function (req, res, next) {
 
 
 exports.detailsData = async function (req, res, next) {
+
+  
   var pageName = "Product Details";
   var pageTitle = req.app.locals.siteName + " - " + pageName;
 
@@ -273,8 +271,6 @@ exports.detailsData = async function (req, res, next) {
     if (!productdetails) {
       return res.status(404).json({ error: 'Product not found' });
     }
-
-    console.log(productdetails);
     // Fetch the parent category
     if(productdetails.hasOwnProperty("category_id"))
     {
@@ -315,9 +311,9 @@ exports.detailsData = async function (req, res, next) {
       productCondition: productcondition,
       productImages: productImages,
       parentCategory: productdetails.hasOwnProperty("category_id") ? parentCategory : null,
+      
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: 'An error occurred' });
   }
 };
@@ -350,33 +346,22 @@ exports.updatedetailsData = async function (req, res, next) {
         flag: req.body.flag,
         approval_status: req.body.approval_status,
       };
-
       if (req.body.price) updData.price = req.body.price;
       if (req.body.offer_price) updData.offer_price = req.body.offer_price;
       if (req.body.height) updData.height = req.body.height;
       if (req.body.weight) updData.weight = req.body.weight;
       if (req.body.length) updData.length = req.body.length;
       if (req.body.breath) updData.breath = req.body.breath;
-
       await Userproduct.findOneAndUpdate({ _id: req.body.product_id }, { $set: updData }, { upsert: true });
-
-  
       if (req.body.remainingImages.length > 0) {
-        console.log("without  0000");
-        console.log(req.body.remainingImages);
         const remainingImages = req.body.remainingImages ? JSON.parse(req.body.remainingImages) : [];
-
         const imagesArray = [];
-
         for (const image of remainingImages) {
           if (image && image.image) {
             imagesArray.push(image.image);
           } else {
-            console.log('Invalid image data:', image);
           }
         }
-        console.log(imagesArray);
-
         if (req.files && req.files.length > 0) {
           const allImages = imagesArray.concat(req.files.map(file => {
             const requrl = url.format({
@@ -385,10 +370,7 @@ exports.updatedetailsData = async function (req, res, next) {
             });
             return requrl + "/public/images/" + file.filename;
           }));
-
           const countAllImages = allImages.length;
-          console.log(allImages);
-
           await Productimage.deleteMany({ product_id: req.body.product_id });
 
           if (allImages && allImages.length > 0) {
@@ -412,13 +394,9 @@ exports.updatedetailsData = async function (req, res, next) {
         }
         else {
           // const count = imagesArray.length;
-          console.log(imagesArray);
           await Productimage.deleteMany({ product_id: req.body.product_id });
           const imagesToUpload = imagesArray.slice(0, 5);
-
           for (const image of imagesToUpload) {
-
-
             const productimageDetail = new Productimage({
               product_id: req.body.product_id,
               category_id: req.body.subcategory_id,
@@ -426,23 +404,13 @@ exports.updatedetailsData = async function (req, res, next) {
               image: image,
               added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
             });
-
             await productimageDetail.save();
           }
-
-
         }
-
       }
       else {
-        console.log("without");
         const List = await Productimage.find({ product_id: req.body.product_id });
-
-        console.log(List);
-
         const count = await Productimage.countDocuments({ product_id: req.body.product_id });
-        console.log(count);
-
         if (count !== 5 || count < 5) {
           if (req.files && req.files.length > 0) {
             const imageDetails = req.files.slice(0, 5 - count).map((file) => {
@@ -494,7 +462,6 @@ exports.updatedetailsData = async function (req, res, next) {
       res.redirect("/productlist");
     }
   }).catch((err) => {
-    console.error(err);
     res.status(500).json({
       status: "0",
       message: "An error occurred while updating the product.",
@@ -532,7 +499,6 @@ exports.updateStatusData = async function (req, res, next) {
           res.redirect("/productlist");
         })
         .catch((error) => {
-          console.error(error);
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the product status.",
@@ -541,7 +507,6 @@ exports.updateStatusData = async function (req, res, next) {
         });
     })
     .catch((error) => {
-      console.error(error);
       return res.status(500).json({
         status: "0",
         message: "An error occurred while finding the brand.",

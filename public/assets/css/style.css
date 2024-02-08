@@ -3336,6 +3336,35 @@ a.slc-btn.lnk-btn {
     background: #007aae;
 }
 
+
+a.slc-btn-wish {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    background: #3a3939;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 18px;
+    margin: 2px;
+    transition: 0.5s;
+    text-decoration: none;
+}
+a.slc-btn-wish.wa-btn {
+    background: #14bd27;
+}
+
+a.slc-btn-wish.tw-btn {
+    background: #00b0e7;
+}
+a.slc-btn-wish.fb-btn {
+    background: #006cf4;
+}
+a.slc-btn-wish.lnk-btn {
+    background: #007aae;
+}
+
 span.close-icon {
     position: absolute;
     right: -25px;
@@ -3628,4 +3657,51 @@ span.close-icon {
     display: flex !important;
     justify-content: space-between !important;
     width: 100% !important;
+}
+
+.custome-pagination {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding-top: 15px;
+}
+
+.pagination.custome-pagination a {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    background: #ddd;
+    border:none;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 15px;
+    margin-right: 8px;
+    transition: 0.5s;
+}
+.pagination.custome-pagination a:hover {
+    background: #000;
+    color: #fff !important;
+    transition: 0.5s;
+    border: 1px solid #000000;
+}
+
+.pagination.custome-pagination a.active{
+    background: #000;
+    color: #fff !important;
+    transition: 0.5s;
+    border: 1px solid #000000;
+}
+.overflow-visible {
+    overflow: visible;
+}
+.wishlist-group-box .bids-row {
+    margin: 0px;
+}
+
+.wishlist-group-box .br-details, .wishlist-group-box .br-results{
+    padding: 10px 0px;
 }

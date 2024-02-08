@@ -94,9 +94,6 @@ exports.createData = async function (req, res, next) {
         name: req.body.condition_name,
         added_dtime: dateTime,
       });
-
-     // console.log(newProductcondition);
-
       newProductcondition
         .save()
         .then((productcondition) => {
@@ -163,7 +160,6 @@ exports.updateStatusData = async function (req, res, next) {
           res.redirect("/productcondition"); 
         })
         .catch((error) => {
-          console.error(error);
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the size status.",
@@ -172,7 +168,6 @@ exports.updateStatusData = async function (req, res, next) {
         });
     })
     .catch((error) => {
-      console.error(error);
       return res.status(500).json({
         status: "0",
         message: "An error occurred while finding the size.",
@@ -188,10 +183,7 @@ exports.editData = async function (req, res, next) {
   var pageTitle = req.app.locals.siteName + " - Edit " + pageName;
 
   const id = mongoose.Types.ObjectId(req.params.id);
-  // console.log(id);
-
   Productcondition.findOne({ _id: id }).then((productcondition) => {
-    // console.log(productcondition);
     res.render("pages/productcondition/edit", {
       status: 1,
       siteName: req.app.locals.siteName,
@@ -218,8 +210,6 @@ exports.updateData = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
-    console.log(req.body.condition_id);
-
     const productcondition = await Productcondition.findById(req.body.condition_id);
 
     if (!productcondition) {
@@ -250,7 +240,6 @@ exports.updateData = async function (req, res, next) {
     }
     res.redirect("/productcondition");
   } catch (error) {
-    console.error(error);
     return res.status(500).json({
       status: "0",
       message: "An error occurred while updating the brand.",

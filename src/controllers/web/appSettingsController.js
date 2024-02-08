@@ -108,10 +108,7 @@ exports.getData = async function (req, res, next) {
           requrl: req.app.locals.requrl,
           respdata: {},
         });
-      } else {
-        
-        console.log(req.body);
-        
+      } else {        
         const newSettings = Appsettings({
           app_ver: req.body.app_ver,
           app_name: req.body.app_name,
@@ -140,7 +137,6 @@ exports.getData = async function (req, res, next) {
             });
           })
           .catch((error) => {
-            console.log(error);
             res.render("pages/app-settings/create", {
               status: 0,
               pageName: pageName,

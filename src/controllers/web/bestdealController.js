@@ -26,7 +26,6 @@ const upload = multer({ dest: 'public/images/' });
 
 
 exports.getData = async function (req, res, next) {
-    console.log('Best Deal');
     var pageName = "Best Deal";
     var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
   
@@ -96,9 +95,7 @@ exports.getData = async function (req, res, next) {
           name: req.body.deal_name,
           added_dtime: dateTime,
         });
-  
-        console.log(newDeal);
-  
+    
         newDeal
           .save()
           .then((bestdeal) => {

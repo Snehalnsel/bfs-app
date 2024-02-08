@@ -46,7 +46,6 @@ exports.getData = async function (req, res) {
         },
       });
     } catch (error) {
-      console.error("Error fetching counts:", error);
       res.status(500).send("Internal Server Error");
     }
   } else {

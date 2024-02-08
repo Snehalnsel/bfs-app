@@ -86,8 +86,6 @@ exports.getData = async function (req, res, next) {
 //       });
 //     }
 
-//     // console.log(subcategoryList);
-
 //     res.render("pages/body-focus/subcatlist", {
 //       siteName: req.app.locals.siteName,
 //       pageName: pageName,
@@ -108,7 +106,6 @@ exports.getData = async function (req, res, next) {
 //       currentPage :currentPage
 //     });
 //   } catch (error) {
-//     console.error(error);
 //     return res.status(500).json({
 //       status: "0",
 //       message: "An error occurred while fetching the Sub Category data.",
@@ -136,16 +133,11 @@ exports.getSubcatData = async function (page,searchType, searchValue, req, res, 
         query.name = { $regex: `${searchValue}`, $options: 'i' };
       }
     }
-
-     console.log(query);
     const totalSubcategoriesCount = await Category.countDocuments(query);
     const subcategories = await Category.find(query)
       .skip(skip)
       .limit(item_per_page)
       .exec();
-
-      console.log(subcategories);
-
     const subcategoryList = [];
 
     for (const subcategory of subcategories) {
@@ -181,7 +173,6 @@ exports.getSubcatData = async function (page,searchType, searchValue, req, res, 
       searchValue:searchValue ? searchValue : ''
     });
   } catch (error) {
-    console.error(error);
     return res.status(500).json({
       status: "0",
       message: "An error occurred while fetching the Sub Category data.",
@@ -291,7 +282,6 @@ exports.getSubcatDataBySearches = async function (req, res, next) {
     });
 
   } catch (error) {
-    console.error(error);
     return {
       status: '0',
       message: 'An error occurred while fetching products with matching parent_id.',
@@ -340,12 +330,8 @@ exports.createData = async function (req, res, next) {
       respdata: []
     });
   }
-
   const requrl = req.protocol + '://' + req.get('host');
   const imagePath = requrl + '/public/images/' + req.file.filename;
-  console.log(req.body);
-
-
   Category.findOne({ name: req.body.focus_name }).then((category) => {
     if (category) {
       res.render("pages/body-focus/create", {
@@ -416,10 +402,7 @@ exports.editData = async function (req, res, next) {
   var pageTitle = req.app.locals.siteName + " - Edit " + pageName;
 
   const user_id = mongoose.Types.ObjectId(req.params.id);
-  console.log(user_id);
-
   Category.findOne({ _id: user_id }).then((category) => {
-    console.log(category);
     res.render("pages/body-focus/edit", {
       status: 1,
       siteName: req.app.locals.siteName,
@@ -463,9 +446,6 @@ exports.updateData = async function (req, res, next) {
       description: req.body.description || category.description,
       status: req.body.status || category.status,
     };
-
-    console.log(req.file);
-
     if (req.file) {
       const requrl = req.protocol + "://" + req.get("host");
       const imagePath = requrl + "/public/images/" + req.file.filename;
@@ -487,7 +467,6 @@ exports.updateData = async function (req, res, next) {
     }
     res.redirect("/body-focus");
   } catch (error) {
-    console.error(error);
     return res.status(500).json({
       status: "0",
       message: "An error occurred while updating the brand.",
@@ -547,9 +526,6 @@ exports.editSubCatData = async function (req, res, next) {
   var pageTitle = req.app.locals.siteName + " - Edit " + pageName;
 
   const user_id = mongoose.Types.ObjectId(req.params.id);
-
-  console.log(user_id);
-
   try {
     const category = await Category.findOne({ _id: user_id }).exec();
 
@@ -580,7 +556,6 @@ exports.editSubCatData = async function (req, res, next) {
       },
     });
   } catch (error) {
-    console.error(error);
     return res.status(500).json({
       status: "0",
       message: "An error occurred while fetching the Sub Category data.",
@@ -641,7 +616,6 @@ exports.updateSubCatData = async function (req, res, next) {
 
     res.redirect("/body-focus-subcat");
   } catch (error) {
-    console.error(error);
     return res.status(500).json({
       status: "0",
       message: "An error occurred while updating the Sub Category.",
@@ -678,7 +652,6 @@ exports.updateStatusData = async function (req, res, next) {
           res.redirect("/body-focus"); 
         })
         .catch((error) => {
-          console.error(error);
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the brand status.",
@@ -687,7 +660,6 @@ exports.updateStatusData = async function (req, res, next) {
         });
     })
     .catch((error) => {
-      console.error(error);
       return res.status(500).json({
         status: "0",
         message: "An error occurred while finding the brand.",
@@ -734,7 +706,6 @@ exports.statusData = async function (req, res, next) {
           }
         })
         .catch((error) => {
-          console.error(error);
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the brand status.",
@@ -743,7 +714,6 @@ exports.statusData = async function (req, res, next) {
         });
     })
     .catch((error) => {
-      console.error(error);
       return res.status(500).json({
         status: "0",
         message: "An error occurred while finding the brand.",

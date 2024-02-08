@@ -117,8 +117,7 @@ exports.getData = async function (req, res, next) {
         });
       } else {
         var image_url = req.app.locals.requrl + "/public/images/no-image.jpg";
-        
-console.log(req.body);
+      
         bcrypt.hash(req.body.pwd, saltRounds, (error, hash) => {
 
           const newUsr = Users({
@@ -299,7 +298,7 @@ console.log(req.body);
       // });
   
     } catch (error) {
-      console.error(error);
+     
       res.status(500).json({
         status: "0",
         message: "Internal server error!",

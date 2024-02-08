@@ -36,14 +36,10 @@ exports.getData = function (req, res, next) {
     }
   ]).exec(function (error, brandList) {
     if (error) {
-      console.error(error);
       res.status(500).json({ error: 'An error occurred' });
     } else {
-      console.log(brandList);
-
       Category.find({}, function (err, categories) {
         if (err) {
-          console.error(err);
           res.status(500).json({ error: 'An error occurred' });
         } else {
           res.render("pages/brand/list", {
@@ -258,7 +254,6 @@ exports.updateData = async function (req, res, next) {
           res.redirect("/brand");
         })
         .catch((error) => {
-          console.error(error);
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the brand.",
@@ -267,7 +262,6 @@ exports.updateData = async function (req, res, next) {
         });
     })
     .catch((error) => {
-      console.error(error);
       return res.status(500).json({
         status: "0",
         message: "An error occurred while finding the brand.",
@@ -304,7 +298,6 @@ exports.updateStatusData = async function (req, res, next) {
           res.redirect("/brand"); 
         })
         .catch((error) => {
-          console.error(error);
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the brand status.",
@@ -313,7 +306,6 @@ exports.updateStatusData = async function (req, res, next) {
         });
     })
     .catch((error) => {
-      console.error(error);
       return res.status(500).json({
         status: "0",
         message: "An error occurred while finding the brand.",

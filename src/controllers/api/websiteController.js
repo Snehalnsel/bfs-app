@@ -1378,7 +1378,7 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
       categoryId = id;
 
       userproducts = await Userproduct.find({ 
-        category_id: id,
+        category_id: categoryId,
         approval_status: 1,
         flag: 0 
       })
@@ -2157,7 +2157,7 @@ exports.addToWishlistWeb = async function (req, res, next) {
     const existingList = await Wishlist.findOne({ user_id, product_id, status: 0 });
     if (existingList) {
       return res.status(200).json({
-        message: 'The product has been added to your wishlist.',
+        message: 'The product has been already added to your wishlist.',
         wishlist: existingList,
         success: true,
         is_wishlisted: true
@@ -2176,7 +2176,7 @@ exports.addToWishlistWeb = async function (req, res, next) {
       const savedFavData = await newFavList.save();
 
       return res.status(200).json({
-        message: 'Item added to your wishlist successfully',
+        message: 'The product has been added to your wishlist',
         success: true,
         is_wishlisted: true
       });

@@ -23,9 +23,7 @@ $(document).on("click",".bidButton",function() {
     if(isLoggedIn2 != "") {
         productId = $(this).siblings('a').data("id");
         $('#bid_modal').modal('show'); 
-        //window.location.href = "/api/bid-for-product";
     } else {
-        //$('.loginModal').trigger('click');
         $('#login_modal').modal('show'); 
     }
 });
@@ -33,7 +31,6 @@ $(document).on("click",".bidButton",function() {
 $(document).on('click', ".buy-btn", function(e){
     if(isLoggedIn2 != "") {
        var id = $(this).data('id');
-       //console.log(id);
        $.ajax({
             url: '/api/addtocart/'+id.trim(), 
             method: 'POST',
@@ -41,11 +38,14 @@ $(document).on('click', ".buy-btn", function(e){
             {
                 if (data.is_added) {
                     Swal.fire({
-                            html: data.message,  
-                            confirmButtonText: "OK",
-                            customClass: { confirmButton: 'alert-box-button' }
-                            
-                            });
+                        title: data.message,
+                        iconHtml: '<img src="'+ src +'">',
+                        customClass: {  
+                            icon: 'alert-logo-item',
+                            popup: "bid-alert-modal"
+                        },
+                        confirmButtonText: "OK",
+                      });
                 getHeaderData();
                 } else {
                     Swal.fire({
@@ -79,9 +79,13 @@ $(document).on('click', ".wish-btn", async function (e) {
             success: function (data) {
                 if (data.is_wishlisted) {
                 Swal.fire({
-                    html: data.message,
+                    title: data.message,
+                    iconHtml: '<img src="'+ src +'">',
+                    customClass: {  
+                        icon: 'alert-logo-item',
+                        popup: "bid-alert-modal"
+                    },
                     confirmButtonText: "OK",
-                    customClass: { confirmButton: 'alert-box-button' }
                 });
                 $(".wish-btn").addClass("wish-rem-btn").find("i").removeClass("fa fa-heart-o").addClass("fa fa-heart");
                 setTimeout(() => {
@@ -118,11 +122,15 @@ $(document).on('click', ".wish-rem-btn", async function (e) {
             method: 'GET',
             success: function (data) {
                 if (data.success) {
-                Swal.fire({
-                    html: data.message,
-                    confirmButtonText: "OK",
-                    customClass: { confirmButton: 'alert-box-button' }
-                });
+                    Swal.fire({
+                        title: data.message,
+                        iconHtml: '<img src="'+ src +'">',
+                        customClass: {  
+                            icon: 'alert-logo-item',
+                            popup: "bid-alert-modal"
+                        },
+                        confirmButtonText: "OK",
+                      });
                 $(".wish-rem-btn").addClass("wish-btn").find("i").removeClass("fa fa-heart").addClass("fa fa-heart-o");
                 setTimeout(() => {
                     $(".wish-btn").removeClass("wish-rem-btn");
@@ -173,10 +181,14 @@ $(document).on('click', ".wish-rem-button", async function (e) {
             success: function (data) {
                 if (data.success) {
                     Swal.fire({
-                        html: data.message,
+                        title: data.message,
+                        iconHtml: '<img src="'+ src +'">',
+                        customClass: {  
+                            icon: 'alert-logo-item',
+                            popup: "bid-alert-modal"
+                        },
                         confirmButtonText: "OK",
-                        customClass: { confirmButton: 'alert-box-button' }
-                    });
+                      });
                     $("#" + divid).remove();
                     if(data.count == 0)
                     {

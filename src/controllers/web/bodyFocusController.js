@@ -330,8 +330,12 @@ exports.createData = async function (req, res, next) {
       respdata: []
     });
   }
-  const requrl = req.protocol + '://' + req.get('host');
-  const imagePath = requrl + '/public/images/' + req.file.filename;
+  let imagePath;
+  if(req.file)
+  {
+    const requrl = req.protocol + '://' + req.get('host');
+    imagePath = requrl + '/public/images/' + req.file.filename;
+  }
   Category.findOne({ name: req.body.focus_name }).then((category) => {
     if (category) {
       res.render("pages/body-focus/create", {
@@ -348,9 +352,7 @@ exports.createData = async function (req, res, next) {
         respdata: {},
       });
     } else {
-    
       const parent1 = '650444488501422c8bf24bdb';
-      
       const parent =  req.body.parent_id !== '0' ? req.body.parent_id : parent1;
       const newCat = Category({
         name: req.body.focus_name,
@@ -359,7 +361,6 @@ exports.createData = async function (req, res, next) {
         parent_id: parent,
         added_dtime: dateTime,
       });
-      
       newCat
         .save()
         .then((category) => {

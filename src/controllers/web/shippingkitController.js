@@ -97,11 +97,9 @@ async function generateCouriresList() {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Errottr:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -113,7 +111,6 @@ async function generateCouriresList() {
 async function generateAWBno(shipment_id, courier_id) {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -131,7 +128,6 @@ async function generateAWBno(shipment_id, courier_id) {
     })
   };
 
-  console.log(options);
 
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
@@ -139,12 +135,9 @@ async function generateAWBno(shipment_id, courier_id) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Errottr:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -156,7 +149,6 @@ async function generateAWBno(shipment_id, courier_id) {
 async function generateOrder(data) {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -177,12 +169,9 @@ async function generateOrder(data) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Errottr:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -235,7 +224,6 @@ exports.getOrderList = function (req, res, next) {
     }
   ]).exec(function (error, orderList) {
     if (error) {
-      console.error(error);
       res.status(500).json({ error: 'An error occurred' });
     } else {
 
@@ -257,7 +245,6 @@ exports.getOrderList = function (req, res, next) {
             order.productImage = productImages[index];
           });
 
-           console.log(orderList);
 
           res.render("pages/shippingkit/list", {
             siteName: req.app.locals.siteName,
@@ -276,7 +263,6 @@ exports.getOrderList = function (req, res, next) {
           });
         })
         .catch((err) => {
-          console.error(err);
           res.status(500).json({ error: 'Error fetching product images' });
         });
     }
@@ -334,7 +320,6 @@ exports.getShipmentKit = function (req, res, next) {
     }
   ]).exec(function (error, orderList) {
     if (error) {
-      console.error(error);
       res.status(500).json({ error: 'An error occurred' });
     } else {
 
@@ -356,7 +341,6 @@ exports.getShipmentKit = function (req, res, next) {
             order.productImage = productImages[index];
           });
 
-           console.log(orderList);
 
           res.render("pages/shippingkit/shipmentpage", {
             siteName: req.app.locals.siteName,
@@ -375,7 +359,6 @@ exports.getShipmentKit = function (req, res, next) {
           });
         })
         .catch((err) => {
-          console.error(err);
           res.status(500).json({ error: 'Error fetching product images' });
         });
     }

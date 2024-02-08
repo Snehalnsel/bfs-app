@@ -584,17 +584,15 @@ async function generateLabel(shipment_id) {
  };
 
 
- return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
    request(options, function (error, response, body) {
      if (error) {
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = JSON.parse(body);
-       console.log("hi");
        const token = responseBody;
        resolve(token);
      } else {
-       console.error('Errottr:', response);
        reject(new Error(`Error: ${response.statusCode}`));
      }
    });
@@ -607,7 +605,6 @@ async function generateLabel(shipment_id) {
 async function generateInvoice(order_id) {
   token = await generateToken(email,shipPassword);
  if (!token) {
-   console.error('Token not available. Call generateToken first.');
    return Promise.reject('Token not available. Call generateToken first.');
  }
 
@@ -626,7 +623,6 @@ async function generateInvoice(order_id) {
   })
  };
 
- console.log(options);
 
  return new Promise((resolve, reject) => {
    request(options, function (error, response, body) {
@@ -634,12 +630,9 @@ async function generateInvoice(order_id) {
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = JSON.parse(body);
-       console.log(responseBody);
-       console.log("hi");
        const token = responseBody;
        resolve(token);
      } else {
-       console.error('Errottr:', response);
        reject(new Error(`Error: ${response.statusCode}`));
      }
    });
@@ -662,8 +655,6 @@ exports.getAWBnoById = async function (req, res, next) {
     const orderId = req.body.order_id;
 
     const existingOrder = await Order.findById(orderId);
-
-    console.log(orderId);
 
     if (!existingOrder) {
       return res.status(404).json({
@@ -698,7 +689,6 @@ exports.getAWBnoById = async function (req, res, next) {
       });
     }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -731,7 +721,6 @@ exports.getListOfCourires = async function (req, res, next) {
      }
     
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -755,7 +744,6 @@ exports.getCourierServiceability = async function (req, res, next) {
 
     const existingOrder = await Order.findById(orderId);
 
-    console.log(orderId);
 
     if (!existingOrder) {
       return res.status(404).json({
@@ -788,7 +776,6 @@ exports.getCourierServiceability = async function (req, res, next) {
       });
     }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -811,8 +798,6 @@ exports.getShipmentPickup = async function (req, res, next) {
     const orderId = req.body.order_id;
 
     const existingOrder = await Order.findById(orderId);
-
-    console.log(orderId);
 
     if (!existingOrder) {
       return res.status(404).json({
@@ -844,7 +829,6 @@ exports.getShipmentPickup = async function (req, res, next) {
       });
     }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -914,7 +898,6 @@ exports.getAllOrderList = async function (req, res, next) {
       });
     
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -940,7 +923,6 @@ exports.getOrderDetail = async function (req, res, next) {
 
     const existingOrder = await Order.findById(orderId);
 
-    console.log(orderId);
 
     if (!existingOrder) {
       return res.status(404).json({
@@ -961,7 +943,6 @@ exports.getOrderDetail = async function (req, res, next) {
       });
     
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -987,7 +968,6 @@ exports.getTrackByAWB = async function (req, res, next) {
 
     const existingOrder = await Order.findById(orderId);
 
-    console.log(orderId);
 
     if (!existingOrder) {
       return res.status(404).json({
@@ -1008,7 +988,6 @@ exports.getTrackByAWB = async function (req, res, next) {
       });
     
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -1034,7 +1013,6 @@ exports.getTrackByorderid = async function (req, res, next) {
 
     const existingOrder = await Order.findById(orderId);
 
-    console.log(orderId);
 
     if (!existingOrder) {
       return res.status(404).json({
@@ -1055,7 +1033,6 @@ exports.getTrackByorderid = async function (req, res, next) {
       });
     
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -1080,7 +1057,6 @@ exports.getTrackByshipmentid = async function (req, res, next) {
 
     const existingOrder = await Order.findById(orderId);
 
-    console.log(orderId);
 
     if (!existingOrder) {
       return res.status(404).json({
@@ -1101,7 +1077,6 @@ exports.getTrackByshipmentid = async function (req, res, next) {
       });
     
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -1126,7 +1101,6 @@ exports.getCancelShipment = async function (req, res, next) {
 
     const existingOrder = await Order.findById(orderId);
 
-    console.log(orderId);
 
     if (!existingOrder) {
       return res.status(404).json({
@@ -1152,7 +1126,6 @@ exports.getCancelShipment = async function (req, res, next) {
       }
     
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -1186,7 +1159,6 @@ exports.getAllShipmentDetails = async function (req, res, next) {
       }
     
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -1212,7 +1184,6 @@ exports.getParticularShipmentDetails = async function (req, res, next) {
 
     const existingOrder = await Order.findById(orderId);
 
-    console.log(orderId);
 
     if (!existingOrder) {
       return res.status(404).json({
@@ -1237,7 +1208,6 @@ exports.getParticularShipmentDetails = async function (req, res, next) {
       }
     
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -1263,7 +1233,6 @@ exports.getGenerateManifest = async function (req, res, next) {
 
     const existingOrder = await Order.findById(orderId);
 
-    console.log(orderId);
 
     if (!existingOrder) {
       return res.status(404).json({
@@ -1293,7 +1262,6 @@ exports.getGenerateManifest = async function (req, res, next) {
       }
     
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -1318,8 +1286,6 @@ exports.getGenerateLabel = async function (req, res, next) {
     const orderId = req.body.order_id;
 
     const existingOrder = await Order.findById(orderId);
-
-    console.log(orderId);
 
     if (!existingOrder) {
       return res.status(404).json({
@@ -1349,7 +1315,6 @@ exports.getGenerateLabel = async function (req, res, next) {
       }
     
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -1374,7 +1339,6 @@ exports.getGenerateInvoice = async function (req, res, next) {
 
     const existingOrder = await Order.findById(orderId);
 
-    console.log(orderId);
 
     if (!existingOrder) {
       return res.status(404).json({
@@ -1404,7 +1368,6 @@ exports.getGenerateInvoice = async function (req, res, next) {
       }
     
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -1525,8 +1488,6 @@ exports.ReturnToBuyer = async function (req, res, next) {
 
         const shiprocketResponse = await updateOrder(orderData);
 
-          console.log('JSON Response:', shiprocketResponse);
-
           if (shiprocketResponse) {
             
             const payment_status = '0';
@@ -1548,7 +1509,6 @@ exports.ReturnToBuyer = async function (req, res, next) {
           });
     }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",

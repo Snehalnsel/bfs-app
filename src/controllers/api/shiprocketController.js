@@ -71,7 +71,6 @@ function generateToken(email, password) {
         const token = responseBody.token;
         resolve(token);
       } else {
-        console.error('Error:', response.body);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -82,7 +81,6 @@ function generateToken(email, password) {
 async function generateAWBno(shipment_id,courier_id) {
   token = await generateToken(email,shipPassword);
  if (!token) {
-   console.error('Token not available. Call generateToken first.');
    return Promise.reject('Token not available. Call generateToken first.');
  }
 
@@ -100,7 +98,6 @@ async function generateAWBno(shipment_id,courier_id) {
   })
  };
 
- console.log(options);
 
  return new Promise((resolve, reject) => {
    request(options, function (error, response, body) {
@@ -108,12 +105,9 @@ async function generateAWBno(shipment_id,courier_id) {
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = JSON.parse(body);
-       console.log(responseBody);
-       console.log("hi");
        const token = responseBody;
        resolve(token);
      } else {
-       console.error('Errottr:', response);
        reject(new Error(`Error: ${response.statusCode}`));
      }
    });
@@ -125,7 +119,6 @@ async function generateAWBno(shipment_id,courier_id) {
 async function generateCouriresList() {
   token = await generateToken(email,shipPassword);
  if (!token) {
-   console.error('Token not available. Call generateToken first.');
    return Promise.reject('Token not available. Call generateToken first.');
  }
 
@@ -145,12 +138,9 @@ async function generateCouriresList() {
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = JSON.parse(body);
-       console.log(responseBody);
-       console.log("hi");
        const token = responseBody;
        resolve(token);
      } else {
-       console.error('Errottr:', response);
        reject(new Error(`Error: ${response.statusCode}`));
      }
    });
@@ -162,7 +152,6 @@ async function generateCouriresList() {
 async function generateCouriresServiceability(shipment_id,pickup_postcode,delivery_postcode,cod,weight) {
   token = await generateToken(email,shipPassword);
  if (!token) {
-   console.error('Token not available. Call generateToken first.');
    return Promise.reject('Token not available. Call generateToken first.');
  }
 
@@ -182,12 +171,9 @@ async function generateCouriresServiceability(shipment_id,pickup_postcode,delive
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = JSON.parse(body);
-       console.log(responseBody);
-       console.log("hi");
        const token = responseBody;
        resolve(token);
      } else {
-       console.error('Errottr:', response);
        reject(new Error(`Error: ${response.statusCode}`));
      }
    });
@@ -200,7 +186,6 @@ async function generateCouriresServiceability(shipment_id,pickup_postcode,delive
 async function generateRequestShipmentPickup(shipment_id) {
   token = await generateToken(email,shipPassword);
  if (!token) {
-   console.error('Token not available. Call generateToken first.');
    return Promise.reject('Token not available. Call generateToken first.');
  }
 
@@ -225,12 +210,9 @@ async function generateRequestShipmentPickup(shipment_id) {
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = JSON.parse(body);
-       console.log(responseBody);
-       console.log("hi");
        const token = responseBody;
        resolve(token);
      } else {
-       console.error('Errottr:', response);
        reject(new Error(`Error: ${response.statusCode}`));
      }
    });
@@ -243,7 +225,6 @@ async function generateOrderList(optionalParams = {}) {
   token = await generateToken(email, shipPassword);
 
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -275,12 +256,9 @@ async function generateOrderList(optionalParams = {}) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Error:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -291,7 +269,6 @@ async function generateOrderList(optionalParams = {}) {
 async function generateOrderDetails(shiproket_orderid) {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -310,12 +287,9 @@ async function generateOrderDetails(shiproket_orderid) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Error:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -326,7 +300,6 @@ async function generateOrderDetails(shiproket_orderid) {
 async function generateOrderDetails(shiproket_orderid) {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -345,12 +318,9 @@ async function generateOrderDetails(shiproket_orderid) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Error:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -360,7 +330,6 @@ async function generateOrderDetails(shiproket_orderid) {
 async function trackbyawbid(pickup_awb) {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -379,12 +348,9 @@ async function trackbyawbid(pickup_awb) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Error:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -394,7 +360,6 @@ async function trackbyawbid(pickup_awb) {
 async function trackbyaorderid(order_id){
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -414,12 +379,9 @@ async function trackbyaorderid(order_id){
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Error:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -429,7 +391,6 @@ async function trackbyaorderid(order_id){
 async function trackbyshipmentid(shipment_id) {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -448,12 +409,9 @@ async function trackbyshipmentid(shipment_id) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Error:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -464,7 +422,6 @@ async function trackbyshipmentid(shipment_id) {
 async function cancelshipmentbyshipmentid(pickup_awb) {
   token = await generateToken(email,shipPassword);
  if (!token) {
-   console.error('Token not available. Call generateToken first.');
    return Promise.reject('Token not available. Call generateToken first.');
  }
 
@@ -483,7 +440,6 @@ async function cancelshipmentbyshipmentid(pickup_awb) {
   })
  };
 
- console.log(options);
 
  return new Promise((resolve, reject) => {
    request(options, function (error, response, body) {
@@ -491,12 +447,9 @@ async function cancelshipmentbyshipmentid(pickup_awb) {
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = JSON.parse(body);
-       console.log(responseBody);
-       console.log("hi");
        const token = responseBody;
        resolve(token);
      } else {
-       console.error('Errottr:', response);
        reject(new Error(`Error: ${response.statusCode}`));
      }
    });
@@ -508,7 +461,6 @@ async function cancelshipmentbyshipmentid(pickup_awb) {
 async function allShipmentData() {
   token = await generateToken(email,shipPassword);
  if (!token) {
-   console.error('Token not available. Call generateToken first.');
    return Promise.reject('Token not available. Call generateToken first.');
  }
 
@@ -528,12 +480,9 @@ async function allShipmentData() {
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = JSON.parse(body);
-       console.log(responseBody);
-       console.log("hi");
        const token = responseBody;
        resolve(token);
      } else {
-       console.error('Errottr:', response);
        reject(new Error(`Error: ${response.statusCode}`));
      }
    });
@@ -546,7 +495,6 @@ async function allShipmentData() {
 async function SpecificShipmentDeatils(shipment_id) {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -565,12 +513,9 @@ async function SpecificShipmentDeatils(shipment_id) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Error:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -581,7 +526,6 @@ async function SpecificShipmentDeatils(shipment_id) {
 async function generateManifest(shipment_id) {
   token = await generateToken(email,shipPassword);
  if (!token) {
-   console.error('Token not available. Call generateToken first.');
    return Promise.reject('Token not available. Call generateToken first.');
  }
 
@@ -600,7 +544,6 @@ async function generateManifest(shipment_id) {
   })
  };
 
- console.log(options);
 
  return new Promise((resolve, reject) => {
    request(options, function (error, response, body) {
@@ -608,12 +551,9 @@ async function generateManifest(shipment_id) {
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = JSON.parse(body);
-       console.log(responseBody);
-       console.log("hi");
        const token = responseBody;
        resolve(token);
      } else {
-       console.error('Errottr:', response);
        reject(new Error(`Error: ${response.statusCode}`));
      }
    });
@@ -625,7 +565,6 @@ async function generateManifest(shipment_id) {
 async function generateLabel(shipment_id) {
   token = await generateToken(email,shipPassword);
  if (!token) {
-   console.error('Token not available. Call generateToken first.');
    return Promise.reject('Token not available. Call generateToken first.');
  }
 
@@ -644,7 +583,6 @@ async function generateLabel(shipment_id) {
   })
  };
 
- console.log(options);
 
  return new Promise((resolve, reject) => {
    request(options, function (error, response, body) {
@@ -652,7 +590,6 @@ async function generateLabel(shipment_id) {
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = JSON.parse(body);
-       console.log(responseBody);
        console.log("hi");
        const token = responseBody;
        resolve(token);

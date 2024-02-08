@@ -69,7 +69,6 @@ function generateToken(email, password) {
         const token = responseBody.token;
         resolve(token);
       } else {
-        console.error('Error:', response.body);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -79,7 +78,6 @@ function generateToken(email, password) {
 async function generateCouriresList() {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -420,7 +418,6 @@ exports.getHublist = async function (req, res, next) {
       },
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: 'An error occurred while fetching data' });
   }
 };
@@ -428,7 +425,6 @@ exports.getHublist = async function (req, res, next) {
 async function generateLabel(shipment_id) {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -446,21 +442,15 @@ async function generateLabel(shipment_id) {
       ]
     })
   };
-
-  console.log(options);
-
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
       if (error) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Errottr:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -473,11 +463,8 @@ async function generateLabel(shipment_id) {
 async function generateInvoice(order_id) {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
-
-
   const options = {
     method: 'POST',
     url: baseUrl + '/orders/print/invoice',
@@ -491,33 +478,23 @@ async function generateInvoice(order_id) {
       ]
     })
   };
-
-  console.log(options);
-
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
       if (error) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Errottr:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
   });
-
-
 }
-
 async function generateRequestShipmentPickup(shipment_id) {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -542,12 +519,9 @@ async function generateRequestShipmentPickup(shipment_id) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Errottr:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -557,9 +531,7 @@ async function generateRequestShipmentPickup(shipment_id) {
 
 async function generateCouriresServiceability(pickup_postcode, delivery_postcode, cod, weight) {
   token = await generateToken(email, shipPassword);
-  console.log(token);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -579,12 +551,9 @@ async function generateCouriresServiceability(pickup_postcode, delivery_postcode
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        //  console.log(responseBody);
-        //  console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Errottr:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -621,7 +590,6 @@ exports.updateData = async function (req, res, next) {
 
     res.redirect("/shippingkitlist"); // Redirect after successful update
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while updating the shipping kit.",
@@ -675,11 +643,8 @@ exports.getShipmentList = function (req, res, next) {
     },
   ]).exec(function (error, orderList) {
     if (error) {
-      console.error(error);
       res.status(500).json({ error: 'An error occurred' });
     } else {
-
-      console.log(orderList);
       res.render("pages/order/shipmentlist", {
         siteName: req.app.locals.siteName,
         pageName: pageName,
@@ -764,9 +729,6 @@ exports.deleteData = async function (req, res, next) {
 //     CartDetail.find({ cart_id: cartId })
 //       .populate('product_id', 'name')
 //       .then((cartDetails) => {
-
-
-//         console.log(cartDetails);
 //         res.render("pages/order/details", {
 //           status: 1,
 //           siteName: req.app.locals.siteName,
@@ -785,12 +747,10 @@ exports.deleteData = async function (req, res, next) {
 //         });
 //       })
 //       .catch((error) => {
-//         console.error(error);
 //         res.status(500).json({ error: 'An error occurred while fetching cart details' });
 //       });
 //   })
 //   .catch((error) => {
-//     console.error(error);
 //     res.status(500).json({ error: 'An error occurred while fetching order details' });
 //   });
 
@@ -806,10 +766,6 @@ exports.kitorderplaced = async (req, res) => {
       .populate('buyer_id', 'name phone_no email')
       .populate('shipping_address_id')
       .populate('hub_address_id');
-
-      // console.log(orderDetails.hub_address_id.shiprocket_address);
-      // return;
-
     const productdetails = await Userproduct.findById(orderDetails.product_id);
 
     if (productdetails) {
@@ -862,11 +818,7 @@ exports.kitorderplaced = async (req, res) => {
         height: productdetails.height,
         weight: productdetails.weight,
       };
-
       const shiprocketResponse = await generateOrder(orderData);
-
-      console.log('JSON Response:', shiprocketResponse);
-
       if (shiprocketResponse) {
 
         const payment_status = '0';
@@ -899,7 +851,6 @@ exports.kitorderplaced = async (req, res) => {
 
 
   } catch (error) {
-    console.error('Error placing order:', error);
     res.status(500).json({ error: 'An error occurred while placing the order' });
   }
 };
@@ -983,7 +934,6 @@ exports.checkCourierServiceability = async function (req, res, next) {
         });
       }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -1019,26 +969,15 @@ exports.getAWBnoById = async function (req, res, next) {
     }
     if (existingOrder) {
       const shipment_id = existingOrder.shiprocket_shipment_id;
-
-
       const shiprocketResponse = await generateAWBno(shipment_id,courier_id);
-
-      console.log(shiprocketResponse);
-
       if (shiprocketResponse) {
-
         existingOrder.pickup_awb = shiprocketResponse.response.data.awb_code;
         existingOrder.shiprocket_delivery_partner = shiprocketResponse.response.courier_company_id;
-
         await existingOrder.save();
-
         res.redirect("/shippingkitlist");
       }
-
-
     }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -1083,7 +1022,6 @@ exports.getGenerateLabelforkit = async function (req, res, next) {
           file.close(() => {
             res.download(outputFilePath, 'label.pdf', (err) => {
               if (err) {
-                console.error('Error downloading the file:', err);
                 return res.status(500).json({
                   status: "0",
                   message: "Error downloading the file!",
@@ -1093,16 +1031,13 @@ exports.getGenerateLabelforkit = async function (req, res, next) {
               // File downloaded and response sent successfully
               fs.unlink(outputFilePath, (unlinkErr) => {
                 if (unlinkErr) {
-                  console.error('Error deleting the downloaded file:', unlinkErr);
                 }
               });
             });
           });
         });
       });
-
       request.on('error', (error) => {
-        console.error('Error downloading the file:', error);
         return res.status(500).json({
           status: "0",
           message: "Error downloading the file!",
@@ -1110,10 +1045,6 @@ exports.getGenerateLabelforkit = async function (req, res, next) {
         });
       });
     } else {
-      console.error('shiprocketResponse');
-      console.error(shiprocketResponse);
-      //alert('something went wrong'+ shiprocketResponse.response);
-
       return res.status(404).json({
         status: "0",
         message: "Label URL not found!",
@@ -1121,7 +1052,6 @@ exports.getGenerateLabelforkit = async function (req, res, next) {
       });
     }
   } catch (error) {
-    console.error(error);
     //alert('something went wrong');
     res.status(500).json({
       status: "0",
@@ -1175,7 +1105,6 @@ exports.getGenerateInvoiceforkit = async function (req, res, next) {
         file.close(() => {
           res.download(outputFilePath, 'invoice.pdf', (err) => {
             if (err) {
-              console.error('Error downloading the file:', err);
               return res.status(500).json({
                 status: "0",
                 message: "Error downloading the file!",
@@ -1185,7 +1114,6 @@ exports.getGenerateInvoiceforkit = async function (req, res, next) {
             // File downloaded and response sent successfully
             fs.unlink(outputFilePath, (unlinkErr) => {
               if (unlinkErr) {
-                console.error('Error deleting the downloaded file:', unlinkErr);
               }
             });
           });
@@ -1194,7 +1122,6 @@ exports.getGenerateInvoiceforkit = async function (req, res, next) {
     });
 
     request.on('error', (error) => {
-      console.error('Error downloading the file:', error);
       return res.status(500).json({
         status: "0",
         message: "Error downloading the file!",
@@ -1202,7 +1129,6 @@ exports.getGenerateInvoiceforkit = async function (req, res, next) {
       });
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -1237,25 +1163,13 @@ exports.getShipmentPickup = async function (req, res, next) {
 
     if (existingOrder) {
       const shipment_id = existingOrder.shiprocket_shipment_id;
-
-
-      // if(date)
-      // {
-      //   const shiprocketResponse = await generateRequestShipmentPickup(shipment_id,date);
-
-      // }
-
       const shiprocketResponse = await generateRequestShipmentPickup(shipment_id);
-
-      console.log(shiprocketResponse);
-
       if (shiprocketResponse) {
         existingOrder.pickup_token_number = shiprocketResponse.response.pickup_token_number;
         existingOrder.pickup_dtime = shiprocketResponse.response.pickup_scheduled_date;
 
         await existingOrder.save();
       }
-
       // res.status(200).json({
       //   status: "1",
       //   message: "Order canceled successfully!",
@@ -1299,7 +1213,6 @@ exports.getShipmentPickup = async function (req, res, next) {
       });
     }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -1324,11 +1237,7 @@ exports.getList = async function (req, res, next) {
 
   try {
     const orderId = req.params.id;
-
     const existingOrder = await Order.findById(orderId);
-
-    console.log(orderId);
-
     if (!existingOrder) {
       return res.render("pages/order/list", {
         status: "0",
@@ -1372,7 +1281,6 @@ exports.getList = async function (req, res, next) {
       });
     }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -1517,34 +1425,23 @@ exports.huborderplaced = async (req, res) => {
         height: productdetails.height,
         weight: productdetails.weight,
       };
-
       const shiprocketResponse = await generateOrder(orderData);
-
-      console.log('JSON Response:', shiprocketResponse);
-
       if (shiprocketResponse) {
-
         const payment_status = '0';
-
         shiprocket_payment_status = payment_status;
         shiprocket_order_id = shiprocketResponse.order_id;
         shiprocket_shipment_id = shiprocketResponse.shipment_id;
         shiprocket_status_code = shiprocketResponse.status_code;
-
-
         orderDetails.shiprocket_payment_status = shiprocket_payment_status;
         orderDetails.shiprocket_order_id = shiprocket_order_id;
         orderDetails.shiprocket_shipment_id = shiprocket_shipment_id;
         orderDetails.shiprocket_status_code = shiprocket_status_code;
-
         await orderDetails.save();
-
         const updatedOrderTracking = await Ordertracking.findOneAndUpdate(
           { tracking_id: track_id },
           { $set: { status: 2 } },
           { new: true }
         );
-
       }
     }
     else {
@@ -1556,10 +1453,7 @@ exports.huborderplaced = async (req, res) => {
     else {
       res.redirect("/orderlist");
     }
-
-
   } catch (error) {
-    console.error('Error placing order:', error);
     res.status(500).json({ error: 'An error occurred while placing the order' });
   }
 };

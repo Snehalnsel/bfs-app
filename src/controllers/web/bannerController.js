@@ -77,10 +77,6 @@ exports.addData = async function (req, res, next) {
 exports.createData = async function (req, res, next) {
   var pageName = "Banner";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-
-  console.log(req.file);
-  console.log(req.body);
-
   try {
     if (!req.file) {
       return res.status(400).json({
@@ -227,7 +223,6 @@ exports.updateData = async function (req, res, next) {
           res.redirect("/banner-list");
         })
         .catch((error) => {
-          console.error(error);
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the brand.",
@@ -236,7 +231,6 @@ exports.updateData = async function (req, res, next) {
         });
     })
     .catch((error) => {
-      console.error(error);
       return res.status(500).json({
         status: "0",
         message: "An error occurred while finding the brand.",
@@ -273,7 +267,6 @@ exports.updateStatusData = async function (req, res, next) {
           res.redirect("/banner-list"); 
         })
         .catch((error) => {
-          console.error(error);
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the brand status.",
@@ -282,7 +275,6 @@ exports.updateStatusData = async function (req, res, next) {
         });
     })
     .catch((error) => {
-      console.error(error);
       return res.status(500).json({
         status: "0",
         message: "An error occurred while finding the brand.",

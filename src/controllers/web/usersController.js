@@ -49,12 +49,8 @@ exports.signUp = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   // let userCount = await Users.countDocuments();
   // let userCode = `BFS${(userCount + 1).toString().padStart(3, '0')}`;
-
-  // console.log(userCode);
-
   bcrypt.hash(req.body.password, rounds, (error, hash) => {
     if (error) {
       res.status(400).json({
@@ -256,7 +252,6 @@ exports.uploadImage = async function (req, res, next) {
       const folderPath = "./public/images/";
       const path = Date.now() + ".png";
       fs.writeFileSync(folderPath + path, imgData, "base64", function (err) {
-        console.log(err);
       });
 
       var image_url = req.app.locals.requrl + "/public/images/" + path;
@@ -469,7 +464,6 @@ exports.countProducts = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error counting products:", error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while counting products",
@@ -490,7 +484,6 @@ exports.countUsers = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error counting users:", error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while counting users",

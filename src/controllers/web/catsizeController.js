@@ -58,7 +58,6 @@ exports.getData = function (req, res, next) {
     }
   ]).exec(function (error, productList) {
     if (error) {
-      console.error(error);
       res.status(500).json({ error: 'An error occurred' });
     } else {
     
@@ -178,9 +177,6 @@ exports.editData = async function (req, res, next) {
       Size.find()   
     ]);
   const productsize_id = mongoose.Types.ObjectId(req.params.id);
-
-  console.log(category);
-
   Productsize.findOne({ _id: productsize_id }).then((productsize) => {
     res.render("pages/catbrand/edit", {
       status: 1,
@@ -250,7 +246,6 @@ exports.updateData = async function (req, res, next) {
           res.redirect("/catbrand");
         })
         .catch((error) => {
-          console.error(error);
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the Product Size.",
@@ -259,7 +254,6 @@ exports.updateData = async function (req, res, next) {
         });
     })
     .catch((error) => {
-      console.error(error);
       return res.status(500).json({
         status: "0",
         message: "An error occurred while finding the Product Size.",
@@ -296,7 +290,6 @@ exports.updateStatusData = async function (req, res, next) {
           res.redirect("/catbrand"); 
         })
         .catch((error) => {
-          console.error(error);
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the brand status.",
@@ -305,7 +298,6 @@ exports.updateStatusData = async function (req, res, next) {
         });
     })
     .catch((error) => {
-      console.error(error);
       return res.status(500).json({
         status: "0",
         message: "An error occurred while finding the Product Size.",

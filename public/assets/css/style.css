@@ -3696,3 +3696,13 @@ span.close-icon {
     transition: 0.5s;
     border: 1px solid #000000;
 }
+.overflow-visible {
+    overflow: visible;
+}
+.wishlist-group-box .bids-row {
+    margin: 0px;
+}
+
+.wishlist-group-box .br-details, .wishlist-group-box .br-results{
+    padding: 10px 0px;
+}

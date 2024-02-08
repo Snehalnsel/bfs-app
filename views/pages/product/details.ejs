@@ -35,7 +35,6 @@
                                 <div class="card-body">
                                     <form class="user" action="/updateproductdetails" method="post"
                                         enctype="multipart/form-data">
-                                <% console.log("##### HELLO WORLD ########"); console.log(respdata);%>
                                         <div class="form-group row">
                                             <div class="col-sm-6 mb-3 mb-sm-0">
                                                 <input type="hidden" name="product_id" value="<%- respdata._id %>">
@@ -342,13 +341,11 @@
 
 <script>
     var productImages = JSON.parse('<%- JSON.stringify(productImages) %>');
-    console.log(productImages);
     const remainingImagesField = document.getElementById('remainingImages');
         remainingImagesField.value =[];
     uploadbuttonShowhide();
 
     function handleCloseButtonClick(id) {
-        console.log('Close button clicked for index:', id);
         let filteredImageIndex = -1;
         productImages.forEach((image, index) => {
             if (image._id === id) {
@@ -357,7 +354,6 @@
         });
         if (filteredImageIndex !== -1) {
             const removedImage = productImages.splice(filteredImageIndex, 1)[0];
-            console.log('Removed Image:', removedImage);
         }
 
         const imageContainer = document.querySelector(`[data-id="${id}"]`);
@@ -369,10 +365,8 @@
 
         uploadbuttonShowhide();
 
-        console.log('Remaining Images:', productImages);
         const remainingImagesField = document.getElementById('remainingImages');
         remainingImagesField.value =JSON.stringify(productImages);
-        console.log(remainingImagesField.value)
     }
 
 

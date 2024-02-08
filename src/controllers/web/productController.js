@@ -230,7 +230,7 @@ exports.getData = function (req, res, next) {
       },
     },
     {
-      $limit: 20 // Limit to the first 20 documents
+      //$limit: 20 // Limit to the first 20 documents
     }
   ]).exec(function (error, productList) {
     if (error) {
@@ -279,7 +279,7 @@ exports.detailsData = async function (req, res, next) {
       return res.status(404).json({ error: 'Product not found' });
     }
 
-    console.log(productdetails);
+    //console.log(productdetails);
     // Fetch the parent category
     if(productdetails.hasOwnProperty("category_id"))
     {
@@ -323,7 +323,7 @@ exports.detailsData = async function (req, res, next) {
       
     });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ error: 'An error occurred' });
   }
 };
@@ -368,8 +368,8 @@ exports.updatedetailsData = async function (req, res, next) {
 
   
       if (req.body.remainingImages.length > 0) {
-        console.log("without  0000");
-        console.log(req.body.remainingImages);
+        //console.log("without  0000");
+        //console.log(req.body.remainingImages);
         const remainingImages = req.body.remainingImages ? JSON.parse(req.body.remainingImages) : [];
 
         const imagesArray = [];
@@ -378,10 +378,10 @@ exports.updatedetailsData = async function (req, res, next) {
           if (image && image.image) {
             imagesArray.push(image.image);
           } else {
-            console.log('Invalid image data:', image);
+            //console.log('Invalid image data:', image);
           }
         }
-        console.log(imagesArray);
+        //console.log(imagesArray);
 
         if (req.files && req.files.length > 0) {
           const allImages = imagesArray.concat(req.files.map(file => {
@@ -393,7 +393,7 @@ exports.updatedetailsData = async function (req, res, next) {
           }));
 
           const countAllImages = allImages.length;
-          console.log(allImages);
+          //console.log(allImages);
 
           await Productimage.deleteMany({ product_id: req.body.product_id });
 
@@ -418,7 +418,7 @@ exports.updatedetailsData = async function (req, res, next) {
         }
         else {
           // const count = imagesArray.length;
-          console.log(imagesArray);
+          //console.log(imagesArray);
           await Productimage.deleteMany({ product_id: req.body.product_id });
           const imagesToUpload = imagesArray.slice(0, 5);
 
@@ -441,13 +441,13 @@ exports.updatedetailsData = async function (req, res, next) {
 
       }
       else {
-        console.log("without");
+        //console.log("without");
         const List = await Productimage.find({ product_id: req.body.product_id });
 
-        console.log(List);
+        //console.log(List);
 
         const count = await Productimage.countDocuments({ product_id: req.body.product_id });
-        console.log(count);
+        //console.log(count);
 
         if (count !== 5 || count < 5) {
           if (req.files && req.files.length > 0) {
@@ -500,7 +500,7 @@ exports.updatedetailsData = async function (req, res, next) {
       res.redirect("/productlist");
     }
   }).catch((err) => {
-    console.error(err);
+    //console.error(err);
     res.status(500).json({
       status: "0",
       message: "An error occurred while updating the product.",
@@ -538,7 +538,7 @@ exports.updateStatusData = async function (req, res, next) {
           res.redirect("/productlist");
         })
         .catch((error) => {
-          console.error(error);
+          //console.error(error);
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the product status.",
@@ -547,7 +547,7 @@ exports.updateStatusData = async function (req, res, next) {
         });
     })
     .catch((error) => {
-      console.error(error);
+      //console.error(error);
       return res.status(500).json({
         status: "0",
         message: "An error occurred while finding the brand.",

@@ -35,6 +35,7 @@ const HubController = require("../controllers/web/hubController");
 const ShippingkitController = require("../controllers/web/shippingkitController");
 const CartremoveController = require("../controllers/web/cartremoveController");
 const BannerController = require("../controllers/web/bannerController");
+const GenderController = require("../controllers/web/genderController");
 
 
 var session = require("express-session");
@@ -274,15 +275,10 @@ router.post(
   upload.single('image'),
   BodyFocusController.createData
 );
-
 router.get("/edit-body-focus/:id", cors(), BodyFocusController.editData);
-
 router.post('/update-body-focus', cors(), [], upload.single('image'), BodyFocusController.updateData);
-
 router.get("/body-focus-statu-change/:id", cors(), BodyFocusController.updateStatusData);
-
 router.get("/body-focus-status/:id", cors(), BodyFocusController.statusData);
-
 //SUB CATEGORY APIS
 
 // router.get("/body-focus-subcat/:page", cors(), BodyFocusController.getSubcatData);
@@ -556,5 +552,12 @@ router.get("/banner/:id", cors(), BannerController.editData);
 router.post("/update-banner", cors(), upload.single('image'), BannerController.updateData);
 router.get("/delete-banner/:id", cors(), BannerController.deleteData);
 router.get("/banner-status-change/:id", cors(), BannerController.updateStatusData);
+
+
+//Gender
+router.get("/genderlist", cors(), GenderController.getData);
+router.get("/add-gender", cors(), GenderController.addData);
+router.post("/create-gender",GenderController.createData);
+router.get("/delete-gender/:id", cors(), GenderController.deleteData);
 
 module.exports = router;

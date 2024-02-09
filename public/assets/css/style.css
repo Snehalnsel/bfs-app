@@ -3706,3 +3706,11 @@ span.close-icon {
 .wishlist-group-box .br-details, .wishlist-group-box .br-results{
     padding: 10px 0px;
 }
+.inlineflex {
+    display: flex;
+    align-items: center;
+}
+
+.inlineflex span {
+    margin-right: 10px;
+}

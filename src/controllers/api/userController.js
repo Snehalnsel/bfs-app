@@ -107,8 +107,6 @@ exports.signUp = async function (req, res, next) {
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   let userCount = await Users.countDocuments();
   let userCode = `BFS${(userCount + 1).toString().padStart(5, '0')}`;
-
-  console.log(userCode);
   bcrypt.hash(req.body.password, rounds, (error, hash) => {
     if (error) {
       res.status(400).json({
@@ -559,7 +557,6 @@ exports.uploadImage = async function (req, res, next) {
       const path = Date.now() + ".png";
     
       fs.writeFileSync(folderPath + path, imgData, "base64", function (err) {
-        console.log(err);
       });
 
       var image_url = req.app.locals.requrl + "/public/images/" + path;
@@ -880,7 +877,6 @@ exports.deleteData = async function (req, res, next) {
 };
 
 exports.deleteuser = async function (req, res, next) {
-  console.log('req.body:', req.body);
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

@@ -178,6 +178,21 @@
                         </div>
 
                         <div class="div-6">
+                           <label>Gender</label>
+                           <div class=" inlineflex" >
+                              <% if(genderList){%>
+                                 <% genderList.forEach(function(item) { %>
+                                    <span>
+                                       <input type="radio" id="<%= item._id %>" name="gender" <%= respdata && respdata.gender_id.equals(item._id) ? 'checked' : '' %> value="<%= item._id %>">
+                                       <label for="<%= item._id %>"><%= item.name %></label>
+                                    </span>
+                                    
+                                 <% }); %>   
+                              <% } %>
+                           </div>
+                        </div>
+
+                        <div class="div-6">
                            <label>Height</label>
                            <input type="type" name="height" class="ds-form-control"  value="<%=respdata.height%>" placeholder="Height in cm">
                         </div>

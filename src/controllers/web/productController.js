@@ -14,6 +14,7 @@ const Productsize = require("../../models/api/catsizeModel");
 const Userproduct = require("../../models/api/userproductModel");
 const Productimage = require("../../models/api/productimageModel");
 const Productcondition = require("../../models/api/productconditionModel");
+const Gender = require("../../models/api/genderModel");
 // const helper = require("../helpers/helper");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -126,9 +127,6 @@ const upload = multer({ dest: 'public/images/' });
 //   });
 
 // };
-
-
-
 exports.getData = function (req, res, next) {
   var pageName = "Product List";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
@@ -285,6 +283,7 @@ exports.detailsData = async function (req, res, next) {
     const subcategoryList = await Category.find({ parent_id: { $ne: '650444488501422c8bf24bdb' } });
     const sizeList = await Size.find();
     const productcondition = await Productcondition.find();
+    const genderList = await Gender.find();
 
     const requrl = url.format({
       protocol: req.protocol,
@@ -309,6 +308,7 @@ exports.detailsData = async function (req, res, next) {
       brand: brandList,
       size: sizeList,
       productCondition: productcondition,
+      genderList: genderList,
       productImages: productImages,
       parentCategory: productdetails.hasOwnProperty("category_id") ? parentCategory : null,
       
@@ -352,6 +352,7 @@ exports.updatedetailsData = async function (req, res, next) {
       if (req.body.weight) updData.weight = req.body.weight;
       if (req.body.length) updData.length = req.body.length;
       if (req.body.breath) updData.breath = req.body.breath;
+      if (req.body.gender_id) updData.gender_id = req.body.gender_id;
       await Userproduct.findOneAndUpdate({ _id: req.body.product_id }, { $set: updData }, { upsert: true });
       if (req.body.remainingImages.length > 0) {
         const remainingImages = req.body.remainingImages ? JSON.parse(req.body.remainingImages) : [];

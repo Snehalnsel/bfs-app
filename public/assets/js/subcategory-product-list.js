@@ -28,6 +28,7 @@ async function searchByFilter(priceList = '',pageId = '') {
     let brandList = [];
     let sizeList = [];
     let conditionList = [];
+    let genderList = [];
     let optionId = $("#sortBy").val();
     let productcategoryId = $("#product_category_id").val();
     let pageNo = (pageId != "") ? pageId : 1;
@@ -43,6 +44,11 @@ async function searchByFilter(priceList = '',pageId = '') {
     $(".searchByCondition:checked").each(function () {
         conditionList.push($(this).data("id"));
     });
+
+    $(".searchByGender:checked").each(function () {
+        genderList.push($(this).data("id"));
+    });
+   
    
     $.ajax({
         type: 'POST',
@@ -51,6 +57,7 @@ async function searchByFilter(priceList = '',pageId = '') {
             brandList: brandList,
             sizeList: sizeList,
             conditionList: conditionList,
+            genderList: genderList,
             priceList: priceList ? priceList : null,
             optionId: optionId,
             productcategoryId: productcategoryId,

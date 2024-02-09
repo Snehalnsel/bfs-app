@@ -34,11 +34,8 @@
             <!-- Begin Page Content -->
             <div class="container-fluid">
 
-              <!-- Page Heading -->
               <h1 class="h3 mb-2 text-gray-800"><%-pageName%></h1>
               <p class="mb-4">View / edit <%-pageName%> details</p>
-
-              <!-- DataTales Example -->
               <div class="card shadow mb-4">
                 <div class="card-header py-3">
                   <h6 class="m-0 font-weight-bold text-primary"><%-pageName%> Details</h6>
@@ -152,7 +149,6 @@
                                       <%= value.added_dtime || 'Date not available' %>
                                     </td>
                                     <td>
-                                      <!-- Action Links -->
                                       <a href="/productdetails/<%= value._id %>" class="btn btn-info btn-circle btn-sm"
                                         title="Edit">
                                         <i class="fas fa-pencil-alt"></i>
@@ -165,8 +161,6 @@
 
                                     </td>
                             </tr>
-                            <!-- ... -->
-
                             <% }); %>
                               <% } %>
 

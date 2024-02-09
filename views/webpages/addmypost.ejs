@@ -168,13 +168,29 @@
                       </div>
  
                       <div class="div-6">
-                         <label>Original Packaging</label>
+                        <label>Original Packaging</label>
                         <label class="switch ">
                            <input type="checkbox" name="original_package">
                              <span class="tg-slider round"></span>
                          </label>
                       </div>
-                      
+
+                      <div class="div-6">
+                        <label>Gender</label>
+                        <div class=" inlineflex" >
+                           <% if(genderList){%>
+                              <% genderList.forEach(function(item) { %>
+                                 <span>
+                                    <input type="radio" id="<%= item._id %>" name="gender" value="<%= item._id %>">
+                                    <label for="<%= item._id %>"><%= item.name %></label>
+                                 </span>
+                                 
+                              <% }); %>   
+                           <% } %>
+                        </div>
+                     </div>
+
+    
                       <div class="div-6">
                          <label>Height</label>
                         <input type="type" name="height" class="ds-form-control" placeholder="Height in cm">

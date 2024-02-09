@@ -179,29 +179,13 @@
                                                                     </ul>
                                         </div>
                                     </div>
-
-
-                                    <!-- ... existing code ... -->
-
                                 </div>
                             </div>
                         </div>
-                        <!-- /.container-fluid -->
-
                 </div>
-                <!-- End of Main Content -->
-
-                <!-- Footer -->
                 <%- include('../../partials/footer', {year: year, siteName: siteName}); %>
-                    <!-- End of Footer -->
-
             </div>
-            <!-- End of Content Wrapper -->
-
     </div>
-    <!-- End of Page Wrapper -->
-
-    <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
@@ -243,11 +227,8 @@
                 searchValue: productName,
             },
             success: function (response) {
-                console.log("hi");
-                console.log(response);
             },
             error: function (error) {
-                console.error('Error:', error);
             }
         });
 
@@ -275,10 +256,4 @@
     if (searchValue) {
         $('#productNameInput').val(searchValue);
     }
-
-    // Log the values to the console (you can do further processing here)
-    console.log('Page:', page);
-    console.log('Search Type:', searchType);
-    console.log('Search Value:', searchValue);
-
 </script>

@@ -184,7 +184,6 @@
 
    // Message from server
    socket.on('message', async (message) => {
-      //console.log(message);
       //outputMessage(message, "outgoing-message");
       if(message.username == username) {
          outputMessage(message, "outgoing-message");

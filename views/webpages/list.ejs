@@ -182,7 +182,6 @@
          });
 
      } catch (error) {
-       console.error('Error fetching data:', error);
      }
    }
 
@@ -236,11 +235,9 @@
                  method: 'POST',
                  success: function(data) 
                   {
-                      console.log('Danger Alert');
                   },
                  error: function(err) 
                   {
-                      console.error('Error:', err);
                   } 
         });
    });

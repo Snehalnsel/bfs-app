@@ -30,13 +30,10 @@ function generateToken(user) {
 
 exports.getData = async function (req, res, next) {
     try {
-      
       const pageName = "Admin Users";
       const pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-  
+      let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
       const users = await Users.find();
-    
-  
       res.render("pages/admin-users/list", {
         siteName: req.app.locals.siteName,
         pageName: pageName,
@@ -51,6 +48,7 @@ exports.getData = async function (req, res, next) {
         respdata: {
           list: users,
         },
+        isAdminLoggedIn:isAdminLoggedIn
       });
     } catch (error) {
       next(error); 
@@ -75,6 +73,7 @@ exports.getData = async function (req, res, next) {
       requrl: req.app.locals.requrl,
       message: "",
       respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
     });
   
   };
@@ -97,6 +96,7 @@ exports.getData = async function (req, res, next) {
         message: "Validation error!",
         requrl: req.app.locals.requrl,
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   
@@ -114,6 +114,7 @@ exports.getData = async function (req, res, next) {
           message: "Already email exists!",
           requrl: req.app.locals.requrl,
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       } else {
         var image_url = req.app.locals.requrl + "/public/images/no-image.jpg";
@@ -134,6 +135,7 @@ exports.getData = async function (req, res, next) {
               status: "0",
               message: "Error!",
               respdata: error,
+              isAdminLoggedIn:isAdminLoggedIn
             });
           } else 
           {
@@ -152,6 +154,7 @@ exports.getData = async function (req, res, next) {
                 message: "Added!",
                 requrl: req.app.locals.requrl,
                 respdata: users,
+                isAdminLoggedIn:isAdminLoggedIn
               });
             })
             .catch((error) => {
@@ -167,6 +170,7 @@ exports.getData = async function (req, res, next) {
                 requrl: req.app.locals.requrl,
                 message: "Error!",
                 respdata: error,
+                isAdminLoggedIn:isAdminLoggedIn
               });
             });
           }
@@ -197,6 +201,7 @@ exports.getData = async function (req, res, next) {
         requrl: req.app.locals.requrl,
         message: "",
         respdata: users,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
   };
@@ -209,6 +214,7 @@ exports.getData = async function (req, res, next) {
         status: "0",
         message: "Validation error!",
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   

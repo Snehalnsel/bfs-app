@@ -26,7 +26,7 @@ exports.getData = async function (req, res) {
   if ( req.session.admin) {
     try {
       var pageTitle = req.app.locals.siteName + " - Dashboard";
-
+      let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
       const totalProducts = await Userproduct.countDocuments();
       const totalUsers = await Users.countDocuments();
       const totalSoldProduct = await Userproduct.countDocuments({ flag: 1 });
@@ -44,6 +44,7 @@ exports.getData = async function (req, res) {
           users: totalUsers,
           sold: totalSoldProduct
         },
+        isAdminLoggedIn:isAdminLoggedIn
       });
     } catch (error) {
       res.status(500).send("Internal Server Error");

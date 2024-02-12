@@ -23,6 +23,10 @@ var crypto = require("crypto");
 var randId = crypto.randomBytes(20).toString("hex");
 const multer = require("multer");
 
+const generateAdminTokens = require("../../utils/generateAdminTokens");
+const verifyRefreshToken = require("../../utils/verifyRefreshToken");
+const tokenDecode = require("../../utils/tokenDecode");
+
 //functions
 function generateToken(user) {
   return jwt.sign({ data: user }, tokenSecret, { expiresIn: "24h" });
@@ -101,7 +105,166 @@ exports.signUp = async function (req, res, next) {
   });
 };
 
-exports.getLogin = async function (req, res, next) {
+exports.ajaxAdminLogin = async function (req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    var pageTitle = req.app.locals.siteName + " - Login";
+    res.render("pages", {
+      status: 0,
+      siteName: req.app.locals.siteName,
+      pageTitle: pageTitle,
+      year: moment().format("YYYY"),
+      message: "Validation error!",
+      respdata: errors.array(),
+    });
+  }
+  var pageTitle = req.app.locals.siteName + " - Dashboard";
+  const { email, password, cookieAccessToken, cookieRefreshToken } = req.body;
+  //Token generate
+  let accessTokenGlobal = "";
+  let refreshTokenGlobal = "";
+  Users.findOne({ email: email }).then((user) => {
+    if (!user)
+      res.render("pages", {
+        status: 0,
+        siteName: req.app.locals.siteName,
+        pageTitle: pageTitle,
+        year: moment().format("YYYY"),
+        message: "User not found!",
+        respdata: {},
+      });
+    else {
+      bcrypt.compare(password, user.password, async (error, match) => {
+        if (error) {
+          res.render("pages", {
+            status: 0,
+            siteName: req.app.locals.siteName,
+            pageTitle: pageTitle,
+            year: moment().format("YYYY"),
+            message: "Error!",
+            respdata: error,
+          });
+        } else if (match) {
+  
+          const userToken = {
+            userId: user._id,
+            email: user.email,
+            password: user.password,
+          };
+          //Generate Token Required By Condition
+          if (cookieRefreshToken != "") {
+            //Access token validate
+            let getAccessTokenData = await tokenDecode(cookieAccessToken, process.env.ACCESS_TOKEN_PRIVATE_KEY);
+            if (!getAccessTokenData.error) {
+              if ((typeof req.session.user != "undefined") && (req.session.user.userId.toString() == getAccessTokenData.tokenDetails.userId.toString())) {
+                res.status(200).json({
+                  status: "success",
+                  refreshReset: false,
+                  message: "Already logged In!!"
+                });
+              } else {
+                let getRefreshTokenData = await tokenDecode(cookieRefreshToken, process.env.REFRESH_TOKEN_PRIVATE_KEY);
+                if (!getRefreshTokenData.error) {
+                  if (getRefreshTokenData.tokenDetails.exp > (Date.now() / 1000)) {
+                    //generate access token only
+                    const { accessToken, refreshToken } = await generateAdminTokens(userToken, cookieRefreshToken);
+                    accessTokenGlobal = accessToken;
+                    refreshTokenGlobal = refreshToken;
+                  } else {
+                    //generate refresh token
+                    const { accessToken, refreshToken } = await generateAdminTokens(userToken, "");
+                    accessTokenGlobal = accessToken;
+                    refreshTokenGlobal = refreshToken;
+                  }
+                } else {
+                  //Do something while you will get error in refresh token
+                  res.status(200).json({
+                    status: "error",
+                    refreshReset: false,
+                    message: "Error while generating your token!"
+                  });
+                }
+              }
+            } else {
+              //Do something while you will get error in access token
+              res.status(200).json({
+                status: "error",
+                refreshReset: false,
+                message: "Error while generating your token!"
+              });
+            }
+          } else {
+            //Admin is logging for the first time
+            const { accessToken, refreshToken } = await generateAdminTokens(userToken, "");
+            accessTokenGlobal = accessToken;
+            refreshTokenGlobal = refreshToken;
+          }
+          Users.findOneAndUpdate(
+            { _id: user._id },
+            { $set: { token: accessTokenGlobal, last_login: dateTime } },
+            { upsert: true },
+            function (err, doc) {
+              if (err) {
+                throw err;
+              } else {
+                Users.findOne({ _id: user._id }).then((user) => {
+                  if (user.image != "na") {
+                    var image_url =
+                      req.app.locals.requrl + "/public/images/" + user.image;
+                  } else {
+                    var image_url =
+                      req.app.locals.requrl +
+                      "/public/images/" +
+                      "no-image.jpg";
+                  }
+
+                  delete req.session.user;
+                  req.session.user = {
+                    userId: user._id,
+                    email: user.email,
+                    name: user.name,
+                    userToken: user.token,
+                    image: user.image,
+                    image_url: image_url,
+                  };
+                  //After Successfull Logged in Send Response
+                  res.status(200).json({
+                    status: "success",
+                    message: "Successfully logged in!",
+                    respdata: {
+                      accessToken: accessTokenGlobal,
+                      accessTokenExpires: process.env.COOCKIE_ACCESS_TOKEN_EXPIRES_IN,
+                      refreshToken: refreshTokenGlobal,
+                      refreshTokenExpires: process.env.COOCKIE_REFRESH_TOKEN_EXPIRES_IN,
+                      refreshReset: true,
+                    },
+                  });
+                  //res.redirect("/dashboard");
+                });
+              }
+            }
+          );
+        } else {
+          res.status(400).json({
+            status: "error",
+            message: "Password does not match!",
+            respdata: {},
+          });
+          /*res.render("pages", {
+            status: 0,
+            siteName: req.app.locals.siteName,
+            pageTitle: pageTitle,
+            year: moment().format("YYYY"),
+            message: "Password does not match!",
+            respdata: {},
+          });*/
+        }
+      });
+    }
+  });
+};
+
+/*exports.getLogin = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     var pageTitle = req.app.locals.siteName + " - Login";
@@ -192,7 +355,7 @@ exports.getLogin = async function (req, res, next) {
       });
     }
   });
-};
+};*/
 
 exports.getProfile = async function (req, res, next) {
  
@@ -285,8 +448,8 @@ exports.getLogout = async function (req, res, next) {
   if (!req.session.user) {
     res.redirect("/");
   }
-
-  const user_id = mongoose.Types.ObjectId(req.session.user.userId);
+  let adminUserId = typeof req.session.user != "undefined" ? req.session.user.userId : "";
+  const user_id = mongoose.Types.ObjectId(adminUserId);
 
   Users.findOne({ _id: user_id }).then((user) => {
     if (!user) {

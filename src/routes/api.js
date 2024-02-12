@@ -633,8 +633,6 @@ router.post(
 
 const checkLogin = (req, res, next) => {
     
-    console.log('Check Login>>>>>>>>>>');
-    console.log(req.isAuthenticated());
   // Check if the user is authenticated/logged in
   if (req.isAuthenticated()) {
     // User is authenticated, proceed to the next middleware

@@ -41,34 +41,32 @@
                   <h6 class="m-0 font-weight-bold text-primary"><%-pageName%> Details</h6>
                   <div>
                     <div class="search-container">
-                        <!-- <input type="text" placeholder="Search.." id="searchInput"
+                      <!-- <input type="text" placeholder="Search.." id="searchInput"
                             class="search_by" name="search">
                         <button type="submit"><i class="fa fa-search"></i></button> -->
-                        <form>
-                            <div class="searchlist-rowbox">
-                                <div class="fld-part">
-                                    <select id="categorySelect" class="custom-select sr-field"
-                                        required>
-                                        <option selected>Select Category</option>
-                                        <option value="name">Name</option>
-                                        <option value="category_name">Category Name</option>
-                                        <option value="brand_name">Brand Name</option>
-                                        <option value="user_name">User Name</option>
-                                        <option value="size_name">Size</option>
-                                        <option value="productCondition_name">Condition</option>
-                                        <option value="approval_status">Approval Status</option>
-                                    </select>
+                      <form>
+                        <!-- <div class="searchlist-rowbox">
+                          <div class="fld-part">
+                            <select id="categorySelect" class="custom-select sr-field" required>
+                              <option selected>Select Category</option>
+                              <option value="name">Name</option>
+                              <option value="category_name">Category Name</option>
+                              <option value="brand_name">Brand Name</option>
+                              <option value="user_name">User Name</option>
+                              <option value="size_name">Size</option>
+                              <option value="productCondition_name">Condition</option>
+                              <option value="approval_status">Approval Status</option>
+                            </select>
 
-                                    <input type="text" placeholder="Product Name"
-                                        id="productNameInput" class="sr-field">
-                                </div>
-                                <div class="sb-box"><button type="button" onclick="searchNow()"
-                                        placeholder="Submit" class="sr-button">Search Now</button>
-                                </div>
-                            </div>
-                        </form>
+                            <input type="text" placeholder="Product Name" id="productNameInput" class="sr-field">
+                          </div>
+                          <div class="sb-box"><button type="button" onclick="searchNow()" placeholder="Submit"
+                              class="sr-button">Search Now</button>
+                          </div>
+                        </div> -->
+                      </form>
                     </div>
-                </div>
+                  </div>
                 </div>
                 <div class="card-body">
                   <div class="table-responsive">
@@ -211,7 +209,7 @@
   <%- include('../../partials/logoutModal'); %>
     <%- include('../../partials/footerJs'); %>
 </body>
-<!-- <script>
+<script>
   $(document).ready(function () {
     $('#dataTable').DataTable({
       "paging": true,
@@ -219,50 +217,51 @@
       "searching": true
     });
   });
-</script> -->
+</script>
+
 </html>
-<script>
+<!-- <script>
 
   function searchNow() {
-      var selectedCategory = $('#categorySelect').val();
-      var productName = $('#productNameInput').val();
-      var page = 1;
-      let url = '/productlist?';
-      if(page && !isNaN(page)){
-          url = url+'page='+page;
-      }
-      if(selectedCategory && (selectedCategory !=='')){
-          url = url+'&searchType='+selectedCategory;
-      }
-      if(productName && (productName !=='')){
-          url = url+'&searchValue='+productName;
-      }
-      window.location.href = url;
+    var selectedCategory = $('#categorySelect').val();
+    var productName = $('#productNameInput').val();
+    var page = 1;
+    let url = '/productlist?';
+    if (page && !isNaN(page)) {
+      url = url + 'page=' + page;
+    }
+    if (selectedCategory && (selectedCategory !== '')) {
+      url = url + '&searchType=' + selectedCategory;
+    }
+    if (productName && (productName !== '')) {
+      url = url + '&searchValue=' + productName;
+    }
+    window.location.href = url;
 
-      $.ajax({
-          url: `/productlist`,
-          type: 'GET',
-          data: {
-              page: page,
-              searchType: selectedCategory,
-              searchValue: productName,
-          },
-          success: function (response) {
-          },
-          error: function (error) {
-          }
-      });
+    $.ajax({
+      url: `/productlist`,
+      type: 'GET',
+      data: {
+        page: page,
+        searchType: selectedCategory,
+        searchValue: productName,
+      },
+      success: function (response) {
+      },
+      error: function (error) {
+      }
+    });
 
   }
 
   function getParameterByName(name, url) {
-      if (!url) url = window.location.href;
-      name = name.replace(/[\[\]]/g, "\\$&");
-      var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-          results = regex.exec(url);
-      if (!results) return null;
-      if (!results[2]) return '';
-      return decodeURIComponent(results[2].replace(/\+/g, " "));
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+      results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
   }
 
   // Usage
@@ -271,10 +270,10 @@
   var searchValue = getParameterByName('searchValue');
 
   if (searchType) {
-      $('#categorySelect').val(searchType);
+    $('#categorySelect').val(searchType);
   }
 
   if (searchValue) {
-      $('#productNameInput').val(searchValue);
+    $('#productNameInput').val(searchValue);
   }
-</script>
+</script> -->

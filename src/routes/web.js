@@ -156,7 +156,7 @@ router.get(
   //     .trim()
   //     .escape(),
   // ],
-  UsersController.getLogout
+  UsersController.signOut
 );
 
 // Admin Users

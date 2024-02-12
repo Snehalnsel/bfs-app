@@ -52,6 +52,7 @@ router.use(
 
 router.get("/", cors(), function (req, res) {
   // res.send("Front end!");
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const requrl = url.format({
     protocol: req.protocol,
     host: req.get("host"),
@@ -68,6 +69,7 @@ router.get("/", cors(), function (req, res) {
       siteName: req.app.locals.siteName,
       pageTitle: pageTitle,
       year: moment().format("YYYY"),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   } else {
     res.redirect("/dashboard");

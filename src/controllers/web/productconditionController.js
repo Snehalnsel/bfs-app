@@ -25,7 +25,7 @@ const upload = multer({ dest: 'public/images/' });
 
 //methods
 exports.getData = async function (req, res, next) {
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Product Condition";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
 
@@ -44,15 +44,16 @@ exports.getData = async function (req, res, next) {
       respdata: {
         list: productcondition,
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
   });
 };
 
 exports.addData = async function (req, res, next) {
 
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Product Condition";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-
   res.render("pages/productcondition/create", {
     status: 1,
     siteName: req.app.locals.siteName,
@@ -65,14 +66,15 @@ exports.addData = async function (req, res, next) {
     requrl: req.app.locals.requrl,
     message: "",
     respdata: {},
+    isAdminLoggedIn:isAdminLoggedIn
   });
  
 };
 
 exports.createData = async function (req, res, next) {
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Product Condition";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-
   Productcondition.findOne({ name: req.body.condition_name }).then((productcondition) => {
     if (productcondition) {
       res.render("pages/productcondition/create", {
@@ -87,6 +89,7 @@ exports.createData = async function (req, res, next) {
         message: "Already exists!",
         requrl: req.app.locals.requrl,
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     } else {
     
@@ -109,6 +112,7 @@ exports.createData = async function (req, res, next) {
             message: "Added!",
             requrl: req.app.locals.requrl,
             respdata: productcondition,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         })
         .catch((error) => {
@@ -124,6 +128,7 @@ exports.createData = async function (req, res, next) {
             requrl: req.app.locals.requrl,
             message: "Error!",
             respdata: error,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         });
     }
@@ -131,8 +136,8 @@ exports.createData = async function (req, res, next) {
 };
 
 exports.updateStatusData = async function (req, res, next) {
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const productconditioneId = req.params.id;
-
   Productcondition.findById(productconditioneId)
     .then((productcondition) => {
       if (!productcondition) {
@@ -140,10 +145,9 @@ exports.updateStatusData = async function (req, res, next) {
           status: "0",
           message: "Size not found!",
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
-
-      
       productcondition.status = productcondition.status === 0 ? 1 : 0;
 
       productcondition.save()
@@ -153,6 +157,7 @@ exports.updateStatusData = async function (req, res, next) {
               status: "0",
               message: "Size status not updated!",
               respdata: {},
+              isAdminLoggedIn:isAdminLoggedIn
             });
           }
 
@@ -164,6 +169,7 @@ exports.updateStatusData = async function (req, res, next) {
             status: "0",
             message: "An error occurred while updating the size status.",
             respdata: {},
+            isAdminLoggedIn:isAdminLoggedIn
           });
         });
     })
@@ -172,6 +178,7 @@ exports.updateStatusData = async function (req, res, next) {
         status: "0",
         message: "An error occurred while finding the size.",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
 };
@@ -179,9 +186,9 @@ exports.updateStatusData = async function (req, res, next) {
 
 exports.editData = async function (req, res, next) {
 
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Product Condition";
   var pageTitle = req.app.locals.siteName + " - Edit " + pageName;
-
   const id = mongoose.Types.ObjectId(req.params.id);
   Productcondition.findOne({ _id: id }).then((productcondition) => {
     res.render("pages/productcondition/edit", {
@@ -196,18 +203,21 @@ exports.editData = async function (req, res, next) {
       requrl: req.app.locals.requrl,
       message: "",
       respdata: productcondition,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   });
 };
 
 exports.updateData = async function (req, res, next) {
   try {
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
         status: "0",
         message: "Validation error!",
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
     const productcondition = await Productcondition.findById(req.body.condition_id);
@@ -217,6 +227,7 @@ exports.updateData = async function (req, res, next) {
         status: "0",
         message: "Product Condition not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -236,6 +247,7 @@ exports.updateData = async function (req, res, next) {
         status: "0",
         message: "Product Condition not updated!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
     res.redirect("/productcondition");
@@ -244,18 +256,21 @@ exports.updateData = async function (req, res, next) {
       status: "0",
       message: "An error occurred while updating the brand.",
       respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
 
 exports.deleteData = async function (req, res, next) {
   try {
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
         status: "0",
         message: "Validation error!",
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -265,6 +280,7 @@ exports.deleteData = async function (req, res, next) {
         status: "0",
         message: "Not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -279,7 +295,8 @@ exports.deleteData = async function (req, res, next) {
     return res.status(500).json({
       status: "0",
       message: "Error occurred while deleting the productcondition!",
-      respdata: error.message, 
+      respdata: error.message,
+      isAdminLoggedIn:isAdminLoggedIn 
     });
   }
 };

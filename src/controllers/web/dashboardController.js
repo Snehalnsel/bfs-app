@@ -23,6 +23,8 @@ var ObjectId = require("mongodb").ObjectId;
 
 
 exports.getData = async function (req, res) {
+  console.log(1);
+  return ;
   if ( req.session.admin) {
     try {
       var pageTitle = req.app.locals.siteName + " - Dashboard";

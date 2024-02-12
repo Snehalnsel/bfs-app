@@ -27,7 +27,7 @@ exports.getData = async function (req, res, next) {
   
     var pageName = "App Settings";
     var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-  
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     Appsettings.find().then((details) => {
       res.render("pages/app-settings/list", {
         siteName: req.app.locals.siteName,
@@ -43,6 +43,7 @@ exports.getData = async function (req, res, next) {
         respdata: {
           list: details,
         },
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
   };
@@ -53,8 +54,7 @@ exports.getData = async function (req, res, next) {
   
     var pageName = "App Settings";
     var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-  
-   
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     res.render("pages/app-settings/create", {
       status: 1,
       siteName: req.app.locals.siteName,
@@ -67,6 +67,7 @@ exports.getData = async function (req, res, next) {
       requrl: req.app.locals.requrl,
       message: "",
       respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
     });
  
   };
@@ -75,7 +76,7 @@ exports.getData = async function (req, res, next) {
   exports.createData = async function (req, res, next) {
     var pageName = "App Settings";
     var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-  
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.render("pages/app-settings/create", {
@@ -90,6 +91,7 @@ exports.getData = async function (req, res, next) {
         message: "Validation error!",
         requrl: req.app.locals.requrl,
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   
@@ -107,6 +109,7 @@ exports.getData = async function (req, res, next) {
           message: "Already exists!",
           requrl: req.app.locals.requrl,
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       } else {        
         const newSettings = Appsettings({
@@ -134,6 +137,7 @@ exports.getData = async function (req, res, next) {
               message: "Added!",
               requrl: req.app.locals.requrl,
               respdata: settings,
+              isAdminLoggedIn:isAdminLoggedIn
             });
           })
           .catch((error) => {
@@ -149,6 +153,7 @@ exports.getData = async function (req, res, next) {
               requrl: req.app.locals.requrl,
               message: "Error!",
               respdata: error,
+              isAdminLoggedIn:isAdminLoggedIn
             });
           });
       }
@@ -160,7 +165,7 @@ exports.getData = async function (req, res, next) {
   
     var pageName = "App Settings";
     var pageTitle = req.app.locals.siteName + " - Edit " + pageName;
-  
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const user_id = mongoose.Types.ObjectId(req.params.id);
   
     Appsettings.findOne({ _id: user_id }).then((details) => {
@@ -176,6 +181,7 @@ exports.getData = async function (req, res, next) {
         requrl: req.app.locals.requrl,
         message: "",
         respdata: details,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
   };
@@ -183,11 +189,13 @@ exports.getData = async function (req, res, next) {
 
   exports.updateData = async function (req, res, next) {
     const errors = validationResult(req);
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     if (!errors.isEmpty()) {
       return res.status(400).json({
         status: "0",
         message: "Validation error!",
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   
@@ -197,6 +205,7 @@ exports.getData = async function (req, res, next) {
           status: "0",
           message: "Not found!",
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       } else {
         const requrl = req.app.locals.requrl;
@@ -229,11 +238,13 @@ exports.getData = async function (req, res, next) {
   exports.deleteData = async function (req, res, next) {
     try {
       const errors = validationResult(req);
+      let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
       if (!errors.isEmpty()) {
         return res.status(400).json({
           status: "0",
           message: "Validation error!",
           respdata: errors.array(),
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
   
@@ -243,6 +254,7 @@ exports.getData = async function (req, res, next) {
           status: "0",
           message: "Not found!",
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
   
@@ -259,6 +271,7 @@ exports.getData = async function (req, res, next) {
         status: "0",
         message: "Error occurred while deleting the category!",
         respdata: error.message,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   };

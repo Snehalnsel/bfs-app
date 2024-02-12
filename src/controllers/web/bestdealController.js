@@ -28,7 +28,7 @@ const upload = multer({ dest: 'public/images/' });
 exports.getData = async function (req, res, next) {
     var pageName = "Best Deal";
     var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-  
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     Bestdeal.find().sort({ _id: -1 }).then((bestdeal) => {
       res.render("pages/bestdeal/list", {
         siteName: req.app.locals.siteName,
@@ -44,6 +44,7 @@ exports.getData = async function (req, res, next) {
         respdata: {
           list: bestdeal,
         },
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
     
@@ -53,7 +54,7 @@ exports.getData = async function (req, res, next) {
 
     var pageName = "Best Deal";
     var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-  
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     res.render("pages/bestdeal/create", {
       status: 1,
       siteName: req.app.locals.siteName,
@@ -66,6 +67,7 @@ exports.getData = async function (req, res, next) {
       requrl: req.app.locals.requrl,
       message: "",
       respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
     });
    
   };
@@ -73,7 +75,7 @@ exports.getData = async function (req, res, next) {
   exports.createData = async function (req, res, next) {
     var pageName = "Best Deal";
     var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-  
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     Bestdeal.findOne({ name: req.body.deal_name }).then((bestdeal) => {
       if (bestdeal) {
         res.render("pages/bestdeal/create", {
@@ -88,6 +90,7 @@ exports.getData = async function (req, res, next) {
           message: "Already exists!",
           requrl: req.app.locals.requrl,
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       } else {
       
@@ -111,6 +114,7 @@ exports.getData = async function (req, res, next) {
               message: "Added!",
               requrl: req.app.locals.requrl,
               respdata: bestdeal,
+              isAdminLoggedIn:isAdminLoggedIn
             });
           })
           .catch((error) => {
@@ -126,6 +130,7 @@ exports.getData = async function (req, res, next) {
               requrl: req.app.locals.requrl,
               message: "Error!",
               respdata: error,
+              isAdminLoggedIn:isAdminLoggedIn
             });
           });
       }

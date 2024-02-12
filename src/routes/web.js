@@ -59,7 +59,6 @@ router.get("/", cors(), function (req, res) {
   });
   req.app.locals.requrl = requrl;
 
-  console.log(requrl);
 
   if (!req.session.user) {
     var pageTitle = req.app.locals.siteName + " - Login";
@@ -97,8 +96,24 @@ router.post(
   ],
   UsersController.editProfile
 );
-
+router.post("/admin-relogin",cors(),
+UsersController.adminRelogin
+);
 router.post(
+  "/ajax-userlogin",
+  cors(),
+  [
+    check("email", "Email length should be 10 to 30 characters")
+      .isEmail()
+      .isLength({ min: 10, max: 30 }),
+    check("password", "Password length should be 8 to 10 characters").isLength({
+      min: 8,
+    }),
+  ],
+  UsersController.ajaxAdminLogin
+);
+
+/*router.post(
   "/login",
   cors(),
   [
@@ -110,7 +125,7 @@ router.post(
     }),
   ],
   UsersController.getLogin
-);
+);*/
 
 router.post(
   "/signup",

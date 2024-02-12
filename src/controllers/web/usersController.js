@@ -35,11 +35,14 @@ function generateToken(user) {
 //methods
 exports.getUsers = async function (req, res, next) {
   
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+
   Users.find().then((users) => {
     res.status(200).json({
       status: "1",
       message: "Found!",
       respdata: users,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   });
 };
@@ -53,6 +56,7 @@ exports.signUp = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   // let userCount = await Users.countDocuments();
   // let userCode = `BFS${(userCount + 1).toString().padStart(3, '0')}`;
   bcrypt.hash(req.body.password, rounds, (error, hash) => {
@@ -61,6 +65,7 @@ exports.signUp = async function (req, res, next) {
         status: "0",
         message: "Error!",
         respdata: error,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     } else {
 
@@ -84,6 +89,7 @@ exports.signUp = async function (req, res, next) {
                 status: "1",
                 message: "Added!",
                 respdata: user,
+                isAdminLoggedIn:isAdminLoggedIn
               });
             })
             .catch((error) => {
@@ -91,6 +97,7 @@ exports.signUp = async function (req, res, next) {
                 status: "0",
                 message: "Error!",
                 respdata: error,
+                isAdminLoggedIn:isAdminLoggedIn
               });
             });
         } else {
@@ -98,6 +105,7 @@ exports.signUp = async function (req, res, next) {
             status: "0",
             message: "User already exists!",
             respdata: {},
+            isAdminLoggedIn:isAdminLoggedIn
           });
         }
       });
@@ -120,6 +128,8 @@ exports.ajaxAdminLogin = async function (req, res, next) {
   }
   var pageTitle = req.app.locals.siteName + " - Dashboard";
   const { email, password, cookieAccessToken, cookieRefreshToken } = req.body;
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   //Token generate
   let accessTokenGlobal = "";
   let refreshTokenGlobal = "";
@@ -132,6 +142,7 @@ exports.ajaxAdminLogin = async function (req, res, next) {
         year: moment().format("YYYY"),
         message: "User not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     else {
       bcrypt.compare(password, user.password, async (error, match) => {
@@ -143,6 +154,7 @@ exports.ajaxAdminLogin = async function (req, res, next) {
             year: moment().format("YYYY"),
             message: "Error!",
             respdata: error,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         } else if (match) {
   
@@ -160,7 +172,8 @@ exports.ajaxAdminLogin = async function (req, res, next) {
                 res.status(200).json({
                   status: "success",
                   refreshReset: false,
-                  message: "Already logged In!!"
+                  message: "Already logged In!!",
+                  isAdminLoggedIn:isAdminLoggedIn
                 });
               } else {
                 let getRefreshTokenData = await tokenDecode(cookieRefreshToken, process.env.REFRESH_TOKEN_PRIVATE_KEY);
@@ -181,7 +194,8 @@ exports.ajaxAdminLogin = async function (req, res, next) {
                   res.status(200).json({
                     status: "error",
                     refreshReset: false,
-                    message: "Error while generating your token!"
+                    message: "Error while generating your token!",
+                    isAdminLoggedIn:isAdminLoggedIn
                   });
                 }
               }
@@ -190,7 +204,8 @@ exports.ajaxAdminLogin = async function (req, res, next) {
               res.status(200).json({
                 status: "error",
                 refreshReset: false,
-                message: "Error while generating your token!"
+                message: "Error while generating your token!",
+                isAdminLoggedIn:isAdminLoggedIn
               });
             }
           } else {
@@ -237,6 +252,7 @@ exports.ajaxAdminLogin = async function (req, res, next) {
                       refreshToken: refreshTokenGlobal,
                       refreshTokenExpires: process.env.COOCKIE_REFRESH_TOKEN_EXPIRES_IN,
                       refreshReset: true,
+                      isAdminLoggedIn:isAdminLoggedIn
                     },
                   });
                   //res.redirect("/dashboard");
@@ -249,6 +265,7 @@ exports.ajaxAdminLogin = async function (req, res, next) {
             status: "error",
             message: "Password does not match!",
             respdata: {},
+            isAdminLoggedIn:isAdminLoggedIn
           });
           /*res.render("pages", {
             status: 0,
@@ -362,12 +379,14 @@ exports.adminRelogin = async function (req, res, next) {
   let refreshTokenGlobal = "";
   if (cookieRefreshToken != "") {
     let tokenDetailsData = await tokenDecode(cookieRefreshToken, process.env.REFRESH_TOKEN_PRIVATE_KEY);
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     if (!tokenDetailsData.error) {
       const email = tokenDetailsData.tokenDetails.email;
       if ((typeof  req.session.admin != "undefined") && ( req.session.admin.userId.toString() == tokenDetailsData.tokenDetails.userId.toString())) {
         res.status(200).json({
           status: "error",
-          message: "Already logged In!!"
+          message: "Already logged In!!",
+          isAdminLoggedIn:isAdminLoggedIn
         });
       } else {
         Users.findOne({ email }).then(async (user) => {
@@ -399,6 +418,7 @@ exports.adminRelogin = async function (req, res, next) {
                 res.status(500).json({
                   status: "error",
                   message: "Token update error!",
+                  isAdminLoggedIn:isAdminLoggedIn
                 });
               } else {
                 Users.findOne({ _id: user._id }).then((updatedUser) => {
@@ -409,6 +429,7 @@ exports.adminRelogin = async function (req, res, next) {
                     refreshToken: refreshTokenGlobal,
                     accessTokenExpires: process.env.COOCKIE_ACCESS_TOKEN_EXPIRES_IN,
                     refreshTokenExpires: process.env.COOCKIE_REFRESH_TOKEN_EXPIRES_IN,
+                    isAdminLoggedIn:isAdminLoggedIn
                   });
                 });
               }
@@ -422,6 +443,7 @@ exports.adminRelogin = async function (req, res, next) {
       res.status(200).json({
         status: "error",
         message: "Invalid Token!!",
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   }
@@ -433,7 +455,7 @@ exports.getProfile = async function (req, res, next) {
   if (! req.session.admin) {
     res.redirect("/");
   }
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageTitle = req.app.locals.siteName + " - Profile";
   const user_id = mongoose.Types.ObjectId( req.session.admin.userId);
 
@@ -443,6 +465,7 @@ exports.getProfile = async function (req, res, next) {
         status: "0",
         message: "User does not exist!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     } else {
       
@@ -458,6 +481,7 @@ exports.getProfile = async function (req, res, next) {
         year: moment().format("YYYY"),
         requrl: req.app.locals.requrl,
         respdata: user,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   });
@@ -472,13 +496,14 @@ exports.uploadImage = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   Users.findOne({ _id: req.body.user_id }).then((user) => {
     if (!user)
       res.status(404).json({
         status: "0",
         message: "User not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     else {
       const imgData = req.body.img_base64;
@@ -505,6 +530,7 @@ exports.uploadImage = async function (req, res, next) {
                 status: "1",
                 message: "Successful!",
                 respdata: user,
+                isAdminLoggedIn:isAdminLoggedIn
               });
             });
           }
@@ -516,7 +542,7 @@ exports.uploadImage = async function (req, res, next) {
 
 exports.signOut = async function (req, res, next) {
   //const banner = await Banner.find({ status: 1 });
-  let isLoggedIn = (typeof  req.session.admin != "undefined") ?  req.session.admin.userId : "";
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   if(isLoggedIn != ''){
     Users.findOne({ _id:  req.session.admin.userId }).then((user) => {
       if (!user)
@@ -524,6 +550,7 @@ exports.signOut = async function (req, res, next) {
           status: "0",
           message: "User not found!",
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       else {
         var updData = {
@@ -544,11 +571,13 @@ exports.signOut = async function (req, res, next) {
                     status: "error",
                     message: "Error logging out",
                     respdata: {},
+                    isAdminLoggedIn:isAdminLoggedIn
                   });
                 }
                 res.status(200).json({
                     status: "success",                 
                     message: "Sign out!",
+                    isAdminLoggedIn:isAdminLoggedIn
               });
                 // Session destroyed, redirect or render logout success message
                 // res.render("webpages/list", {
@@ -569,7 +598,7 @@ exports.signOut = async function (req, res, next) {
     res.status(200).json({
       status: "error",
       message: "Unable to logout at this moment.",
-     
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
@@ -632,6 +661,7 @@ exports.editProfile = async function (req, res, next) {
     });
   }
 
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const user_id = mongoose.Types.ObjectId( req.session.admin.userId);
 
   Users.findOne({ _id: user_id }).then((user) => {
@@ -647,6 +677,7 @@ exports.editProfile = async function (req, res, next) {
         status: 0,
         message: "User not found!",
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     } else {
       if (!req.body.newPassword) {
@@ -673,6 +704,7 @@ exports.editProfile = async function (req, res, next) {
                   status: 0,
                   message: "Successfully updated!",
                   respdata: user,
+                  isAdminLoggedIn:isAdminLoggedIn
                 });
               });
             }
@@ -692,6 +724,7 @@ exports.editProfile = async function (req, res, next) {
               status: 0,
               message: "error!",
               respdata: error,
+              isAdminLoggedIn:isAdminLoggedIn
             });
           } else if (!match) {
             bcrypt.hash(req.body.newPassword, rounds, (error, hash) => {
@@ -718,6 +751,7 @@ exports.editProfile = async function (req, res, next) {
                         status: 0,
                         message: "Successfully updated!",
                         respdata: user,
+                        isAdminLoggedIn:isAdminLoggedIn
                       });
                     });
                   }
@@ -735,6 +769,7 @@ exports.editProfile = async function (req, res, next) {
               year: moment().format("YYYY"),
               message: "New password cannot be same as your Old password!!",
               respdata: {},
+              isAdminLoggedIn:isAdminLoggedIn
             });
           }
         });
@@ -746,6 +781,7 @@ exports.editProfile = async function (req, res, next) {
 
 exports.countProducts = async (req, res) => {
   try {
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const totalProducts = await Userproduct.countDocuments();
     
     res.status(200).json({
@@ -754,12 +790,14 @@ exports.countProducts = async (req, res) => {
       respdata: {
         totalProducts: totalProducts,
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
   } catch (error) {
     res.status(500).json({
       status: "0",
       message: "An error occurred while counting products",
       respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
@@ -767,19 +805,21 @@ exports.countProducts = async (req, res) => {
 exports.countUsers = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
-
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     res.status(200).json({
       status: "1",
       message: "Total users count retrieved successfully!",
       respdata: {
         totalUsers: totalUsers,
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
   } catch (error) {
     res.status(500).json({
       status: "0",
       message: "An error occurred while counting users",
       respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };

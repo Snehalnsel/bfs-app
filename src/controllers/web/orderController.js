@@ -193,7 +193,7 @@ async function generateOrder(data) {
 exports.getOrderList = function (req, res, next) {
   var pageName = "Order List";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   Order.aggregate([
     {
       $lookup: {
@@ -316,6 +316,7 @@ exports.getOrderList = function (req, res, next) {
             respdata: {
               list: orderList,
             },
+            isAdminLoggedIn:isAdminLoggedIn
           });
         })
         .catch((err) => {
@@ -326,9 +327,10 @@ exports.getOrderList = function (req, res, next) {
 };
 
 exports.getOrderDetails = function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Order Details";
   var pageTitle = req.app.locals.siteName + " - " + pageName;
-
   const orderId = req.params.id;
 
   if (!mongoose.Types.ObjectId.isValid(orderId)) {
@@ -377,6 +379,7 @@ exports.getOrderDetails = function (req, res, next) {
               hublist: hubdata,
               shiprocketResponse: shiprocketResponse
             },
+            isAdminLoggedIn:isAdminLoggedIn
           });
         })
         .catch((error) => {
@@ -566,12 +569,15 @@ async function generateCouriresServiceability(pickup_postcode, delivery_postcode
 }
 
 exports.updateData = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -581,6 +587,7 @@ exports.updateData = async function (req, res, next) {
         status: "0",
         message: "Not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     } else {
       // var updData = {
@@ -666,11 +673,14 @@ exports.updateData = async function (req, res, next) {
       status: "0",
       message: "An error occurred while updating the product.",
       respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
     });
   });
 };
 
 exports.getShipmentList = function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Shipment List";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
 
@@ -731,6 +741,7 @@ exports.getShipmentList = function (req, res, next) {
         respdata: {
           list: orderList
         },
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   });
@@ -793,12 +804,14 @@ exports.getShipmentList = function (req, res, next) {
 
 exports.deleteData = async function (req, res, next) {
   try {
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
         status: "0",
         message: "Validation error!",
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -808,6 +821,7 @@ exports.deleteData = async function (req, res, next) {
         status: "0",
         message: "Not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -830,6 +844,7 @@ exports.deleteData = async function (req, res, next) {
       status: "0",
       message: "Error occurred while deleting the category!",
       respdata: error.message,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
@@ -881,8 +896,9 @@ exports.deleteData = async function (req, res, next) {
 
 exports.orderplaced = async (req, res) => {
   try {
-    const track_id = req.params.id;
 
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+    const track_id = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(track_id)) {
       return res.status(400).json({ error: 'Invalid order ID' });
     }
@@ -1012,15 +1028,17 @@ exports.orderplaced = async (req, res) => {
 
 
 exports.getAWBnoById = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
-
   try {
     const trackId = req.params.id;
 
@@ -1035,6 +1053,7 @@ exports.getAWBnoById = async function (req, res, next) {
         status: "0",
         message: "Order not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
     if (existingOrder) {
@@ -1094,6 +1113,7 @@ exports.getAWBnoById = async function (req, res, next) {
       status: "0",
       message: "Error!",
       respdata: error,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
@@ -1136,12 +1156,15 @@ const mailData = {
 
 
 exports.getGenerateLabel = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -1154,6 +1177,7 @@ exports.getGenerateLabel = async function (req, res, next) {
         status: "0",
         message: "Order not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -1175,6 +1199,7 @@ exports.getGenerateLabel = async function (req, res, next) {
                   status: "0",
                   message: "Error downloading the file!",
                   respdata: err,
+                  isAdminLoggedIn:isAdminLoggedIn
                 });
               }
               // File downloaded and response sent successfully
@@ -1192,6 +1217,7 @@ exports.getGenerateLabel = async function (req, res, next) {
           status: "0",
           message: "Error downloading the file!",
           respdata: error,
+          isAdminLoggedIn:isAdminLoggedIn
         });
       });
     } else {
@@ -1201,6 +1227,7 @@ exports.getGenerateLabel = async function (req, res, next) {
         status: "0",
         message: "Label URL not found!",
         respdata: shiprocketResponse,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   } catch (error) {
@@ -1215,12 +1242,15 @@ exports.getGenerateLabel = async function (req, res, next) {
 
 
 exports.getGenerateInvoice = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -1233,6 +1263,7 @@ exports.getGenerateInvoice = async function (req, res, next) {
         status: "0",
         message: "Order not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -1244,6 +1275,7 @@ exports.getGenerateInvoice = async function (req, res, next) {
         status: "0",
         message: "Invoice not found!",
         respdata: shiprocketResponse,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -1261,6 +1293,7 @@ exports.getGenerateInvoice = async function (req, res, next) {
                 status: "0",
                 message: "Error downloading the file!",
                 respdata: err,
+                isAdminLoggedIn:isAdminLoggedIn
               });
             }
             fs.unlink(outputFilePath, (unlinkErr) => {
@@ -1277,6 +1310,7 @@ exports.getGenerateInvoice = async function (req, res, next) {
         status: "0",
         message: "Error downloading the file!",
         respdata: error,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
   } catch (error) {
@@ -1284,6 +1318,7 @@ exports.getGenerateInvoice = async function (req, res, next) {
       status: "0",
       message: "Error!",
       respdata: error,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
@@ -1360,6 +1395,8 @@ exports.getGenerateInvoice = async function (req, res, next) {
 
 
 exports.getCourierServiceability = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   var pageName = "Check Courier Serviceability";
   var pageTitle = req.app.locals.siteName + " - List " + pageName;
@@ -1369,6 +1406,7 @@ exports.getCourierServiceability = async function (req, res, next) {
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -1381,6 +1419,7 @@ exports.getCourierServiceability = async function (req, res, next) {
         status: "0",
         message: "Order not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -1435,7 +1474,8 @@ exports.getCourierServiceability = async function (req, res, next) {
           message: "",
           respdata: existingOrder,
           shiprocketResponse: shiprocketResponse,
-          error: null
+          error: null,
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
       else {
@@ -1467,7 +1507,8 @@ exports.getCourierServiceability = async function (req, res, next) {
             requrl: req.app.locals.requrl,
             message: "",
             respdata: existingOrder,
-            error: shiprocketResponse.error
+            error: shiprocketResponse.error,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         }
 
@@ -1485,7 +1526,8 @@ exports.getCourierServiceability = async function (req, res, next) {
           message: "",
           respdata: existingOrder,
           shiprocketResponse: shiprocketResponse,
-          error: null
+          error: null,
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
     }
@@ -1494,12 +1536,15 @@ exports.getCourierServiceability = async function (req, res, next) {
       status: "0",
       message: "Error!",
       respdata: error,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
 
 
 exports.getList = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   var pageName = "Schedule pickup";
   var pageTitle = req.app.locals.siteName + " - Schedule Your Pick Up " + pageName;
@@ -1509,6 +1554,7 @@ exports.getList = async function (req, res, next) {
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -1528,6 +1574,7 @@ exports.getList = async function (req, res, next) {
         year: moment().format("YYYY"),
         requrl: req.app.locals.requrl,
         message: "not found",
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -1552,7 +1599,8 @@ exports.getList = async function (req, res, next) {
         message: "",
         respdata: existingOrder,
         billingaddress: billingaddress,
-        shippingaddress: shippingaddress
+        shippingaddress: shippingaddress,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   } catch (error) {
@@ -1560,17 +1608,21 @@ exports.getList = async function (req, res, next) {
       status: "0",
       message: "Error!",
       respdata: error,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
 
 exports.getShipmentPickup = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -1583,6 +1635,7 @@ exports.getShipmentPickup = async function (req, res, next) {
         status: "0",
         message: "Order not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -1617,7 +1670,8 @@ exports.getShipmentPickup = async function (req, res, next) {
           requrl: req.app.locals.requrl,
           message: "",
           respdata: existingOrder,
-          error: shiprocketResponse.error
+          error: shiprocketResponse.error,
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
 
@@ -1635,7 +1689,8 @@ exports.getShipmentPickup = async function (req, res, next) {
         message: "",
         respdata: existingOrder,
         shiprocketResponse: shiprocketResponse,
-        error: null
+        error: null,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   } catch (error) {
@@ -1643,6 +1698,7 @@ exports.getShipmentPickup = async function (req, res, next) {
       status: "0",
       message: "Error!",
       respdata: error,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
@@ -1650,8 +1706,9 @@ exports.getShipmentPickup = async function (req, res, next) {
 
 exports.huborderplaced = async (req, res) => {
   try {
-    const orderid = req.params.id;
 
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+    const orderid = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(orderid)) {
       return res.status(400).json({ error: 'Invalid order ID' });
     }

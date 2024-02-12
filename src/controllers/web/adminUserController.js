@@ -56,11 +56,9 @@ exports.getData = async function (req, res, next) {
   };
 
   exports.addData = async function (req, res, next) {
-   
-  
     var pageName = "Admin Users";
     var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-  
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     res.render("pages/admin-users/create", {
       status: 1,
       siteName: req.app.locals.siteName,
@@ -75,13 +73,12 @@ exports.getData = async function (req, res, next) {
       respdata: {},
       isAdminLoggedIn:isAdminLoggedIn
     });
-  
   };
 
   exports.createData = async function (req, res, next) {
     var pageName = "Admin Users";
     var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-  
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.render("pages/admin-users/create", {
@@ -185,7 +182,7 @@ exports.getData = async function (req, res, next) {
   
     var pageName = "Admin Users";
     var pageTitle = req.app.locals.siteName + " - Edit " + pageName;
-  
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const user_id = mongoose.Types.ObjectId(req.params.id);
   
     Users.findOne({ _id: user_id }).then((users) => {
@@ -208,6 +205,7 @@ exports.getData = async function (req, res, next) {
 
   exports.updateData = async function (req, res, next) {
 
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -224,6 +222,7 @@ exports.getData = async function (req, res, next) {
           status: "0",
           message: "Not found!",
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       } else {
         
@@ -249,6 +248,7 @@ exports.getData = async function (req, res, next) {
                   status: "1",
                   message: "Successfully updated!",
                   respdata: category,
+                  isAdminLoggedIn:isAdminLoggedIn
                 });
               });
             }
@@ -261,12 +261,14 @@ exports.getData = async function (req, res, next) {
   exports.deleteData = async function (req, res, next) {
     var pageName = "Admin Users";
     var pageTitle = req.app.locals.siteName + " - Edit " + pageName;
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
         status: "0",
         message: "Validation error!",
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   
@@ -277,19 +279,14 @@ exports.getData = async function (req, res, next) {
           status: "0",
           message: "Not found!",
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
-  
       const deleteuser = await Users.deleteOne({ _id: req.params.user_id });
-  
-     
       if(deleteuser)
       {
         res.redirect("/admin-users");
       }
-     
-      
-
       // res.render("pages/admin-users/list", {
       //   status: 200,
       //   pageName: pageName,
@@ -309,6 +306,7 @@ exports.getData = async function (req, res, next) {
         status: "0",
         message: "Internal server error!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   };

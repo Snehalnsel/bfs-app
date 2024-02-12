@@ -63,6 +63,9 @@ const model = mongoose.Schema({
   forget_otp: {
     type: String,
   },
+  ip_address: {
+    type: String,
+  },
   status: {
     type: Number,
     enum: [0, 1 , 2],

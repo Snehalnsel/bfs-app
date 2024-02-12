@@ -120,6 +120,8 @@ exports.signUp = async function (req, res, next) {
       var trial_date = moment(today, "YYYY-MM-DD").add(14, "days");
       trial_date = trial_date.format("YYYY-MM-DD");
 
+      const userIpAddress = req.connection.remoteAddress;
+
       Users.findOne({ email: req.body.email , status: "0" }).then((user) => {
         if (!user) {
           const newUser = Users({
@@ -141,6 +143,7 @@ exports.signUp = async function (req, res, next) {
             app_user_id: userCode,
             trial_end_date: trial_date,
             image: "na",
+            ip_address: userIpAddress, 
           });
 
           newUser

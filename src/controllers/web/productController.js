@@ -31,10 +31,136 @@ var randId = crypto.randomBytes(20).toString("hex");
 const multer = require("multer");
 const upload = multer({ dest: 'public/images/' });
 
-// exports.getData = function (req, res, next) {
+exports.getData = function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+  var pageName = "Product List";
+  var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+  Userproduct.aggregate([
+    {
+      $lookup: {
+        from: 'mt_categories',
+        localField: 'category_id',
+        foreignField: '_id',
+        as: 'category',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_brands',
+        localField: 'brand_id',
+        foreignField: '_id',
+        as: 'brand',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_sizes',
+        localField: 'size_id',
+        foreignField: '_id',
+        as: 'size',
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user_id',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_product_images', 
+        let: { productId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ['$product_id', '$$productId'] },
+            },
+          },
+          {
+            $limit: 1, 
+          },
+        ],
+        as: 'productImages',
+      },
+    },    
+    {
+      $lookup: {
+        from: 'mt_productconditions',
+        localField: 'status',
+        foreignField: '_id',
+        as: 'productCondition',
+      },
+    },
+    {
+      $unwind: '$category',
+    },
+    {
+      $lookup: {
+        from: 'mt_categories',
+        localField: 'category.parent_id',
+        foreignField: '_id',
+        as: 'category.parent'
+      }
+    }
+  ]).exec(function (error, productList) {
+    if (error) {
+      return res.status(500).json({ error: 'An error occurred' });
+    }
+    res.render("pages/product/list", {
+      siteName: req.app.locals.siteName,
+      pageName: pageName,
+      pageTitle: pageTitle,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
+      year: moment().format("YYYY"),
+      requrl: req.app.locals.requrl,
+      status: 0,
+      message: "found!",
+      respdata: {
+        list: productList
+      },
+      isAdminLoggedIn:isAdminLoggedIn
+    });
+  });
+
+};
+// exports.getData = function (page, searchType, searchValue,req, res, next) {
 //   var pageName = "Product List";
 //   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
 
+//   let query = {};
+
+//   if (searchValue) {
+//     if (searchType === 'name') {
+//       query.name = { $regex: `${searchValue}`, $options: 'i' };
+//     } else if (searchType === 'description') {
+//       query.description = { $regex: `${searchValue}`, $options: 'i' };
+//     } else if (searchType === 'category_name') {
+//       query['category.name'] = { $regex: `${searchValue}`, $options: 'i' };
+//     } else if (searchType === 'brand_name') {
+//       query['brand.name'] = { $regex: `${searchValue}`, $options: 'i' };
+//     } else if (searchType === 'user_name') {
+//       query['user.name'] = { $regex: `${searchValue}`, $options: 'i' };
+//     } else if (searchType === 'size_name') {
+//       query['size.name'] = { $regex: `${searchValue}`, $options: 'i' };
+//     }else if (searchType === 'productCondition_name') {
+//       query['productCondition.name'] = { $regex: `${searchValue}`, $options: 'i' };
+//     }
+//     else if (searchType === 'approval_status') {
+//        if(searchValue == 'Pending'){
+//         searchValue = 0;
+//        }else if(searchValue == 'Approved'){
+//         searchValue = 1;
+//        }else if(searchValue == 'Rejected'){
+//         searchValue = 2;
+//        }
+//       query.approval_status = { $regex: `${searchValue}`, $options: 'i' };
+//     }
+//   }
 
 //   Userproduct.aggregate([
 //     {
@@ -71,7 +197,7 @@ const upload = multer({ dest: 'public/images/' });
 //     },
 //     {
 //       $lookup: {
-//         from: 'mt_product_images', 
+//         from: 'mt_product_images',
 //         let: { productId: '$_id' },
 //         pipeline: [
 //           {
@@ -80,12 +206,12 @@ const upload = multer({ dest: 'public/images/' });
 //             },
 //           },
 //           {
-//             $limit: 1, 
+//             $limit: 1,
 //           },
 //         ],
 //         as: 'productImages',
 //       },
-//     },    
+//     },
 //     {
 //       $lookup: {
 //         from: 'mt_productconditions',
@@ -95,20 +221,46 @@ const upload = multer({ dest: 'public/images/' });
 //       },
 //     },
 //     {
-//       $unwind: '$category',
+//       $unwind: {
+//         path: '$category',
+//         preserveNullAndEmptyArrays: true,
+//       },
 //     },
 //     {
 //       $lookup: {
 //         from: 'mt_categories',
 //         localField: 'category.parent_id',
 //         foreignField: '_id',
-//         as: 'category.parent'
-//       }
-//     }
+//         as: 'category.parent',
+//       },
+//     },
+//     {
+//       $project: {
+//         product: {
+//           $cond: {
+//             if: { $ne: ['$category', null] },
+//             then: '$$ROOT',
+//             else: '$$REMOVE',
+//           },
+//         },
+//       },
+//     },
+//     {
+//       $replaceRoot: { newRoot: '$product' },
+//     },
+//     {
+//       $unwind: {
+//         path: '$user',
+//         preserveNullAndEmptyArrays: true,
+//       },
+//     },
+//     { $match: query },
+//     { $limit: 20 }
 //   ]).exec(function (error, productList) {
 //     if (error) {
 //       return res.status(500).json({ error: 'An error occurred' });
 //     }
+
 //     res.render("pages/product/list", {
 //       siteName: req.app.locals.siteName,
 //       pageName: pageName,
@@ -125,159 +277,10 @@ const upload = multer({ dest: 'public/images/' });
 //       },
 //     });
 //   });
-
 // };
-exports.getData = function (page, searchType, searchValue,req, res, next) {
-  var pageName = "Product List";
-  var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-
-  let query = {};
-
-  if (searchValue) {
-    if (searchType === 'name') {
-      query.name = { $regex: `${searchValue}`, $options: 'i' };
-    } else if (searchType === 'description') {
-      query.description = { $regex: `${searchValue}`, $options: 'i' };
-    } else if (searchType === 'category_name') {
-      query['category.name'] = { $regex: `${searchValue}`, $options: 'i' };
-    } else if (searchType === 'brand_name') {
-      query['brand.name'] = { $regex: `${searchValue}`, $options: 'i' };
-    } else if (searchType === 'user_name') {
-      query['user.name'] = { $regex: `${searchValue}`, $options: 'i' };
-    } else if (searchType === 'size_name') {
-      query['size.name'] = { $regex: `${searchValue}`, $options: 'i' };
-    }else if (searchType === 'productCondition_name') {
-      query['productCondition.name'] = { $regex: `${searchValue}`, $options: 'i' };
-    }
-    else if (searchType === 'approval_status') {
-       if(searchValue == 'Pending'){
-        searchValue = 0;
-       }else if(searchValue == 'Approved'){
-        searchValue = 1;
-       }else if(searchValue == 'Rejected'){
-        searchValue = 2;
-       }
-      query.approval_status = { $regex: `${searchValue}`, $options: 'i' };
-    }
-  }
-
-  Userproduct.aggregate([
-    {
-      $lookup: {
-        from: 'mt_categories',
-        localField: 'category_id',
-        foreignField: '_id',
-        as: 'category',
-      },
-    },
-    {
-      $lookup: {
-        from: 'mt_brands',
-        localField: 'brand_id',
-        foreignField: '_id',
-        as: 'brand',
-      },
-    },
-    {
-      $lookup: {
-        from: 'mt_sizes',
-        localField: 'size_id',
-        foreignField: '_id',
-        as: 'size',
-      },
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'user_id',
-        foreignField: '_id',
-        as: 'user',
-      },
-    },
-    {
-      $lookup: {
-        from: 'mt_product_images',
-        let: { productId: '$_id' },
-        pipeline: [
-          {
-            $match: {
-              $expr: { $eq: ['$product_id', '$$productId'] },
-            },
-          },
-          {
-            $limit: 1,
-          },
-        ],
-        as: 'productImages',
-      },
-    },
-    {
-      $lookup: {
-        from: 'mt_productconditions',
-        localField: 'status',
-        foreignField: '_id',
-        as: 'productCondition',
-      },
-    },
-    {
-      $unwind: {
-        path: '$category',
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    {
-      $lookup: {
-        from: 'mt_categories',
-        localField: 'category.parent_id',
-        foreignField: '_id',
-        as: 'category.parent',
-      },
-    },
-    {
-      $project: {
-        product: {
-          $cond: {
-            if: { $ne: ['$category', null] },
-            then: '$$ROOT',
-            else: '$$REMOVE',
-          },
-        },
-      },
-    },
-    {
-      $replaceRoot: { newRoot: '$product' },
-    },
-    {
-      $unwind: {
-        path: '$user',
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    { $match: query },
-    { $limit: 20 }
-  ]).exec(function (error, productList) {
-    if (error) {
-      return res.status(500).json({ error: 'An error occurred' });
-    }
-
-    res.render("pages/product/list", {
-      siteName: req.app.locals.siteName,
-      pageName: pageName,
-      pageTitle: pageTitle,
-      userFullName:  req.session.admin.name,
-      userImage:  req.session.admin.image_url,
-      userEmail:  req.session.admin.email,
-      year: moment().format("YYYY"),
-      requrl: req.app.locals.requrl,
-      status: 0,
-      message: "found!",
-      respdata: {
-        list: productList
-      },
-    });
-  });
-};
 exports.detailsData = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Product Details";
   var pageTitle = req.app.locals.siteName + " - " + pageName;
   const productId = req.params.id;
@@ -328,19 +331,22 @@ exports.detailsData = async function (req, res, next) {
       genderList: genderList,
       productImages: productImages,
       parentCategory: productdetails.hasOwnProperty("category_id") ? parentCategory : null,
-
+      isAdminLoggedIn:isAdminLoggedIn
     });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred' });
   }
 };
 exports.updatedetailsData = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
   Userproduct.findById(req.body.product_id).then(async (product) => {
@@ -349,6 +355,7 @@ exports.updatedetailsData = async function (req, res, next) {
         status: "0",
         message: "Not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     } else {
       var updData = {
@@ -473,10 +480,13 @@ exports.updatedetailsData = async function (req, res, next) {
       status: "0",
       message: "An error occurred while updating the product.",
       respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
     });
   });
 };
 exports.updateStatusData = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const Id = req.params.id;
   Userproduct.findById(Id)
     .then((product) => {
@@ -485,6 +495,7 @@ exports.updateStatusData = async function (req, res, next) {
           status: "0",
           message: "Brand not found!",
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
       product.flag = product.flag === 0 ? 1 : 0;
@@ -496,6 +507,7 @@ exports.updateStatusData = async function (req, res, next) {
               status: "0",
               message: "Product status not updated!",
               respdata: {},
+              isAdminLoggedIn:isAdminLoggedIn
             });
           }
           res.redirect("/productlist");
@@ -505,6 +517,7 @@ exports.updateStatusData = async function (req, res, next) {
             status: "0",
             message: "An error occurred while updating the product status.",
             respdata: {},
+            isAdminLoggedIn:isAdminLoggedIn
           });
         });
     })
@@ -513,6 +526,7 @@ exports.updateStatusData = async function (req, res, next) {
         status: "0",
         message: "An error occurred while finding the brand.",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
 };
@@ -520,12 +534,15 @@ exports.updateStatusData = async function (req, res, next) {
 
 exports.deleteData = async function (req, res, next) {
   try {
+
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
         status: "0",
         message: "Validation error!",
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -535,6 +552,7 @@ exports.deleteData = async function (req, res, next) {
         status: "0",
         message: "Not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -551,6 +569,7 @@ exports.deleteData = async function (req, res, next) {
       status: "0",
       message: "Error occurred while deleting the product!",
       respdata: error.message,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };

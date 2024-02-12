@@ -29,9 +29,9 @@ const upload = multer({ dest: 'public/images/' });
 
 exports.addData = async function (req, res, next) {
 
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     var pageName = "Shipping Charges";
     var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-  
     res.render("pages/shippingcharges/create", {
       status: 1,
       siteName: req.app.locals.siteName,
@@ -44,14 +44,16 @@ exports.addData = async function (req, res, next) {
       requrl: req.app.locals.requrl,
       message: "",
       respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
     });
    
   };
 
   exports.createData = async function (req, res, next) {
+
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     var pageName = "Shipping Details";
     var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-  
     Shippingchrgs.findOne({ name: req.body.shipping_name }).then((shippingchrgs) => {
       if (shippingchrgs) {
         res.render("pages/shippingcharges/create", {
@@ -66,6 +68,7 @@ exports.addData = async function (req, res, next) {
           message: "Already exists!",
           requrl: req.app.locals.requrl,
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       } else {
       
@@ -88,6 +91,7 @@ exports.addData = async function (req, res, next) {
               message: "Added!",
               requrl: req.app.locals.requrl,
               respdata: shippingchrgs,
+              isAdminLoggedIn:isAdminLoggedIn
             });
           })
           .catch((error) => {
@@ -103,6 +107,7 @@ exports.addData = async function (req, res, next) {
               requrl: req.app.locals.requrl,
               message: "Error!",
               respdata: error,
+              isAdminLoggedIn:isAdminLoggedIn
             });
           });
       }
@@ -111,6 +116,7 @@ exports.addData = async function (req, res, next) {
 
   exports.getData = async function (req, res, next) {
 
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     var pageName = "Shipping Charges";
     var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
   
@@ -129,6 +135,7 @@ exports.addData = async function (req, res, next) {
         respdata: {
           list: shippingchrgs,
         },
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
   };

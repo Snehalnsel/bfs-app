@@ -542,7 +542,7 @@ exports.uploadImage = async function (req, res, next) {
 exports.signOut = async function (req, res, next) {
   //const banner = await Banner.find({ status: 1 });
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-  if(isLoggedIn != ''){
+  if(isAdminLoggedIn != ''){
     Users.findOne({ _id:  req.session.admin.userId }).then((user) => {
       if (!user)
         res.status(404).json({

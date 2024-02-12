@@ -145,8 +145,8 @@ router.post(
   UsersController.signUp
 );
 
-router.get(
-  "/logout",
+router.post(
+  "/sign-out",
   cors(),
   // auth.isAuthorized,
   // [

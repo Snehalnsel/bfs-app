@@ -25,9 +25,9 @@ const upload = multer({ dest: 'public/images/' });
 
 //methods
 exports.getData = async function (req, res, next) {
-
   var pageName = "Size";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
 
   Size.find().sort({ _id: -1 }).then((size) => {
     res.render("pages/size/list", {
@@ -44,6 +44,7 @@ exports.getData = async function (req, res, next) {
       respdata: {
         list: size,
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
   });
 };
@@ -52,7 +53,7 @@ exports.addData = async function (req, res, next) {
 
   var pageName = "Size List";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   res.render("pages/size/create", {
     status: 1,
     siteName: req.app.locals.siteName,
@@ -65,6 +66,7 @@ exports.addData = async function (req, res, next) {
     requrl: req.app.locals.requrl,
     message: "",
     respdata: {},
+    isAdminLoggedIn:isAdminLoggedIn
   });
  
 };
@@ -72,7 +74,7 @@ exports.addData = async function (req, res, next) {
 exports.createData = async function (req, res, next) {
   var pageName = "Size";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   Size.findOne({ name: req.body.size_name }).then((size) => {
     if (size) {
       res.render("pages/size/create", {
@@ -87,6 +89,7 @@ exports.createData = async function (req, res, next) {
         message: "Already exists!",
         requrl: req.app.locals.requrl,
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     } else {
     
@@ -109,6 +112,7 @@ exports.createData = async function (req, res, next) {
             message: "Added!",
             requrl: req.app.locals.requrl,
             respdata: size,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         })
         .catch((error) => {
@@ -124,6 +128,7 @@ exports.createData = async function (req, res, next) {
             requrl: req.app.locals.requrl,
             message: "Error!",
             respdata: error,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         });
     }
@@ -132,7 +137,7 @@ exports.createData = async function (req, res, next) {
 
 exports.updateStatusData = async function (req, res, next) {
   const sizeId = req.params.id;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   Size.findById(sizeId)
     .then((size) => {
       if (!size) {
@@ -140,6 +145,7 @@ exports.updateStatusData = async function (req, res, next) {
           status: "0",
           message: "Size not found!",
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
 
@@ -154,6 +160,7 @@ exports.updateStatusData = async function (req, res, next) {
               status: "0",
               message: "Size status not updated!",
               respdata: {},
+              isAdminLoggedIn:isAdminLoggedIn
             });
           }
 
@@ -165,6 +172,7 @@ exports.updateStatusData = async function (req, res, next) {
             status: "0",
             message: "An error occurred while updating the size status.",
             respdata: {},
+            isAdminLoggedIn:isAdminLoggedIn
           });
         });
     })
@@ -173,6 +181,7 @@ exports.updateStatusData = async function (req, res, next) {
         status: "0",
         message: "An error occurred while finding the size.",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
 };
@@ -181,12 +190,14 @@ exports.updateStatusData = async function (req, res, next) {
 
 exports.deleteData = async function (req, res, next) {
   try {
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
         status: "0",
         message: "Validation error!",
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -196,6 +207,7 @@ exports.deleteData = async function (req, res, next) {
         status: "0",
         message: "Not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -212,6 +224,7 @@ exports.deleteData = async function (req, res, next) {
       status: "0",
       message: "Error occurred while deleting the category!",
       respdata: error.message, // Include the error message for debugging purposes
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };

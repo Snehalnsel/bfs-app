@@ -2,20 +2,32 @@ let productId = "";
 let isLoggedIn2 = $("#userReloggedIn").val();
 
 $(document).on("click",".bidNowAmountBtn",function() {
+    $(".valid-amount").html("");
     let bidAmount = $("#bid_amount").val();
     if(productId !== "" && bidAmount != "") {
         $.ajax({
-        url: '/api/bid-check-exist-reccord', // Request to bid for first time or update the bid amount
-        data: {productId:productId,bidAmount:bidAmount},
-        method: 'POST',
-        success: function(data) {
-            window.location.href = "/api/bid-for-product/"+data.bidId;
-            //console.log('Danger Alert');
-        },
-        error: function(err) {
-                console.error('Error:', err);
-        } 
-    });
+            url: '/api/bid-check-exist-reccord', // Request to bid for first time or update the bid amount
+            data: {productId:productId,bidAmount:bidAmount},
+            method: 'POST',
+            success: function(data) {
+                if(typeof data.message != "undefined") {
+                    $(".valid-amount").html(data.message);
+                }
+                if(data.status == "success") {
+                    window.location.href = "/api/bid-for-product/"+data.bidId;
+                } else {
+                    setTimeout(function(){ 
+                        $(".valid-amount").html("");
+                    }, 3000);
+                }
+                //console.log('Danger Alert');
+            },
+            error: function(err) {
+                setTimeout(function(){ 
+                    $(".valid-amount").html("");
+                }, 5000);
+            } 
+        });
     }
 });
 
@@ -237,38 +249,38 @@ range = document.querySelector(".slider .progress");
 let priceGap = 1000;
 
 priceInput.forEach((input) => {
-input.addEventListener("input", (e) => {
-  let minPrice = parseInt(priceInput[0].value),
-    maxPrice = parseInt(priceInput[1].value);
+    input.addEventListener("input", (e) => {
+    let minPrice = parseInt(priceInput[0].value),
+        maxPrice = parseInt(priceInput[1].value);
 
-  if (maxPrice - minPrice >= priceGap && maxPrice <= rangeInput[1].max) {
-    if (e.target.className === "input-min") {
-      rangeInput[0].value = minPrice;
-      range.style.left = (minPrice / rangeInput[0].max) * 100 + "%";
-    } else {
-      rangeInput[1].value = maxPrice;
-      range.style.right = 100 - (maxPrice / rangeInput[1].max) * 100 + "%";
+    if (maxPrice - minPrice >= priceGap && maxPrice <= rangeInput[1].max) {
+        if (e.target.className === "input-min") {
+        rangeInput[0].value = minPrice;
+        range.style.left = (minPrice / rangeInput[0].max) * 100 + "%";
+        } else {
+        rangeInput[1].value = maxPrice;
+        range.style.right = 100 - (maxPrice / rangeInput[1].max) * 100 + "%";
+        }
     }
-  }
-});
+    });
 });
 
 rangeInput.forEach((input) => {
-input.addEventListener("input", (e) => {
-  let minVal = parseInt(rangeInput[0].value),
-    maxVal = parseInt(rangeInput[1].value);
+    input.addEventListener("input", (e) => {
+    let minVal = parseInt(rangeInput[0].value),
+        maxVal = parseInt(rangeInput[1].value);
 
-  if (maxVal - minVal < priceGap) {
-    if (e.target.className === "range-min") {
-      rangeInput[0].value = maxVal - priceGap;
+    if (maxVal - minVal < priceGap) {
+        if (e.target.className === "range-min") {
+        rangeInput[0].value = maxVal - priceGap;
+        } else {
+        rangeInput[1].value = minVal + priceGap;
+        }
     } else {
-      rangeInput[1].value = minVal + priceGap;
+        priceInput[0].value = minVal;
+        priceInput[1].value = maxVal;
+        range.style.left = (minVal / rangeInput[0].max) * 100 + "%";
+        range.style.right = 100 - (maxVal / rangeInput[1].max) * 100 + "%";
     }
-  } else {
-    priceInput[0].value = minVal;
-    priceInput[1].value = maxVal;
-    range.style.left = (minVal / rangeInput[0].max) * 100 + "%";
-    range.style.right = 100 - (maxVal / rangeInput[1].max) * 100 + "%";
-  }
-});
+    });
 });

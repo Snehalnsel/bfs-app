@@ -868,8 +868,15 @@ exports.userFilter = async function (req, res, next) {
     }
 }
 // let totalProduct = await Userproduct.find(concatVar).sort({ offer_price: optionId });
-let totalProduct = await Userproduct.countDocuments(concatVar);
-let allProductData = await Userproduct.find(concatVar)
+console.log(concatVar);
+const query = { 
+  ...concatVar,
+  approval_status: 1,
+  flag: 0
+};
+console.log(query);
+let totalProduct = await Userproduct.countDocuments(query);
+let allProductData = await Userproduct.find(query)
 .sort({ offer_price: optionId })
 .skip(skip)
 .limit(pageSize);
@@ -1245,7 +1252,7 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
     const skip = (page - 1) * pageSize;
 
     let userproducts = [];
-
+    let count = [];
     if (id === "whatshot") {
       userproducts = await Userproduct.find({
         approval_status: 1,
@@ -1258,6 +1265,11 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
       .sort([sortCriteria, { hitCount: -1 }])
       .exec();
 
+      count = await Userproduct.countDocuments({
+        approval_status: 1,
+        flag: 0
+      });
+
     } else if (id === "justsold") {
       userproducts = await Userproduct.find({
         approval_status: 1,
@@ -1269,6 +1281,11 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
       .populate('size_id', 'name')
       .sort(sortCriteria)
       .exec();
+
+      count = await Userproduct.countDocuments({
+        approval_status: 1,
+        flag: 1
+      });
 
     } else if (id === "bestDeal") {
       const appSettings = await Appsettings.findOne();
@@ -1286,6 +1303,12 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
       .sort(sortCriteria)
       .exec();
 
+      count = await Userproduct.countDocuments({
+        percentage: { $gte: percentageFilter },
+        approval_status: 1,
+        flag: 0
+      });
+
     } else {
       categoryId = id;
 
@@ -1300,6 +1323,12 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
       .populate('size_id', 'name')
       .sort(sortCriteria)
       .exec();
+
+      count = await Userproduct.countDocuments({ 
+        category_id: categoryId,
+        approval_status: 1,
+        flag: 0 
+      });
     }
     const formattedUserProducts = [];
     for (const userproduct of userproducts) {
@@ -1336,6 +1365,7 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
       productCount: productCount,
       totalPages: totalPages,
       currentPage: currentPage,
+      count: count,
       message: 'Success',
       respdata: paginatedData,
     };
@@ -1356,7 +1386,8 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
     const pageSize = 8;  
     const sortid = req.params.sortid || 0;
     const data = await getProductDataWithSort(id,sortid,pageno, pageSize);
-    const productCount = data.productCount; 
+    const productCount = data.count; 
+    console.log(productCount);
     const formattedUserProducts = data.respdata; 
     const filterproductCount = formattedUserProducts.length;
     const totalPages = data.totalPages;

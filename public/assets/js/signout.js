@@ -10,9 +10,7 @@ $(document).ready(async function(){
                     await setCookeiFunc(accessTokenVar,'',0);
                     await setCookeiFunc(refreshTokenVar,'',0);
                     location.href = webSiteUrl + "/api/home";
-                } else {
-
-                    
+                } else {                    
                 }
             },
             error: function(response){

@@ -94,7 +94,10 @@ async function searchByFilter(priceList = '',pageId = '') {
 $(document).on('change', ".sortBy", function (e) {
 
     if ($('.filterByChecked').is(':checked') || ($('.input-max').val() && $('.input-min').val())) {
-        searchByFilter();
+        const max = $('.input-max').val();
+        const min = $('.input-min').val();
+        let priceList = min + '-' + max;
+        searchByFilter(priceList);
     } else {
         let categoryId = $("#product_category_id").val();
         if (categoryId === "whatshot") {

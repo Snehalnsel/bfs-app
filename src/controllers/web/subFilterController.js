@@ -27,6 +27,8 @@ const upload = multer({ dest: 'public/images/' });
 
 //methods
 exports.getData = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Product";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
 
@@ -45,12 +47,15 @@ exports.getData = async function (req, res, next) {
       respdata: {
         list: subcat,
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
     
   });
 };
 
 exports.addData = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Product";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
 
@@ -69,12 +74,15 @@ exports.addData = async function (req, res, next) {
       respdata: {
         category: category,
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
   });
 };
 
 
 exports.createData = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Product";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
 
@@ -95,6 +103,7 @@ exports.createData = async function (req, res, next) {
       message: "Validation error!",
       requrl: req.app.locals.requrl,
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -114,6 +123,7 @@ exports.createData = async function (req, res, next) {
         message: "Already exists!",
         requrl: req.app.locals.requrl,
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     } else {
      
@@ -144,6 +154,7 @@ exports.createData = async function (req, res, next) {
             message: "Added!",
             requrl: req.app.locals.requrl,
             respdata: subCategory,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         })
         .catch((error) => {
@@ -159,6 +170,7 @@ exports.createData = async function (req, res, next) {
             requrl: req.app.locals.requrl,
             message: "Error!",
             respdata: error,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         });
     }

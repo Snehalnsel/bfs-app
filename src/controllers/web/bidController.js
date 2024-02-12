@@ -28,7 +28,7 @@ const Users = require("../../models/api/userModel");
 exports.getData = function (req, res, next) {
   var pageName = "Bid Management List";
   var pageTitle = req.app.locals.siteName + " - " + pageName;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   BidManagement.aggregate([
     {
       $lookup: {
@@ -110,6 +110,7 @@ exports.getData = function (req, res, next) {
         respdata: {
           list: bidList,
         },
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   });
@@ -118,7 +119,7 @@ exports.getData = function (req, res, next) {
 exports.detailsData = function (req, res, next) {
   var pageName = "Bid Details";
   var pageTitle = req.app.locals.siteName + " - " + pageName;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const bidId = req.params.id;
 
   if (!mongoose.Types.ObjectId.isValid(bidId)) {
@@ -155,6 +156,7 @@ exports.detailsData = function (req, res, next) {
                   productDetails: productDetails,
                   productImage: productImage, 
                 },
+                isAdminLoggedIn:isAdminLoggedIn
               });
             })
             .catch((error) => {
@@ -172,11 +174,13 @@ exports.detailsData = function (req, res, next) {
 
 exports.updatedetailsData = async function (req, res, next) {
   const errors = validationResult(req);
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -188,6 +192,7 @@ exports.updatedetailsData = async function (req, res, next) {
         status: "0",
         message: "Bid not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -210,6 +215,7 @@ exports.updatedetailsData = async function (req, res, next) {
         status: "0",
         message: "Failed to update bid!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -220,6 +226,7 @@ exports.updatedetailsData = async function (req, res, next) {
       status: "0",
       message: "An error occurred while updating bid!",
       respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
@@ -227,11 +234,13 @@ exports.updatedetailsData = async function (req, res, next) {
 exports.deleteData = async function (req, res, next) {
   try {
     const errors = validationResult(req);
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     if (!errors.isEmpty()) {
       return res.status(400).json({
         status: "0",
         message: "Validation error!",
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -241,6 +250,7 @@ exports.deleteData = async function (req, res, next) {
         status: "0",
         message: "Not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -256,7 +266,8 @@ exports.deleteData = async function (req, res, next) {
     return res.status(500).json({
       status: "0",
       message: "Error occurred while deleting the category!",
-      respdata: error.message, 
+      respdata: error.message,
+      isAdminLoggedIn:isAdminLoggedIn 
     });
   }
 };

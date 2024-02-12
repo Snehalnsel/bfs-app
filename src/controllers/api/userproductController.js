@@ -54,7 +54,6 @@ exports.getSizeList = async function (req, res, next) {
 
     res.status(200).json({ status: "1", size_list: sizeInfo });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Internal server error",
@@ -78,7 +77,6 @@ exports.getSizeData = async function (req, res, next) {
 
     res.status(200).json({ status: "1", productSize: productsize });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Internal server error",
@@ -101,7 +99,6 @@ exports.getBrandData = async function (req, res, next) {
 
     res.status(200).json({ status: "1", productBrand: productbrand });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Internal server error",
@@ -148,9 +145,6 @@ exports.getBrandData = async function (req, res, next) {
 //     });
 
 //     const savedProductdata = await newProduct.save();
-
-//     console.log(savedProductdata);
-
 //     const requrl = url.format({
 //       protocol: req.protocol,
 //       host: req.get("host"),
@@ -184,7 +178,6 @@ exports.getBrandData = async function (req, res, next) {
 //     } 
  
 //    } catch (error) {
-//     console.error(error);
 //     res.status(500).json({
 //       status: "0",
 //       message: "Error!",
@@ -209,7 +202,6 @@ exports.getProductconditionList = async function (req, res, next) {
 
     res.status(200).json({ status: "1", productConditions: productConditions });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Internal server error",
@@ -231,8 +223,6 @@ exports.addData = async function (req, res, next) {
   }
 
   try {
-
-    console.log(req.body);
     // const existingProduct = await Userproduct.findOne({ name: req.body.name });
 
     // if (existingProduct) {
@@ -297,15 +287,10 @@ exports.addData = async function (req, res, next) {
     });
 
     const savedProductdata = await newProduct.save();
-
-    console.log(savedProductdata);
-
     const requrl = url.format({
       protocol: req.protocol,
       host: req.get("host"),
     });
-
-    console.log(req.files);
     const imageUrls = [];
     if (req.files && req.files.length > 0) {
       const imageDetails = [];
@@ -335,7 +320,6 @@ exports.addData = async function (req, res, next) {
     }
 
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -378,10 +362,6 @@ exports.getProductData = async function (req, res, next) {
     .skip((page - 1) * limit)
     .limit(limit)
     .exec();
-
-    // console.log(userproducts);
-
-   
     if (!userproducts || userproducts.length === 0) {
       return res.status(404).json({
         status: "0",
@@ -394,9 +374,6 @@ exports.getProductData = async function (req, res, next) {
  
     for (const userproduct of userproducts) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
-
-      console.log(productImages);
-
       const formattedUserProduct = {
         _id: userproduct._id,
         name: userproduct.name,
@@ -425,14 +402,9 @@ exports.getProductData = async function (req, res, next) {
         __v: userproduct.__v,
         product_images: productImages, 
       };
-      
-    
       formattedUserProducts.push(formattedUserProduct);
     }
-
-    console.log(formattedUserProducts);
     const totalPages = Math.ceil(count / limit);
-
     if(formattedUserProducts)
     {
       res.status(200).json({
@@ -506,11 +478,7 @@ exports.getProductDataById = async function (req, res, next) {
         respdata: [],
       });
     }
-
     const formattedUserProducts = [];
-   
-    console.log(userproducts);
-
     for (const userproduct of userproducts) {
       
      
@@ -671,7 +639,6 @@ exports.getDetailsById = async function (req, res, next) {
       respdata: formattedUserProduct,
     });
   } catch (error) {
-    console.error('Error while fetching product details:', error);
     return res.status(500).json({
       status: "0",
       message: "Server error!",
@@ -707,7 +674,6 @@ exports.getProduct = async function (req, res, next) {
       respdata: productDetails,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -728,11 +694,8 @@ exports.updateProduct = async function (req, res, next) {
   }
 
   try {
-    console.log(req.body);
     const productId = req.body.product_id;
-
     const existingProduct = await Userproduct.findById(productId);
-
     if (!existingProduct) {
       return res.status(404).json({
         status: "0",
@@ -822,7 +785,6 @@ exports.updateProduct = async function (req, res, next) {
       respdata: productDetails,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -857,7 +819,6 @@ exports.updateProductBidDetails = async (req, res) => {
       respdata: updatedUserProduct,
     });
   } catch (error) {
-    console.error(error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
@@ -886,7 +847,6 @@ exports.deleteProduct = async function (req, res, next) {
       respdata: {},
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",

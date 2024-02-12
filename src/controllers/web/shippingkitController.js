@@ -410,8 +410,6 @@ async function generateLabel(shipment_id) {
   if (!token) {
     return Promise.reject('Token not available. Call generateToken first.');
   }
-
-
   const options = {
     method: 'POST',
     url: baseUrl + '/courier/generate/label',
@@ -438,11 +436,7 @@ async function generateLabel(shipment_id) {
       }
     });
   });
-
-
 }
-
-
 async function generateInvoice(order_id) {
   token = await generateToken(email, shipPassword);
   if (!token) {
@@ -480,8 +474,6 @@ async function generateRequestShipmentPickup(shipment_id) {
   if (!token) {
     return Promise.reject('Token not available. Call generateToken first.');
   }
-
-
   const options = {
     method: 'POST',
     url: baseUrl + '/courier/generate/pickup',
@@ -495,7 +487,6 @@ async function generateRequestShipmentPickup(shipment_id) {
       ]
     })
   };
-
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
       if (error) {
@@ -509,7 +500,6 @@ async function generateRequestShipmentPickup(shipment_id) {
       }
     });
   });
-
 }
 
 async function generateCouriresServiceability(pickup_postcode, delivery_postcode, cod, weight) {
@@ -517,8 +507,6 @@ async function generateCouriresServiceability(pickup_postcode, delivery_postcode
   if (!token) {
     return Promise.reject('Token not available. Call generateToken first.');
   }
-
-
   const options = {
     method: 'GET',
     url: `${baseUrl}/courier/serviceability/?pickup_postcode=${pickup_postcode}&delivery_postcode=${delivery_postcode}&cod=${cod}&weight=${weight}`,
@@ -527,7 +515,6 @@ async function generateCouriresServiceability(pickup_postcode, delivery_postcode
       'Authorization': `Bearer ${token}`
     }
   };
-
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
       if (error) {
@@ -541,8 +528,6 @@ async function generateCouriresServiceability(pickup_postcode, delivery_postcode
       }
     });
   });
-
-
 }
 
 exports.updateData = async function (req, res, next) {
@@ -554,13 +539,10 @@ exports.updateData = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   try {
     const orderID = req.body.order_id;
     const hubAddressID = req.body.hub_address; 
-
     const shippingKit = await Shippingkit.findById(orderID);
-
     if (!shippingKit) {
       return res.status(404).json({
         status: "0",
@@ -570,8 +552,7 @@ exports.updateData = async function (req, res, next) {
     }
     shippingKit.hub_address_id = hubAddressID;
     await shippingKit.save();
-
-    res.redirect("/shippingkitlist"); // Redirect after successful update
+    res.redirect("/shippingkitlist"); 
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -584,7 +565,6 @@ exports.updateData = async function (req, res, next) {
 exports.getShipmentList = function (req, res, next) {
   var pageName = "Shipment List";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-
   var orderId = req.params.id;
   Order.aggregate([
     {
@@ -658,7 +638,6 @@ exports.deleteData = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
-
     const order = await Order.findOne({ _id: req.params.id });
     if (!order) {
       return res.status(404).json({
@@ -667,13 +646,12 @@ exports.deleteData = async function (req, res, next) {
         respdata: {},
       });
     }
-
     await Order.deleteOne(
       { _id: req.params.id },
       { w: "majority", wtimeout: 100 }
     );
 
-    await OrderTracking.deleteMany({ order_id: req.params.id });
+    await Ordertracking.deleteMany({ order_id: req.params.id });
 
     // Delete the order from the Order table
     await Order.deleteOne(
@@ -1292,7 +1270,6 @@ exports.huborderplaced = async (req, res) => {
     const order_id = order._id;
     const order_code = order.order_code;
     const buyer_id = order.user_id;
-    // const seller_id = order.seller_id;
     const product_id = order.product_id;
     const shipping_address_id = order.shipping_address_id;
     const total_price = order.total_price;

@@ -40,6 +40,7 @@ const Order = require("../../models/api/orderModel");
 const Banner = require("../../models/api/bannerModel");
 const Brand = require("../../models/api/brandModel");
 const Size = require("../../models/api/sizeModel");
+const Gender = require("../../models/api/genderModel");
 //const smtpUser = "sneha.lnsel@gmail.com";
 const smtpUser = "hello@bidforsale.com";
 const nodemailer = require("nodemailer");
@@ -55,8 +56,6 @@ const Shippingkit = require("../../models/api/shippingkitModel");
 //const Ordertracking = require("../../models/api/ordertrackModel");
 const Track = require("../../models/api/trackingModel");
 const { log, Console } = require("console");
-
-
 
 const transporter = nodemailer.createTransport({
   port: 465,
@@ -117,7 +116,6 @@ function generateToken1(email, password) {
         const token = responseBody.token;
         resolve(token);
       } else {
-        console.error('Error:', response.body);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -152,7 +150,6 @@ async function generateSellerPickup(data) {
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Errottr:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -167,7 +164,6 @@ exports.productData = async function (req, res, next) {
 
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const productId = req.params.id;
-    console.log(productId);
     let query = {};
 
     query._id = productId;
@@ -178,7 +174,6 @@ exports.productData = async function (req, res, next) {
         user_id: isLoggedIn,
         product_id: productId,
       });
-      console.log("product");
     }
 
     const categoydetails = await Userproduct.findById(query)
@@ -194,10 +189,6 @@ exports.productData = async function (req, res, next) {
       .populate('user_id', 'name')
       .populate('size_id', 'name')
       .exec();
-
-      console.log(userproducts);
-      console.log("product ------");
-
       const userproducts1 = await Userproduct.find({ 
         category_id: categoydetails.category_id , 
         approval_status: 1
@@ -293,7 +284,6 @@ exports.productData = async function (req, res, next) {
       isWhislist: isProductInWishlist != null && Object.keys(isProductInWishlist).length ? true : false
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the dashboard.",
@@ -311,7 +301,6 @@ exports.privacypolicyData = async function (req, res, next) {
       isLoggedIn: isLoggedIn,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the privacy policy.",
@@ -330,7 +319,6 @@ exports.tremsandconditionData = async function (req, res, next) {
       isLoggedIn: isLoggedIn,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the privacy policy.",
@@ -342,7 +330,6 @@ exports.tremsandconditionData = async function (req, res, next) {
 
 exports.registration = async function (req, res, next) {
   try {
-    // console.log("Registration");
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     if (isLoggedIn == "") {
       res.render("webpages/registration", {
@@ -354,7 +341,6 @@ exports.registration = async function (req, res, next) {
       res.redirect('/api/my-account');
     }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the privacy policy.",
@@ -511,7 +497,6 @@ exports.signin = async function (req, res, next) {
       }
     });
   } catch (error) {
-    console.error("An error occurred:", error);
     res.status(500).json({
       status: "0",
       message: "Internal Server Error",
@@ -639,8 +624,6 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
                 let getAccessTokenData = await tokenDecode(cookieAccessToken, process.env.ACCESS_TOKEN_PRIVATE_KEY);
                 if (!getAccessTokenData.error) {
                   if ((typeof req.session.user != "undefined") && (req.session.user.userId.toString() == getAccessTokenData.tokenDetails.userId.toString())) {
-                    //Do Nothing....
-                    //console.log("session matched with current data");
                     res.status(200).json({
                       status: "success",
                       refreshReset: false,
@@ -733,8 +716,6 @@ exports.userRelogin = async function (req, res, next) {
     if (!tokenDetailsData.error) {
       const email = tokenDetailsData.tokenDetails.email;
       if ((typeof req.session.user != "undefined") && (req.session.user.userId.toString() == tokenDetailsData.tokenDetails.userId.toString())) {
-        //Do Nothing....
-        //console.log("session matched with current data");
         res.status(200).json({
           status: "error",
           message: "Already logged In!!"
@@ -818,7 +799,7 @@ exports.userRelogin = async function (req, res, next) {
 };
 
 exports.userFilter = async function (req, res, next) {
-  let { brandList, sizeList, conditionList, priceList, optionId,productcategoryId,pageNo } = req.body;
+  let { brandList, sizeList, conditionList, priceList, genderList,optionId,productcategoryId,pageNo } = req.body;
   if (typeof optionId != "undefined") {
     if ((optionId == 0)) {
       optionId = 1;
@@ -850,8 +831,10 @@ exports.userFilter = async function (req, res, next) {
   if ((typeof conditionList != "undefined") && (objConditionList.length > 0)) {
     concatVar["status"] = { "$in": objConditionList };
   }
+  if ((typeof genderList != "undefined")) {
+    concatVar["gender_id"] = { "$in": genderList };
+  }
   // if (priceList && typeof priceList !== "undefined" && priceList !='') {
-
   //   let [min, max] = priceList.split('-').map(Number);
   //   const priceConditions= {
   //     offer_price: {
@@ -859,7 +842,6 @@ exports.userFilter = async function (req, res, next) {
   //       $lte: parseFloat(max)
   //     }
   //   };
-
   //     // Check if concatVar already has an $and array
   //     if (concatVar.$and) {
   //       concatVar.$and.push(priceConditions);
@@ -867,16 +849,9 @@ exports.userFilter = async function (req, res, next) {
   //       // Create a new $and array
   //       concatVar.$and = [priceConditions];
   //   }
-
-
-  
   //   concatVar['$and'] = priceConditions;
   // }
-  
-  // console.log(concatVar);
   // let allProductData = await Userproduct.find({ $and: concatVar}).sort({ offer_price: optionId });
-
-
   if (priceList && typeof priceList !== "undefined" && priceList !== '') {
     let [min, max] = priceList.split('-').map(Number);
     const priceConditions = {
@@ -892,22 +867,16 @@ exports.userFilter = async function (req, res, next) {
         concatVar.$and = [priceConditions];
     }
 }
-
-console.log(concatVar);
 // let totalProduct = await Userproduct.find(concatVar).sort({ offer_price: optionId });
 let totalProduct = await Userproduct.countDocuments(concatVar);
-
 let allProductData = await Userproduct.find(concatVar)
 .sort({ offer_price: optionId })
 .skip(skip)
 .limit(pageSize);
- 
   const formattedUserProducts = [];
   for (const userproduct of allProductData) {
-
     const productImages = await Productimage.find({ product_id: userproduct._id });
     const productCondition = await Productcondition.findById(userproduct.status);
-
     const formattedUserProduct = {
       _id: userproduct._id,
       name: userproduct.name,
@@ -930,14 +899,8 @@ let allProductData = await Userproduct.find(concatVar)
     };
     formattedUserProducts.push(formattedUserProduct);
   }
-
   const totalPages = Math.ceil(totalProduct / pageSize);
-
-  console.log("totalPages",totalPages);
-  console.log("totalProduct",totalProduct);
-  console.log("pageSize",pageSize);
   const userProductsCount = formattedUserProducts.length;
-
   if (formattedUserProducts.length > 0) {
     return res.json({
       status: 'success',
@@ -967,10 +930,8 @@ exports.getUserLogin = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   const { email, password } = req.body;
-
   Users.findOne({ email }).then(async (user) => {
     if (!user)
       res.status(404).json({
@@ -984,7 +945,6 @@ exports.getUserLogin = async function (req, res, next) {
         host: req.get("host"),
       });
       req.app.locals.requrl = requrl;
-
       bcrypt.compare(password, user.password, async (error, match) => {
         if (error) {
           res.status(400).json({
@@ -993,11 +953,9 @@ exports.getUserLogin = async function (req, res, next) {
             respdata: error,
           });
         } else if (match) {
-
           // user.deviceid = deviceid;
           // user.devicename = devicename;
           // user.fcm_token = fcm_token;
-
           user.save(async (err) => {
             if (err) {
               res.status(400).json({
@@ -1016,17 +974,13 @@ exports.getUserLogin = async function (req, res, next) {
                   user.name +
                   ", <br> <p>Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items </p>",
               };
-
               transporter.sendMail(mailData, function (err, info) {
                 if (err) console.log(err);
                 else console.log(info);
               });
-
               // const msg = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
-
               const whatsappMessage = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
               const userPhoneNo = "+917044289770";
-
               twilioClient.messages.create({
                 body: whatsappMessage,
                 // From: 'whatsapp:+12565734549',
@@ -1035,10 +989,8 @@ exports.getUserLogin = async function (req, res, next) {
                 to: 'whatsapp:+917044289770'
               })
                 .then((message) => {
-                  console.log(`WhatsApp message sent with SID: ${message.sid}`);
                 })
                 .catch((error) => {
-                  console.error(`Error sending WhatsApp message: ${error.message}`);
                 });
               const userToken = {
                 userId: user._id,
@@ -1057,9 +1009,7 @@ exports.getUserLogin = async function (req, res, next) {
                 goal: user.goal,
                 hear_from: user.hear_from,
               };
-
               //delete req.session.user;
-
               req.session.user = {
                 userId: user._id,
                 email: user.email,
@@ -1084,7 +1034,6 @@ exports.getUserLogin = async function (req, res, next) {
                 { $set: { token: await generateToken(userToken), last_login: dateTime } },
                 { upsert: true },
                 function (err, doc) {
-                  console.log("err", err);
                   if (err) {
                     throw err;
                   } else {
@@ -1094,9 +1043,7 @@ exports.getUserLogin = async function (req, res, next) {
                       //   message: "Successful!",
                       //   respdata: updatedUser,
                       // });
-
                     });
-
                     res.redirect('/api/my-account');
                   }
                 }
@@ -1114,7 +1061,6 @@ exports.getUserLogin = async function (req, res, next) {
     }
   });
 };
-
 exports.myAccount = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -1126,10 +1072,7 @@ exports.myAccount = async function (req, res, next) {
     }
     else{
       var userData = req.session.user;
-
       const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId) });
-
-      console.log(address);
       res.render("webpages/myaccount", {
         title: "My Account",
         message: "Welcome to the privacy policy page!",
@@ -1138,9 +1081,7 @@ exports.myAccount = async function (req, res, next) {
         isLoggedIn: isLoggedIn,
       });
     }
-
   } catch (error) {
-    //console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the privacy policy.",
@@ -1148,14 +1089,10 @@ exports.myAccount = async function (req, res, next) {
     });
   }
 };
-
 exports.editProfile = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
-    //console.log('**************** HI EDIT PROFILE**************');
-    //console.log(userData);
-    //console.log("Edit profile");
     res.render("webpages/edit-profile", {
       title: "Edit profile",
       message: "Welcome to the Edit Profile page!",
@@ -1164,7 +1101,6 @@ exports.editProfile = async function (req, res, next) {
       userData:userData
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
@@ -1172,12 +1108,10 @@ exports.editProfile = async function (req, res, next) {
     });
   }
 };
-
 exports.addAddress = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
-   
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -1186,10 +1120,8 @@ exports.addAddress = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
-
     const address = await addressBook.findOne({ user_id: userData.userId });
     var add = address;
-
     res.render("webpages/edit-address", {
       title: "Edit Address",
       message: "Welcome to the Edit Profile page!",
@@ -1198,7 +1130,6 @@ exports.addAddress = async function (req, res, next) {
       isLoggedIn: isLoggedIn,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
@@ -1206,7 +1137,6 @@ exports.addAddress = async function (req, res, next) {
     });
   }
 };
-
 exports.getParentCategories = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -1215,7 +1145,6 @@ exports.getParentCategories = async function (req, res, next) {
       message: "Welcome to the Product Categories!",
       isLoggedIn: isLoggedIn,
       //respdata: parentCategories,
-
     });
     // return res.status(200).json({
     //   status: "1",
@@ -1226,10 +1155,8 @@ exports.getParentCategories = async function (req, res, next) {
     //   title: "Product Categories",
     //   message: "Welcome to the Product Categories!",
     //   //respdata: parentCategories,
-
     // });
   } catch (error) {
-    console.error('Error fetching unique parent details:', error);
     return res.status(500).json({
       status: "0",
       message: "An error occurred while fetching unique parent details.",
@@ -1243,9 +1170,6 @@ exports.getParentCategories = async function (req, res, next) {
 exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
   try {
     const id = req.params.id;
-
-
-
     const categoriesWithMatchingParentId = await Userproduct.aggregate([
       {
         $lookup: {
@@ -1271,7 +1195,7 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
           name: { $first: '$matchedCategories.name' },
           description: { $first: '$matchedCategories.description' },
           images: { $first: '$matchedCategories.image' },
-          product_ids: { $push: '$_id' }, // Collect product IDs in an array
+          product_ids: { $push: '$_id' }, 
         },
       },
       {
@@ -1283,10 +1207,6 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
         },
       },
     ]);
-
-    console.log('********** Hi ****************11111');
-    console.log(categoriesWithMatchingParentId);
-
     if (!categoriesWithMatchingParentId || categoriesWithMatchingParentId.length === 0) {
       return res.status(404).json({
         status: '0',
@@ -1294,12 +1214,6 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
         respdata: {},
       });
     }
-
-    // return res.status(200).json({
-    //   status: '1',
-    //   message: 'Found!',
-    //   respdata: categoriesWithMatchingParentId,
-    // });
     res.render("webpages/productsubcategories", {
       title: "Product Sub Categories",
       message: "Welcome to the Product Sub Categories!",
@@ -1308,7 +1222,6 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
 
     });
   } catch (error) {
-    console.error('Error fetching sub categories with matching parent_id:', error);
     return res.status(500).json({
       status: '0',
       message: 'An error occurred while fetching sub categories with matching parent_id.',
@@ -1316,7 +1229,6 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
     });
   }
 };
-
 async function getProductDataWithSort(id, sortid, page, pageSize) {
   try {
     let categoryId;
@@ -1378,7 +1290,7 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
       categoryId = id;
 
       userproducts = await Userproduct.find({ 
-        category_id: id,
+        category_id: categoryId,
         approval_status: 1,
         flag: 0 
       })
@@ -1389,13 +1301,10 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
       .sort(sortCriteria)
       .exec();
     }
-
     const formattedUserProducts = [];
-
     for (const userproduct of userproducts) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
       const productCondition = await Productcondition.findById(userproduct.status);
-
       const formattedUserProduct = {
         _id: userproduct._id,
         name: userproduct.name,
@@ -1416,15 +1325,12 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
         product_images: productImages,
         status_name: productCondition ? productCondition.name : '',
       };
-
       formattedUserProducts.push(formattedUserProduct);
     }
-
     const paginatedData = formattedUserProducts.slice(skip, skip + pageSize);
     const productCount = formattedUserProducts.length;
     const totalPages = Math.ceil(productCount / pageSize);
     const currentPage = parseInt(page);
-
     return {
       status: '1',
       productCount: productCount,
@@ -1434,7 +1340,6 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
       respdata: paginatedData,
     };
   } catch (error) {
-    console.error('Error fetching products with matching parent_id:', error);
     return {
       status: '0',
       message: 'An error occurred while fetching products with matching parent_id.',
@@ -1442,32 +1347,21 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
     };
   }
 }
-
-
 exports.getSubCategoriesProducts = async function (page,req, res, next) {
   try {
 
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const id = req.params.id;
-    console.log("id is that",id);
     const pageno = page || 1; 
     const pageSize = 8;  
-
     const sortid = req.params.sortid || 0;
-
     const data = await getProductDataWithSort(id,sortid,pageno, pageSize);
-
     const productCount = data.productCount; 
-
-    const formattedUserProducts = data.respdata;
-    
+    const formattedUserProducts = data.respdata; 
     const filterproductCount = formattedUserProducts.length;
-
     const totalPages = data.totalPages;
     const currentPage = data.currentPage;
-
     const categoryName = await Category.find({ _id: id}).populate('name');
-
     const userProducts = await Userproduct.find({
       category_id : id,
       approval_status: 1,
@@ -1497,6 +1391,7 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
     const brandList = await brandModel.find({ _id: { $in: brandIds } });
     const sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
     const conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
+    const genderList = await Gender.find();
     res.render("webpages/subcategoryproduct",
       {
         title: "Product Sub Categories",
@@ -1508,6 +1403,7 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
         categoryName:categoryName,
         conditionList: conditionList,
         productCount:productCount,
+        genderList:genderList,
         filterproductCount:filterproductCount,
         totalPages: totalPages,
         currentPage: currentPage,
@@ -1519,7 +1415,6 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
 
   }
   catch (error) {
-    console.error('Error fetching products with matching parent_id:', error);
     return{
       status: '0',
       message: 'An error occurred while fetching products with matching parent_id.',
@@ -1534,13 +1429,9 @@ exports.getSubCategoriesProductswithSort = async function (page,req, res, next) 
   const sortid = req.params.sortid || 0;
   const pageno = page || 1; 
   const pageSize = 8;
-
   const data = await getProductDataWithSort(id,sortid,pageno, pageSize);
   const formattedUserProducts = data.respdata;
   const productCount = formattedUserProducts.length;
-
-console.log(productCount);
-console.log("product changes");
   return res.json({
     status: '1',
     message: 'Success',
@@ -1550,7 +1441,6 @@ console.log("product changes");
   });
 
 };
-
 exports.userUpdate = async function (req, res, next) {
   try {
     const errors = validationResult(req);
@@ -1594,7 +1484,6 @@ exports.userUpdate = async function (req, res, next) {
     req.session.user.phone_no = updatedUser.phone_no;
     res.redirect("/api/my-account");
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
@@ -1602,7 +1491,6 @@ exports.userUpdate = async function (req, res, next) {
     });
   }
 };
-
 exports.userNewCheckOutAddressAdd = async function (req, res, next) {
   try{
     const addr_name = req.body.addrType;
@@ -1652,7 +1540,6 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
       res.redirect('/api/checkout-web');
     }    
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
@@ -1712,7 +1599,6 @@ exports.userAddressAdd = async function (req, res, next) {
       res.redirect('/api/my-account');
     }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
@@ -1737,7 +1623,6 @@ exports.deleteUserAddress = async function (req, res, next) {
     }
     res.redirect('/api/my-account');
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
@@ -1798,7 +1683,6 @@ exports.userWisePost = async function (req, res, next) {
       });
     }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
@@ -1816,16 +1700,17 @@ exports.addPostView = async function (req, res, next) {
     const productConditions = await Productcondition.find();
     const parentCategoryId = "650444488501422c8bf24bdb";
     const categoriesWithoutParentId = await Category.find({ parent_id: { $ne: parentCategoryId } });
+    const genderList = await Gender.find();
     res.render("webpages/addmypost", {
       title: "My Account",
       message: "Welcome to the Add Post page!",
       respdata: req.session.user,
       productcondition: productConditions,
       subcate: categoriesWithoutParentId,
+      genderList :genderList,
       isLoggedIn: isLoggedIn,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
@@ -1845,6 +1730,7 @@ exports.addNewPost = async function (req, res, next) {
   try {
     let invoice;
     let packaging;
+    let gender;
     if (req.body.original_invoice == 'on' || req.body.original_invoice != '') {
       invoice = '1';
     }
@@ -1856,6 +1742,12 @@ exports.addNewPost = async function (req, res, next) {
     }
     else {
       packaging = '0';
+    }
+    if (req.body.gender ) {
+      gender = req.body.gender;
+    }
+    else{
+      gender = '';
     }
     const newProduct = new Userproduct({
       category: req.body.product_cate,
@@ -1875,6 +1767,7 @@ exports.addNewPost = async function (req, res, next) {
       percentage: req.body.percentage,
       original_invoice: invoice,
       original_packaging: packaging,
+      gender_id : gender,
       added_dtime: moment().tz('Asia/Kolkata').format("YYYY-MM-DD HH:mm:ss"),
     });
     const savedProductdata = await newProduct.save();
@@ -1898,10 +1791,63 @@ exports.addNewPost = async function (req, res, next) {
     }
     res.redirect('/api/my-account');
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Add Post.",
+      error: error.message,
+    });
+  }
+};
+
+exports.editUserWisePost = async function (req, res, next) {
+
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+
+    const productConditions = await Productcondition.find();
+
+    const parentCategoryId = "650444488501422c8bf24bdb";
+    const categoriesWithoutParentId = await Category.find({ parent_id: { $ne: parentCategoryId } });
+     const brands = await Brand.find({ status: 1 });
+     const productsize = await Size.find();
+
+    const productId = req.params.id;
+    const product = await Userproduct.findById(productId);
+    const genderList = await Gender.find();
+
+    if (!product) {
+      return res.status(404).json({
+        status: "0",
+        message: "Product not found!",
+        respdata: {},
+      });
+    }
+
+    const productImages = await Productimage.find({ product_id: req.params.id });
+
+    const productDetails = {
+      ...product.toObject(),
+      images: productImages,
+    };
+
+    res.render("webpages/editmypost", {
+      title: "My Post",
+      message: "Welcome to the My Post page!",
+      respdata: productDetails,
+      userData: req.session.user,
+      productcondition: productConditions,
+      subcate: categoriesWithoutParentId,
+      productId: productId,
+      brands:brands,
+      productsize:productsize,
+      genderList :genderList,
+      isLoggedIn: isLoggedIn,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the Edit Profile.",
       error: error.message,
     });
   }
@@ -1943,6 +1889,7 @@ exports.updatePostData = async function (req, res, next) {
     existingProduct.price = req.body.price || existingProduct.price;
     existingProduct.offer_price = req.body.offer_price || existingProduct.offer_price;
     existingProduct.percentage = req.body.percentage || existingProduct.percentage;
+    existingProduct.gender_id = req.body.gender || existingProduct.gender_id;
     const newProduct = new Userproduct({
       category_id: req.body.category_id,
       user_id: req.body.user_id,
@@ -2015,7 +1962,6 @@ exports.updatePostData = async function (req, res, next) {
     };
       res.redirect('/api/my-account');
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Add Post.",
@@ -2050,7 +1996,6 @@ exports.signOut = async function (req, res, next) {
             } else {
               req.session.destroy((err) => {
                 if (err) {
-                  console.error('Error destroying session:', err);
                   res.status(500).json({
                     status: "error",
                     message: "Error logging out",
@@ -2085,61 +2030,6 @@ exports.signOut = async function (req, res, next) {
   }
 };
 
-
-exports.editUserWisePost = async function (req, res, next) {
-
-  try {
-    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-
-    const productConditions = await Productcondition.find();
-
-    const parentCategoryId = "650444488501422c8bf24bdb";
-    const categoriesWithoutParentId = await Category.find({ parent_id: { $ne: parentCategoryId } });
-     const brands = await Brand.find({ status: 1 });
-     const productsize = await Size.find();
-
-    const productId = req.params.id;
-    const product = await Userproduct.findById(productId);
-
-    if (!product) {
-      return res.status(404).json({
-        status: "0",
-        message: "Product not found!",
-        respdata: {},
-      });
-    }
-
-    const productImages = await Productimage.find({ product_id: req.params.id });
-
-    const productDetails = {
-      ...product.toObject(),
-      images: productImages,
-    };
-
-    res.render("webpages/editmypost", {
-      title: "My Post",
-      message: "Welcome to the My Post page!",
-      respdata: productDetails,
-      userData: req.session.user,
-      productcondition: productConditions,
-      subcate: categoriesWithoutParentId,
-      productId: productId,
-      brands:brands,
-      productsize:productsize,
-      isLoggedIn: isLoggedIn,
-    });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      status: "0",
-      message: "An error occurred while rendering the Edit Profile.",
-      error: error.message,
-    });
-  }
-};
-
-// For Wishlist
 exports.addToWishlistWeb = async function (req, res, next) {
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   const errors = validationResult(req);
@@ -2157,7 +2047,7 @@ exports.addToWishlistWeb = async function (req, res, next) {
     const existingList = await Wishlist.findOne({ user_id, product_id, status: 0 });
     if (existingList) {
       return res.status(200).json({
-        message: 'The product has been added to your wishlist.',
+        message: 'The product has been already added to your wishlist.',
         wishlist: existingList,
         success: true,
         is_wishlisted: true
@@ -2172,19 +2062,15 @@ exports.addToWishlistWeb = async function (req, res, next) {
         status,
         added_dtime: new Date(),
       });
-
       const savedFavData = await newFavList.save();
-
       return res.status(200).json({
-        message: 'Item added to your wishlist successfully',
+        message: 'The product has been added to your wishlist',
         success: true,
         is_wishlisted: true
       });
     }
-
   }
   catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       success: false,
@@ -2194,7 +2080,6 @@ exports.addToWishlistWeb = async function (req, res, next) {
     });
   }
 };
-
 exports.viewWishListByUserId = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -2223,14 +2108,9 @@ exports.viewWishListByUserId = async function (req, res, next) {
         if(product)
         {
           const productImages = await Productimage.find({ product_id: item.product_id }).limit(1);
-
-          //const date = moment(item.added_dtime);
           const date = moment(item.added_dtime, 'YYYY-MM-DDTHH:mm:ssZ');
-  
           const addedDate = date.format('DD/MM/YYYY');
-  
           const category_name = product.category_id ? product.category_id.name : 'Uncategorized';
-  
           return {
             _id: item._id,
             user_id: item.user_id._id,
@@ -2245,11 +2125,8 @@ exports.viewWishListByUserId = async function (req, res, next) {
             __v: item.__v,
           };
         }
-        
       }));
-
       const count = formattedList.length;
-
       res.render("webpages/wishlist", {
         title: "Wish List Page",
         message: "Welcome to the Wish List page!",
@@ -2260,7 +2137,6 @@ exports.viewWishListByUserId = async function (req, res, next) {
       });
     }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering Wishlist Listing Page.",
@@ -2268,18 +2144,12 @@ exports.viewWishListByUserId = async function (req, res, next) {
     });
   }
 };
-
-
-
 exports.removeWishlistWeb = async (req, res) => {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const product_id = req.params.id;
     const user_id = req.session.user.userId;
     const existingList = await Wishlist.findOne({ user_id, product_id });
-
-    console.log(existingList);
-    console.log(existingList);
     if (Object.keys(existingList).length == 0) {
       return res.status(404).json({
         message: 'Product is not found in the Wishlist',
@@ -2298,7 +2168,6 @@ exports.removeWishlistWeb = async (req, res) => {
     }
   }
   catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       success: false,
@@ -2312,15 +2181,11 @@ exports.removeWishlistWeb = async (req, res) => {
 
 exports.addToCart = async function (req, res, next) {
   try {
-
     var userData = req.session.user;
     var qty = '1';
-
     const product_id = req.params.id;
     const user_id = req.session.user.userId;
-
     const existingCart = await Cart.findOne({ user_id: user_id, status: 0 });
-
     if (existingCart) {
       const existingCartItem = await CartDetail.findOne({
         cart_id: existingCart._id
@@ -2361,29 +2226,21 @@ exports.addToCart = async function (req, res, next) {
         added_dtime: existingCart.added_dtime,
         __v: existingCart.__v,
       };
-
-
       setTimeout(() => {
         removeItemAfterTime(existingCart._id); 
       }, 20 * 60 * 1000);
-
       return res.status(200).json({
         message: 'Item Added to Cart',
         cart: cartResponse,
       });
-
     }
     else {
-
-      console.log("NEW..###############");
       const newCart = new Cart({
         user_id,
         status: 0,
         added_dtime: dateTime,
       });
-
       const savedCart = await newCart.save();
-
       const cartDetail = new CartDetail({
         cart_id: savedCart._id,
         product_id,
@@ -2392,15 +2249,10 @@ exports.addToCart = async function (req, res, next) {
         status: 0,
         added_dtime: dateTime,
       });
-
       const savedata = await cartDetail.save();
-
-      // Cart Count
       var cartCount = await Cart.countDocuments({ user_id: savedCart.user_id });
-
       const user = await Users.findById(user_id);
       const product = await Userproduct.findById(product_id);
-
       const cartResponse = {
         _id: savedCart._id,
         user_id: savedCart.user_id,
@@ -2413,82 +2265,47 @@ exports.addToCart = async function (req, res, next) {
         added_dtime: savedCart.added_dtime,
         __v: savedCart.__v,
       };
-
       const cartRemove = await Cartremove.findOne({}, { name: 1, _id: 0 });
-
-      const durationInSeconds = cartRemove.name; // Assuming 'name' holds a duration in seconds
-
-
+      const durationInSeconds = cartRemove.name; 
       const durationInMilliseconds = durationInSeconds * 60 * 1000;
-      console.log("removal time");
-      console.log(durationInSeconds);
-
       setTimeout(() => {
-        removeItemAfterTime(savedCart._id); // savedata._id contains the ID of the added item
-        //console.log('welcome');
+        removeItemAfterTime(savedCart._id); 
       }, durationInMilliseconds);
-
-      // Convert duration from seconds to milliseconds
-
-
-      console.log("removal time in miliseond");
-      console.log(durationInMilliseconds);
-
-
-      // render after success 
-
       res.status(200).json({
         cart_count: cartCount,
         message: 'Item Added to Cart',
         cart: cartResponse,
         is_added: true
       });
-
-
     }
-
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
       error: error.message,
     });
   }
-
 };
 
 const removeItemAfterTime = async (cartId) => {
-  console.log('hi' + cartId)
   try {
-    console.log("Timer expired for cart:", cartId);
-
     await Cart.findByIdAndDelete(cartId);
-    // Perform logic to remove items from the cart after 1 minute (for testing purposes)
     const cartItems = await CartDetail.find({ cart_id: cartId, status: 0 });
-
     for (const cartItem of cartItems) {
       await CartDetail.findByIdAndDelete(cartItem._id);
-      console.log(`Item ${cartItem._id} removed from the cart after 1 minute (test).`);
     }
   } catch (error) {
-    console.error('Error while removing item from cart:', error);
   }
 };
-
 exports.viewCartListByUserId = async function (req, res, next) {
   try {
 
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-
-    //if (!req.session.user || !req.session.user.userId) {
     if (isLoggedIn == "") {
       return res.redirect("/api/registration");
     }
-
     const user_id = req.session.user.userId;
     const existingCart = await Cart.findOne({ user_id, status: 0 });
-
     if (!existingCart) {
       res.render("webpages/addtocart", {
         title: "Cart List Page",
@@ -2508,16 +2325,13 @@ exports.viewCartListByUserId = async function (req, res, next) {
           select: 'name images',
         })
         .exec();
-
       const user = await Users.findById(existingCart.user_id);
-
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
       const formattedCartList = await Promise.all(cartList.map(async (cartItem) => {
         const product = await Userproduct.findOne({ _id: cartItem.product_id._id }).populate('category_id', 'name');
         const productImages = await Productimage.find({ product_id: cartItem.product_id._id }).limit(1);
-
         const finalData = {
           _id: cartItem._id,
           cart_id: existingCart._id,
@@ -2533,11 +2347,9 @@ exports.viewCartListByUserId = async function (req, res, next) {
           added_dtime: cartItem.added_dtime,
           status: cartItem.status,
         };
-
         const product_price = finalData.product_price;
         const gst = (product_price * 18) / 100;
         const finalPrice = parseInt(product_price) + 250 + parseInt(gst);
-
         res.render("webpages/addtocart", {
           title: "Cart List Page",
           message: "Welcome to the Cart List page!",
@@ -2545,15 +2357,11 @@ exports.viewCartListByUserId = async function (req, res, next) {
           respdata1: finalPrice,
           user: user_id,
           isLoggedIn: isLoggedIn,
-
         });
-
       }));
-
     }
   }
   catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering Cart List.",
@@ -2561,8 +2369,6 @@ exports.viewCartListByUserId = async function (req, res, next) {
     });
   }
 };
-
-// Delete cart
 exports.deleteCart = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -2588,7 +2394,6 @@ exports.deleteCart = async function (req, res, next) {
     if (cartDetailsCount === 0) {
       await existingCart.remove();
     }
-
     res.render("webpages/deletecart", {
       title: "Delete Cart",
       message: "Welcome to the Delete Cart page!",
@@ -2596,7 +2401,6 @@ exports.deleteCart = async function (req, res, next) {
     });
   }
   catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Cart Page.",
@@ -2607,49 +2411,31 @@ exports.deleteCart = async function (req, res, next) {
 
 exports.changeProfileImgWeb = async function (req, res, next) {
   try {
-
     const requrl = url.format({
       protocol: req.protocol,
       host: req.get("host"),
     });
-
     const imageUrls = [];
     if (req.files && req.files.length > 0) {
       const imageDetails = [];
-
       req.files.forEach(async (file) => {
         const imageUrl = requrl + "/public/images/" + file.filename;
-        console.log(imageUrl);
-
         const updData = {
           image: imageUrl,
         };
-
         const updatedUser = await Users.findOneAndUpdate(
           { _id: req.body.user_id },
           { $set: updData },
-          { upsert: true, new: true } // Use new: true to get the updated document
+          { upsert: true, new: true }
         );
-
         if (updatedUser) {
           req.session.user.image = updatedUser.image;
           res.redirect('/api/my-account');
         }
-
-
       });
-
-      // res.status(200).json({
-      //   status: "1",
-      //   status: "1",
-      //   message: "Product and images added!",
-      //   respdata: savedProductdata
-      // });
     }
-
   }
   catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while Profile Image Change.",
@@ -2657,18 +2443,14 @@ exports.changeProfileImgWeb = async function (req, res, next) {
     });
   }
 };
-
 exports.checkoutWeb = async function (req, res, next) {
   try {
-    
       let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-      
       if (isLoggedIn == "") {
         return res.redirect("/api/registration");
       }
       const user_id = req.session.user.userId;
       const existingCart = await Cart.findOne({ user_id, status: 0 });
-
       if (!existingCart) {
         res.render("webpages/addtocart", {
           title: "Cart List Page",
@@ -2677,7 +2459,6 @@ exports.checkoutWeb = async function (req, res, next) {
           respdata1: [],
           user: user_id,
           isLoggedIn: isLoggedIn,
-  
         });
       }else{
         const cartList = await CartDetail.find({ cart_id: existingCart._id, status: 0 })
@@ -2687,14 +2468,11 @@ exports.checkoutWeb = async function (req, res, next) {
             select: 'name images',
           })
           .exec();
-
         // const addressUserList = await addressBook.find({user_id: user_id });
-
         const addressUserList = await addressBook.find({
             user_id: user_id,
             default_status: 0
         });
-
         const user = await Users.findById(existingCart.user_id);
         if (!user) {
           return res.status(404).json({ error: 'User not found' });
@@ -2702,7 +2480,6 @@ exports.checkoutWeb = async function (req, res, next) {
         const formattedCartList = await Promise.all(cartList.map(async (cartItem) => {
           const product = await Userproduct.findOne({ _id: cartItem.product_id._id }).populate('category_id', 'name');
           const productImages = await Productimage.find({ product_id: cartItem.product_id._id }).limit(1);
-  
           const finalData = {
             _id: cartItem._id,
             cart_id: existingCart._id,
@@ -2718,11 +2495,9 @@ exports.checkoutWeb = async function (req, res, next) {
             added_dtime: cartItem.added_dtime,
             status: cartItem.status,
           };
-  
           const product_price = finalData.product_price;
           const gst = (product_price * 18) / 100;
           const finalPrice = parseInt(product_price) + 250 + parseInt(gst);
-          
           res.render("webpages/mycheckoutweb", {
             title: "Check Out Page",
             status: '1',
@@ -2736,13 +2511,10 @@ exports.checkoutWeb = async function (req, res, next) {
             user: req.session.user,
             addressUserList:addressUserList,
           });
-          
-  
         }));
   }
   }
   catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred Checkout .",
@@ -2750,21 +2522,17 @@ exports.checkoutWeb = async function (req, res, next) {
     });
   }
 };
-
 exports.myOrderWeb = async (req, res) => {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-
     res.render("webpages/myorder", {
       title: "Wish List Page",
       message: "Welcome to the Wish List page!",
       respdata: req.session.user,
       isLoggedIn: isLoggedIn,
     });
-
   }
   catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred My order .",
@@ -2772,26 +2540,19 @@ exports.myOrderWeb = async (req, res) => {
     });
   }
 };
-
-
 exports.myOrderDetailsWeb = async (req, res) => {
   try {
-    
     const orderlistId = req.params.id; 
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : ""; 
-    
     if (!orderlistId) {
       return res.status(400).json({ message: 'Order ID is missing in the request' });
     }
-
     const order = await Order.findById(orderlistId)
       .populate('seller_id', 'name')
       .populate('user_id', 'name');
-    
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
-
     let productId;
     if (order.product_id) {
       productId = order.product_id.toString();
@@ -2848,9 +2609,6 @@ exports.myOrderDetailsWeb = async (req, res) => {
 
        shipping_user_details = await Users.findById({ _id: shippingKitData.buyer_id });
     }
-
-    console.log(shippingkit_details);
-
     const orderDetails = {
       _id: order._id,
       total_price: order.total_price,
@@ -2890,7 +2648,6 @@ exports.myOrderDetailsWeb = async (req, res) => {
 
   }
   catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred My order .",
@@ -2898,46 +2655,33 @@ exports.myOrderDetailsWeb = async (req, res) => {
     });
   }
 };
-
 exports.addShipmentData = async (req, res) => {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-
     const order_id = req.params.id;
-
     const price = 350;
     const gst = (price * 18)/100;
     const final_price = price +  gst;
-
     const track = await Ordertracking.findOne({ order_id: order_id }).exec();
-   
     if (track == null)  {
-      console.log(4556646546);
-      //return res.status(404).json({ message: 'Order Delivery Partner Not chosse yet' });
       return res.status(200).json({
         status: "0",
         message: 'Order Delivery Partner Not chosse yet',
         is_shippingkit: false,
       });
     }
-  
     const hubaddress = await Track.findById(track.tracking_id)
       .populate('seller_id', 'name phone_no email')
       .populate('billing_address_id')
       .populate('hub_address_id');
-
     if (!hubaddress) {
-      // return res.status(404).json({ message: 'Order Delivery Partner Not chosse yet' });
       res.status(200).json({
         status: "0",
         message: 'Order Delivery Partnerss Not chosse yet',
         is_shippingkit: false,
       });
-
     }
-
     const orderCode = `BFSSHIPKIT${Date.now().toString()}`;
-
     const shippingkit = new Shippingkit({
       track_code: orderCode,
       buyer_id: hubaddress.seller_id._id,
@@ -2948,35 +2692,14 @@ exports.addShipmentData = async (req, res) => {
       payment_method : 1,
       added_dtime: new Date().toISOString(),
     });
-
     const savedOrder = await shippingkit.save();
     if (savedOrder) {
-
       const updatedTrack = await Track.findOneAndUpdate(
         { _id: track.tracking_id },
         { $set: { shippingkit_status: 1 } },
         { new: true }
       );
-
       const user = await Users.findById(savedOrder.buyer_id);
-
-      // if (user.email) {
-      //   const mailData = {
-      //     from: smtpUser,
-      //     to: user.email,
-      //     subject: "BFS - Bid For Sale  - Order Placed Successfully",
-      //     text: "Server Email!",
-      //     html:
-      //       "Hey " +
-      //       user.name +
-      //       ", <br> <p>Congratulations your order is placed.please wait for some times and the delivery details you will show on the app.</p>",
-      //   };
-
-      //   transporter.sendMail(mailData, function (err, info) {
-      //     if (err) console.log(err);
-      //     else console.log(info);
-      //   });
-      // }
       res.status(200).json({
         status: "1",
         message: 'Shipping Kit Order placed successfully',
@@ -2985,13 +2708,8 @@ exports.addShipmentData = async (req, res) => {
         order: savedOrder,
         isLoggedIn: isLoggedIn,
       });
-
-      
-    //}
     }
-
   } catch (error) {
-    console.error('Error placing order:', error);
     res.status(200).json({
       status: "0",
       message: 'Can not Order Shipping kit',
@@ -2999,8 +2717,6 @@ exports.addShipmentData = async (req, res) => {
     });
   }
 };
-
-
 exports.getWhatsHotProductsweb = async function (req, res) {
 
   const page = parseInt(req.body.page) || 1; // Current page, default: 1
@@ -3073,9 +2789,6 @@ exports.getWhatsHotProductsweb = async function (req, res) {
       });
 
   } catch (error) {
-
-    console.error('Error fetching what\'s hot products:', error);
-
     return res.status(500).json({ message: 'Internal server error' });
 
   }
@@ -3164,11 +2877,7 @@ exports.getJustSoldProductsweb = async function (req, res) {
       });
 
   } catch (error) {
-
-    console.error('Error fetching just sold products:', error);
-
     return res.status(500).json({ message: 'Internal server error' });
-
   }
 
 };
@@ -3258,9 +2967,6 @@ exports.getBestDealProductsweb = async function (req, res) {
       });
 
   } catch (error) {
-
-    console.error('Error fetching just sold products:', error);
-
     return res.status(500).json({ message: 'Internal server error' });
 
   }
@@ -3298,8 +3004,6 @@ exports.userPlacedOrder = async function (req, res) {
     //   return res.status(404).json({ message: 'Billing address not found' });
     // }
     // const billing_address_id = productdetails.user_id;
-    // console.log(billing_address_id);
-
     const billingaddress = await addressBook.findOne({ user_id: seller_id });
 
     if (!billingaddress) {
@@ -3400,11 +3104,7 @@ exports.userPlacedOrder = async function (req, res) {
       });
     }
  } catch (error) {
-
-  console.error('Error fetching Order Palced: ', error);
-
   return res.status(500).json({ message: 'Internal server error' });
-
 }
 };
 
@@ -3431,19 +3131,11 @@ exports.forgotPassword = async function (req, res, next) {
     });
 
   } catch (error) {
-
-    console.error(error);
-
     res.status(500).json({
-
       status: "0",
-
       message: "An error occurred while rendering the dashboard.",
-
       error: error.message,
-
     });
-
   }
 
 };
@@ -3455,7 +3147,6 @@ exports.sendotp = async function (req, res, next) {
   //   subject: "Hiii",
   //   html:"<p>Hello!!</p>"
   // });
-  // console.log(info);return false;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(200).json({
@@ -3518,7 +3209,6 @@ exports.sendotp = async function (req, res, next) {
     }
     else
     {
-      console.log("chaange password");
       if (user.forget_otp == req.body.otp) {
         bcrypt.hash(req.body.newPassword, rounds, (error, hash) => {
           bcrypt.compare(req.body.confirmPassword, hash, (error, match) => {

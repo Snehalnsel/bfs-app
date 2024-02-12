@@ -35,6 +35,7 @@ const HubController = require("../controllers/web/hubController");
 const ShippingkitController = require("../controllers/web/shippingkitController");
 const CartremoveController = require("../controllers/web/cartremoveController");
 const BannerController = require("../controllers/web/bannerController");
+const GenderController = require("../controllers/web/genderController");
 
 
 var session = require("express-session");
@@ -246,12 +247,7 @@ router.get(
   ],
   AppusersController.deleteData
 );
-
-
-
 //category APIS
-
-
 router.get("/body-focus", cors(), BodyFocusController.getData);
 router.get("/add-body-focus", cors(), BodyFocusController.addData);
 
@@ -274,15 +270,10 @@ router.post(
   upload.single('image'),
   BodyFocusController.createData
 );
-
 router.get("/edit-body-focus/:id", cors(), BodyFocusController.editData);
-
 router.post('/update-body-focus', cors(), [], upload.single('image'), BodyFocusController.updateData);
-
 router.get("/body-focus-statu-change/:id", cors(), BodyFocusController.updateStatusData);
-
 router.get("/body-focus-status/:id", cors(), BodyFocusController.statusData);
-
 //SUB CATEGORY APIS
 
 // router.get("/body-focus-subcat/:page", cors(), BodyFocusController.getSubcatData);
@@ -318,12 +309,8 @@ router.get(
   BodyFocusController.deleteData
 );
 
-
-//brand
 router.get("/brand", cors(), BrandController.getData);
 router.get("/add-brand", cors(), BrandController.addData);
-
-
 router.post(
   "/create-brand",
   cors(),
@@ -331,7 +318,6 @@ router.post(
   upload.single('image'),
   BrandController.createData
 );
-
 router.get("/edit-brand/:id", cors(), BrandController.editData);
 
 router.post(
@@ -341,18 +327,14 @@ router.post(
   upload.single('image'),
   BrandController.updateData
 );
-
 router.get("/brand-statu-change/:id", cors(), BrandController.updateStatusData);
-
 router.get(
   "/delete-brand/:id",
   [], BrandController.deleteData
 );
-//SIZE MASTER
 
 router.get("/size", cors(), SizeController.getData);
 router.get("/add-size", cors(), SizeController.addData);
-
 router.post(
   "/create-size",
   cors(),
@@ -365,25 +347,18 @@ router.post(
   ],
   SizeController.createData
 );
-
 // router.get("/edit-size/:id", cors(), SizeController.editData);
-
 // router.post(
 //   "/update-size",
 //   cors(),
 //   [],
 //   SizeController.updateData
 // );
-
 router.get("/size-status-change/:id", cors(), SizeController.updateStatusData);
-
 router.get("/delete-size/:id", cors(), SizeController.deleteData);
-
-//CATEGORY BRAND SIZE MASTER
 
 router.get("/catbrand", cors(), CatsizeController.getData);
 router.get("/add-catbrand", cors(), CatsizeController.addData);
-
 router.post(
   "/create-catbrand",
   cors(),
@@ -415,7 +390,13 @@ router.get("/productsize-status-change/:id", cors(), CatsizeController.updateSta
 router.get("/deleteproductsize/:id", cors(), CatsizeController.deleteData);
 
 // product list 
-router.get("/productlist", cors(), ProductController.getData);
+router.get("/productlist", cors(), (req, res) => {
+  const page = req.query.page;
+  const searchType = req.query.searchType;
+  const searchValue = req.query.searchValue;
+  ProductController.getData(page, searchType, searchValue, req, res);
+});
+// router.get("/productlist", cors(), ProductController.getData);
 router.get("/productdetails/:id", cors(), ProductController.detailsData);
 router.post("/updateproductdetails", cors(), upload.array('images[]'), ProductController.updatedetailsData);
 
@@ -499,9 +480,7 @@ router.post(
   ],
   BestDealController.createData
 );
-
 // Shipping Charges Master (Add List)
-
 router.get("/shippingchrgs", cors(), ShippingchargesController.getData);
 router.get("/add-shippingchrgs", cors(), ShippingchargesController.addData);
 router.post(
@@ -516,7 +495,6 @@ router.post(
   ],
   ShippingchargesController.createData
 );
-
 //  SHIPPING KIT MASTER
 router.get("/shippingkitlist", cors(), ShippingkitController.getOrderList);
 router.get("/shippingkitdetails/:id", cors(), ShippingkitController.getShipmentKit);
@@ -528,8 +506,6 @@ router.get("/generateawbforkit/:id/:courier_company_id", cors(), ShippingkitCont
 router.get("/generatelabelforkit/:id", cors(), ShippingkitController.getGenerateLabelforkit);
 router.get("/generateinvoiceforkit/:id", cors(), ShippingkitController.getGenerateInvoiceforkit);
 router.get("/schedule-pickupforkit/:id", cors(), ShippingkitController.getShipmentPickup);
-
-
 //Cart Remove Time
 router.get("/carttime", cors(), CartremoveController.getData);
 router.get("/add-carttime", cors(), CartremoveController.addData);
@@ -541,8 +517,6 @@ router.post(
 );
 router.get("/carttime-details/:id", cors(), CartremoveController.editData);
 router.post("/update-carttime", cors(), CartremoveController.updateData);
-
-
 //Banner
 router.get("/banner-list", cors(), BannerController.getData);
 router.get("/add-banner", cors(), BannerController.addData);
@@ -556,5 +530,10 @@ router.get("/banner/:id", cors(), BannerController.editData);
 router.post("/update-banner", cors(), upload.single('image'), BannerController.updateData);
 router.get("/delete-banner/:id", cors(), BannerController.deleteData);
 router.get("/banner-status-change/:id", cors(), BannerController.updateStatusData);
+//Gender
+router.get("/genderlist", cors(), GenderController.getData);
+router.get("/add-gender", cors(), GenderController.addData);
+router.post("/create-gender",GenderController.createData);
+router.get("/delete-gender/:id", cors(), GenderController.deleteData);
 
 module.exports = router;

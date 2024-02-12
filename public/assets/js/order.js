@@ -29,10 +29,14 @@ $(document).on('click', ".remove-order", async function (e) {
             success: function (data) {
                 if (data.is_cancelorder == true) {
                     Swal.fire({
-                        html: data.message,
+                        title: data.message,
+                        iconHtml: '<img src="'+ src +'">',
+                        customClass: {  
+                            icon: 'alert-logo-item',
+                            popup: "bid-alert-modal"
+                        },
                         confirmButtonText: "OK",
-                        customClass: { confirmButton: 'alert-box-button' }
-                    });
+                      });
                     // $(e.target).closest('.remove-cart').hide();
                     $(e.target).closest('.remove-cart').hide().after('<p>Order canceled</p>');
                    

@@ -1,188 +1,241 @@
 <%- include('../../public/assets/include/header'); %>
 
-<section class="dashboard-wrapper">
-    <div class="dashboard-container">
-       <div class="dashboard-sidbar">
-        <div class="sidbar-box user-profile">
-            <div class="user-icon">
-               <img src="<%=userData.image%>" alt="user-image" id="output">
+   <section class="dashboard-wrapper">
+      <div class="dashboard-container">
+         <div class="dashboard-sidbar">
+            <div class="sidbar-box user-profile">
+               <div class="user-icon">
+                  <img src="<%=userData.image%>" alt="user-image" id="output">
+               </div>
+               <div class="user-info">
+                  <div class="sht-ui">Hello</div>
+                  <div class="user-name">
+                     <%=userData.title%>
+                        <%=userData.name%>
+                  </div>
+               </div>
+               <div class="userimage-edit">
+                  <!--  <a href="javascript:void(0)" data-toggle="modal" data-target="#profile-change-modal"><i class="fa fa-pencil" aria-hidden="true"></i></a> -->
+                  <label for="file"><i class="fa fa-pencil" aria-hidden="true"></i></label>
+                  <input id="file" class="file-line" type="file" onchange="loadFile(event)" />
+               </div>
             </div>
-            <div class="user-info">
-               <div class="sht-ui">Hello</div>
-               <div class="user-name"><%=userData.title%> <%=userData.name%> </div>
-            </div>
-             <div class="userimage-edit">
-              <!--  <a href="javascript:void(0)" data-toggle="modal" data-target="#profile-change-modal"><i class="fa fa-pencil" aria-hidden="true"></i></a> -->
-                <label for="file"><i class="fa fa-pencil" aria-hidden="true"></i></label>
-                <input id="file" class="file-line" type="file" onchange="loadFile(event)"/>
-             </div>
-         </div>
-         <div class="sidbar-box sidbar-nav">
-            <ul class="nav d-flex flex-column mb-2 ">
-                <li class="nav-item">
-                  <a class="nav-link" href="/api/my-account"><i class="fa fa-user" aria-hidden="true"></i> <span>Profile</span></a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="/api/web-my-order"><i class="fa fa-list-ul" aria-hidden="true"></i> <span>My Orders</span></a>
-                </li>
-  
-                <li class="nav-item">
-                  <a class="nav-link" href="/api/my-post/<%=userData.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Product</span></a>
-                </li>
-  
-                <li class="nav-item">
-                  <a class="nav-link" href="/api/bid-for-product"><i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> <span>My Bids</span></a>
-                </li>
-                
-              </ul>
-              <div class="bottom-link">
+            <div class="sidbar-box sidbar-nav">
                <ul class="nav d-flex flex-column mb-2 ">
-                  <li><a class="nav-link" href="/api/sign-out"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li>
+                  <li class="nav-item">
+                     <a class="nav-link" href="/api/my-account"><i class="fa fa-user" aria-hidden="true"></i>
+                        <span>Profile</span></a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link" href="/api/web-my-order"><i class="fa fa-list-ul" aria-hidden="true"></i>
+                        <span>My Orders</span></a>
+                  </li>
+
+                  <li class="nav-item">
+                     <a class="nav-link" href="/api/my-post/<%=userData.userId%>"><i class="fa fa-file-image-o"
+                           aria-hidden="true"></i> <span>My Product</span></a>
+                  </li>
+
+                  <li class="nav-item">
+                     <a class="nav-link" href="/api/bid-for-product"><i class="fa fa-arrow-circle-o-right"
+                           aria-hidden="true"></i> <span>My Bids</span></a>
+                  </li>
+
                </ul>
+               <div class="bottom-link">
+                  <ul class="nav d-flex flex-column mb-2 ">
+                     <li><a class="nav-link" href="/api/sign-out"><i class="fa fa-sign-out" aria-hidden="true"></i>
+                           <span>Sign Out</span></a></li>
+                  </ul>
 
-                       
-                    </div>
 
-         </div>        
-       </div>
+               </div>
 
-       <div class="dashboard-content">
-          <div class="dashboard-infobox">
-             <div class="dashboard-title-arrow mb-25">
-                <h4 class="di-title mr-25">Edit Your Product</h4>
-                <div class="edit-link"><a href="/api/my-account">Back </a></div>
-             </div>
-             
-             <div class="dsh-shortbox">
-                <form action="/api/updatepostdata" method="post" enctype="multipart/form-data">                    
-                   <div class="div-row">
-                     <div class="div-12">
-                        <div class="post-imagebox">
-                            <% respdata.images.forEach(function(img, index) { %>
-                                <div class="upload-post full-post-image">
+            </div>
+         </div>
+
+         <div class="dashboard-content">
+            <div class="dashboard-infobox">
+               <div class="dashboard-title-arrow mb-25">
+                  <h4 class="di-title mr-25">Edit Your Product</h4>
+                  <div class="edit-link"><a href="/api/my-account">Back </a></div>
+               </div>
+
+               <div class="dsh-shortbox">
+                  <form action="/api/updatepostdata" method="post" enctype="multipart/form-data">
+                     <div class="div-row">
+                        <div class="div-12">
+                           <div class="post-imagebox">
+                              <% respdata.images.forEach(function(img, index) { %>
+                                 <div class="upload-post full-post-image">
                                     <img src="<%= img.image %>" style="width:50%; height:80%;">
-                                    <input type="file"  name="img<%= index %>" />
-                                </div>
-                            <% }); %>
-                           
-                            <% for(let i = respdata.images.length; i < 5; i++) { %>
-                              <div class="upload-post full-post-image">
-                                  <h6>+Add Image</h6>
-                                  <input type="file" name="img<%= i %>" />
-                              </div>
-                          <% } %>
-                          
+                                    <input type="file" name="img<%= index %>" />
+                                 </div>
+                                 <% }); %>
+
+                                    <% for(let i=respdata.images.length; i < 5; i++) { %>
+                                       <div class="upload-post full-post-image">
+                                          <h6>+Add Image</h6>
+                                          <input type="file" name="img<%= i %>" />
+                                       </div>
+                                       <% } %>
+
+                           </div>
                         </div>
-                    </div>
-                     <div class="div-12">
-                        <label>Product Name <span class="required">*</span></label>                        
-                         <input type="type" name="name" value="<%=respdata.name%>" class="ds-form-control" required placeholder="Product Name">
-                         <input type="hidden" name="productid" value="<%=productId%>" class="ds-form-control">
-                     </div> 
-                      <div class="div-12">
-                         <label>Product Description</label>                        
-                         
-                         <input type="type" name="description" value="<%=respdata.description%>" class="ds-form-control" placeholder="Product description">
+                        <div class="div-12">
+                           <label>Product Name <span class="required">*</span></label>
+                           <input type="type" name="name" value="<%=respdata.name%>" class="ds-form-control" required
+                              placeholder="Product Name">
+                           <input type="hidden" name="productid" value="<%=productId%>" class="ds-form-control">
                         </div>
- 
+                        <div class="div-12">
+                           <label>Product Description</label>
+
+                           <input type="type" name="description" value="<%=respdata.description%>"
+                              class="ds-form-control" placeholder="Product description">
+                        </div>
+
                         <div class="div-6">
-                           <label for="productCategory">Product Category <span class="required">*</span></label>
+                           <label for="productCategory">Product Category <span class="required"></span></label>
                            <% if(respdata.category_id) { %>
                               <select class="ds-form-control" name="category_id" id="category_id" required>
                                  <option value="" disabled selected>Select Category</option>
                                  <% subcate.forEach(function(subcatitems) { %>
-                                    <option value="<%= subcatitems._id %>"  <%=(respdata &&
-                                       respdata.category_id.equals(subcatitems._id)) ? 'selected' : ''
-                                       %>><%= subcatitems.name %></option>
-                                 <% }); %>
+                                    <option value="<%= subcatitems._id %>" <%=(respdata &&
+                                       respdata.category_id.equals(subcatitems._id)) ? 'selected' : '' %>><%=
+                                          subcatitems.name %>
+                                    </option>
+                                    <% }); %>
                               </select>
-                           <% }else { %>
-                              <input type="text" name="category" value="<%=respdata.category%>" class="ds-form-control" required placeholder="Product Name">
-                           <% } %>
-                       </div>
-                       
- 
-                      <div class="div-6">
-                         <label>Product Brand <span class="required">*</span></label>
-                         <% if(respdata.brand_id) { %>
-                           <select class="ds-form-control" name="brand_id" id="brand_id" required>
-                              <option value="" disabled selected>Select Category</option>
-                              <% brands.forEach(function(brand) { %>
-                                 <option value="<%= brand._id %>"  <%=(respdata &&
-                                    respdata.brand_id.equals(brand._id)) ? 'selected' : ''
-                                    %>><%= brand.name %></option>
-                              <% }); %>
-                           </select>
-                         <% }else { %>
-                           <input type="type" name="brand" value="<%=respdata.brand%>" class="ds-form-control" placeholder="Enter Brand" required>
-                         <% } %>
+                              <% }else { %>
+                                 <input type="text" name="category" value="<%=respdata.category%>"
+                                    class="ds-form-control" placeholder="Product Name">
+                                 <% } %>
                         </div>
 
-                      <div class="div-6">
-                        <label for="productCondition">Product Condition <span class="required">*</span></label>
-                        <select class="ds-form-control" name="status" id="status" required>
-                            <option value="" disabled selected>Select Condition</option>
-                            <% productcondition.forEach(function(item) { %>
-                                <option value="<%= item._id %>"  <%=(respdata &&
-                                 respdata.status.equals(item._id)) ? 'selected' : ''
-                                 %>><%= item.name %></option>
-                            <% }); %>
-                        </select>
-                    </div>
-                    
- 
-                      <div class="div-6">
-                         <label>Product Size <span class="required">*</span></label>
-                         <% if(respdata.size_id) { %>
-                           <select class="ds-form-control" name="size_id" id="size_id" required>
-                              <option value="" disabled selected>Select Category</option>
-                              <% productsize.forEach(function(size) { %>
-                                 <option value="<%= size._id %>"  <%=(respdata &&
-                                    respdata.size_id.equals(size._id)) ? 'selected' : ''
-                                    %>><%= size.name %></option>
-                              <% }); %>
-                           </select>
-                         <% }else { %>
-                           <input type="type" name="size" value="<%=respdata.size%>" class="ds-form-control" placeholder="Product Size" required>
-                         <% } %>
-                        </div>
- 
-                      <div class="div-6">
-                         <label>Original Invoice</label>
-                         <label class="switch ">
-                           <input type="checkbox" name="original_invoice" value="<%=respdata.original_invoice%>">
-                             <span class="tg-slider round"></span>
-                         </label>                        
-                      </div> 
-                      <div class="div-6">
-                         <label>Original Packaging</label>
-                        <label class="switch ">
-                           <input type="checkbox" name="original_package" value="<%=respdata.original_package%>">
-                             <span class="tg-slider round"></span>
-                         </label>
-                      </div> 
-                      <div class="div-6">
-                         <label>Price <span class="required">*</span></label>
-                        <input type="type" name="price" value="<%=respdata.price%>" class="ds-form-control" placeholder="Price" required>
-                      </div>
- 
-                      <div class="div-6">
-                         <label>Offer Price <span class="required">*</span></label>
-                        <input type="type" name="offer_price" value="<%=respdata.offer_price%>" class="ds-form-control" placeholder="Offer Price" required>
-                      </div>
-                      
-                     
-                      <div class="div-12">
-                         <input type="submit" name="" class="ds-form-control userpost-btn" value="Post Your Product" required>
-                      </div>
-                   </div>                  
-                </form>                
-             </div>             
-          </div>
-       </div>
-    </div>
- </section>
 
- <%- include('../../public/assets/include/newsletter'); %> 
-<%- include('../../public/assets/include/footer'); %>
-</body>
+                        <div class="div-6">
+                           <label>Product Brand <span class="required">*</span></label>
+                           <% if(respdata.brand_id) { %>
+                              <select class="ds-form-control" name="brand_id" id="brand_id" required>
+                                 <option value="" disabled selected>Select Brand</option>
+                                 <% brands.forEach(function(brand) { %>
+                                    <option value="<%= brand._id %>" <%=(respdata &&
+                                       respdata.brand_id.equals(brand._id)) ? 'selected' : '' %>><%= brand.name %>
+                                    </option>
+                                    <% }); %>
+                              </select>
+                              <% }else { %>
+                                 <input type="type" name="brand" value="<%=respdata.brand%>" class="ds-form-control"
+                                    placeholder="Enter Brand" required>
+                                 <% } %>
+                        </div>
+
+                        <div class="div-6">
+                           <label for="productCondition">Product Condition <span class="required">*</span></label>
+                           <select class="ds-form-control" name="status" id="status" required>
+                              <option value="" disabled selected>Select Condition</option>
+                              <% productcondition.forEach(function(item) { %>
+                                 <option value="<%= item._id %>" <%=(respdata && respdata.status.equals(item._id))
+                                    ? 'selected' : '' %>><%= item.name %>
+                                 </option>
+                                 <% }); %>
+                           </select>
+                        </div>
+
+
+                        <div class="div-6">
+                           <label>Product Size <span class="required"></span></label>
+                           <% if(respdata.size_id) { %>
+                              <select class="ds-form-control" name="size_id" id="size_id" required>
+                                 <option value="" disabled selected>Select Category</option>
+                                 <% productsize.forEach(function(size) { %>
+                                    <option value="<%= size._id %>" <%=(respdata && respdata.size_id.equals(size._id))
+                                       ? 'selected' : '' %>><%= size.name %>
+                                    </option>
+                                    <% }); %>
+                              </select>
+                              <% }else { %>
+                                 <input type="type" name="size" value="<%=respdata.size%>" class="ds-form-control"
+                                    placeholder="Product Size">
+                                 <% } %>
+                        </div>
+
+                        <div class="div-6">
+                           <label>Original Invoice</label>
+                           <label class="switch">
+                              <input type="checkbox" <%= respdata.original_invoice == 1 ? 'checked' : '' %> name="original_invoice" value="<%= respdata.original_invoice %>">
+                              <span class="tg-slider round"></span>
+                           </label>
+                        </div>
+                        
+                        <div class="div-6">
+                           <label>Original Packaging</label>
+                           <label class="switch ">
+                              <input type="checkbox" <%= respdata.original_package == 1 ? 'checked' : '' %> name="original_package" value="<%=respdata.original_package%>">
+                              <span class="tg-slider round"></span>
+                           </label>
+                        </div>
+
+                        <div class="div-6">
+                           <label>Gender</label>
+                           <div class=" inlineflex" >
+                              <% if(genderList){%>
+                                 <% genderList.forEach(function(item) { %>
+                                    <span>
+                                       <input type="radio" id="<%= item._id %>" name="gender" <%= respdata && respdata.gender_id.equals(item._id) ? 'checked' : '' %> value="<%= item._id %>">
+                                       <label for="<%= item._id %>"><%= item.name %></label>
+                                    </span>
+                                    
+                                 <% }); %>   
+                              <% } %>
+                           </div>
+                        </div>
+
+                        <div class="div-6">
+                           <label>Height</label>
+                           <input type="type" name="height" class="ds-form-control"  value="<%=respdata.height%>" placeholder="Height in cm">
+                        </div>
+
+                        <div class="div-6">
+                           <label>Weight</label>
+                           <input type="type" name="weight" class="ds-form-control" value="<%=respdata.weight%>" placeholder="Weight in Kg">
+                        </div>
+
+                        <div class="div-6">
+                           <label>Length</label>
+                           <input type="type" name="length" class="ds-form-control" value="<%=respdata.length%>" placeholder="Length in cm">
+                        </div>
+
+                        <div class="div-6">
+                           <label>Breadth</label>
+                           <input type="type" name="breath" class="ds-form-control" value="<%=respdata.breath%>" placeholder="Breadth in cm">
+                        </div>
+                        <div class="div-6">
+                           <label>Price <span class="required">*</span></label>
+                           <input type="type" name="price" value="<%=respdata.price%>" class="ds-form-control"
+                              placeholder="Price" required>
+                        </div>
+
+                        <div class="div-6">
+                           <label>Offer Price <span class="required">*</span></label>
+                           <input type="type" name="offer_price" value="<%=respdata.offer_price%>"
+                              class="ds-form-control" placeholder="Offer Price" required>
+                        </div>
+
+
+                        <div class="div-12">
+                           <input type="submit" name="" class="ds-form-control userpost-btn" value="Post Your Product"
+                              required>
+                        </div>
+                     </div>
+                  </form>
+               </div>
+            </div>
+         </div>
+      </div>
+   </section>
+
+   <%- include('../../public/assets/include/newsletter'); %>
+      <%- include('../../public/assets/include/footer'); %>
+         </body>

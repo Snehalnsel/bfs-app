@@ -122,9 +122,7 @@
                 <form >
                    
                    <div class="div-row">
-                     <% respdata1.forEach(function(item) { %>
-                        <% console.log(respdata1); %>
-                        
+                     <% respdata1.forEach(function(item) { %>                        
                       <% if(item.address_name == 'Home' && item.default_status == '0') {%>
                       <div class="div-12">
                          <label>Home: <div class="edit-link"><a href="/api/delete-address/<%=item._id%>">Delete Address</a></div></label>                        

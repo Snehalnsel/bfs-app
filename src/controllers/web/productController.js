@@ -14,6 +14,7 @@ const Productsize = require("../../models/api/catsizeModel");
 const Userproduct = require("../../models/api/userproductModel");
 const Productimage = require("../../models/api/productimageModel");
 const Productcondition = require("../../models/api/productconditionModel");
+const Gender = require("../../models/api/genderModel");
 // const helper = require("../helpers/helper");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -126,12 +127,39 @@ const upload = multer({ dest: 'public/images/' });
 //   });
 
 // };
-
-
-
-exports.getData = function (req, res, next) {
+exports.getData = function (page, searchType, searchValue,req, res, next) {
   var pageName = "Product List";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+
+  let query = {};
+
+  if (searchValue) {
+    if (searchType === 'name') {
+      query.name = { $regex: `${searchValue}`, $options: 'i' };
+    } else if (searchType === 'description') {
+      query.description = { $regex: `${searchValue}`, $options: 'i' };
+    } else if (searchType === 'category_name') {
+      query['category.name'] = { $regex: `${searchValue}`, $options: 'i' };
+    } else if (searchType === 'brand_name') {
+      query['brand.name'] = { $regex: `${searchValue}`, $options: 'i' };
+    } else if (searchType === 'user_name') {
+      query['user.name'] = { $regex: `${searchValue}`, $options: 'i' };
+    } else if (searchType === 'size_name') {
+      query['size.name'] = { $regex: `${searchValue}`, $options: 'i' };
+    }else if (searchType === 'productCondition_name') {
+      query['productCondition.name'] = { $regex: `${searchValue}`, $options: 'i' };
+    }
+    else if (searchType === 'approval_status') {
+       if(searchValue == 'Pending'){
+        searchValue = 0;
+       }else if(searchValue == 'Approved'){
+        searchValue = 1;
+       }else if(searchValue == 'Rejected'){
+        searchValue = 2;
+       }
+      query.approval_status = { $regex: `${searchValue}`, $options: 'i' };
+    }
+  }
 
   Userproduct.aggregate([
     {
@@ -225,6 +253,8 @@ exports.getData = function (req, res, next) {
         preserveNullAndEmptyArrays: true,
       },
     },
+    { $match: query },
+    { $limit: 20 }
   ]).exec(function (error, productList) {
     if (error) {
       return res.status(500).json({ error: 'An error occurred' });
@@ -247,51 +277,37 @@ exports.getData = function (req, res, next) {
     });
   });
 };
-
-
 exports.detailsData = async function (req, res, next) {
-
-  
   var pageName = "Product Details";
   var pageTitle = req.app.locals.siteName + " - " + pageName;
-
   const productId = req.params.id;
-
   if (!mongoose.Types.ObjectId.isValid(productId)) {
     return res.status(400).json({ error: 'Invalid product ID' });
   }
-
   try {
     const productdetails = await Userproduct.findOne({ _id: productId })
       .populate('brand_id', 'name')
       .populate('category_id', 'name')
       .populate('user_id', 'name')
       .populate('status', 'name');
-
     if (!productdetails) {
       return res.status(404).json({ error: 'Product not found' });
     }
-    // Fetch the parent category
-    if(productdetails.hasOwnProperty("category_id"))
-    {
+    if (productdetails.hasOwnProperty("category_id")) {
       const CategoryDetails = await Category.findById(productdetails.category_id);
-
       const parentCategory = await Category.findById(CategoryDetails.parent_id);
     }
-  
     const productImages = await Productimage.find({ product_id: productId });
     const brandList = await Brand.find();
     const categoryList = await Category.find({ parent_id: '650444488501422c8bf24bdb' });
     const subcategoryList = await Category.find({ parent_id: { $ne: '650444488501422c8bf24bdb' } });
     const sizeList = await Size.find();
     const productcondition = await Productcondition.find();
-
+    const genderList = await Gender.find();
     const requrl = url.format({
       protocol: req.protocol,
       host: req.get("host"),
     });
-
-
     res.render("pages/product/details", {
       status: 1,
       siteName: req.app.locals.siteName,
@@ -309,15 +325,15 @@ exports.detailsData = async function (req, res, next) {
       brand: brandList,
       size: sizeList,
       productCondition: productcondition,
+      genderList: genderList,
       productImages: productImages,
       parentCategory: productdetails.hasOwnProperty("category_id") ? parentCategory : null,
-      
+
     });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred' });
   }
 };
-
 exports.updatedetailsData = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -327,7 +343,6 @@ exports.updatedetailsData = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   Userproduct.findById(req.body.product_id).then(async (product) => {
     if (!product) {
       res.status(404).json({
@@ -352,6 +367,7 @@ exports.updatedetailsData = async function (req, res, next) {
       if (req.body.weight) updData.weight = req.body.weight;
       if (req.body.length) updData.length = req.body.length;
       if (req.body.breath) updData.breath = req.body.breath;
+      if (req.body.gender_id) updData.gender_id = req.body.gender_id;
       await Userproduct.findOneAndUpdate({ _id: req.body.product_id }, { $set: updData }, { upsert: true });
       if (req.body.remainingImages.length > 0) {
         const remainingImages = req.body.remainingImages ? JSON.parse(req.body.remainingImages) : [];
@@ -385,15 +401,12 @@ exports.updatedetailsData = async function (req, res, next) {
                 image: imageUrl,
                 added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
               });
-
               return productimageDetail.save();
             });
-
             await Promise.all(imageDetails);
           }
         }
         else {
-          // const count = imagesArray.length;
           await Productimage.deleteMany({ product_id: req.body.product_id });
           const imagesToUpload = imagesArray.slice(0, 5);
           for (const image of imagesToUpload) {
@@ -419,7 +432,6 @@ exports.updatedetailsData = async function (req, res, next) {
                 host: req.get("host"),
               });
               const imageUrl = requrl + "/public/images/" + file.filename;
-
               const productimageDetail = new Productimage({
                 product_id: req.body.product_id,
                 category_id: req.body.subcategory_id,
@@ -427,16 +439,12 @@ exports.updatedetailsData = async function (req, res, next) {
                 image: imageUrl,
                 added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
               });
-
               return productimageDetail.save();
             });
-
             await Promise.all(imageDetails);
           }
         }
-
       }
-
       // if (req.files && req.files.length > 0) {
       //   const imageDetails = req.files.map((file) => {
       //     const requrl = url.format({
@@ -458,7 +466,6 @@ exports.updatedetailsData = async function (req, res, next) {
 
       //   await Promise.all(imageDetails);
       // }
-
       res.redirect("/productlist");
     }
   }).catch((err) => {
@@ -469,12 +476,8 @@ exports.updatedetailsData = async function (req, res, next) {
     });
   });
 };
-
-
-
 exports.updateStatusData = async function (req, res, next) {
   const Id = req.params.id;
-
   Userproduct.findById(Id)
     .then((product) => {
       if (!product) {
@@ -484,7 +487,6 @@ exports.updateStatusData = async function (req, res, next) {
           respdata: {},
         });
       }
-
       product.flag = product.flag === 0 ? 1 : 0;
 
       product.save()
@@ -541,10 +543,10 @@ exports.deleteData = async function (req, res, next) {
       { w: "majority", wtimeout: 100 }
     );
 
-    
+
     res.redirect("/productlist");
   } catch (error) {
-   
+
     return res.status(500).json({
       status: "0",
       message: "Error occurred while deleting the product!",

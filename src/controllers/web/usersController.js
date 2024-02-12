@@ -232,7 +232,6 @@ exports.ajaxAdminLogin = async function (req, res, next) {
                       "/public/images/" +
                       "no-image.jpg";
                   }
-
                   delete  req.session.admin;
                   req.session.admin = {
                     userId: user._id,

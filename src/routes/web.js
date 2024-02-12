@@ -60,7 +60,7 @@ router.get("/", cors(), function (req, res) {
   req.app.locals.requrl = requrl;
 
 
-  if (!req.session.user) {
+  if (!req.session.admin) {
     var pageTitle = req.app.locals.siteName + " - Login";
 
     res.render("pages/index.ejs", {

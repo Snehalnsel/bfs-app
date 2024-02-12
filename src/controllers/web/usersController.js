@@ -356,7 +356,77 @@ exports.ajaxAdminLogin = async function (req, res, next) {
     }
   });
 };*/
+exports.adminRelogin = async function (req, res, next) {
+  const { cookieRefreshToken } = req.body;
+  let accessTokenGlobal = "";
+  let refreshTokenGlobal = "";
+  if (cookieRefreshToken != "") {
+    let tokenDetailsData = await tokenDecode(cookieRefreshToken, process.env.REFRESH_TOKEN_PRIVATE_KEY);
+    if (!tokenDetailsData.error) {
+      const email = tokenDetailsData.tokenDetails.email;
+      if ((typeof req.session.user != "undefined") && (req.session.user.userId.toString() == tokenDetailsData.tokenDetails.userId.toString())) {
+        res.status(200).json({
+          status: "error",
+          message: "Already logged In!!"
+        });
+      } else {
+        Users.findOne({ email }).then(async (user) => {
+          //user.save(async (err) => {
+          const userToken = {
+            userId: user._id,
+            email: user.email,
+            password: user.password,
+          };
+          //user data stored in session
+          req.session.user = userToken;
+          if (tokenDetailsData.tokenDetails.exp > (Date.now() / 1000)) {
+            //generate access token only
+            const { accessToken, refreshToken } = await generateAdminTokens(userToken, cookieRefreshToken);
+            accessTokenGlobal = accessToken;
+            refreshTokenGlobal = refreshToken;
+          } else {
+            //generate refresh token
+            const { accessToken, refreshToken } = await generateAdminTokens(userToken, "");
+            accessTokenGlobal = accessToken;
+            refreshTokenGlobal = refreshToken;
+          }
+          Users.findOneAndUpdate(
+            { _id: user._id },
+            { $set: { token: accessTokenGlobal, last_login: dateTime } },
+            { upsert: true },
+            function (err, doc) {
+              if (err) {
+                res.status(500).json({
+                  status: "error",
+                  message: "Token update error!",
+                });
+              } else {
+                Users.findOne({ _id: user._id }).then((updatedUser) => {
+                  res.status(200).json({
+                    status: "success",
+                    message: "Successful!",
+                    accessToken: accessTokenGlobal,
+                    refreshToken: refreshTokenGlobal,
+                    accessTokenExpires: process.env.COOCKIE_ACCESS_TOKEN_EXPIRES_IN,
+                    refreshTokenExpires: process.env.COOCKIE_REFRESH_TOKEN_EXPIRES_IN,
+                  });
+                });
+              }
+            }
+          );
+          //}
+          //});
+        });
+      }
+    } else {
+      res.status(200).json({
+        status: "error",
+        message: "Invalid Token!!",
+      });
+    }
+  }
 
+};
 exports.getProfile = async function (req, res, next) {
  
 

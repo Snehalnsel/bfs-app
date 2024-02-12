@@ -1,7 +1,7 @@
 $(document).ready(async function() {
     let reCookieAccessToken = await getCookieFunc(accessTokenVar);
     let reCookieRefreshToken = await getCookieFunc(refreshTokenVar);
-    if((reCookieRefreshToken != "") && ($("#userReloggedIn").val() == "")) {
+    if((reCookieRefreshToken != "") && ($("#adminReloggedIn").val() == "")) {
         await userReLogin(reCookieAccessToken, reCookieRefreshToken);
     }
 });
@@ -9,7 +9,7 @@ async function userReLogin(reCookieAccessToken, reCookieRefreshToken) {
     //Check Or Login
     $.ajax({
         type: 'POST',
-        url:  webSiteUrl + "/user-relogin",
+        url:  webSiteUrl + "/admin-relogin",
         data: {
             cookieRefreshToken:reCookieRefreshToken
         },

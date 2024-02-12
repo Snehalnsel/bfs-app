@@ -96,7 +96,9 @@ router.post(
   ],
   UsersController.editProfile
 );
-
+router.post("/admin-relogin",cors(),
+UsersController.adminRelogin
+);
 router.post(
   "/ajax-userlogin",
   cors(),

@@ -868,13 +868,11 @@ exports.userFilter = async function (req, res, next) {
     }
 }
 // let totalProduct = await Userproduct.find(concatVar).sort({ offer_price: optionId });
-console.log(concatVar);
 const query = { 
   ...concatVar,
   approval_status: 1,
   flag: 0
 };
-console.log(query);
 let totalProduct = await Userproduct.countDocuments(query);
 let allProductData = await Userproduct.find(query)
 .sort({ offer_price: optionId })

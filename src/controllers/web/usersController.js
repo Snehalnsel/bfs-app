@@ -156,7 +156,7 @@ exports.ajaxAdminLogin = async function (req, res, next) {
             //Access token validate
             let getAccessTokenData = await tokenDecode(cookieAccessToken, process.env.ACCESS_TOKEN_PRIVATE_KEY);
             if (!getAccessTokenData.error) {
-              if ((typeof req.session.user != "undefined") && (req.session.user.userId.toString() == getAccessTokenData.tokenDetails.userId.toString())) {
+              if ((typeof  req.session.admin != "undefined") && ( req.session.admin.userId.toString() == getAccessTokenData.tokenDetails.userId.toString())) {
                 res.status(200).json({
                   status: "success",
                   refreshReset: false,
@@ -218,8 +218,8 @@ exports.ajaxAdminLogin = async function (req, res, next) {
                       "no-image.jpg";
                   }
 
-                  delete req.session.user;
-                  req.session.user = {
+                  delete  req.session.admin;
+                  req.session.admin = {
                     userId: user._id,
                     email: user.email,
                     name: user.name,
@@ -327,8 +327,8 @@ exports.ajaxAdminLogin = async function (req, res, next) {
                       "no-image.jpg";
                   }
 
-                  delete req.session.user;
-                  req.session.user = {
+                  delete  req.session.admin;
+                   req.session.admin = {
                     userId: user._id,
                     email: user.email,
                     name: user.name,
@@ -364,7 +364,7 @@ exports.adminRelogin = async function (req, res, next) {
     let tokenDetailsData = await tokenDecode(cookieRefreshToken, process.env.REFRESH_TOKEN_PRIVATE_KEY);
     if (!tokenDetailsData.error) {
       const email = tokenDetailsData.tokenDetails.email;
-      if ((typeof req.session.user != "undefined") && (req.session.user.userId.toString() == tokenDetailsData.tokenDetails.userId.toString())) {
+      if ((typeof  req.session.admin != "undefined") && ( req.session.admin.userId.toString() == tokenDetailsData.tokenDetails.userId.toString())) {
         res.status(200).json({
           status: "error",
           message: "Already logged In!!"
@@ -378,7 +378,7 @@ exports.adminRelogin = async function (req, res, next) {
             password: user.password,
           };
           //user data stored in session
-          req.session.user = userToken;
+           req.session.admin = userToken;
           if (tokenDetailsData.tokenDetails.exp > (Date.now() / 1000)) {
             //generate access token only
             const { accessToken, refreshToken } = await generateAdminTokens(userToken, cookieRefreshToken);
@@ -430,12 +430,12 @@ exports.adminRelogin = async function (req, res, next) {
 exports.getProfile = async function (req, res, next) {
  
 
-  if (!req.session.user) {
+  if (! req.session.admin) {
     res.redirect("/");
   }
 
   var pageTitle = req.app.locals.siteName + " - Profile";
-  const user_id = mongoose.Types.ObjectId(req.session.user.userId);
+  const user_id = mongoose.Types.ObjectId( req.session.admin.userId);
 
   Users.findOne({ _id: user_id }).then((user) => {
     if (!user) {
@@ -452,9 +452,9 @@ exports.getProfile = async function (req, res, next) {
         status: 1,
         siteName: req.app.locals.siteName,
         pageTitle: pageTitle,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         year: moment().format("YYYY"),
         requrl: req.app.locals.requrl,
         respdata: user,
@@ -516,9 +516,9 @@ exports.uploadImage = async function (req, res, next) {
 
 exports.signOut = async function (req, res, next) {
   //const banner = await Banner.find({ status: 1 });
-  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+  let isLoggedIn = (typeof  req.session.admin != "undefined") ?  req.session.admin.userId : "";
   if(isLoggedIn != ''){
-    Users.findOne({ _id: req.session.user.userId }).then((user) => {
+    Users.findOne({ _id:  req.session.admin.userId }).then((user) => {
       if (!user)
         res.status(404).json({
           status: "0",
@@ -531,7 +531,7 @@ exports.signOut = async function (req, res, next) {
           last_logout: dateTime,
         };
         Users.findOneAndUpdate(
-          { _id: req.session.user.userId },
+          { _id:  req.session.admin.userId },
           { $set: updData },
           { upsert: true },
           function (err, doc) {
@@ -574,10 +574,10 @@ exports.signOut = async function (req, res, next) {
   }
 };
 /*exports.getLogout = async function (req, res, next) {
-  if (!req.session.user) {
+  if (! req.session.admin) {
     res.redirect("/");
   }
-  let adminUserId = typeof req.session.user != "undefined" ? req.session.user.userId : "";
+  let adminUserId = typeof  req.session.admin != "undefined" ?  req.session.admin.userId : "";
   const user_id = mongoose.Types.ObjectId(adminUserId);
 
   Users.findOne({ _id: user_id }).then((user) => {
@@ -604,7 +604,7 @@ exports.signOut = async function (req, res, next) {
             throw err;
           } else {
             Users.findOne({ _id: user_id }).then((user) => {
-              delete req.session.user;
+              delete  req.session.admin;
               res.redirect("/");
             });
           }
@@ -621,9 +621,9 @@ exports.editProfile = async function (req, res, next) {
     res.render("pages/profile", {
       siteName: req.app.locals.siteName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       status: 0,
@@ -632,16 +632,16 @@ exports.editProfile = async function (req, res, next) {
     });
   }
 
-  const user_id = mongoose.Types.ObjectId(req.session.user.userId);
+  const user_id = mongoose.Types.ObjectId( req.session.admin.userId);
 
   Users.findOne({ _id: user_id }).then((user) => {
     if (!user) {
       res.render("pages/profile", {
         siteName: req.app.locals.siteName,
         pageTitle: pageTitle,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         year: moment().format("YYYY"),
         requrl: req.app.locals.requrl,
         status: 0,
@@ -666,7 +666,7 @@ exports.editProfile = async function (req, res, next) {
                   siteName: req.app.locals.siteName,
                   pageTitle: pageTitle,
                   userFullName: user.name,
-                  userImage: req.session.user.image_url,
+                  userImage:  req.session.admin.image_url,
                   userEmail: user.email,
                   year: moment().format("YYYY"),
                   requrl: req.app.locals.requrl,
@@ -685,7 +685,7 @@ exports.editProfile = async function (req, res, next) {
               siteName: req.app.locals.siteName,
               pageTitle: pageTitle,
               userFullName: user.name,
-              userImage: req.session.user.image_url,
+              userImage:  req.session.admin.image_url,
               userEmail: user.email,
               year: moment().format("YYYY"),
               requrl: req.app.locals.requrl,
@@ -710,9 +710,9 @@ exports.editProfile = async function (req, res, next) {
                       res.render("pages/profile", {
                         siteName: req.app.locals.siteName,
                         pageTitle: pageTitle,
-                        userFullName: req.session.user.name,
-                        userImage: req.session.user.image_url,
-                        userEmail: req.session.user.email,
+                        userFullName:  req.session.admin.name,
+                        userImage:  req.session.admin.image_url,
+                        userEmail:  req.session.admin.email,
                         year: moment().format("YYYY"),
                         requrl: req.app.locals.requrl,
                         status: 0,
@@ -728,9 +728,9 @@ exports.editProfile = async function (req, res, next) {
             res.render("pages/profile", {
               siteName: req.app.locals.siteName,
               pageTitle: pageTitle,
-              userFullName: req.session.user.name,
-              userImage: req.session.user.image_url,
-              userEmail: req.session.user.email,
+              userFullName:  req.session.admin.name,
+              userImage:  req.session.admin.image_url,
+              userEmail:  req.session.admin.email,
               status: 0,
               year: moment().format("YYYY"),
               message: "New password cannot be same as your Old password!!",

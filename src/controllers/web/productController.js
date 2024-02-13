@@ -32,7 +32,6 @@ const multer = require("multer");
 const upload = multer({ dest: 'public/images/' });
 
 exports.getData = function (req, res, next) {
-
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Product List";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";

@@ -25,7 +25,7 @@ async function userReLogin(reCookieAccessToken, reCookieRefreshToken) {
             }
         },
         error: function(response){
-            location.reload()
+            //location.reload()
         }
     });
 }

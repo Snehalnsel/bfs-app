@@ -122,7 +122,7 @@ var routes = require("./src/routes/routes.js");
 var web = require("./src/routes/web.js");
 var api = require("./src/routes/api.js");
 
-app.use("/", web);
+app.use("/admin_2F19C0M", web);
 app.use("/api", api);
 app.use("/routes", routes); //test
 

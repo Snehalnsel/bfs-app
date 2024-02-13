@@ -92,8 +92,8 @@
                <div class="action-botton-group">
                   <ul class="resultlist">
                      <li><a href="javascript:void(0)" class="chatbox-btn" id="reBidButton">Re Bid</a></li>
-                     <!--<li><a href="javascript:void(0)" class="chatbox-btn" id="acceptButton">Accept</a></li>
-                     <li><a href="javascript:void(0)" class="chatbox-btn black-btn" id="withdrawButton">Withdraw</a></li>-->
+                     <li><a href="javascript:void(0)" class="chatbox-btn" id="acceptButton">Accept</a></li>
+                     <!--<li><a href="javascript:void(0)" class="chatbox-btn black-btn" id="withdrawButton">Withdraw</a></li>-->
                   </ul>
                </div>
             </div>
@@ -140,6 +140,13 @@
             
          }
       });*/
+   });
+   $("body").on('DOMSubtreeModified', ".chat-messages", function() {
+      $(".message-box-holder").each(async function() {
+         if($(this).children("div").hasClass("outgoing-message")){
+            $("#acceptButton").css({"pointer-events":"none"});
+         }
+      });
    });
 </script>
 <script>

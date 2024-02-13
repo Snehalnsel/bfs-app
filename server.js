@@ -15,6 +15,8 @@ const session = require('express-session');
 app.use("/public", express.static(path.join(__dirname, "public")));
 require('dotenv').config();
 
+const Userproduct = require("./src/models/api/userproductModel");
+
 app.locals.siteName = "BFS - Bid For Sale";
 
 //database
@@ -120,7 +122,7 @@ var routes = require("./src/routes/routes.js");
 var web = require("./src/routes/web.js");
 var api = require("./src/routes/api.js");
 
-app.use("/", web);
+app.use("/admin_2F19C0M", web);
 app.use("/api", api);
 app.use("/routes", routes); //test
 
@@ -210,34 +212,38 @@ io.on("connection", (socket) => {
     };
     let bidOldData = await getBidData(queryData);
     bidOldData = bidOldData[0];
-    let currIndex = parseInt(bidOldData.currentOffer.offerIndex) + 1;
-    const currDateTime = new Date();
-    let timeMiliSeccond = currDateTime.valueOf();
-    let currentOffer = {
-      bidId: bidId,
-      createdAt: timeMiliSeccond,
-      id:(username == bidOldData.buyerId) ? "offer_buyer_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond : "offer_seller_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond,
-      isFromBuyer:(username == bidOldData.buyerId) ? true: false,
-      offerIndex:currIndex,
-      price: (msg != "") ? msg : 0,
-      status: 0,
-      userId: queryData.userId,
-    };
-    let updateData = {
-      //buyerId:queryData.userId,
-      buyerId:(bidOldData.buyerId != "") ? bidOldData.buyerId : "",
-      id:bidId,
-      createdAt: timeMiliSeccond,
-      productId: (bidOldData.productId != "") ? bidOldData.productId : "",
-      withdrew: false,
-      status:1,
-      currentOffer: currentOffer,
-      sellerId:(bidOldData.sellerId != "") ? bidOldData.sellerId : "",
-    }; 
-    await updateBidData(updateData,bidId);
-    await insertBidOfferData(currentOffer,currentOffer.id);
-    let currUserDetails = await UserModel.findOne({_id:username});
-    io.to(roomName).emit("message",formatMessage(currUserDetails.name, msg,username, roomName));
+    let bidProductId = bidOldData.productId;
+    let bidProductDetails = await Userproduct.findOne({_id:bidProductId});
+    if(bidProductDetails.offer_price >= msg) {
+      let currIndex = parseInt(bidOldData.currentOffer.offerIndex) + 1;
+      const currDateTime = new Date();
+      let timeMiliSeccond = currDateTime.valueOf();
+      let currentOffer = {
+        bidId: bidId,
+        createdAt: timeMiliSeccond,
+        id:(username == bidOldData.buyerId) ? "offer_buyer_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond : "offer_seller_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond,
+        isFromBuyer:(username == bidOldData.buyerId) ? true: false,
+        offerIndex:currIndex,
+        price: (msg != "") ? msg : 0,
+        status: 0,
+        userId: queryData.userId,
+      };
+      let updateData = {
+        //buyerId:queryData.userId,
+        buyerId:(bidOldData.buyerId != "") ? bidOldData.buyerId : "",
+        id:bidId,
+        createdAt: timeMiliSeccond,
+        productId: (bidOldData.productId != "") ? bidOldData.productId : "",
+        withdrew: false,
+        status:1,
+        currentOffer: currentOffer,
+        sellerId:(bidOldData.sellerId != "") ? bidOldData.sellerId : "",
+      }; 
+      await updateBidData(updateData,bidId);
+      await insertBidOfferData(currentOffer,currentOffer.id);
+      let currUserDetails = await UserModel.findOne({_id:username});
+      io.to(roomName).emit("message",formatMessage(currUserDetails.name, msg,username, roomName));
+    }
   });
   //Get old messages form database
   socket.on("getOldMessages", async ({ roomName,username }) => {

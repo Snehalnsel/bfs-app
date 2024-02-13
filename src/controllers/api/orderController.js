@@ -877,30 +877,27 @@ exports.updateOrderById = async function (req, res, next) {
 exports.getOrderListByUser = async (req, res) => {
   try {
     let  user_id  = typeof req.body.user_id != "undefined"  ? req.body.user_id : req.session.user.userId;
-    
-
     const orders = await Order.find({ user_id: user_id }).populate('seller_id', 'name').populate('user_id', 'name');
-
     if (!orders || orders.length === 0) {
       return res.status(404).json({ message: 'No orders found for this seller' });
     }
-
     const ordersWithProductDetails = [];
-
     for (const order of orders) {
+
+      const orderCreationTime = moment(order.createdAt); 
+      const isOrderWithin24Hours = now.diff(orderCreationTime, 'hours') < 24;
+      const is_deletedtime = isOrderWithin24Hours ? 0 : 1;
+
+      await Order.updateOne({ _id: order._id }, { is_deletedtime });
+
       const productDetails = await Userproduct.find({ _id: order.product_id });
       const productId = order.product_id.toString();
       const productImage = await Productimage.find({ product_id: productId }).limit(1);
-      
       const shipdetails = await Ordertracking.find({ order_id: order._id });
-
       let shipping_details = {}; 
-      
-
       if (typeof shipdetails !="undefined" && shipdetails.length > 0) {
           shipping_details = await Track.find({ _id: shipdetails[0].tracking_id });
       }
-
       const orderDetails = {
         _id: order._id,
         total_price: order.total_price,
@@ -911,17 +908,15 @@ exports.getOrderListByUser = async (req, res) => {
         user_id: order.user_id,
         delete_by: order.delete_by,
         delete_status: order.delete_status,
+        is_deletedtime: is_deletedtime,
         product: {
           name: productDetails.length ? productDetails[0].name : 'Unknown Product',
           image: productImage.length ? productImage[0].image : 'No Image',
         },
         shippingkit_status: (Object.keys(shipping_details).length > 0) ? shipping_details[0].shippingkit_status : 2, 
       };
-
       ordersWithProductDetails.push(orderDetails);
     }
-
-
     res.status(200).json({
       message: 'Orders retrieved successfully',
       orders: ordersWithProductDetails,
@@ -934,35 +929,25 @@ exports.getOrderListByUser = async (req, res) => {
 exports.getOrdersBySeller = async (req, res) => {
   try {
     //const { seller_id } = req.body;
-    
     let  seller_id  = typeof req.body.user_id != "undefined"  ? req.body.user_id : req.session.user.userId;
-
     const orders = await Order.find({ seller_id }).populate('seller_id', 'name').populate('user_id', 'name');
-
     if (!orders || orders.length === 0) {
       return res.status(404).json({ message: 'No orders found for this seller' });
     }
-    
-
     const ordersWithProductDetails = [];
-
     for (const order of orders) {
+      const orderCreationTime = moment(order.createdAt); 
+      const isOrderWithin24Hours = now.diff(orderCreationTime, 'hours') < 24;
+      const is_deletedtime = isOrderWithin24Hours ? 0 : 1;
       const productDetails = await Userproduct.find({ _id: order.product_id });
       const productId = order.product_id.toString();
       const productImage = await Productimage.find({ product_id: productId }).limit(1);
-
       const shipdetails = await Ordertracking.find({ order_id: order._id });
-
       let shipping_details = {}; 
-      
-
       if (typeof shipdetails !="undefined" && shipdetails.length > 0) {
           shipping_details = await Track.find({ _id: shipdetails[0].tracking_id });
       }
-
-      // Check if there's any ShippingKit data for this order
       //const shippingKitData = await Shippingkit.findOne({ order_id: order._id });
-
       const orderDetails = {
         _id: order._id,
         total_price: order.total_price,
@@ -973,16 +958,15 @@ exports.getOrdersBySeller = async (req, res) => {
         user_id: order.user_id,
         delete_by: order.delete_by,
         delete_status: order.delete_status,
+        is_deletedtime: is_deletedtime,
         product: {
           name: productDetails.length ? productDetails[0].name : 'Unknown Product',
           image: productImage.length ? productImage[0].image : 'No Image',
         },
         shippingkit_status: (Object.keys(shipping_details).length > 0) ? shipping_details[0].shippingkit_status : 2, 
       };
-
       ordersWithProductDetails.push(orderDetails);
     }
-
     res.status(200).json({
       message: 'Orders retrieved successfully',
       orders: ordersWithProductDetails,
@@ -1119,6 +1103,22 @@ exports.cancelOrderById = async function (req, res, next) {
         respdata: {},
         is_cancelorder: true,
       });
+    }
+    const orderCreationTime = moment(existingOrder.createdAt);
+    const isOrderWithin24Hours = moment().diff(orderCreationTime, 'hours') < 24;
+
+    if (!isOrderWithin24Hours) {
+      existingOrder.is_deletedtime = '1';
+      existingOrder.updated_dtime = new Date().toISOString();
+      const canceledOrder = await existingOrder.save();
+      if (canceledOrder) {
+        return res.status(403).json({
+          status: "0",
+          message: "Order cannot be canceled as it has been over 24 hours since creation!",
+          respdata: {},
+          is_cancelorder: false,
+        });
+      }
     }
     existingOrder.delete_status = '1';
     existingOrder.delete_by = deleteby;

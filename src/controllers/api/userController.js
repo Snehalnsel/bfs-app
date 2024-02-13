@@ -9,6 +9,7 @@ const path = require("path");
 const fs = require("fs");
 const mime = require("mime");
 const Users = require("../../models/api/userModel");
+const Iptrnsaction = require("../../models/api/ipTransactionModel");
 // const helper = require("../helpers/helper");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -122,7 +123,7 @@ exports.signUp = async function (req, res, next) {
 
       const userIpAddress = req.connection.remoteAddress;
 
-      Users.findOne({ email: req.body.email , status: "0" }).then((user) => {
+      Users.findOne({ $or: [{ email: req.body.email }, { phone_no: req.body.phone_no }], status: "0" }).then((user) => {
         if (!user) {
           const newUser = Users({
             email: req.body.email,
@@ -147,8 +148,15 @@ exports.signUp = async function (req, res, next) {
           });
 
           newUser
-            .save()
-            .then((user) => {
+          .save()
+          .then((user) => {
+            Iptrnsaction.create({
+              user_id: user._id,
+              Purpose: "Registration",
+              ip_address: userIpAddress,
+              created_dtime: new Date(),
+            })
+            .then(() => {
               res.status(200).json({
                 status: "1",
                 message: "Added!",
@@ -163,6 +171,14 @@ exports.signUp = async function (req, res, next) {
                 respdata: error,
               });
             });
+          })
+          .catch((error) => {
+            res.status(400).json({
+              status: "0",
+              message: "Error!",
+              respdata: error,
+            });
+          });
         } else {
           res.status(400).json({
             status: "0",

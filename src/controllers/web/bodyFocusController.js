@@ -315,15 +315,15 @@ exports.createData = async function (req, res, next) {
   var pageName = "Category";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-  if (!req.file) {
+  // if (!req.file) {
     
-    return res.status(400).json({
-      status: "0",
-      message: "Image is required!",
-      respdata: [],
-      isAdminLoggedIn:isAdminLoggedIn
-    });
-  }
+  //   return res.status(400).json({
+  //     status: "0",
+  //     message: "Image is required!",
+  //     respdata: [],
+  //     isAdminLoggedIn:isAdminLoggedIn
+  //   });
+  // }
   let imagePath;
   if(req.file)
   {

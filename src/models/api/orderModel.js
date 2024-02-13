@@ -138,6 +138,11 @@ const model = mongoose.Schema({
     enum: [0,1,2,3],
     default: 0,
   },
+  is_deletedtime:{
+    type: Number,
+    enum: [0,1],
+    default: 0,
+  },
   bid_status:{
     type: Number,
     enum: [0,1],

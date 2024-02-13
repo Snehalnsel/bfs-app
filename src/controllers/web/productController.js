@@ -23,6 +23,7 @@ const rounds = 10;
 const dateTime = moment().format("YYYY-MM-DD h:mm:ss");
 const auth = require("../../middlewares/auth");
 const url = require("url");
+const ExcelJS = require('exceljs');
 // var { getAllActiveSessions } = require("../../middlewares/redis");
 const { check, validationResult } = require("express-validator");
 // var uuid = require("uuid");
@@ -572,3 +573,143 @@ exports.deleteData = async function (req, res, next) {
     });
   }
 };
+exports.downloadProductExcel = async function (req, res, next) {
+  try {
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+
+    Userproduct.aggregate([
+      {
+        $lookup: {
+          from: 'mt_categories',
+          localField: 'category_id',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      {
+        $lookup: {
+          from: 'mt_brands',
+          localField: 'brand_id',
+          foreignField: '_id',
+          as: 'brand',
+        },
+      },
+      {
+        $lookup: {
+          from: 'mt_sizes',
+          localField: 'size_id',
+          foreignField: '_id',
+          as: 'size',
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'user_id',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      {
+        $lookup: {
+          from: 'mt_product_images', 
+          let: { productId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$product_id', '$$productId'] },
+              },
+            },
+            {
+              $limit: 1, 
+            },
+          ],
+          as: 'productImages',
+        },
+      },    
+      {
+        $lookup: {
+          from: 'mt_productconditions',
+          localField: 'status',
+          foreignField: '_id',
+          as: 'productCondition',
+        },
+      },
+      {
+        $unwind: '$category',
+      },
+      {
+        $lookup: {
+          from: 'mt_categories',
+          localField: 'category.parent_id',
+          foreignField: '_id',
+          as: 'category.parent'
+        }
+      }
+    ]).exec(async function (error, productList) {
+      if (error) {
+        return res.status(500).json({ error: 'An error occurred' });
+      }
+      try {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Product List');
+        worksheet.addRow([
+          'Product Name',
+          'Category',
+          'Brand',
+          'Size',
+          'User',
+          'Product Condition',
+          'Price',
+          'Offer Price',
+          'Approval Status',
+        ]);
+        productList.forEach(product => {
+
+          let approvalStatus;
+          switch (product.approval_status) {
+            case 0:
+              approvalStatus = 'Pending';
+              break;
+            case 1:
+              approvalStatus = 'Approved';
+              break;
+            case 2:
+              approvalStatus = 'Rejected';
+              break;
+            default:
+              approvalStatus = 'Unknown';
+          }
+          const rowData = [
+            product.name,
+            product.category && product.category.length > 0 && product.category[0].name || '', // Check if category exists and has a name property
+            product.brand && product.brand.length > 0 && product.brand[0].name || '', // Check if brand exists and has a name property
+            product.size && product.size.length > 0 && product.size[0].name || '', // Check if size exists and has a name property
+            product.user && product.user.length > 0 && product.user[0].name || '', // Check if user exists and has a name property
+            product.productCondition && product.productCondition.length > 0 && product.productCondition[0].name || '', // Check if productCondition exists and has a name property
+            product.price || '', // Assuming price exists directly on the product document
+            product.offer_price || '', // Assuming offer_price exists directly on the product document
+            approvalStatus
+          ];
+          worksheet.addRow(rowData);
+        });
+        
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=product_list.xlsx');
+        await workbook.xlsx.write(res);
+        res.end();
+      } catch (err) {
+        console.error('Error generating Excel file:', err);
+        return res.status(500).json({ error: 'An error occurred while generating Excel file' });
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "0",
+      message: "Error occurred while generating Excel file!",
+      respdata: error.message,
+      isAdminLoggedIn: isAdminLoggedIn
+    });
+  }
+};
+

@@ -36,11 +36,9 @@ const ShippingkitController = require("../controllers/web/shippingkitController"
 const CartremoveController = require("../controllers/web/cartremoveController");
 const BannerController = require("../controllers/web/bannerController");
 const GenderController = require("../controllers/web/genderController");
-
+const IpaddressController = require("../controllers/web/ipaddressController");
 
 var session = require("express-session");
-
-
 router.use(
   session({
     secret: "fd$e43W7ujyDFw(8@tF",
@@ -552,5 +550,12 @@ router.get("/genderlist", cors(), GenderController.getData);
 router.get("/add-gender", cors(), GenderController.addData);
 router.post("/create-gender",GenderController.createData);
 router.get("/delete-gender/:id", cors(), GenderController.deleteData);
+
+//IP Address LIST
+router.get("/iplist", cors(), IpaddressController.getList);
+
+//download product excel
+router.get("/download-product-excel", cors(), ProductController.downloadProductExcel);
+router.get("/download-order-excel", cors(), OrderController.downloadOrderExcel);
 
 module.exports = router;

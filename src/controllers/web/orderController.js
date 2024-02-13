@@ -31,6 +31,7 @@ const tokenSecret = "a2sd#Fs43d4G3524Kh";
 const rounds = 10;
 const dateTime = moment().format("YYYY-MM-DD h:mm:ss");
 const auth = require("../../middlewares/auth");
+const ExcelJS = require('exceljs');
 // var { getAllActiveSessions } = require("../../middlewares/redis");
 const { check, validationResult } = require("express-validator");
 // var uuid = require("uuid");
@@ -1880,4 +1881,133 @@ exports.huborderplaced = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while placing the order' });
   }
+};
+
+exports.downloadOrderExcel = function (req, res, next) {
+  var pageName = "Order List";
+  var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+
+  Order.aggregate([
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user_id',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'seller_id',
+        foreignField: '_id',
+        as: 'seller',
+      },
+    },
+    {
+      $lookup: {
+        from: 'addressbook_lists',
+        localField: 'billing_address_id',
+        foreignField: '_id',
+        as: 'billing_address',
+      },
+    },
+    {
+      $lookup: {
+        from: 'addressbook_lists',
+        localField: 'shipping_address_id',
+        foreignField: '_id',
+        as: 'shipping_address',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_userproducts',
+        localField: 'product_id',
+        foreignField: '_id',
+        as: 'product',
+      },
+    },
+    {
+      $lookup: {
+        from: 'order_trackings',
+        localField: '_id',
+        foreignField: 'order_id',
+        as: 'trackingDetails',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_tracks',
+        localField: 'trackingDetails.tracking_id',
+        foreignField: '_id',
+        as: 'trackDetails',
+      },
+    },
+    {
+      $sort: {
+        added_dtime: -1
+      }
+    }
+  ]).exec(async function (error, orderList) {
+    if (error) {
+      res.status(500).json({ error: 'An error occurred' });
+    } else {
+      try {
+        // Create Excel workbook and worksheet
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Order List');
+
+        // Add headers to the worksheet
+        worksheet.addRow([
+          'Order ID',
+          'User',
+          'Seller',
+          'Billing Address',
+          'Shipping Address',
+          'Product Name',
+          // 'Product Image',
+          'Product Price',
+          'ShippingKit Status',
+          'Status',
+          'Payment Method',
+          'Order Date',
+        ]);
+
+        orderList.forEach(order => {
+          const buyerAddress = order.billing_address && order.billing_address.length > 0 ?
+          `${order.billing_address[0].street_name}, ${order.billing_address[0].address1}, ${order.billing_address[0].landmark}, ${order.billing_address[0].city_name}, ${order.billing_address[0].state_name}` : '';
+        const sellerAddress = order.shipping_address && order.shipping_address.length > 0 ?
+          `${order.shipping_address[0].street_name}, ${order.shipping_address[0].address1}, ${order.shipping_address[0].landmark}, ${order.shipping_address[0].city_name}, ${order.shipping_address[0].state_name}` : '';
+          const rowData = [
+            order._id,
+            order.user && order.user.length > 0 && order.user[0].name || '',
+            order.seller && order.seller.length > 0 && order.seller[0].name || '',
+            buyerAddress,
+            sellerAddress,
+            order.product && order.product.length > 0 && order.product[0].name || '',
+            // order.productImage && order.productImage.image || '', 
+            order.total_price,
+            order.trackDetails[0] && order.trackDetails[0].shippingkit_status === 0 ? 'ShippingKit Ordered' : 'Not Ordered',
+            order.bid_status === 0 ? 'Buy Now' : 'Won Bid',
+            order.payment_method === 0 ? 'COD' : 'Online',
+            order.added_dtime,
+          ];
+          worksheet.addRow(rowData);
+        });
+
+        // Set response headers to trigger file download in browser
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=order_list.xlsx');
+
+        // Pipe workbook to response
+        await workbook.xlsx.write(res);
+        res.end();
+      } catch (err) {
+        console.error('Error generating Excel file:', err);
+        res.status(500).json({ error: 'An error occurred while generating Excel file' });
+      }
+    }
+  });
 };

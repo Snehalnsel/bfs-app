@@ -24,7 +24,7 @@ $(document).on('click', ".remove-order", async function (e) {
             method: 'POST',
             data: {
                 orderid:orderid,
-                deleteby:deleteby 
+                deleteby:deleteby
             },
             success: function (data) {
                 if (data.is_cancelorder == true) {

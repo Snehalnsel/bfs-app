@@ -40,6 +40,7 @@
                 <div class="card-header py-3">
                   <h6 class="m-0 font-weight-bold text-primary"><%-pageName%> Details</h6>
                   <div>
+                    <button id="downloadExcelBtn" class="btn btn-primary">Download Excel</button>
                     <div class="search-container">
                       <!-- <input type="text" placeholder="Search.." id="searchInput"
                             class="search_by" name="search">
@@ -216,6 +217,10 @@
       "ordering": true,
       "searching": true
     });
+
+    document.getElementById('downloadExcelBtn').addEventListener('click', function() {
+    window.location.href = '/download-product-excel';
+  });
   });
 </script>
 

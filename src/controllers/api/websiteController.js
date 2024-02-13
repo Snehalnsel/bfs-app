@@ -41,6 +41,7 @@ const Banner = require("../../models/api/bannerModel");
 const Brand = require("../../models/api/brandModel");
 const Size = require("../../models/api/sizeModel");
 const Gender = require("../../models/api/genderModel");
+const Iptrnsaction = require("../../models/api/ipTransactionModel");
 //const smtpUser = "sneha.lnsel@gmail.com";
 const smtpUser = "hello@bidforsale.com";
 const nodemailer = require("nodemailer");
@@ -121,15 +122,12 @@ function generateToken1(email, password) {
     });
   });
 }
-
 async function generateSellerPickup(data) {
   token = await generateToken1(email, shipPassword);
   if (!token) {
     console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
-
-
   const options = {
     method: 'POST',
     url: baseUrl + '/settings/company/addpickup',
@@ -139,7 +137,6 @@ async function generateSellerPickup(data) {
     },
     body: JSON.stringify(data)
   };
-
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
       if (error) {
@@ -154,11 +151,7 @@ async function generateSellerPickup(data) {
       }
     });
   });
-
-
 }
-
-
 exports.productData = async function (req, res, next) {
   try {
 
@@ -175,7 +168,6 @@ exports.productData = async function (req, res, next) {
         product_id: productId,
       });
     }
-
     const categoydetails = await Userproduct.findById(query)
       .populate('category_id', 'name')
       .exec();
@@ -224,11 +216,7 @@ exports.productData = async function (req, res, next) {
               formattedUserProducts1.push(formattedUserProduct1);
             }
         }  
-    
-   
-
     if (!userproducts) {
-  
       return res.render("webpages/productdetails", {
         title: "Not Found",
         message: "The requested product was not found.",
@@ -239,9 +227,7 @@ exports.productData = async function (req, res, next) {
         relatedProducts: formattedUserProducts1,
         isWhislist: isProductInWishlist != null && Object.keys(isProductInWishlist).length ? true : false
       });
-
     }
-
     userproducts.hitCount = (userproducts.hitCount || 0) + 1;
     await userproducts.save();
     const productImages = await Productimage.find({ product_id: userproducts._id });
@@ -251,11 +237,11 @@ exports.productData = async function (req, res, next) {
       name: userproducts.name,
       description: userproducts.description,
       category_id: userproducts.category_id._id,
-      category: userproducts.category_id ? userproducts.category_id.name : '', // Check if category_id exists before accessing 'name'
-      brand: userproducts.brand_id ? userproducts.brand_id.name : '', // Check if brand_id exists before accessing 'name'
+      category: userproducts.category_id ? userproducts.category_id.name : '', 
+      brand: userproducts.brand_id ? userproducts.brand_id.name : '', 
       user_id: userproducts.user_id ? userproducts.user_id._id : '',
       user_name: userproducts.user_id ? userproducts.user_id.name : '',
-      size_id: userproducts.size_id ? userproducts.size_id.name : '', // Check if size_id exists before accessing 'name'
+      size_id: userproducts.size_id ? userproducts.size_id.name : '', 
       price: userproducts.price,
       offer_price: userproducts.offer_price,
       percentage: userproducts.percentage,
@@ -266,13 +252,10 @@ exports.productData = async function (req, res, next) {
       approval_status: userproducts.approval_status,
       satus_name: productCondition ? productCondition.name : '',
       added_dtime: userproducts.added_dtime,
-      hitCount: userproducts.hitCount || 0, // Provide a default value if hitCount is undefined
+      hitCount: userproducts.hitCount || 0,
       __v: userproducts.__v,
       product_images: productImages,
-    };
-
-
-    
+    };    
     res.render("webpages/productdetails", {
       title: "Product Details",
       message: "Welcome to the Product page!",
@@ -434,12 +417,14 @@ exports.signin = async function (req, res, next) {
       } else {
         const user = await Users.findOne({ email: req.body.email });
 
+        const userIpAddress = req.connection.remoteAddress;
+
         if (!user) {
           const newUser = Users({
             email: req.body.email,
             password: hash,
             token: "na",
-            //title: req.body.title,
+
             name: req.body.name,
             phone_no: req.body.phone_no,
             deviceid: "na",
@@ -454,12 +439,18 @@ exports.signin = async function (req, res, next) {
             app_user_id: "na",
             trial_end_date: "na",
             image: "na",
+            ip_address: userIpAddress,
           });
-
           await newUser.save();
+          const ipTransaction = new Iptrnsaction({
+            user_id: newUser._id, // Use newUser._id instead of user._id
+            Purpose: "Web User Registration",
+            ip_address: userIpAddress,
+            created_dtime: dateTime,
+          });
+          await ipTransaction.save();
 
           const user = await Users.findOne({ email: req.body.email });
-          
           const userToken = {
             userId: user._id,
             email: user.email,
@@ -468,7 +459,6 @@ exports.signin = async function (req, res, next) {
             name: user.name,
             age: user.age,
             image: user.image ? user.image:'',
-            //usertoken:user.token,
             phone_no: user.phone_no,
             weight: user.weight,
             height: user.height,
@@ -478,7 +468,6 @@ exports.signin = async function (req, res, next) {
             goal: user.goal,
             hear_from: user.hear_from,
           };
-      
           const { accessToken, refreshToken } = await generateTokens(userToken, "");
           return res.status(200).json({
             status: "success",
@@ -504,9 +493,6 @@ exports.signin = async function (req, res, next) {
     });
   }
 };
-
-
-
 exports.ajaxGetUserLogin = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -620,7 +606,6 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
               //const { accessToken, refreshToken } = await generateTokens(userToken, cookieRefreshToken);
               //Generate Token Required By Condition
               if (cookieRefreshToken != "") {
-                //Access token validate
                 let getAccessTokenData = await tokenDecode(cookieAccessToken, process.env.ACCESS_TOKEN_PRIVATE_KEY);
                 if (!getAccessTokenData.error) {
                   if ((typeof req.session.user != "undefined") && (req.session.user.userId.toString() == getAccessTokenData.tokenDetails.userId.toString())) {
@@ -633,18 +618,15 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
                     let getRefreshTokenData = await tokenDecode(cookieRefreshToken, process.env.REFRESH_TOKEN_PRIVATE_KEY);
                     if (!getRefreshTokenData.error) {
                       if (getRefreshTokenData.tokenDetails.exp > (Date.now() / 1000)) {
-                        //generate access token only
                         const { accessToken, refreshToken } = await generateTokens(userToken, cookieRefreshToken);
                         accessTokenGlobal = accessToken;
                         refreshTokenGlobal = refreshToken;
                       } else {
-                        //generate refresh token
                         const { accessToken, refreshToken } = await generateTokens(userToken, "");
                         accessTokenGlobal = accessToken;
                         refreshTokenGlobal = refreshToken;
                       }
                     } else {
-                      //Do something while you will get error in refresh token
                       res.status(200).json({
                         status: "error",
                         refreshReset: false,
@@ -653,7 +635,6 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
                     }
                   }
                 } else {
-                  //Do something while you will get error in access token
                   res.status(200).json({
                     status: "error",
                     refreshReset: false,
@@ -661,12 +642,10 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
                   });
                 }
               } else {
-                //User is logging for the first time
                 const { accessToken, refreshToken } = await generateTokens(userToken, "");
                 accessTokenGlobal = accessToken;
                 refreshTokenGlobal = refreshToken;
               }
-              //Generate Token Required By Condition
               let myquery = { _id: user._id };
               let newvalues = { $set: { token: accessTokenGlobal, last_login: dateTime } };
               Users.updateOne(myquery, newvalues, function (err, response) {
@@ -677,9 +656,7 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
                     respdata: {},
                   });
                 } else {
-                  //Store user data into the session
                   req.session.user = userToken;
-
                   res.status(200).json({
                     status: "success",
                     message: "Successfully logged in!",
@@ -3072,6 +3049,14 @@ exports.userPlacedOrder = async function (req, res) {
     const savedOrder = await order.save();
 
     if (savedOrder) {
+
+      await Iptrnsaction.create({
+        user_id: savedOrder.user_id, 
+        Purpose: "Order Placement",
+        ip_address: req.connection.remoteAddress, 
+        created_dtime: new Date(),
+      });
+
       const user = await Users.findById(savedOrder.user_id);
 
       const mailData = {

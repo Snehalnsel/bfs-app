@@ -35,25 +35,17 @@
                       <div class="card shadow mb-4">
                           <div class="card-header py-3">
                               <h6 class="m-0 font-weight-bold text-primary"><%-pageName%> Details</h6>
-                              <button id="downloadExcel" class="btn btn-primary">Download Excel</button>
                           </div>
                           <div class="card-body">
                             <div class="table-responsive">
-    
-
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
-
                                         <tr>
                                             <th>Sl No</th>
-                                            <th>Name</th>
-                                            <th>User Id</th>
-                                            <th>Email</th>
-                                            <th>Phone No.</th>
-                                            <th>Ip Address</th>
+                                            <th>User Nmae</th>
+                                            <th>Type</th>
+                                            <th>IP <Address></Address></th>
                                             <th>Created On</th>
-                                            <!-- <th>Status</th> -->
-                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -61,28 +53,10 @@
                                             <% respdata.list.forEach(function(value, index) { %> 
                                             <tr>
                                                 <td><%= (index+1) %></td>
-                                                <td><%= value.name %></td>
-                                                <td><%= value.app_user_id %></td>
-                                                <td><%= value.email %></td>
-                                                <td><%= value.phone_no %></td>
-                                                <td>
-                                                    <% if (value.ip_address) { %>
-                                                      <%= value.ip_address %>
-                                                    <% } else { %>
-                                                      No IP address found yet
-                                                    <% } %>
-                                                  </td>
-                                                  
+                                                <td><%= value.user_id.name %></td>
+                                                <td><%= value.purpose%></td>
+                                                <td><%= value.ip_address%></td>
                                                 <td><%= value.created_dtime%></td>
-                                                <!-- <td>Active</th> -->
-                                                <td>
-                                                    <a href="/edit-app-users/<%= value._id %>" class="btn btn-info btn-circle btn-sm"  title="Edit">
-                                                        <i class="fas fa-pencil-alt"></i>
-                                                    </a>
-                                                    <a href="/delete-app-users/<%= value._id %>" class="btn btn-danger btn-circle btn-sm"  title="Delete">
-                                                        <i class="fas fa-trash"></i>
-                                                    </a>
-                                                </td>
                                             </tr>
                                             <% });  %>
                                         <% } %> 
@@ -121,7 +95,6 @@
 </body>
 
 </html>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 
 <script>
     $(document).ready(function() {
@@ -130,19 +103,5 @@
         "ordering": true,
         "searching": true
       });
-    });
-
-      // Function to download data as Excel
-      function downloadExcel() {
-        var table = document.getElementById('dataTable');
-        var ws = XLSX.utils.table_to_sheet(table);
-        var wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-        XLSX.writeFile(wb, 'data.xlsx');
-    }
-
-    // Trigger download on button click
-    document.getElementById('downloadExcel').addEventListener('click', function() {
-        downloadExcel();
     });
   </script>

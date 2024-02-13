@@ -30,6 +30,11 @@ exports.getList = async function (req, res, next) {
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   try {
     const ipTransactions = await Iptrnsaction.find().populate('user_id').sort({ _id: -1 });
+
+    ipTransactions.forEach(transaction => {
+      transaction.created_dtime = moment(transaction.created_dtime).format("YYYY-MM-DD HH:mm:ss");
+    });
+    
     res.render("pages/ip/list", {
       siteName: req.app.locals.siteName,
       pageName: pageName,

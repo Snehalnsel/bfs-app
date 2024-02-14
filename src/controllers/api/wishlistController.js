@@ -21,6 +21,7 @@ var ObjectId = require("mongodb").ObjectId;
 const Wishlist = require('../../models/api/wishlistModel');
 const Userproduct = require("../../models/api/userproductModel");
 const Productimage = require("../../models/api/productimageModel");
+const insertNotification = require("../../models/api/insertNotification");
 const Users = require("../../models/api/userModel");
 
 exports.addToWishlist = async (req, res) => {
@@ -52,9 +53,15 @@ exports.addToWishlist = async (req, res) => {
         status,
         added_dtime: new Date(), 
       });
-
       const savedFavData = await newFavList.save();
-
+      const requestUrl = req.originalUrl || req.url;
+      // await insertNotification(
+      //   'Wishlist Notification', 
+      //   `Item ${product.name} added to wishlist by ${user.name}`, 
+      //   user_id, 
+      //   requestUrl, 
+      //   new Date()
+      // );
       return res.status(200).json({
         message: 'Item added to your wishlist successfully',
         wishlist: {

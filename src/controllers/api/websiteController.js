@@ -3049,16 +3049,13 @@ exports.userPlacedOrder = async function (req, res) {
     const savedOrder = await order.save();
 
     if (savedOrder) {
-
       await Iptrnsaction.create({
         user_id: savedOrder.user_id, 
-        Purpose: "Order Placement",
+        Purpose: "Order Placement from Web",
         ip_address: req.connection.remoteAddress, 
         created_dtime: new Date(),
       });
-
       const user = await Users.findById(savedOrder.user_id);
-
       const mailData = {
         from: "Bid For Sale! <"+smtpUser+">",
         to: user.email,
@@ -3069,23 +3066,18 @@ exports.userPlacedOrder = async function (req, res) {
           user.name +
           ", <br> <p>Congratulations your order is placed.please wait for some times and the delivery details you will show on the app.</p>",
       };
-
       transporter.sendMail(mailData, function (err, info) {
         if (err) console.log(err);
         else console.log(info);
       });
-
       // const deleteCart;
       //Delete Cart while place order
-
-        const existingCart = await Cart.findOne({ user_id, status: 0 });
-    
+      const existingCart = await Cart.findOne({ user_id, status: 0 });
         if (!existingCart) {
           return res.status(404).json({
             message: 'Cart not found',
           });
         }
-    
         const cartDetail = await CartDetail.findOne({
           cart_id: existingCart._id,
           product_id,
@@ -3104,7 +3096,6 @@ exports.userPlacedOrder = async function (req, res) {
         if (cartDetailsCount === 0) {
           await existingCart.remove();
         }
-      //Delete Cart while place order
       const updatedProduct = await Userproduct.findOneAndUpdate(
         { _id: product_id },
         { $set: { flag: 1 } },

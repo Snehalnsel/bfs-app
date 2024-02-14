@@ -42,6 +42,7 @@ const Brand = require("../../models/api/brandModel");
 const Size = require("../../models/api/sizeModel");
 const Gender = require("../../models/api/genderModel");
 const Iptrnsaction = require("../../models/api/ipTransactionModel");
+const insertNotification = require("../../models/api/insertNotification");
 //const smtpUser = "sneha.lnsel@gmail.com";
 const smtpUser = "hello@bidforsale.com";
 const nodemailer = require("nodemailer");
@@ -2060,6 +2061,7 @@ exports.addToWishlistWeb = async function (req, res, next) {
       });
     }
     else {
+      console.log("helllo");
       const user = await Users.findOne({ _id: user_id });
       const product = await Userproduct.findOne({ _id: product_id }).populate('category_id', 'name');
       const newFavList = new Wishlist({
@@ -2069,6 +2071,17 @@ exports.addToWishlistWeb = async function (req, res, next) {
         added_dtime: new Date(),
       });
       const savedFavData = await newFavList.save();
+
+      const requestUrl = req.originalUrl || req.url;
+
+      await insertNotification(
+        'Wishlist Notification', 
+        `Item ${product.name} added to wishlist by ${user.name}`, 
+        user_id, 
+        requestUrl, 
+        new Date()
+      );
+
       return res.status(200).json({
         message: 'The product has been added to your wishlist',
         success: true,

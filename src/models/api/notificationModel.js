@@ -21,10 +21,12 @@ const model = mongoose.Schema({
     type: String,
   },
   is_read: {
+    type: Number,
     enum: [0, 1],
     default: 0,
   },
   status: {
+    type: Number,
     enum: [0, 1],
     default: 0,
   },

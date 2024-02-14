@@ -39,26 +39,14 @@ const url = require("url");
 var ObjectId = require("mongodb").ObjectId;
 
 const Appsettings = require("../../models/api/appSettingsModel");
-
 const Users = require("../../models/api/userModel");
-
 const Category = require("../../models/api/categoryModel");
-
 const Userproduct = require("../../models/api/userproductModel");
-
 const Productimage = require("../../models/api/productimageModel");
-
 const Productcondition = require("../../models/api/productconditionModel");
-
 const Banner = require("../../models/api/bannerModel");
-
 const Cart = require('../../models/api/cartModel');
-
-
-
-
-
-
+const Notifications = require("../../models/api/notificationModel");
 
 exports.homedetails = async function (req, res) {
 
@@ -716,10 +704,14 @@ exports.getHeaderData = async function (req, res, next) {
         let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
         const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : ""
         var cartCount = (userId != "") ? await Cart.countDocuments({user_id: mongoose.Types.ObjectId(userId)}) : 0;
+        var notificationCount = (userId !== "") ? 
+        await Notifications.countDocuments({ user_id: mongoose.Types.ObjectId(userId), is_read: 0 }) : 
+        0;    
          res.status(200).json({
              status: 1,
              message: "Count Increase",
              cart: cartCount,
+             notification:notificationCount,
              isLoggedIn: isLoggedIn,
          });
   } catch (error) {

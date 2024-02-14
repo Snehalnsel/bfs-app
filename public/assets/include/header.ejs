@@ -139,7 +139,7 @@
                             <div class="pib-box">
                                 <a href="">
                                     <i class="fa fa-bell-o" aria-hidden="true"></i>
-                                    <div class="top-count">0</div>
+                                    <div class="top-count" id="notificationCount">0</div>
                                 </a>
 
                             </div>
@@ -429,7 +429,9 @@
                 const response = await fetch('/headerData');
                 const data = await response.json();
                 const cartCount = data.cart;
+                const notificationCount = data.notification;
                 document.getElementById('cartCount').innerText = cartCount;
+                document.getElementById('notificationCount').innerText = notificationCount;
             }
             catch (error) {
                 console.error('Error fetching data:', error);

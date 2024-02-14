@@ -322,7 +322,7 @@ exports.registration = async function (req, res, next) {
         isLoggedIn: isLoggedIn,
       });
     } else {
-      res.redirect('/api/my-account');
+      res.redirect('/my-account');
     }
   } catch (error) {
     res.status(500).json({
@@ -378,7 +378,7 @@ exports.registration = async function (req, res, next) {
 //           });
 
 //           newUser.save();
-//           //res.redirect('/api/home');
+//           //res.redirect('/');
 //           await exports.ajaxGetUserLogin(req, res, next, req.body.email, req.body.password);
 //         }
 //         else {
@@ -388,7 +388,7 @@ exports.registration = async function (req, res, next) {
 //           //   respdata: {},
 //           // });
 
-//           res.redirect('/api/registration?userExists=true');
+//           res.redirect('/registration?userExists=true');
 //         }
 //       });
 //     }
@@ -482,7 +482,7 @@ exports.signin = async function (req, res, next) {
             },
           });
         } else {
-          res.redirect('/api/registration?userExists=true');
+          res.redirect('/registration?userExists=true');
         }
       }
     });
@@ -1027,7 +1027,7 @@ exports.getUserLogin = async function (req, res, next) {
                       //   respdata: updatedUser,
                       // });
                     });
-                    res.redirect('/api/my-account');
+                    res.redirect('/my-account');
                   }
                 }
               );
@@ -1051,7 +1051,7 @@ exports.myAccount = async function (req, res, next) {
     //if (userData === undefined || userData === null)
     if (isLoggedIn == "")
     {
-      res.redirect('/api/registration');
+      res.redirect('/registration');
     }
     else{
       var userData = req.session.user;
@@ -1489,7 +1489,7 @@ exports.userUpdate = async function (req, res, next) {
     req.session.user.name = updatedUser.name;
     req.session.user.email = updatedUser.email;
     req.session.user.phone_no = updatedUser.phone_no;
-    res.redirect("/api/my-account");
+    res.redirect("/my-account");
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -1544,7 +1544,7 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
       savedAddress.shiprocket_address = pickupLocation;
       savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
       await savedAddress.save();
-      res.redirect('/api/checkout-web');
+      res.redirect('/checkout-web');
     }    
   } catch (error) {
     res.status(500).json({
@@ -1603,7 +1603,7 @@ exports.userAddressAdd = async function (req, res, next) {
       savedAddress.shiprocket_address = pickupLocation;
       savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
       await savedAddress.save();
-      res.redirect('/api/my-account');
+      res.redirect('/my-account');
     }
   } catch (error) {
     res.status(500).json({
@@ -1628,7 +1628,7 @@ exports.deleteUserAddress = async function (req, res, next) {
         respdata: {},
       });
     }
-    res.redirect('/api/my-account');
+    res.redirect('/my-account');
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -1702,7 +1702,7 @@ exports.addPostView = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     if (isLoggedIn == "") {
-      res.redirect("/api/registration");
+      res.redirect("/registration");
     }
     const productConditions = await Productcondition.find();
     const parentCategoryId = "650444488501422c8bf24bdb";
@@ -1796,7 +1796,7 @@ exports.addNewPost = async function (req, res, next) {
         const savedImage = productimageDetail.save();
       });
     }
-    res.redirect('/api/my-account');
+    res.redirect('/my-account');
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -1967,7 +1967,7 @@ exports.updatePostData = async function (req, res, next) {
       ...updatedProduct.toObject(),
       images: productImages,
     };
-      res.redirect('/api/my-account');
+      res.redirect('/my-account');
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -2104,7 +2104,7 @@ exports.viewWishListByUserId = async function (req, res, next) {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
 
     if (isLoggedIn == "") {
-      res.redirect("/api/registration");
+      res.redirect("/registration");
     }
 
     const user_id = req.session.user.userId;
@@ -2321,7 +2321,7 @@ exports.viewCartListByUserId = async function (req, res, next) {
 
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     if (isLoggedIn == "") {
-      return res.redirect("/api/registration");
+      return res.redirect("/registration");
     }
     const user_id = req.session.user.userId;
     const existingCart = await Cart.findOne({ user_id, status: 0 });
@@ -2449,7 +2449,7 @@ exports.changeProfileImgWeb = async function (req, res, next) {
         );
         if (updatedUser) {
           req.session.user.image = updatedUser.image;
-          res.redirect('/api/my-account');
+          res.redirect('/my-account');
         }
       });
     }
@@ -2466,7 +2466,7 @@ exports.checkoutWeb = async function (req, res, next) {
   try {
       let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
       if (isLoggedIn == "") {
-        return res.redirect("/api/registration");
+        return res.redirect("/registration");
       }
       const user_id = req.session.user.userId;
       const existingCart = await Cart.findOne({ user_id, status: 0 });

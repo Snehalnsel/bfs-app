@@ -3888,4 +3888,7 @@ span.close-icon {
     color: #000; 
 }
 
+.unread-notification {
+    background-color: #f0f0f0; /* Grey background color */
+}
 

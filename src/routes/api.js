@@ -1094,7 +1094,7 @@ router.post("/notificationslist", auth.isAuthorized, [],NotificationsController.
 router.post("/readnotification", auth.isAuthorized, [],NotificationsController.getNotificationById);
 router.post("/updatenotification", auth.isAuthorized, [],NotificationsController.updateNotificationById);
 router.post("/deletenotification", auth.isAuthorized, [],NotificationsController.deleteNotificationById);
-
+router.get("/webnotificationslist",[],NotificationsController.listofWebNotification);
 
 // generate 
 router.post("/get-shipmentkit", auth.isAuthorized,[],ShippingkitController.addShipmentData);

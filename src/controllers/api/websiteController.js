@@ -2072,7 +2072,9 @@ exports.addToWishlistWeb = async function (req, res, next) {
       });
       const savedFavData = await newFavList.save();
 
-      const requestUrl = req.originalUrl || req.url;
+      const requestUrl =  req.headers.referer;
+      console.log(requestUrl);
+      return;
 
       await insertNotification(
         'Wishlist Notification', 

@@ -6,7 +6,7 @@ $(document).on("click",".bidNowAmountBtn",function() {
     let bidAmount = $("#bid_amount").val();
     if(productId !== "" && bidAmount != "") {
         $.ajax({
-            url: '/api/bid-check-exist-reccord', // Request to bid for first time or update the bid amount
+            url: '/bid-check-exist-reccord', // Request to bid for first time or update the bid amount
             data: {productId:productId,bidAmount:bidAmount},
             method: 'POST',
             success: function(data) {
@@ -14,7 +14,7 @@ $(document).on("click",".bidNowAmountBtn",function() {
                     $(".valid-amount").html(data.message);
                 }
                 if(data.status == "success") {
-                    window.location.href = "/api/bid-for-product/"+data.bidId;
+                    window.location.href = "/bid-for-product/"+data.bidId;
                 } else {
                     setTimeout(function(){ 
                         $(".valid-amount").html("");
@@ -44,7 +44,7 @@ $(document).on('click', ".buy-btn", function(e){
     if(isLoggedIn2 != "") {
        var id = $(this).data('id');
        $.ajax({
-            url: '/api/addtocart/'+id.trim(), 
+            url: '/addtocart/'+id.trim(), 
             method: 'POST',
             success: function(data) 
             {
@@ -86,7 +86,7 @@ $(document).on('click', ".wish-btn", async function (e) {
         var id = $(this).data('id');
         console.log(id);
         $.ajax({
-            url: '/api/add-to-wishlist-web/' + id.trim(),
+            url: '/add-to-wishlist-web/' + id.trim(),
             method: 'POST',
             success: function (data) {
                 if (data.is_wishlisted) {
@@ -130,7 +130,7 @@ $(document).on('click', ".wish-rem-btn", async function (e) {
         var id = $(this).data('id');
         console.log(id);
         $.ajax({
-            url: '/api/remove-wishlist-web/' + id.trim(),
+            url: '/remove-wishlist-web/' + id.trim(),
             method: 'GET',
             success: function (data) {
                 if (data.success) {
@@ -188,7 +188,7 @@ $(document).on('click', ".wish-rem-button", async function (e) {
 
             var id = $(this).data('id');
             $.ajax({
-            url: '/api/remove-wishlist-web/' + id.trim(),
+            url: '/remove-wishlist-web/' + id.trim(),
             method: 'GET',
             success: function (data) {
                 if (data.success) {

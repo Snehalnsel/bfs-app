@@ -51,7 +51,7 @@ $(document).ready(async function(){
          
             $.ajax({
                 type: 'POST',
-                url:  webSiteUrl + "/api/signin",
+                url:  webSiteUrl + "/signin",
                 data: {
                     name:$('#name').val(),
                     phone_no: $('#phoneno').val(),

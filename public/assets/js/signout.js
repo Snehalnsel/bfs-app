@@ -2,7 +2,7 @@ $(document).ready(async function(){
     $(document).on('click', '.signout',async function() {
         $.ajax({
             type: 'POST',
-            url:  webSiteUrl + "/api/sign-out",
+            url:  webSiteUrl + "/sign-out",
             success: async function(obj){                
                 let error_success = obj.status;
                 //return false;

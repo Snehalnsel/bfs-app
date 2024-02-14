@@ -3,7 +3,7 @@ $(document).ready(function(){
         let searchBy = $(".search_by").val();
         if(searchBy != "") {
             $.ajax({
-                url: '/api/search-by-keyword',
+                url: '/search-by-keyword',
                 data: {searchBy:searchBy},
                 method: 'POST',
                 success: function(data) {

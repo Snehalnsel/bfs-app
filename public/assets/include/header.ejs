@@ -29,7 +29,7 @@
         <div class="container p-relative">
             <div class="header-group">
                 <div class="theme-logo">
-                    <a href="/api/home"><img src="/public/assets/images/bfs-logo.png" alt="images"></a>
+                    <a href="/"><img src="/public/assets/images/bfs-logo.png" alt="images"></a>
                 </div>
                 <div class="header-info">
                     <div class="header-top">
@@ -48,17 +48,17 @@
 
                         <div class="buy-sell-link">
                             <ul>
-                                <li class="active-link"><a href="/api/webSubCategories">Buy</a></li>
-                                <li><a href="/api/add-post">Sell</a></li>
+                                <li class="active-link"><a href="/webSubCategories">Buy</a></li>
+                                <li><a href="/add-post">Sell</a></li>
                             </ul>
                         </div>
 
                         <div class="menu-box">
                             <nav class="nav-link">
                                 <ul class="main-nav">
-                                    <li class="nav-item"><a href="/api/home">Home</a></li>
+                                    <li class="nav-item"><a href="/">Home</a></li>
                                     <!-- <li class="nav-item"><a href="javascript:void(0)">About Us</a></li> -->
-                                    <li class="nav-item"><a href="/api/webSubCategories">Categories</a></li>
+                                    <li class="nav-item"><a href="/webSubCategories">Categories</a></li>
                                     <li class="nav-item dropdown">
                                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Categories
@@ -128,7 +128,7 @@
 
                                     </li>
                                     <!--<%if(isLoggedIn != "") {%>
-                                <li class="nav-item"><a href="/api/my-account">My Account</a></li>
+                                <li class="nav-item"><a href="/my-account">My Account</a></li>
                             <% } %>-->
                                 </ul>
 
@@ -145,13 +145,13 @@
                             </div>
 
                             <div class="pib-box">
-                                <a href="/api/show-wishlist-details">
+                                <a href="/show-wishlist-details">
                                     <i class="fa fa-heart-o" aria-hidden="true"></i>
                                 </a>
                             </div>
 
                             <div class="pib-box">
-                                <a href="/api/show-cart-details">
+                                <a href="/show-cart-details">
                                     <i class="fa fa-shopping-cart" aria-hidden="true"></i>
                                     <div class="top-count" id="cartCount">0</div>
                                 </a>
@@ -164,7 +164,7 @@
                                 </div>
                                 <% } else { %>
                                     <div class="pib-box">
-                                        <a href="/api/my-account">
+                                        <a href="/my-account">
                                             <i class="fa fa-user-o" aria-hidden="true"></i>
                                         </a>
                                     </div>
@@ -187,7 +187,7 @@
                 <div class="col-5">
                     <div class="buy-sell-link">
                         <ul>
-                            <li class="active-link"><a href="/api/webSubCategories">Buy</a></li>
+                            <li class="active-link"><a href="/webSubCategories">Buy</a></li>
                             <li><a href="javascript:void(0)">Sell</a></li>
                         </ul>
                     </div>
@@ -222,7 +222,7 @@
                             </div>
                             <% } else { %>
                                 <div class="pib-box">
-                                    <a href="/api/my-account">
+                                    <a href="/my-account">
                                         <i class="fa fa-user-o" aria-hidden="true"></i>
                                     </a>
                                 </div>
@@ -390,7 +390,7 @@
         var hTml = ``;
         async function fetchData1() {
             try {
-                const response = await fetch('/api/top-categoriesweb');
+                const response = await fetch('/top-categoriesweb');
                 const data = await response.json();
                 const topmenu = data.respdata;
                 populateSlider1(topmenu);
@@ -404,7 +404,7 @@
             data.forEach(item => {
                 hTml += `<div class="slider-item">
                             <div class="sld-iconbox">
-                                <a href="/api/websubcategoriesproducts/${item._id}">
+                                <a href="/websubcategoriesproducts/${item._id}">
                                     <div class="ctg-icon">
                                         <img src="${item.image}" alt="images">
                                     </div>
@@ -417,7 +417,7 @@
         }
         function megamenu(data) {
             data.forEach(item => {
-                var hTml1 = `<li><a href="/api/websubcategoriesproducts/${item._id}">${item.name}</a></li>`;
+                var hTml1 = `<li><a href="/websubcategoriesproducts/${item._id}">${item.name}</a></li>`;
                 var ulElements = document.getElementsByClassName('listing-data');
                 for (var i = 0; i < ulElements.length; i++) {
                     ulElements[i].innerHTML += hTml1;
@@ -426,7 +426,7 @@
         }
         async function getHeaderData() {
             try {
-                const response = await fetch('/api/headerData');
+                const response = await fetch('/headerData');
                 const data = await response.json();
                 const cartCount = data.cart;
                 document.getElementById('cartCount').innerText = cartCount;

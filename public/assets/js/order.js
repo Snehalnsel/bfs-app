@@ -20,7 +20,7 @@ $(document).on('click', ".remove-order", async function (e) {
             var orderid = $(this).closest('.cart-list').data('orderid');
             let deleteby = $(this).closest('.cart-list').data('userby');
             $.ajax({
-            url: '/api/cancel-order',
+            url: '/cancel-order',
             method: 'POST',
             data: {
                 orderid:orderid,

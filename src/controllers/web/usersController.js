@@ -254,7 +254,7 @@ exports.ajaxAdminLogin = async function (req, res, next) {
                       isAdminLoggedIn:isAdminLoggedIn
                     },
                   });
-                  //res.redirect("/dashboard");
+                  //res.redirect("/admin/dashboard");
                 });
               }
             }
@@ -353,7 +353,7 @@ exports.ajaxAdminLogin = async function (req, res, next) {
                     image_url: image_url,
                   };
                   
-                  res.redirect("/dashboard");
+                  res.redirect("/admin/dashboard");
                 });
               }
             }

@@ -36,14 +36,15 @@ const ShippingkitController = require("../controllers/api/shippingkitController"
 const dateTime = moment().format("YYYY-MM-DD h:mm:ss");
 
 //apis
-
-router.get("/", function (req, res) {
+router.get("/",[],DashboardController.getData);
+/*router.get("/", function (req, res) {
   res.status(401).json({
     status: "0",
     message: "401 - Unauthorised!",
     respdata: {},
   });
-});
+});*/
+
 
 router.post(
   "/signup",

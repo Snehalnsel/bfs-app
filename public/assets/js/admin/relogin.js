@@ -9,7 +9,7 @@ async function userReLogin(reCookieAccessToken, reCookieRefreshToken) {
     //Check Or Login
     $.ajax({
         type: 'POST',
-        url:  webSiteUrl + "/admin-relogin",
+        url:  webSiteUrl + "/admin/admin-relogin",
         data: {
             cookieRefreshToken:reCookieRefreshToken
         },

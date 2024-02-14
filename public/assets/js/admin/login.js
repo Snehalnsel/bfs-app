@@ -38,7 +38,7 @@ $(document).ready(async function(){
             // form_data.append("email", $('#email').val());
             $.ajax({
                 type: 'POST',
-                url:  webSiteUrl + "/ajax-userlogin",
+                url:  webSiteUrl + "/admin/ajax-userlogin",
                 data: {
                     email: $('#email').val(),
                     password:$('#password').val(),

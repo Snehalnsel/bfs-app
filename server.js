@@ -117,13 +117,27 @@ app.use(cors());
 // adding morgan to log HTTP requests
 app.use(morgan("combined"));
 
-//routes
-var routes = require("./src/routes/routes.js");
-var web = require("./src/routes/web.js");
-var api = require("./src/routes/api.js");
+//Add session in app as it was in web.js -- edited by Palash
 
-app.use("/", web);
-app.use("/api", api);
+app.use(
+  session({
+    secret: "fd$e43W7ujyDFw(8@tF",
+    // store: redisStore,
+    saveUninitialized: true,
+    resave: true,
+  })
+);
+
+//routes
+const routes = require("./src/routes/routes.js");
+const web = require("./src/routes/web.js");
+const api = require("./src/routes/api.js");
+const adminRoute = require("./src/routes/adminRoute");
+
+
+app.use("/", api);
+app.use("/admin_2F19C0M", web);
+app.use("/admin",adminRoute);
 app.use("/routes", routes); //test
 
 // catch 404 and forward to error handler

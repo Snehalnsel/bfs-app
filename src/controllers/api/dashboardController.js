@@ -629,7 +629,6 @@ exports.getJustSoldProducts = async function (req, res) {
 
 
 exports.getData = async function (req, res, next) {
-
   try {
 
     //const requrl = req.protocol + '://' + req.get('host');
@@ -648,7 +647,7 @@ exports.getData = async function (req, res, next) {
 
     res.render("webpages/list", {
 
-      title: "Home Page 123",
+      title: "Home Page",
 
       requrl: req.app.locals.requrl,
 

@@ -30,7 +30,7 @@
                   <div class="modal-content">
                      <div class="loginform-box short-box">
                         <h5 class="box-title">Change Profile Picture</h5>
-                        <form action="/api/change-profile-image-web" method="POST" enctype="multipart/form-data">
+                        <form action="/change-profile-image-web" method="POST" enctype="multipart/form-data">
                              <div class="inner-formbox">
                                 <div class="profile-chnage-box">
                                    <div class="user-icon">
@@ -51,14 +51,14 @@
          <div class="sidbar-box sidbar-nav">
             <ul class="nav d-flex flex-column mb-2 ">
                 <li class="nav-item">
-                  <a class="nav-link" href="/api/my-account"><i class="fa fa-user" aria-hidden="true"></i> <span>Profile</span></a>
+                  <a class="nav-link" href="/my-account"><i class="fa fa-user" aria-hidden="true"></i> <span>Profile</span></a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="#"><i class="fa fa-list-ul" aria-hidden="true"></i> <span>My Orders</span></a>
                 </li>
   
                 <li class="nav-item">
-                  <a class="nav-link" href="/api/my-post/<%=respdata.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Products</span></a>
+                  <a class="nav-link" href="/my-post/<%=respdata.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Products</span></a>
                 </li>
   
                 <li class="nav-item">
@@ -68,7 +68,7 @@
               </ul>
               <div class="bottom-link">
                <ul class="nav d-flex flex-column mb-2 ">
-                  <!-- <li><a class="nav-link" href="/api/sign-out"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li> -->
+                  <!-- <li><a class="nav-link" href="/sign-out"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li> -->
                   <li><a class="nav-link signout" id="signout" href="javascript:void(0)"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li>
                </ul>
 
@@ -82,11 +82,11 @@
           <div class="dashboard-infobox">
              <div class="dashboard-title-arrow mb-25">
                 <h4 class="di-title mr-25">Add Your Product</h4>
-                <div class="edit-link"><a href="/api/my-account">Back </a></div>
+                <div class="edit-link"><a href="/my-account">Back </a></div>
              </div>
              
              <div class="dsh-shortbox">
-                <form action="/api/addnewpost" method="post" enctype="multipart/form-data" id="addPostForm">
+                <form action="/addnewpost" method="post" enctype="multipart/form-data" id="addPostForm">
                    <div class="div-row">
                    <div class="div-12">
                       <div class="post-imagebox">

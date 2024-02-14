@@ -29,7 +29,7 @@
             <h3>Best Deals</h3>
          </div>
          <div class="short-box">
-            <a href="/api/bestdeal">See All</a>
+            <a href="/bestdeal">See All</a>
          </div>
       </div>
       <div class="slider product_Slider product_Slider1" id="best-deals-slider">
@@ -66,7 +66,7 @@
              <h3>What's Hot</h3>
           </div>
           <div class="short-box">
-             <a href="/api/whatshot">See All</a>
+             <a href="/whatshot">See All</a>
           </div>
        </div>
        <div class="slider product_Slider product_Slider1" id="whats-hot-slider">
@@ -81,7 +81,7 @@
              <h3>Just Sold</h3>
           </div>
           <div class="short-box">
-             <a href="/api/justsold">See All</a>
+             <a href="/justsold">See All</a>
           </div>
        </div>
        <div class="slider product_Slider product_Slider1 " id="just-sold-slider">
@@ -129,7 +129,7 @@
 <script>
    async function fetchData() {
      try {
-       const response = await fetch('/api/app-home');
+       const response = await fetch('/app-home');
        const data = await response.json();
 
          isLoggedIn = data.isLoggedIn;
@@ -193,7 +193,7 @@
          html += `
          <div class="product-box">
             <div class="product-image">
-               <a href="/api/productdeatils/${item._id}"><img src="${item.image}" alt="images" class="img-fluid"></a>
+               <a href="/productdeatils/${item._id}"><img src="${item.image}" alt="images" class="img-fluid"></a>
             </div>
             <div class="prd-short-info">
                <div class="prd-name"><a href="javascript:void(0)">${item.name}</a></div>
@@ -230,7 +230,7 @@
         await userReLogin(cartListreCookieAccessToken, cartListreCookieRefreshToken);
         
         $.ajax({
-                 url: '/api/cart-list', // Route on the server to handle the request
+                 url: '/cart-list', // Route on the server to handle the request
                  data: {id1:id1},
                  method: 'POST',
                  success: function(data) 

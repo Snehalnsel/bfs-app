@@ -2073,10 +2073,8 @@ exports.addToWishlistWeb = async function (req, res, next) {
       const savedFavData = await newFavList.save();
 
       const requestUrl =  req.headers.referer;
-      console.log(requestUrl);
-      return;
-
-      await insertNotification(
+     
+     await insertNotification(
         'Wishlist Notification', 
         `Item ${product.name} added to wishlist by ${user.name}`, 
         user_id, 
@@ -2516,6 +2514,17 @@ exports.checkoutWeb = async function (req, res, next) {
             added_dtime: cartItem.added_dtime,
             status: cartItem.status,
           };
+
+          // const requestUrl =  req.headers.referer;
+          const requestUrl =  '/web-my-order';
+     
+          await insertNotification(
+             'Order Placed Successfully from Website', 
+             `Item ${cartItem.product_id.name} added to order list by ${user.name}`, 
+             user_id, 
+             requestUrl, 
+             new Date()
+          );
           const product_price = finalData.product_price;
           const gst = (product_price * 18) / 100;
           const finalPrice = parseInt(product_price) + 250 + parseInt(gst);

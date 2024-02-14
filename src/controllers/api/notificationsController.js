@@ -202,6 +202,26 @@ exports.listofWebNotification = async function (req, res, next) {
   }
 };
 
+exports.markNotificationAsRead = async function (req, res, next) {
+  const notificationId = req.body.notificationId;
+  try {
+      const notification = await Notifications.findById(notificationId);
+      if (!notification) {
+          return res.status(404).json({ message: 'Notification not found' });
+      }
+      notification.is_read = 1;
+      await notification.save();
+      res.status(200).json({
+        message: 'Notification marked as read',
+        notification : true
+      });
+  } catch (error) {
+    return {
+      message: 'Notification not marked as read',
+      notification : false
+    };
+  }
+};
 
 
 

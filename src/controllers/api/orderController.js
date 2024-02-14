@@ -28,6 +28,7 @@ const Ordertracking = require("../../models/api/ordertrackModel");
 const Track = require("../../models/api/trackingModel");
 const AddressBook = require("../../models/api/addressbookModel");
 const Shippingkit = require("../../models/api/shippingkitModel");
+const insertNotification = require("../../models/api/insertNotification");
 const nodemailer = require("nodemailer");
 // const axios = require('axios');
 // const bodyParser = require('body-parser'); 
@@ -1093,6 +1094,7 @@ exports.cancelOrderById = async function (req, res, next) {
     });
   }
   try {
+    const user_id = req.session.user.userId;
     const orderId = req.body.orderid;
     const deleteby = req.body.deleteby;
     const existingOrder = await Order.findById(orderId);
@@ -1124,6 +1126,17 @@ exports.cancelOrderById = async function (req, res, next) {
     existingOrder.delete_by = deleteby;
     existingOrder.updated_dtime = new Date().toISOString();
     const canceledOrder = await existingOrder.save();
+
+    const requestUrl =  '/web-my-order';
+     
+    await insertNotification(
+       'Order Cancelled', 
+       `YOUR ORDER HAS BEEN CANCELED`, 
+       user_id, 
+       requestUrl, 
+       new Date()
+    );
+
     if (canceledOrder) {
         return res.status(200).json({
           status: "1",

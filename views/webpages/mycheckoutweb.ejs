@@ -152,6 +152,38 @@
                            </th>
                         </tr>
                         <tr>
+                           <td colspan="2">
+                              <div class="payment-methodbox">
+                                 <p>Select Payments Method </p>
+                                 <ul>
+                                    <li><label class="form-check-label">
+                                          <input type="radio" class="form-check-input" name="optradio"
+                                             value="Online">Pay Now
+                                       </label>
+                                    </li>
+                                    <li>
+                                       <label class="form-check-label" for="cod-payments">
+                                          <input type="radio" class="form-check-input" id="cod-payments" name="optradio"
+                                             value="COD">Pay On Delivery
+                                       </label>
+                                    </li>
+                                 </ul>
+                                 <div class="pmnt-hidebox">
+                                    <table style="width:100%">
+                                       <tr id="pay-now-row">
+                                          <td>Booking Amount</td>
+                                          <th><i class="fa fa-inr" aria-hidden="true"></i> 200</th>
+                                       </tr>
+                                       <tr id="remaining-amount-row">
+                                          <td><small>Rest Amount Pay on Delivery</small></td>
+                                          <th><i class="fa fa-inr" aria-hidden="true"></i> 200</th>
+                                       </tr>
+                                    </table>
+                                 </div>
+                              </div>
+                           </td>
+                        </tr>
+                        <tr>
                            <td>Packing & Handling Charges</td>
                            <th><i class="fa fa-inr" aria-hidden="true"></i> 250</th>
                         </tr>
@@ -161,12 +193,21 @@
                               <%=gst%>
                            </th>
                         </tr>
-                        <tr class="border-top total-table">
+                        <tr class="border-top total-table" id="total-cod-amount-row">
                            <td><strong>Total Amount</strong></td>
                            <th><i class="fa fa-inr" aria-hidden="true"></i>
                               <%=finalPrice%>
                            </th>
                         </tr>
+                        <tr>
+                           <td colspan="2">
+                              <label class="checkbox-label">
+                                 <input type="checkbox" class="checkbox-input" value="">
+                                 <span>I agree with all <a href="#">Terms & condition</a></span>
+                              </label>
+                           </td>
+                        </tr>
+
                      </tbody>
                   </table>
                </div>
@@ -182,16 +223,32 @@
       <%- include('../../public/assets/include/footer'); %>
 
          <script>
-
-            //  $(document).on('change','.addr_type',function(){
-            //    if ($(this).is(":checked")) 
-            //    {
-            //       var txtVal = $.trim($(this).parent("label").text());   
-            //    }      
-            //    $('#addrType').val(txtVal);
-            // });
+            $(document).ready(function () {
+               $('.pmnt-hidebox').hide();
+               var originalTotalAmount = parseFloat('<%= finalPrice %>');
 
 
+               $(document).on('change', 'input[name="optradio"]', function () {
+                  if ($(this).val() === "COD") {
+                     $('.pmnt-hidebox').show();
+                     var productPrice = parseFloat('<%= product_price %>');
+                     var payNowAmount = productPrice * 0.10;
+                     $('#pay-now-row th').text('₹ ' + payNowAmount.toFixed(2));
+                     var remainingAmount = productPrice - payNowAmount;
+
+                     $('#remaining-amount-row th').text('₹ ' + remainingAmount.toFixed(2));
+
+                     var productPrice = parseFloat('<%= product_price %>');
+                     var gst = parseFloat('<%= gst %>');
+                     var totalAmount = payNowAmount + 250 + gst;
+
+                     $('#total-cod-amount-row th').text('₹ ' + totalAmount.toFixed(2));
+                  } else {
+                     $('.pmnt-hidebox').hide();
+                     $('#total-cod-amount-row th').text('₹ ' + originalTotalAmount.toFixed(2));
+                  }
+               });
+            });
             function setAddressType() {
                var selectedAddrType = document.querySelector('input[name="addr_type"]:checked');
                if (selectedAddrType) {
@@ -211,28 +268,34 @@
                $('.check-out').prop('disabled', false);
             });
 
-            // let selectedCheckboxValue;
-
-            // $(document).on('change', '.checkbox-select', function () {
-            //    selectedCheckboxValue = $(this).val();
-            // });
+            $(document).on('click', '.check-out', async function (e) {
+               e.preventDefault();
+               if (!$('.checkbox-input').is(':checked')) {
+                  $(".check-out").css("pointer-events", "none");
+               }
+               $(".check-out").css("pointer-events", "auto");
+            });
 
             $(document).on("click", ".check-out", async function (e) {
                e.preventDefault();
+               $(".check-out").css("pointer-events", "none");
                let formData = {
                   cart_id: $('#cart_id').val(),
                   seller_id: $('#seller_id').val(),
                   user_id: $('#user_id').val(),
                   product_id: $('#product_id').val(),
-                  total_amt: $('#total_amt').val(),
+                  //total_amt: $('#total_amt').val(),
                   gst: $('#gst').val(),
                   payment_method: $('#payment_method').val(),
                   product_price: $('#product_price').val(),
                   addressBookId: $('#userAddressId').val()
                };
 
-
-
+               let totalAmtText = $('#total-cod-amount-row th').text();
+               let totalAmtValue = parseFloat(totalAmtText.replace('₹ ', '')); 
+               formData.total_amt = totalAmtValue;
+               // console.log(formData);
+               // return;
                let addToCartreCookieAccessToken = await getCookieFunc(accessTokenVar);
                let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
                await userReLogin(addToCartreCookieAccessToken, addToCartreCookieRefreshToken);
@@ -255,9 +318,12 @@
                         setTimeout(() => {
                            window.location.href = '/';
                         }, 3000);
+                     } else {
+                        $(".check-out").css("pointer-events", "auto");
                      }
                   },
                   error: function (xhr, status, error) {
+                     $(".check-out").css("pointer-events", "auto");
                   }
                });
             });

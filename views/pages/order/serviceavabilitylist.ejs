@@ -70,7 +70,7 @@
                               <td><%= value.etd %>(<%= value.estimated_delivery_days %> Days)</td>
                               <td><%= value.cod_charges %> * <%= value.charge_weight %> + <%= value.freight_charge %> = <%= (value.cod_charges * value.charge_weight) + value.freight_charge %></td>
                               
-                              <td> <a href="/generateawb/<%= respdata._id %>/<%= value.courier_company_id %>" class="btn btn-info" title="Order Placed">
+                              <td> <a href="/admin/generateawb/<%= respdata._id %>/<%= value.courier_company_id %>" class="btn btn-info" title="Order Placed">
                                                                        Ship Now
                                                                     </a></td>
                             </tr>

@@ -143,28 +143,28 @@
                                                         <td>
                                                             <% if (value.hub_address[0]) { %>
                                                                 <% if (value.hub_address[0] && value.pickup_awb == 0) { %>
-                                                                    <a href="/shipmentplace/<%= value._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                                                                    <a href="/admin/shipmentplace/<%= value._id %>" class="btn btn-warning newbtn" title="Order Placed">
                                                                         Generate Shipment Kit Pickup
                                                                     </a>
                                                                 <% } else if (value.shiprocket_shipment_id && value.pickup_awb == 0) { %>
-                                                                    <a href="/couriresserviceability/<%= value._id %>" class="btn btn-warning newbtn" title="Order Placed" target="_blank">
+                                                                    <a href="/admin/couriresserviceability/<%= value._id %>" class="btn btn-warning newbtn" title="Order Placed" target="_blank">
                                                                         Check Courier Serviceability
                                                                     </a>
                                                                     
                                                                 <% }else{ %>
-                                                                    <a href="/generatelabelforkit/<%= value._id %>" class="btn btn-secondary newbtn" title="Order Placed">
+                                                                    <a href="/admin/generatelabelforkit/<%= value._id %>" class="btn btn-secondary newbtn" title="Order Placed">
                                                                         Generate Label
                                                                     </a>
-                                                                    <a href="/generateinvoiceforkit/<%= value._id %>" class="btn btn-info newbtn"  style="margin-top: 16px;" title="Order Placed">
+                                                                    <a href="/admin/generateinvoiceforkit/<%= value._id %>" class="btn btn-info newbtn"  style="margin-top: 16px;" title="Order Placed">
                                                                         Generate Invoice
                                                                     </a>
-                                                                    <a href="/schedule-pickupforkit/<%= value._id %>" class="btn btn-success newbtn" target="_blank" title="Schedule Pickup">
+                                                                    <a href="/admin/schedule-pickupforkit/<%= value._id %>" class="btn btn-success newbtn" target="_blank" title="Schedule Pickup">
                                                                         Schedule Pickup
                                                                      </a>
                                                                 <% } %>
                                                             <% } 
                                                              else  { %>
-                                                                <a href="/hubselect/<%= value._id %>" class="btn btn-info btn-circle btn-sm" title="Edit">
+                                                                <a href="/admin/hubselect/<%= value._id %>" class="btn btn-info btn-circle btn-sm" title="Edit">
                                                                     <i class="fas fa-pencil-alt"></i>
                                                                 </a>
                                                             <% }

@@ -82,7 +82,7 @@
                                                             </td>
                                                             <td>
                                                                 <% if (value.order_code) { %>
-                                                                    <a href="/shipmentdetails/<%= value._id %>" target="_blank"><%= value.order_code %></a>
+                                                                    <a href="/admin/shipmentdetails/<%= value._id %>" target="_blank"><%= value.order_code %></a>
                                                                 <% } else { %>
                                                                     <span style="color: red;">No Order Code is Found</span>
                                                                 <% } %>
@@ -114,7 +114,7 @@
                                                                     <span style="color: grey;">Not Ordered Shipping Kit</span>
                                                                 <% } else if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].shippingkit_status === 1) { %>
                                                                     <% if (value.bid_status === 0) { %>
-                                                                      <span style="color: orange;">Ordered Shipping Kit<a href="/shippingkitdetails/<%= value.shipment._id %>" target="_blank">(<%= value.shipment.track_code %>)</a></span>
+                                                                      <span style="color: orange;">Ordered Shipping Kit<a href="/admin/shippingkitdetails/<%= value.shipment._id %>" target="_blank">(<%= value.shipment.track_code %>)</a></span>
                                                                     <% } %>
                                                                 <% } else { %>  
                                                                     <span style="color: #98FB98;">Not Ordered Shipping Kit</span>
@@ -183,7 +183,7 @@
                                                             <td>
                                                                 <% if(value.billing_address && value.billing_address[0] && value.shipping_address && value.shipping_address[0]) {%>
                                                                     <% if(value.delete_status == 0) {%>
-                                                                        <a href="/orderdetails/<%= value._id %>"
+                                                                        <a href="/admin/orderdetails/<%= value._id %>"
                                                                             class="btn btn-info btn-circle btn-sm" title="Edit">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
@@ -191,7 +191,7 @@
                                                                 <% } %>  
                                                                 
                                                                 <% if(value.delete_status == 0) {%>
-                                                                    <a href="/delete-orderdetails/<%= value._id %>" class="btn btn-danger btn-circle btn-sm"  title="Delete" onclick="return confirm('Are you sure you want to delete this item?')">
+                                                                    <a href="/admin/delete-orderdetails/<%= value._id %>" class="btn btn-danger btn-circle btn-sm"  title="Delete" onclick="return confirm('Are you sure you want to delete this item?')">
                                                                         <i class="fas fa-trash"></i>
                                                                     </a>
                                                                 <% }else{ %>
@@ -204,39 +204,39 @@
                                                                         <span style="color: rgb(45, 144, 226);">Canceled By Buyer</span>
                                                                     <% } %>   
                                                                 <% } %>  
-                                                                <!-- <a href="/brand-statu-change/<%= value._id %>"
+                                                                <!-- <a href="/admin/brand-statu-change/<%= value._id %>"
                                                                     class="btn btn-success btn-circle btn-sm"
                                                                     title="Status change">
                                                                     <i class="fa fa-solid fa-refresh"></i>
                                                                 </a> -->
                                                                 <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].hub_address_id!== '0' && !value.trackDetails[0].shiprocket_order_id) { %>
 
-                                                                    <a href="/orderplace/<%= value.trackDetails[0]._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                                                                    <a href="/admin/orderplace/<%= value.trackDetails[0]._id %>" class="btn btn-warning newbtn" title="Order Placed">
                                                                         Generate Seller Pickup
                                                                     </a>
                                                                 <% } else if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 &&  value.trackDetails[0].shiprocket_order_id !== undefined) { %>
                                                                     <span>Order Placed</span>
                                                                     <% if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].pickup_awb !== '0'  && value.trackDetails[0].pickup_dtime == undefined ){%>
-                                                                    <a href="/schedule-pickup/<%= value.trackDetails[0]._id %>" class="btn btn-success newbtn" target="_blank" title="Schedule Pickup">
+                                                                    <a href="/admin/schedule-pickup/<%= value.trackDetails[0]._id %>" class="btn btn-success newbtn" target="_blank" title="Schedule Pickup">
                                                                         Schedule Pickup
                                                                      </a>
-                                                                     <a href="/generatelabel/<%= value.trackDetails[0]._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
+                                                                     <a href="/admin/generatelabel/<%= value.trackDetails[0]._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
                                                                         Generate Label
                                                                     </a>
-                                                                    <a href="/generateinvoice/<%= value.trackDetails[0]._id  %>" class="btn btn-info newbtn"  style="margin-top: 16px;" title="Order Placed">
+                                                                    <a href="/admin/generateinvoice/<%= value.trackDetails[0]._id  %>" class="btn btn-info newbtn"  style="margin-top: 16px;" title="Order Placed">
                                                                         Generate Invoice
                                                                     </a>
                                                                     <% } else if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].pickup_awb !== '0' ){%>
                                                                         
                                                                         <span style="color: green;">Pickup is confirmed by Ecom Express Surface For AWB :- <span style="color: blue;"><%= value.trackDetails[0].pickup_awb %> </span></span> 
-                                                                        <a href="/generatelabel/<%= value.trackDetails[0]._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
+                                                                        <a href="/admin/generatelabel/<%= value.trackDetails[0]._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
                                                                             Generate Label
                                                                         </a>
-                                                                        <a href="/generateinvoice/<%= value.trackDetails[0]._id  %>" class="btn btn-info newbtn"  style="margin-top: 16px;" title="Order Placed">
+                                                                        <a href="/admin/generateinvoice/<%= value.trackDetails[0]._id  %>" class="btn btn-info newbtn"  style="margin-top: 16px;" title="Order Placed">
                                                                             Generate Invoice
                                                                         </a>
                                                                     <% } else {%>
-                                                                        <a href="/check-Couriresserviceability/<%= value.trackDetails[0]._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                                                                        <a href="/admin/check-Couriresserviceability/<%= value.trackDetails[0]._id %>" class="btn btn-warning newbtn" title="Order Placed">
                                                                             Check Courier Serviceability
                                                                         </a>
                                                                     <% } %>                                                                         
@@ -246,22 +246,22 @@
                                                             <td>
                                                                 <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 1 && value.trackDetails[1].pickup_awb == undefined && value.trackDetails[1].shiprocket_shipment_id == undefined ) { %>
 
-                                                                    <a href="/nextorderplace/<%= value._id %>" class="btn btn-warning" title="Order Placed">
+                                                                    <a href="/admin/nextorderplace/<%= value._id %>" class="btn btn-warning" title="Order Placed">
                                                                        Order Placed
                                                                     </a>
                                                                 <% }else if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 1 && value.trackDetails[1].shiprocket_shipment_id !== '0' && value.trackDetails[1].pickup_awb == '0' )  {%>
-                                                                    <a href="/check-Couriresserviceability/<%= value.trackDetails[1]._id %>" class="btn btn-outline-warning" title="Order Placed">
+                                                                    <a href="/admin/check-Couriresserviceability/<%= value.trackDetails[1]._id %>" class="btn btn-outline-warning" title="Order Placed">
                                                                         Check Courier Serviceability
                                                                     </a>
                                                                  <% }else if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 1 && value.trackDetails[1].pickup_awb !== '0'  && value.trackDetails[1].pickup_dtime == undefined )  {%>
-                                                                    <a href="/schedule-pickup/<%= value.trackDetails[1]._id %>" class="btn btn-outline-success" target="_blank" title="Schedule Pickup">
+                                                                    <a href="/admin/schedule-pickup/<%= value.trackDetails[1]._id %>" class="btn btn-outline-success" target="_blank" title="Schedule Pickup">
                                                                         Schedule Pickup
                                                                      </a>
                                                                   <% } else if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 1 && value.trackDetails[1].pickup_awb !== '0' ){%>
-                                                                    <a href="/generatelabel/<%= value.trackDetails[1]._id  %>" class="btn btn-secondary" title="Order Placed">
+                                                                    <a href="/admin/generatelabel/<%= value.trackDetails[1]._id  %>" class="btn btn-secondary" title="Order Placed">
                                                                         Generate Label
                                                                     </a>
-                                                                    <a href="/generateinvoice/<%= value.trackDetails[1]._id  %>" class="btn btn-info" style="margin-top: 16px;" title="Order Placed">
+                                                                    <a href="/admin/generateinvoice/<%= value.trackDetails[1]._id  %>" class="btn btn-info" style="margin-top: 16px;" title="Order Placed">
                                                                         Generate Invoice
                                                                     </a>  
                                                                     <span style="color: green;">Pickup is confirmed by Ecom Express Surface For AWB :- <span style="color: blue;"><%= value.trackDetails[1].pickup_awb %> </span></span>

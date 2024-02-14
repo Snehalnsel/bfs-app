@@ -52,7 +52,7 @@ async function searchByFilter(priceList = '',pageId = '') {
    
     $.ajax({
         type: 'POST',
-        url: webSiteUrl + "/api/user-filter",
+        url: webSiteUrl + "/user-filter",
         data: {
             brandList: brandList,
             sizeList: sizeList,
@@ -118,7 +118,7 @@ $(document).on('change', ".sortBy", function (e) {
             optionId = 0;
         }
         $.ajax({
-            url: `/api/websubcategoriesproductswithsort/${categoryId}/${optionId.trim()}`,
+            url: `/websubcategoriesproductswithsort/${categoryId}/${optionId.trim()}`,
             method: 'GET',
             success: async function (data) {
                 let htmlContent = '';
@@ -151,13 +151,13 @@ async function makeHtml(data,totalPages, currentPage, categoryId, webUrl, brandL
         htmlContent += `
             <div class="product-box">
                 <div class="product-image">
-                    <a href="/api/productdeatils/${item._id}">
+                    <a href="/productdeatils/${item._id}">
                         <img src="${item.product_images[0].image}" alt="images" class="img-fluid">
                     </a>
                 </div>
                 <div class="prd-short-info">
                     <div class="prd-name">
-                        <a href="/api/productdeatils/${item._id}">${item.name}</a>
+                        <a href="/productdeatils/${item._id}">${item.name}</a>
                     </div>
                     <div class="prd-price">
                         <span><i class="fa fa-inr" aria-hidden="true"></i></span>${item.offer_price}

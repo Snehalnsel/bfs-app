@@ -89,12 +89,12 @@
                                                             </td>
                                                             <td> 
                                                                 <% if ( value.pickup_awb == '0' ) { %>
-                                                                <a href="/generateawb/<%= value._id %>" class="btn btn-warning" title="Order Placed">
+                                                                <a href="/admin/generateawb/<%= value._id %>" class="btn btn-warning" title="Order Placed">
                                                                     Ship Now
                                                                 </a>
                                                                 <% } else if(value.pickup_awb != "0") { %>
                                                                     <span>Shipment Placed</span>
-                                                                    <a href="/generateawb/<%= value._id %>" class="btn btn-info" title="Genereate Pickup">
+                                                                    <a href="/admin/generateawb/<%= value._id %>" class="btn btn-info" title="Genereate Pickup">
                                                                         Schedule Pickup 
                                                                     </a>
                                                                 <% } %>

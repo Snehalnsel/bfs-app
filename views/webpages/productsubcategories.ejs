@@ -110,13 +110,13 @@
             <div class="product-image">
                 
                 <% if(item.images == '') { %>
-                    <a href="/api/websubcategoriesproducts/<%=item._id %>"><img src="../../public/assets/images/noimage.jpg" alt="images" class="img-fluid"></a>
+                    <a href="/websubcategoriesproducts/<%=item._id %>"><img src="../../public/assets/images/noimage.jpg" alt="images" class="img-fluid"></a>
                <% } else { %>
-                    <a href="/api/websubcategoriesproducts/<%=item._id %>"><img src="<%=item.image%>" alt="images" class="img-fluid"></a>
+                    <a href="/websubcategoriesproducts/<%=item._id %>"><img src="<%=item.image%>" alt="images" class="img-fluid"></a>
                <% } %>
             </div>
             <div class="prd-short-info">
-               <div class="prd-name"><a href="/api/websubcategoriesproducts/<%=item._id %>"><%=item.name%></a></div>                 
+               <div class="prd-name"><a href="/websubcategoriesproducts/<%=item._id %>"><%=item.name%></a></div>                 
             </div> 
          </div>
          <% }); %>

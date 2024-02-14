@@ -69,7 +69,7 @@
                                  </div>
                                  <% //if(addressUserList.length=='' ){%>
                                     <div class="address-form-open" style="display:none;">
-                                       <form action="/api/user-new-checkout-address" method="POST"
+                                       <form action="/user-new-checkout-address" method="POST"
                                           onsubmit="setAddressType()">
                                           <div class="form-box">
                                              <div class="loginform-box">
@@ -238,7 +238,7 @@
                await userReLogin(addToCartreCookieAccessToken, addToCartreCookieRefreshToken);
                $.ajax({
                   type: 'POST',
-                  url: '/api/placed-order',
+                  url: '/placed-order',
                   data: { data: formData },
                   dataType: "json",
                   success: function (response) {
@@ -253,7 +253,7 @@
                            confirmButtonText: "OK",
                         });
                         setTimeout(() => {
-                           window.location.href = '/api/home';
+                           window.location.href = '/';
                         }, 3000);
                      }
                   },

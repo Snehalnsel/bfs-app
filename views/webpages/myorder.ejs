@@ -17,18 +17,18 @@
                 <div class="sidbar-box sidbar-nav">
                    <ul class="nav d-flex flex-column mb-2 ">
                              <li class="nav-item">
-                               <a class="nav-link" href="/api/my-account"><i class="fa fa-user" aria-hidden="true"></i> <span>Profile</span></a>
+                               <a class="nav-link" href="/my-account"><i class="fa fa-user" aria-hidden="true"></i> <span>Profile</span></a>
                              </li>
                              <li class="nav-item">
-                               <a class="nav-link" href="/api/web-my-order"><i class="fa fa-list-ul" aria-hidden="true"></i> <span>My Orders</span></a>
-                             </li>
-               
-                             <li class="nav-item">
-                               <a class="nav-link" href="/api/my-post/<%=respdata.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Product</span></a>
+                               <a class="nav-link" href="/web-my-order"><i class="fa fa-list-ul" aria-hidden="true"></i> <span>My Orders</span></a>
                              </li>
                
                              <li class="nav-item">
-                               <a class="nav-link" href="/api/bid-for-product"><i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> <span>My Bids</span></a>
+                               <a class="nav-link" href="/my-post/<%=respdata.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Product</span></a>
+                             </li>
+               
+                             <li class="nav-item">
+                               <a class="nav-link" href="/bid-for-product"><i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> <span>My Bids</span></a>
                              </li>
                              
                            </ul>
@@ -87,7 +87,7 @@
          window.onload = sellerList();
 
          async function fetchData() {
-            const orderList = await fetch('/api/orderlist', {
+            const orderList = await fetch('/orderlist', {
                method: 'POST',
                headers: {
                   'Content-Type': 'application/json' 
@@ -108,7 +108,7 @@
                   <div class="bid-images"><img src="${item.product.image}" alt="images" class="img-fluid"></div>
                   <div class="bid-info">
                      <div class="bd-title">
-                        <a href="/api/web-myorder-details/${item._id}">${item.product.name}</a>
+                        <a href="/web-myorder-details/${item._id}">${item.product.name}</a>
                      </div>
                      <div class="bd-price">
                         <span><i class="fa fa-inr" aria-hidden="true"></i></span>
@@ -120,7 +120,7 @@
                 <div class="br-results ">                                            
                               <div class="cart-action d-flex">
                                  <div class="remove-cart">
-                                    <a href="/api/web-myorder-details/${item._id}" class="prd-btn wish-rem-button"
+                                    <a href="/web-myorder-details/${item._id}" class="prd-btn wish-rem-button"
                                        data-id=""><i class="fa fa-eye" aria-hidden="true"></i></a>
                                  </div>`;
                                  if(item.delete_status == 0) {
@@ -165,7 +165,7 @@
 
 
          async function sellerList() {
-            const sellerList = await fetch('/api/selllist', {
+            const sellerList = await fetch('/selllist', {
                method: 'POST',
                headers: {
                   'Content-Type': 'application/json' 
@@ -202,7 +202,7 @@
                 </div>
                 <div class="bid-right flx-content">
                   <div class="remove-cart">
-                     <a href="/api/web-myorder-details/${item._id}"><i class="fa fa-info-circle"></i></a>  
+                     <a href="/web-myorder-details/${item._id}"><i class="fa fa-info-circle"></i></a>  
                    </div>`;
                    if(item.delete_status == 0) {
                      hTml += `
@@ -250,7 +250,7 @@
             var cgRowElement = $(`.cg-row[data-orderid="${orderId}"]`);
            
             $.ajax({
-               url: '/api/get-shipmentkitweb/' + orderId.trim(),
+               url: '/get-shipmentkitweb/' + orderId.trim(),
                method: 'GET',
                success: function (data) {
                      if (data.success) {

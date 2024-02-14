@@ -4,8 +4,8 @@
       <div class="container">
          <div class="breadcum-product">
             <ul>
-               <li><a href="/api/home">Home</a></li>
-               <li><a href="/api/websubcategoriesproducts/<%=category._id%>">
+               <li><a href="/home">Home</a></li>
+               <li><a href="/websubcategoriesproducts/<%=category._id%>">
                      <%=category.name%>
                   </a></li>
                   <% if (respdata && Object.keys(respdata).length > 0) { %>
@@ -251,7 +251,7 @@
                /*$(document).on('click', ".buy-btn", function (e) {
                   var id = $(this).data('id');
                   $.ajax({
-                     url: '/api/addtocart/' + id.trim(),
+                     url: '/addtocart/' + id.trim(),
                      method: 'POST',
                      success: function (data) {
                         if (data.is_added) {

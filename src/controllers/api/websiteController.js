@@ -834,7 +834,7 @@ exports.userFilter = async function (req, res, next) {
     let [min, max] = priceList.split('-').map(Number);
     const priceConditions = {
         offer_price: {
-            $gt: parseFloat(min),
+            $gte: parseFloat(min),
             $lte: parseFloat(max)
         }
     };

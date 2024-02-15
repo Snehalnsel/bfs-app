@@ -30,6 +30,7 @@ const AddressBook = require("../../models/api/addressbookModel");
 const Shippingkit = require("../../models/api/shippingkitModel");
 const insertNotification = require("../../models/api/insertNotification");
 const nodemailer = require("nodemailer");
+const { log } = require("console");
 // const axios = require('axios');
 // const bodyParser = require('body-parser'); 
 //const smtpUser = "sneha.lnsel@gmail.com";
@@ -879,18 +880,16 @@ exports.getOrderListByUser = async (req, res) => {
   try {
     let  user_id  = typeof req.body.user_id != "undefined"  ? req.body.user_id : req.session.user.userId;
     const orders = await Order.find({ user_id: user_id }).populate('seller_id', 'name').populate('user_id', 'name');
+   
     if (!orders || orders.length === 0) {
       return res.status(404).json({ message: 'No orders found for this seller' });
     }
     const ordersWithProductDetails = [];
     for (const order of orders) {
-
       const orderCreationTime = moment(order.createdAt); 
-      const isOrderWithin24Hours = now.diff(orderCreationTime, 'hours') < 24;
+      const isOrderWithin24Hours = moment(new Date().toISOString()).diff(orderCreationTime, 'hours') < 24;
       const is_deletedtime = isOrderWithin24Hours ? 0 : 1;
-
       await Order.updateOne({ _id: order._id }, { is_deletedtime });
-
       const productDetails = await Userproduct.find({ _id: order.product_id });
       const productId = order.product_id.toString();
       const productImage = await Productimage.find({ product_id: productId }).limit(1);
@@ -923,6 +922,8 @@ exports.getOrderListByUser = async (req, res) => {
       orders: ordersWithProductDetails,
     });
   } catch (error) {
+    console.log(error);
+    return;
     res.status(500).json({ error: 'An error occurred while fetching orders' });
   }
 };
@@ -938,7 +939,7 @@ exports.getOrdersBySeller = async (req, res) => {
     const ordersWithProductDetails = [];
     for (const order of orders) {
       const orderCreationTime = moment(order.createdAt); 
-      const isOrderWithin24Hours = now.diff(orderCreationTime, 'hours') < 24;
+      const isOrderWithin24Hours = moment(new Date().toISOString()).diff(orderCreationTime, 'hours') < 24;
       const is_deletedtime = isOrderWithin24Hours ? 0 : 1;
       const productDetails = await Userproduct.find({ _id: order.product_id });
       const productId = order.product_id.toString();

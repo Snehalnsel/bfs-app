@@ -157,13 +157,13 @@
                                  <p>Select Payments Method </p>
                                  <ul>
                                     <li><label class="form-check-label">
-                                          <input type="radio" class="form-check-input" name="optradio"
+                                          <input type="radio" class="form-check-input payment-method" name="optradio"
                                              value="Online">Pay Now
                                        </label>
                                     </li>
                                     <li>
                                        <label class="form-check-label" for="cod-payments">
-                                          <input type="radio" class="form-check-input" id="cod-payments" name="optradio"
+                                          <input type="radio" class="form-check-input payment-method" id="cod-payments" name="optradio"
                                              value="COD">Pay On Delivery
                                        </label>
                                     </li>
@@ -227,7 +227,7 @@
                var originalTotalAmount = parseFloat('<%= finalPrice %>');
 
 
-               $(document).on('change', 'input[name="optradio"]', function () {
+               $(document).on('change', '.payment-method', function () {
                   if ($(this).val() === "COD") {
                      $('.pmnt-hidebox').show();
                      var productPrice = parseFloat('<%= product_price %>');
@@ -278,23 +278,28 @@
             $(document).on("click", ".check-out", async function (e) {
                e.preventDefault();
                $(".check-out").css("pointer-events", "none");
+               let selectedMethod = $(".payment-method:checked").val();
+              if (selectedMethod== "COD") {selectedPaymentMethod = 0;}
+              else{ selectedPaymentMethod = 1; }
                let formData = {
                   cart_id: $('#cart_id').val(),
                   seller_id: $('#seller_id').val(),
                   user_id: $('#user_id').val(),
                   product_id: $('#product_id').val(),
-                  //total_amt: $('#total_amt').val(),
                   gst: $('#gst').val(),
-                  payment_method: $('#payment_method').val(),
+                  payment_method: selectedPaymentMethod,
                   product_price: $('#product_price').val(),
                   addressBookId: $('#userAddressId').val()
                };
 
+               if(selectedPaymentMethod == 0){
+                  formData.pay_now = $('#pay-now-row th').text();
+                  formData.remaining_amount = $('#remaining-amount-row th').text();
+               }
                let totalAmtText = $('#total-cod-amount-row th').text();
                let totalAmtValue = parseFloat(totalAmtText.replace('₹ ', '')); 
                formData.total_amt = totalAmtValue;
-               // console.log(formData);
-               // return;
+         
                let addToCartreCookieAccessToken = await getCookieFunc(accessTokenVar);
                let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
                await userReLogin(addToCartreCookieAccessToken, addToCartreCookieRefreshToken);

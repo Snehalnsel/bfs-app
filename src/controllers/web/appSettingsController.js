@@ -226,7 +226,7 @@ exports.getData = async function (req, res, next) {
             if (err) {
               throw err;
             } else {
-              res.redirect("/app-settings");
+              res.redirect("/admin/app-settings");
             }
           }
         );
@@ -264,7 +264,7 @@ exports.getData = async function (req, res, next) {
       );
   
      
-      res.redirect("/app-settings");
+      res.redirect("/admin/app-settings");
     } catch (error) {
      
       return res.status(500).json({

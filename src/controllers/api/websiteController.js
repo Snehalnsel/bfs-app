@@ -2558,7 +2558,7 @@ exports.myOrderWeb = async (req, res) => {
     res.render("webpages/myorder", {
       title: "Wish List Page",
       message: "Welcome to the Wish List page!",
-      respdata: req.session.user,
+      respdata: typeof req.session.user != "undefined" ? req.session.user : null,
       isLoggedIn: isLoggedIn,
     });
   }
@@ -2626,17 +2626,12 @@ exports.myOrderDetailsWeb = async (req, res) => {
   // }
     const sellerAddress = await addressBook.findOne({ _id: order.billing_address_id});
     const buyerAddress = await addressBook.findOne({ _id: order.shipping_address_id });
-
     const shippingKitData = await Shippingkit.findOne({ order_id: order._id });
-
     let shippingkit_details;
-
     let shipping_user_details;
-
     if(shippingKitData)
     {
        shippingkit_details = await addressBook.findById({ _id: shippingKitData.shipping_address_id });
-
        shipping_user_details = await Users.findById({ _id: shippingKitData.buyer_id });
     }
     const orderDetails = {
@@ -2667,7 +2662,6 @@ exports.myOrderDetailsWeb = async (req, res) => {
       shippingkit_details : shippingkit_details || null,
       shipping_user_details :shipping_user_details || null
     };
-    //return false;
     res.render("webpages/myorderdetails",{
       title: "Wish List Page",
       message: "Welcome to the Wish List page!",
@@ -2675,7 +2669,6 @@ exports.myOrderDetailsWeb = async (req, res) => {
       //respdata1: orderlistId,
       isLoggedIn: isLoggedIn,
     });
-
   }
   catch (error) {
     res.status(500).json({

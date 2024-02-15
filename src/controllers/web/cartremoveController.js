@@ -197,7 +197,7 @@ exports.updateData = async function (req, res, next) {
           if (err) {
             throw err;
           } else {
-            res.redirect("/carttime");
+            res.redirect("/admin/carttime");
           }
         }
       );

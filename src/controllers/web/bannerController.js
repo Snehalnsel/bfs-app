@@ -230,7 +230,7 @@ exports.updateData = async function (req, res, next) {
               isAdminLoggedIn:isAdminLoggedIn
             });
           }
-          res.redirect("/banner-list");
+          res.redirect("/admin/banner-list");
         })
         .catch((error) => {
           return res.status(500).json({
@@ -277,7 +277,7 @@ exports.updateStatusData = async function (req, res, next) {
               respdata: {},
             });
           }
-          res.redirect("/banner-list"); 
+          res.redirect("/admin/banner-list"); 
         })
         .catch((error) => {
           return res.status(500).json({
@@ -327,7 +327,7 @@ exports.deleteData = async function (req, res, next) {
       { w: "majority", wtimeout: 100 }
     );
 
-    res.redirect("/banner-list");
+    res.redirect("/admin/banner-list");
   } catch (error) {
     
     return res.status(500).json({

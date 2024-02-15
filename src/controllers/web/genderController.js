@@ -155,7 +155,7 @@ exports.updateStatusData = async function (req, res, next) {
               isAdminLoggedIn:isAdminLoggedIn
             });
           }
-          res.redirect("/genderlist"); 
+          res.redirect("/admin/genderlist"); 
         })
         .catch((error) => {
           return res.status(500).json({
@@ -200,7 +200,7 @@ exports.deleteData = async function (req, res, next) {
       { _id: req.params.id },
       { w: "majority", wtimeout: 100 }
     );
-    res.redirect("/genderlist");
+    res.redirect("/admin/genderlist");
   } catch (error) {
     return res.status(500).json({
       status: "0",

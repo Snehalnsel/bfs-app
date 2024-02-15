@@ -250,7 +250,7 @@ exports.updateData = async function (req, res, next) {
             });
           }
 
-          res.redirect("/catbrand");
+          res.redirect("/admin/catbrand");
         })
         .catch((error) => {
           return res.status(500).json({
@@ -298,7 +298,7 @@ exports.updateStatusData = async function (req, res, next) {
               isAdminLoggedIn:isAdminLoggedIn
             });
           }
-          res.redirect("/catbrand"); 
+          res.redirect("/admin/catbrand"); 
         })
         .catch((error) => {
           return res.status(500).json({
@@ -349,7 +349,7 @@ exports.deleteData = async function (req, res, next) {
     );
 
     
-    res.redirect("/catbrand");
+    res.redirect("/admin/catbrand");
   } catch (error) {
     
     return res.status(500).json({

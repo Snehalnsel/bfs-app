@@ -165,7 +165,7 @@ exports.updateStatusData = async function (req, res, next) {
           }
 
           // Redirect to the list page or any other appropriate page
-          res.redirect("/size"); // You can change this URL as needed
+          res.redirect("/admin/size"); // You can change this URL as needed
         })
         .catch((error) => {
           return res.status(500).json({
@@ -217,7 +217,7 @@ exports.deleteData = async function (req, res, next) {
     );
 
     // Redirect after successful deletion
-    res.redirect("/size");
+    res.redirect("/admin/size");
   } catch (error) {
     // Handle any errors that occur during the deletion process
     return res.status(500).json({

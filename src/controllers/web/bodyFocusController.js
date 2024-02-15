@@ -468,7 +468,7 @@ exports.updateData = async function (req, res, next) {
         isAdminLoggedIn:isAdminLoggedIn
       });
     }
-    res.redirect("/body-focus");
+    res.redirect("/admin/body-focus");
   } catch (error) {
     return res.status(500).json({
       status: "0",
@@ -511,12 +511,12 @@ exports.deleteData = async function (req, res, next) {
     );
 
     if (referer && referer.includes("/body-focus")) {
-      res.redirect("/body-focus");
+      res.redirect("/admin/body-focus");
     } else if (referer && referer.includes("/body-focus-subcat")) {
-      res.redirect("/body-focus-subcat");
+      res.redirect("/admin/body-focus-subcat");
     } else {
       
-      res.redirect("/body-focus");
+      res.redirect("/admin/body-focus");
     }
   } catch (error) {
     // Handle any errors that occur during the deletion process
@@ -629,7 +629,7 @@ exports.updateSubCatData = async function (req, res, next) {
       });
     }
 
-    res.redirect("/body-focus-subcat");
+    res.redirect("/admin/body-focus-subcat");
   } catch (error) {
     return res.status(500).json({
       status: "0",
@@ -667,7 +667,7 @@ exports.updateStatusData = async function (req, res, next) {
               isAdminLoggedIn:isAdminLoggedIn
             });
           }
-          res.redirect("/body-focus"); 
+          res.redirect("/admin/body-focus"); 
         })
         .catch((error) => {
           return res.status(500).json({
@@ -716,13 +716,13 @@ exports.statusData = async function (req, res, next) {
             });
           }
          
-          if (referer && referer.includes("/body-focus")) {
-            res.redirect("/body-focus");
-          } else if (referer && referer.includes("/body-focus-subcat")) {
-            res.redirect("/body-focus-subcat");
+          if (referer && referer.includes("/admin/body-focus")) {
+            res.redirect("/admin/body-focus");
+          } else if (referer && referer.includes("/admin/body-focus-subcat")) {
+            res.redirect("/admin/body-focus-subcat");
           } else {
             
-            res.redirect("/body-focus");
+            res.redirect("/admin/body-focus");
           }
         })
         .catch((error) => {

@@ -658,16 +658,16 @@ exports.updateData = async function (req, res, next) {
         const savedOrdertrack = await ordertracking.save();
 
         if (savedOrdertrack) {
-          return res.redirect("/orderlist");
+          return res.redirect("/admin/orderlist");
         }
         else {
-          return res.redirect("/orderlist");
+          return res.redirect("/admin/orderlist");
         }
       }
 
       //await Order.findOneAndUpdate({ _id: req.body.order_id }, { $set: updData }, { upsert: true });
 
-      res.redirect("/orderlist");
+      res.redirect("/admin/orderlist");
     }
   }).catch((err) => {;
     res.status(500).json({
@@ -792,7 +792,7 @@ exports.getShipmentList = function (req, res, next) {
 //       { $set: { flag: 0 } }
 //     );
 
-//     res.redirect("/orderlist");
+//     res.redirect("/admin/orderlist");
 //   } catch (error) {
 
 //     return res.status(500).json({
@@ -839,7 +839,7 @@ exports.deleteData = async function (req, res, next) {
       { $set: { flag: 0 } }
     );
 
-    res.redirect("/orderlist");
+    res.redirect("/admin/orderlist");
   } catch (error) {
     return res.status(500).json({
       status: "0",
@@ -1019,8 +1019,8 @@ exports.orderplaced = async (req, res) => {
         { $set: { status: 1 } }, 
         { new: true } 
       );
-      //res.redirect("/orderlist");
-      res.redirect(`/check-Couriresserviceability/${track_id}`);
+      //res.redirect("/admin/orderlist");
+      res.redirect(`/admin/check-Couriresserviceability/${track_id}`);
     }
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while placing the order' });
@@ -1089,20 +1089,15 @@ exports.getAWBnoById = async function (req, res, next) {
               sendEmailWithAttachment(receiver_email, labelUrl, invoiceUrl);
             }
           }
-
-         
-
-          res.redirect("/orderlist");
+          res.redirect("/admin/orderlist");
         }
         else
         {
           existingOrder.pickup_awb = "0";
           existingOrder.shiprocket_delivery_partner = "0";
           existingOrder.shiprocket_courier_name = "0";
-  
           await existingOrder.save();
-
-          res.redirect("/orderlist");
+          res.redirect("/admin/orderlist");
         }
 
       }
@@ -1389,7 +1384,7 @@ exports.getGenerateInvoice = async function (req, res, next) {
 
 //     req.flash('error', errorMessage); // Store the error message in flash
 
-//     res.redirect('/orderlist'); 
+//     res.redirect('/admin/orderlist'); 
 //   }
 // };
 
@@ -1876,7 +1871,7 @@ exports.huborderplaced = async (req, res) => {
       return res.status(404).json({ error: 'Order not found' });
     }
     else {
-      res.redirect("/orderlist");
+      res.redirect("/admin/orderlist");
     }
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while placing the order' });

@@ -565,7 +565,7 @@ exports.updateData = async function (req, res, next) {
     }
     shippingKit.hub_address_id = hubAddressID;
     await shippingKit.save();
-    res.redirect("/shippingkitlist"); 
+    res.redirect("/admin/shippingkitlist"); 
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -680,7 +680,7 @@ exports.deleteData = async function (req, res, next) {
       { w: "majority", wtimeout: 100 }
     );
 
-    res.redirect("/orderlist");
+    res.redirect("/admin/orderlist");
   } catch (error) {
 
     return res.status(500).json({
@@ -830,8 +830,8 @@ exports.kitorderplaced = async (req, res) => {
       return res.status(404).json({ error: 'Order not found' });
     }
     else {
-      //res.redirect("/orderlist");
-      res.redirect(`/couriresserviceability/${order_id}`);
+      //res.redirect("/admin/orderlist");
+      res.redirect(`/admin/couriresserviceability/${order_id}`);
     }
 
 
@@ -970,7 +970,7 @@ exports.getAWBnoById = async function (req, res, next) {
         existingOrder.pickup_awb = shiprocketResponse.response.data.awb_code;
         existingOrder.shiprocket_delivery_partner = shiprocketResponse.response.courier_company_id;
         await existingOrder.save();
-        res.redirect("/shippingkitlist");
+        res.redirect("/admin/shippingkitlist");
       }
     }
   } catch (error) {
@@ -1475,7 +1475,7 @@ exports.huborderplaced = async (req, res) => {
       return res.status(404).json({ error: 'Order not found' });
     }
     else {
-      res.redirect("/orderlist");
+      res.redirect("/admin/orderlist");
     }
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while placing the order' });

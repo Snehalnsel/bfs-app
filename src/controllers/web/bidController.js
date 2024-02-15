@@ -220,7 +220,7 @@ exports.updatedetailsData = async function (req, res, next) {
     }
 
     
-    res.redirect("/bid-listing");
+    res.redirect("/admin/bid-listing");
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -260,7 +260,7 @@ exports.deleteData = async function (req, res, next) {
     );
 
    
-    res.redirect("/bid-listing");
+    res.redirect("/admin/bid-listing");
   } catch (error) {
  
     return res.status(500).json({

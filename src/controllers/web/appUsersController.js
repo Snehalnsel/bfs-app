@@ -251,7 +251,7 @@ exports.getData = async function (req, res, next) {
         isAdminLoggedIn:isAdminLoggedIn
       });
 
-      res.redirect("/app-users"); 
+      res.redirect("/admin/app-users"); 
     } catch (error) {
       res.status(500).json({
         status: "0",
@@ -288,7 +288,7 @@ exports.getData = async function (req, res, next) {
         await Users.deleteOne({ _id: req.params.id }, { w: "majority", wtimeout: 100 });
 
         // Redirect after successful deletion
-        res.redirect("/app-users");
+        res.redirect("/admin/app-users");
     } catch (error) {
         // Handle any errors that occur during the deletion process
         return res.status(500).json({

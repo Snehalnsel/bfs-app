@@ -6,12 +6,15 @@
             <div class="dashboard-sidbar">        
                 <div class="sidbar-box user-profile">
                    <div class="user-icon">
-                      <img src="<%=respdata.image%>" alt="user-image">
+                     <% if(respdata != null && typeof respdata != "undefined" && typeof respdata.image != "undefined") {%>
+                        <img src="<%=respdata.image%>" alt="user-image">
+                      <% } %>
                    </div>
                    <div class="user-info">
                       <div class="sht-ui">Hello</div>
-                      
-                      <div class="user-name"><%=respdata.title%> <%=respdata.name%> </div>
+                      <% if(respdata != null && typeof respdata != "undefined" && typeof respdata.title != "undefined") {%>
+                        <div class="user-name"><%=respdata.title%> <%=respdata.name%> </div>
+                     <% } %>
                    </div>
                 </div>
                 <div class="sidbar-box sidbar-nav">
@@ -24,8 +27,10 @@
                              </li>
                
                              <li class="nav-item">
-                               <a class="nav-link" href="/my-post/<%=respdata.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Product</span></a>
-                             </li>
+                                 <% if(respdata != null && typeof respdata != "undefined" && typeof respdata.userId != "undefined") {%>
+                                    <a class="nav-link" href="/my-post/<%=respdata.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Product</span></a>
+                                 <% } %>
+                              </li>
                
                              <li class="nav-item">
                                <a class="nav-link" href="/bid-for-product"><i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> <span>My Bids</span></a>

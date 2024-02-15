@@ -473,7 +473,7 @@ exports.updatedetailsData = async function (req, res, next) {
 
       //   await Promise.all(imageDetails);
       // }
-      res.redirect("/productlist");
+      res.redirect("/admin/productlist");
     }
   }).catch((err) => {
     res.status(500).json({
@@ -510,7 +510,7 @@ exports.updateStatusData = async function (req, res, next) {
               isAdminLoggedIn:isAdminLoggedIn
             });
           }
-          res.redirect("/productlist");
+          res.redirect("/admin/productlist");
         })
         .catch((error) => {
           return res.status(500).json({
@@ -562,7 +562,7 @@ exports.deleteData = async function (req, res, next) {
     );
 
 
-    res.redirect("/productlist");
+    res.redirect("/admin/productlist");
   } catch (error) {
 
     return res.status(500).json({

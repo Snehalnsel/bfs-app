@@ -266,7 +266,7 @@ exports.updateStatusData = async function (req, res, next) {
             });
           }
 
-          res.redirect("/hublist");
+          res.redirect("/admin/hublist");
         })
         .catch((error) => {
           return res.status(500).json({
@@ -349,7 +349,7 @@ exports.updateData = async function (req, res, next) {
 
       await Userproduct.findOneAndUpdate({ _id: req.body.product_id }, { $set: updData }, { upsert: true });
 
-      res.redirect("/productlist");
+      res.redirect("/admin/productlist");
     }
   }).catch((err) => {
     res.status(500).json({

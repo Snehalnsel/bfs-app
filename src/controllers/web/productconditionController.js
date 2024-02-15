@@ -162,7 +162,7 @@ exports.updateStatusData = async function (req, res, next) {
           }
 
          
-          res.redirect("/productcondition"); 
+          res.redirect("/admin/productcondition"); 
         })
         .catch((error) => {
           return res.status(500).json({
@@ -250,7 +250,7 @@ exports.updateData = async function (req, res, next) {
         isAdminLoggedIn:isAdminLoggedIn
       });
     }
-    res.redirect("/productcondition");
+    res.redirect("/admin/productcondition");
   } catch (error) {
     return res.status(500).json({
       status: "0",
@@ -289,7 +289,7 @@ exports.deleteData = async function (req, res, next) {
       { w: "majority", wtimeout: 100 }
     );
 
-    res.redirect("/productcondition");
+    res.redirect("/admin/productcondition");
   } catch (error) {
    
     return res.status(500).json({

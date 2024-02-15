@@ -285,7 +285,7 @@ exports.getData = async function (req, res, next) {
       const deleteuser = await Users.deleteOne({ _id: req.params.user_id });
       if(deleteuser)
       {
-        res.redirect("/admin-users");
+        res.redirect("/admin/admin-users");
       }
       // res.render("pages/admin-users/list", {
       //   status: 200,

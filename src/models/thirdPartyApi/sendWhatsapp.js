@@ -2,33 +2,25 @@ const axios = require("axios");
 const fs = require('fs');
 const sendWhatsapp = async (reqData) => {
     try {
-        let obj;
-        fs.readFile('../../../api_send_message.json', 'utf8', async function (err, data) {
-            if (err) {
-                    return {
-                    status:false,
-                    data:err
-                };
-            }
-            obj = JSON.parse(data);
-            await axios.get(process.env.SMS_API, {
-                params: {}
-            }).then(async response => {
-                return {
-                    status:true,
-                    data:response
-                };
-            }).catch(async (err) => {
-                return {
-                    status:false,
-                    data:err
-                };
-            });
+        const smsURL = process.env.WP_SMS_API + "?username="+process.env.SMS_USER_NAME+"&password="+process.env.SMS_PASSWORD+"&to="+reqData.toMobile+"&from="+process.env.SMS_SENDER_ID+"&text="+reqData.text;
+        return await axios.post(smsURL).then(async response => {
+            return {
+                status:true,
+                //data:response,
+                data:"Success"
+            };
+        }).catch(async (err) => {
+            return {
+                status:false,
+                //data:response,
+                data:"Can Not Send"
+            };
         });
     } catch (error) {
         return {
             status:false,
-            data:error
+            //data:response,
+            data:"Error While API Call"
         };
     };
 };

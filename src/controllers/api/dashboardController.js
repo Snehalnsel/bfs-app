@@ -47,6 +47,8 @@ const Productcondition = require("../../models/api/productconditionModel");
 const Banner = require("../../models/api/bannerModel");
 const Cart = require('../../models/api/cartModel');
 const Notifications = require("../../models/api/notificationModel");
+const sendSms = require("../../models/thirdPartyApi/sendSms");
+const ApiCallHistory = require("../../models/thirdPartyApi/ApiCallHistory");
 
 exports.homedetails = async function (req, res) {
 
@@ -618,8 +620,35 @@ exports.getJustSoldProducts = async function (req, res) {
 
 exports.getData = async function (req, res, next) {
   try {
-
     //const requrl = req.protocol + '://' + req.get('host');
+    //SEND SMS
+    /*await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
+      if (err) {
+        return {
+          status:false,
+          data:err
+        };
+      }
+      //let obj = JSON.parse(data);
+      let randNumber = Math.floor((Math.random() * 1000000) + 1);
+      let smsData = {
+        textId:"test",
+        toMobile:"918902087379",
+        text:"You have been tagged with an invoice "+randNumber+". Please use OTP "+randNumber+" for approving the invoice. Do not share your OTP with anyone. RJSSLT",
+      };
+      let returnData;
+      returnData = await sendSms(smsData);
+      const historyData = new ApiCallHistory({
+        userId:mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"), 
+        called_for:"page_load",
+        api_link:process.env.SITE_URL,
+        api_param:smsData,
+        api_response:returnData,
+        send_status:'send',
+      });
+      await historyData.save();
+    });*/
+    //SEND SMS
 
     const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : ""
 

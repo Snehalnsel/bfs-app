@@ -7,13 +7,13 @@ const sendSms = async (reqData) => {
             return {
                 status:true,
                 //data:response,
-                data:"Success"
+                data:response.data
             };
         }).catch(async (err) => {
             return {
                 status:false,
                 //data:response,
-                data:"Can Not Send"
+                data:response.data
             };
         });
     } catch (error) {

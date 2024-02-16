@@ -670,11 +670,11 @@ exports.getData = async function (req, res, next) {
           // };
         }
         //let obj = JSON.parse(data);
-        let randNumber = Math.floor((Math.random() * 1000000) + 1);
+        //let randNumber = Math.floor((Math.random() * 1000000) + 1);
         let smsData = xml;
         let returnData;
         returnData = await sendWhatsapp(smsData);
-        const historyData = new ApiCallHistory({
+        const historyData = await new ApiCallHistory({
           userId:mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"), 
           called_for:"whatsapp",
           api_link:process.env.SITE_URL,

@@ -4,13 +4,12 @@ const sendWhatsapp = async (reqData) => {
     try {
         const wpURL = process.env.WP_SMS_API;
         const config = {
-            headers: {'Content-Type': 'text/xml'}
+            headers: {'Content-Type': 'application/xml'}
         };
         return await axios.post(wpURL,reqData,config).then(async response => {
             return {
                 status:true,
-                //data:response,
-                data:"Success"
+                data:response.data
             };
         }).catch(async (err) => {
             return {

@@ -47,6 +47,10 @@ const Productcondition = require("../../models/api/productconditionModel");
 const Banner = require("../../models/api/bannerModel");
 const Cart = require('../../models/api/cartModel');
 const Notifications = require("../../models/api/notificationModel");
+const sendSms = require("../../models/thirdPartyApi/sendSms");
+const sendWhatsapp = require("../../models/thirdPartyApi/sendWhatsapp");
+const ApiCallHistory = require("../../models/thirdPartyApi/ApiCallHistory");
+const { create } = require('xmlbuilder2');
 
 exports.homedetails = async function (req, res) {
 
@@ -618,49 +622,91 @@ exports.getJustSoldProducts = async function (req, res) {
 
 exports.getData = async function (req, res, next) {
   try {
-
     //const requrl = req.protocol + '://' + req.get('host');
+    //SEND SMS
+      /*await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
+        if (err) {
+          // return {
+          //   status:false,
+          //   data:err
+          // };
+        }
+        //let obj = JSON.parse(data);
+        let randNumber = Math.floor((Math.random() * 1000000) + 1);
+        let smsData = {
+          textId:"test",
+          toMobile:"917044289770",
+          text:"You have been tagged with an invoice "+randNumber+". Please use OTP "+randNumber+" for approving the invoice. Do not share your OTP with anyone. RJSSLT",
+        };
+        let returnData;
+        returnData = await sendSms(smsData);
+        const historyData = new ApiCallHistory({
+          userId:mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"), 
+          called_for:"sms",
+          api_link:process.env.SITE_URL,
+          api_param:smsData,
+          api_response:returnData,
+          send_status:'send',
+        });
+        await historyData.save();
+      });*/
+    //SEND SMS
+    //SEND WHATSAPP
+      /*const root = create({ version: '1.0',encoding:"ISO-8859-1" })
+      .ele('MESSAGE', { VER: '1.2' })
+        .ele('USER',{USERNAME:process.env.WP_SMS_USER_NAME,PASSWORD:process.env.WP_PASSWORD})
+          .ele('SMS',{UDH:"0",CODING:"1",TEXT:"Hi",PROPERTY:"0",ID:"1",TEMPLATE:"bfstest"})
+            .ele('ADDRESS',{FROM:process.env.WP_SMS_SENDER_MOBILE,TO:"917044289770",SEQ:"1"})
+        //.up()
+      //.up();
+    
+      // convert the XML tree to string
+      const xml = root.end({ prettyPrint: true });
+      await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
+        if (err) {
+          // return {
+          //   status:false,
+          //   data:err
+          // };
+        }
+        //let obj = JSON.parse(data);
+        //let randNumber = Math.floor((Math.random() * 1000000) + 1);
+        let smsData = xml;
+        let returnData;
+        returnData = await sendWhatsapp(smsData);
+        const historyData = await new ApiCallHistory({
+          userId:mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"), 
+          called_for:"whatsapp",
+          api_link:process.env.SITE_URL,
+          api_param:smsData,
+          api_response:returnData,
+          send_status:'send',
+        });
+        await historyData.save();
+      });*/
+    //SEND WHATSAPP
 
     const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : ""
-
     var cartCount = (userId != "") ? await Cart.countDocuments({ user_id: mongoose.Types.ObjectId(userId) }) : 0;
-
     //console.log("userId", userId); 
-
     //return false;
-
     const banner = await Banner.find({ status: 1 });
-
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-
     res.render("webpages/list", {
-
       title: "Home Page",
-
       requrl: req.app.locals.requrl,
-
       message: "Welcome to the Dashboard page!",
-
       cart: cartCount,
       isLoggedIn: isLoggedIn,
       banner:banner
-
     });
-
   } catch (error) {
-
     //console.error(error);
-
     res.status(500).json({
-
       status: "0",
-
       message: "An error occurred while rendering the dashboard.",
-
       error: error.message,
-
     });
-
   }
 
 };

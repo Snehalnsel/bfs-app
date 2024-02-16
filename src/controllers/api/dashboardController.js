@@ -635,7 +635,7 @@ exports.getData = async function (req, res, next) {
         let randNumber = Math.floor((Math.random() * 1000000) + 1);
         let smsData = {
           textId:"test",
-          toMobile:"918902087379",
+          toMobile:"917044289770",
           text:"You have been tagged with an invoice "+randNumber+". Please use OTP "+randNumber+" for approving the invoice. Do not share your OTP with anyone. RJSSLT",
         };
         let returnData;
@@ -656,7 +656,7 @@ exports.getData = async function (req, res, next) {
       .ele('MESSAGE', { VER: '1.2' })
         .ele('USER',{USERNAME:process.env.WP_SMS_USER_NAME,PASSWORD:process.env.WP_PASSWORD})
           .ele('SMS',{UDH:"0",CODING:"1",TEXT:"Hi",PROPERTY:"0",ID:"1",TEMPLATE:"bfstest"})
-            .ele('ADDRESS',{FROM:process.env.WP_SMS_SENDER_MOBILE,TO:"918902087379",SEQ:"1"})
+            .ele('ADDRESS',{FROM:process.env.WP_SMS_SENDER_MOBILE,TO:"917044289770",SEQ:"1"})
         //.up()
       //.up();
     

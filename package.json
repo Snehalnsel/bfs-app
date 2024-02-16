@@ -43,7 +43,8 @@
     "request": "^2.88.2",
     "select2": "^4.1.0-rc.0",
     "socket.io": "^4.7.2",
-    "twilio": "^4.18.0"
+    "twilio": "^4.18.0",
+    "xmlbuilder2": "^3.1.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"

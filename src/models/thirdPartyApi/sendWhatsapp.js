@@ -2,8 +2,11 @@ const axios = require("axios");
 const fs = require('fs');
 const sendWhatsapp = async (reqData) => {
     try {
-        const smsURL = process.env.WP_SMS_API + "?username="+process.env.SMS_USER_NAME+"&password="+process.env.SMS_PASSWORD+"&to="+reqData.toMobile+"&from="+process.env.SMS_SENDER_ID+"&text="+reqData.text;
-        return await axios.post(smsURL).then(async response => {
+        const wpURL = process.env.WP_SMS_API;
+        const config = {
+            headers: {'Content-Type': 'text/xml'}
+        };
+        return await axios.post(wpURL,reqData,config).then(async response => {
             return {
                 status:true,
                 //data:response,

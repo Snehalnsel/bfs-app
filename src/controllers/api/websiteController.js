@@ -41,6 +41,8 @@ const Banner = require("../../models/api/bannerModel");
 const Brand = require("../../models/api/brandModel");
 const Size = require("../../models/api/sizeModel");
 const Gender = require("../../models/api/genderModel");
+const ReturnOrder = require("../../models/api/returnorderModel");
+const Reasonlist = require("../../models/api/reasonlistModel");
 const Iptrnsaction = require("../../models/api/ipTransactionModel");
 const insertNotification = require("../../models/api/insertNotification");
 //const smtpUser = "sneha.lnsel@gmail.com";
@@ -173,50 +175,50 @@ exports.productData = async function (req, res, next) {
       .populate('category_id', 'name')
       .exec();
 
-      const userproducts = await Userproduct.findOne({
-        _id: productId,
-        approval_status: 1
-      })
+    const userproducts = await Userproduct.findOne({
+      _id: productId,
+      approval_status: 1
+    })
       .populate('brand_id', 'name')
       .populate('category_id', 'name')
       .populate('user_id', 'name')
       .populate('size_id', 'name')
       .exec();
-      const userproducts1 = await Userproduct.find({ 
-        category_id: categoydetails.category_id , 
-        approval_status: 1
-      })
-        .populate('brand_id', 'name')
-        .populate('category_id', 'name')
-        .populate('user_id', 'name')
-        .populate('size_id', 'name')
-        .exec();
-  
-        let formattedUserProducts1 = [];
-  
-        if (userproducts1) {
-            
-            for (const userproduct1 of userproducts1) {
-              const productImages1 = await Productimage.find({ product_id: userproduct1._id });
-        
-              const formattedUserProduct1 = {
-                _id: userproduct1._id,
-                name: userproduct1.name,
-                description: userproduct1.description,
-                price: userproduct1.price,
-                offer_price: userproduct1.offer_price,
-                percentage: userproduct1.percentage,
-                status: userproduct1.status,
-                flag: userproduct1.flag,
-                approval_status: userproduct1.approval_status,
-                added_dtime: userproduct1.added_dtime,
-                __v: userproduct1.__v,
-                product_images: productImages1,
-              };
-        
-              formattedUserProducts1.push(formattedUserProduct1);
-            }
-        }  
+    const userproducts1 = await Userproduct.find({
+      category_id: categoydetails.category_id,
+      approval_status: 1
+    })
+      .populate('brand_id', 'name')
+      .populate('category_id', 'name')
+      .populate('user_id', 'name')
+      .populate('size_id', 'name')
+      .exec();
+
+    let formattedUserProducts1 = [];
+
+    if (userproducts1) {
+
+      for (const userproduct1 of userproducts1) {
+        const productImages1 = await Productimage.find({ product_id: userproduct1._id });
+
+        const formattedUserProduct1 = {
+          _id: userproduct1._id,
+          name: userproduct1.name,
+          description: userproduct1.description,
+          price: userproduct1.price,
+          offer_price: userproduct1.offer_price,
+          percentage: userproduct1.percentage,
+          status: userproduct1.status,
+          flag: userproduct1.flag,
+          approval_status: userproduct1.approval_status,
+          added_dtime: userproduct1.added_dtime,
+          __v: userproduct1.__v,
+          product_images: productImages1,
+        };
+
+        formattedUserProducts1.push(formattedUserProduct1);
+      }
+    }
     if (!userproducts) {
       return res.render("webpages/productdetails", {
         title: "Not Found",
@@ -224,7 +226,7 @@ exports.productData = async function (req, res, next) {
         websiteUrl: process.env.SITE_URL,
         isLoggedIn: isLoggedIn,
         respdata: {},
-        category : categoydetails.category_id,
+        category: categoydetails.category_id,
         relatedProducts: formattedUserProducts1,
         isWhislist: isProductInWishlist != null && Object.keys(isProductInWishlist).length ? true : false
       });
@@ -238,11 +240,11 @@ exports.productData = async function (req, res, next) {
       name: userproducts.name,
       description: userproducts.description,
       category_id: userproducts.category_id._id,
-      category: userproducts.category_id ? userproducts.category_id.name : '', 
-      brand: userproducts.brand_id ? userproducts.brand_id.name : '', 
+      category: userproducts.category_id ? userproducts.category_id.name : '',
+      brand: userproducts.brand_id ? userproducts.brand_id.name : '',
       user_id: userproducts.user_id ? userproducts.user_id._id : '',
       user_name: userproducts.user_id ? userproducts.user_id.name : '',
-      size_id: userproducts.size_id ? userproducts.size_id.name : '', 
+      size_id: userproducts.size_id ? userproducts.size_id.name : '',
       price: userproducts.price,
       offer_price: userproducts.offer_price,
       percentage: userproducts.percentage,
@@ -256,14 +258,14 @@ exports.productData = async function (req, res, next) {
       hitCount: userproducts.hitCount || 0,
       __v: userproducts.__v,
       product_images: productImages,
-    };    
+    };
     res.render("webpages/productdetails", {
       title: "Product Details",
       message: "Welcome to the Product page!",
       respdata: formattedUserProduct,
       relatedProducts: formattedUserProducts1,
-      category : categoydetails.category_id,
-      websiteUrl:process.env.SITE_URL,
+      category: categoydetails.category_id,
+      websiteUrl: process.env.SITE_URL,
       isLoggedIn: isLoggedIn,
       isWhislist: isProductInWishlist != null && Object.keys(isProductInWishlist).length ? true : false
     });
@@ -398,7 +400,7 @@ exports.registration = async function (req, res, next) {
 exports.signin = async function (req, res, next) {
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   const errors = validationResult(req);
-  
+
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
@@ -459,7 +461,7 @@ exports.signin = async function (req, res, next) {
             title: user.title,
             name: user.name,
             age: user.age,
-            image: user.image ? user.image:'',
+            image: user.image ? user.image : '',
             phone_no: user.phone_no,
             weight: user.weight,
             height: user.height,
@@ -538,7 +540,7 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
           // user.devicename = devicename;
           // user.fcm_token = fcm_token;
 
-          const loginHtmlPath = 'views/webpages/mailbody.html';  
+          const loginHtmlPath = 'views/webpages/mailbody.html';
           const loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
 
           user.save(async (err) => {
@@ -550,12 +552,12 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
               });
             } else {
               const mailData = {
-                from: "Bid For Sale! <"+smtpUser+">",
+                from: "Bid For Sale! <" + smtpUser + ">",
                 to: user.email,
                 subject: "Welcome to Bid For Sale!",
-                name:"Bid For Sale!",
-                text:"welocome",
-                html:loginHtmlContent
+                name: "Bid For Sale!",
+                text: "welocome",
+                html: loginHtmlContent
               };
 
               transporter.sendMail(mailData, function (err, info) {
@@ -592,7 +594,7 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
                 title: user.title,
                 name: user.name,
                 age: user.age,
-                image: user.image ? user.image:'',
+                image: user.image ? user.image : '',
                 //usertoken:user.token,
                 phone_no: user.phone_no,
                 weight: user.weight,
@@ -714,7 +716,7 @@ exports.userRelogin = async function (req, res, next) {
             password: user.password,
             title: user.title,
             name: user.name,
-            image: user.image ? user.image:'',
+            image: user.image ? user.image : '',
             age: user.age,
             phone_no: user.phone_no,
             weight: user.weight,
@@ -777,7 +779,7 @@ exports.userRelogin = async function (req, res, next) {
 };
 
 exports.userFilter = async function (req, res, next) {
-  let { brandList, sizeList, conditionList, priceList, genderList,optionId,productcategoryId,pageNo } = req.body;
+  let { brandList, sizeList, conditionList, priceList, genderList, optionId, productcategoryId, pageNo } = req.body;
   if (typeof optionId != "undefined") {
     if ((optionId == 0)) {
       optionId = 1;
@@ -787,8 +789,8 @@ exports.userFilter = async function (req, res, next) {
   } else {
     optionId = 1;
   }
-  const page = pageNo || 1; 
-  const pageSize = 8;  
+  const page = pageNo || 1;
+  const pageSize = 8;
   const skip = (page - 1) * pageSize;
   let concatVar = {};
   let objConditionList = [];
@@ -800,9 +802,9 @@ exports.userFilter = async function (req, res, next) {
   if (typeof brandList != "undefined") {
     concatVar["brand_id"] = { "$in": brandList };
   }
-    if (typeof sizeList != "undefined") {
-      concatVar["size_id"] = { "$in": sizeList };
-    }
+  if (typeof sizeList != "undefined") {
+    concatVar["size_id"] = { "$in": sizeList };
+  }
   if (typeof productcategoryId != "undefined") {
     concatVar["category_id"] = { "$in": mongoose.Types.ObjectId(productcategoryId) };
   }
@@ -833,29 +835,29 @@ exports.userFilter = async function (req, res, next) {
   if (priceList && typeof priceList !== "undefined" && priceList !== '') {
     let [min, max] = priceList.split('-').map(Number);
     const priceConditions = {
-        offer_price: {
-            $gte: parseFloat(min),
-            $lte: parseFloat(max)
-        }
+      offer_price: {
+        $gte: parseFloat(min),
+        $lte: parseFloat(max)
+      }
     };
 
     if (concatVar.$and) {
-        concatVar.$and.push(priceConditions);
+      concatVar.$and.push(priceConditions);
     } else {
-        concatVar.$and = [priceConditions];
+      concatVar.$and = [priceConditions];
     }
-}
-// let totalProduct = await Userproduct.find(concatVar).sort({ offer_price: optionId });
-const query = { 
-  ...concatVar,
-  approval_status: 1,
-  flag: 0
-};
-let totalProduct = await Userproduct.countDocuments(query);
-let allProductData = await Userproduct.find(query)
-.sort({ offer_price: optionId })
-.skip(skip)
-.limit(pageSize);
+  }
+  // let totalProduct = await Userproduct.find(concatVar).sort({ offer_price: optionId });
+  const query = {
+    ...concatVar,
+    approval_status: 1,
+    flag: 0
+  };
+  let totalProduct = await Userproduct.countDocuments(query);
+  let allProductData = await Userproduct.find(query)
+    .sort({ offer_price: optionId })
+    .skip(skip)
+    .limit(pageSize);
   const formattedUserProducts = [];
   for (const userproduct of allProductData) {
     const productImages = await Productimage.find({ product_id: userproduct._id });
@@ -868,7 +870,7 @@ let allProductData = await Userproduct.find(query)
       brand: (typeof userproduct.brand_id != "undefined") ? userproduct.brand_id.name : "",
       user_id: (typeof userproduct.user_id != "undefined") ? userproduct.user_id._id : "",
       user_name: (typeof userproduct.user_id != "undefined") ? userproduct.user_id.name : "",
-      size_id: (typeof userproduct.size_id != "undefined") ? userproduct.size_id.name: "",
+      size_id: (typeof userproduct.size_id != "undefined") ? userproduct.size_id.name : "",
       price: (typeof userproduct.price != "undefined") ? userproduct.price : "",
       offer_price: (typeof userproduct.offer_price != "undefined") ? userproduct.offer_price : "",
       percentage: (typeof userproduct.percentage != "undefined") ? userproduct.percentage : "",
@@ -889,12 +891,12 @@ let allProductData = await Userproduct.find(query)
       status: 'success',
       message: 'Success search result',
       respdata: formattedUserProducts,
-      productCount:userProductsCount,
-      totalPages:totalPages,
+      productCount: userProductsCount,
+      totalPages: totalPages,
       currentPage: page,
-      pageSize: pageSize, 
-      webUrl:'user-filter',
-      totalProduct:totalProduct
+      pageSize: pageSize,
+      webUrl: 'user-filter',
+      totalProduct: totalProduct
     });
   } else {
     res.status(200).json({
@@ -948,7 +950,7 @@ exports.getUserLogin = async function (req, res, next) {
               });
             } else {
               const mailData = {
-                from: "Bid For Sale! <"+smtpUser+">",
+                from: "Bid For Sale! <" + smtpUser + ">",
                 to: user.email,
                 subject: "BFS - Bid For Sale  - Welcome Email",
                 text: "Server Email!",
@@ -1049,18 +1051,17 @@ exports.myAccount = async function (req, res, next) {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
 
     //if (userData === undefined || userData === null)
-    if (isLoggedIn == "")
-    {
+    if (isLoggedIn == "") {
       res.redirect('/registration');
     }
-    else{
+    else {
       var userData = req.session.user;
       const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId) });
       res.render("webpages/myaccount", {
         title: "My Account",
         message: "Welcome to the privacy policy page!",
         respdata: req.session.user,
-        respdata1:address,
+        respdata1: address,
         isLoggedIn: isLoggedIn,
       });
     }
@@ -1081,7 +1082,7 @@ exports.editProfile = async function (req, res, next) {
       message: "Welcome to the Edit Profile page!",
       respdata: req.session.user,
       isLoggedIn: isLoggedIn,
-      userData:userData
+      userData: userData
     });
   } catch (error) {
     res.status(500).json({
@@ -1178,7 +1179,7 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
           name: { $first: '$matchedCategories.name' },
           description: { $first: '$matchedCategories.description' },
           images: { $first: '$matchedCategories.image' },
-          product_ids: { $push: '$_id' }, 
+          product_ids: { $push: '$_id' },
         },
       },
       {
@@ -1218,9 +1219,9 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
     let sortCriteria = {};
 
     if (sortid == 0) {
-      sortCriteria = { offer_price: 1 }; 
+      sortCriteria = { offer_price: 1 };
     } else if (sortid == 1) {
-      sortCriteria = { offer_price: -1 }; 
+      sortCriteria = { offer_price: -1 };
     } else {
       sortCriteria = { offer_price: 1 };
     }
@@ -1234,12 +1235,12 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
         approval_status: 1,
         flag: 0
       })
-      .populate('brand_id', 'name')
-      .populate('category_id', 'name')
-      .populate('user_id', 'name')
-      .populate('size_id', 'name')
-      .sort([sortCriteria, { hitCount: -1 }])
-      .exec();
+        .populate('brand_id', 'name')
+        .populate('category_id', 'name')
+        .populate('user_id', 'name')
+        .populate('size_id', 'name')
+        .sort([sortCriteria, { hitCount: -1 }])
+        .exec();
 
       count = await Userproduct.countDocuments({
         approval_status: 1,
@@ -1251,12 +1252,12 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
         approval_status: 1,
         flag: 1
       })
-      .populate('brand_id', 'name')
-      .populate('category_id', 'name')
-      .populate('user_id', 'name')
-      .populate('size_id', 'name')
-      .sort(sortCriteria)
-      .exec();
+        .populate('brand_id', 'name')
+        .populate('category_id', 'name')
+        .populate('user_id', 'name')
+        .populate('size_id', 'name')
+        .sort(sortCriteria)
+        .exec();
 
       count = await Userproduct.countDocuments({
         approval_status: 1,
@@ -1272,12 +1273,12 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
         approval_status: 1,
         flag: 0
       })
-      .populate('brand_id', 'name')
-      .populate('category_id', 'name')
-      .populate('user_id', 'name')
-      .populate('size_id', 'name')
-      .sort(sortCriteria)
-      .exec();
+        .populate('brand_id', 'name')
+        .populate('category_id', 'name')
+        .populate('user_id', 'name')
+        .populate('size_id', 'name')
+        .sort(sortCriteria)
+        .exec();
 
       count = await Userproduct.countDocuments({
         percentage: { $gte: percentageFilter },
@@ -1288,22 +1289,22 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
     } else {
       categoryId = id;
 
-      userproducts = await Userproduct.find({ 
+      userproducts = await Userproduct.find({
         category_id: categoryId,
         approval_status: 1,
-        flag: 0 
+        flag: 0
       })
-      .populate('brand_id', 'name')
-      .populate('category_id', 'name')
-      .populate('user_id', 'name')
-      .populate('size_id', 'name')
-      .sort(sortCriteria)
-      .exec();
+        .populate('brand_id', 'name')
+        .populate('category_id', 'name')
+        .populate('user_id', 'name')
+        .populate('size_id', 'name')
+        .sort(sortCriteria)
+        .exec();
 
-      count = await Userproduct.countDocuments({ 
+      count = await Userproduct.countDocuments({
         category_id: categoryId,
         approval_status: 1,
-        flag: 0 
+        flag: 0
       });
     }
     const formattedUserProducts = [];
@@ -1353,45 +1354,45 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
     };
   }
 }
-exports.getSubCategoriesProducts = async function (page,req, res, next) {
+exports.getSubCategoriesProducts = async function (page, req, res, next) {
   try {
 
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const id = req.params.id;
-    const pageno = page || 1; 
-    const pageSize = 8;  
+    const pageno = page || 1;
+    const pageSize = 8;
     const sortid = req.params.sortid || 0;
-    const data = await getProductDataWithSort(id,sortid,pageno, pageSize);
-    const productCount = data.count; 
+    const data = await getProductDataWithSort(id, sortid, pageno, pageSize);
+    const productCount = data.count;
     console.log(productCount);
-    const formattedUserProducts = data.respdata; 
+    const formattedUserProducts = data.respdata;
     const filterproductCount = formattedUserProducts.length;
     const totalPages = data.totalPages;
     const currentPage = data.currentPage;
-    const categoryName = await Category.find({ _id: id}).populate('name');
+    const categoryName = await Category.find({ _id: id }).populate('name');
     const userProducts = await Userproduct.find({
-      category_id : id,
+      category_id: id,
       approval_status: 1,
       flag: 0,
     })
       .select('brand_id size_id status');
 
-      const result = await Userproduct.aggregate([
-        {
-          $match: {
-            category_id:  mongoose.Types.ObjectId(id),
-            approval_status: 1,
-            flag: 0
-          }
-        },
-        {
-          $group: {
-            _id: id,
-            maxPrice: { $max: "$offer_price" },
-            minPrice: { $min: "$offer_price" }
-          }
+    const result = await Userproduct.aggregate([
+      {
+        $match: {
+          category_id: mongoose.Types.ObjectId(id),
+          approval_status: 1,
+          flag: 0
         }
-      ]);
+      },
+      {
+        $group: {
+          _id: id,
+          maxPrice: { $max: "$offer_price" },
+          minPrice: { $min: "$offer_price" }
+        }
+      }
+    ]);
     const brandIds = userProducts.map(product => product.brand_id).filter(Boolean);
     const sizeIds = userProducts.map(product => product.size_id).filter(Boolean);
     const statusIds = userProducts.map(product => product.status).filter(Boolean);
@@ -1407,14 +1408,14 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
         product_category_id: id,
         brandList: brandList,
         sizeList: sizeList,
-        categoryName:categoryName,
+        categoryName: categoryName,
         conditionList: conditionList,
-        productCount:productCount,
-        genderList:genderList,
-        filterproductCount:filterproductCount,
+        productCount: productCount,
+        genderList: genderList,
+        filterproductCount: filterproductCount,
         totalPages: totalPages,
         currentPage: currentPage,
-        pageSize: pageSize, 
+        pageSize: pageSize,
         isLoggedIn: isLoggedIn,
         maxvalue: result[0].maxPrice,
         minvalue: result[0].minPrice
@@ -1422,28 +1423,28 @@ exports.getSubCategoriesProducts = async function (page,req, res, next) {
 
   }
   catch (error) {
-    return{
+    return {
       status: '0',
       message: 'An error occurred while fetching products with matching parent_id.',
       error: error.message,
     };
   }
 };
-exports.getSubCategoriesProductswithSort = async function (page,req, res, next) {
+exports.getSubCategoriesProductswithSort = async function (page, req, res, next) {
 
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   const id = req.params.id;
   const sortid = req.params.sortid || 0;
-  const pageno = page || 1; 
+  const pageno = page || 1;
   const pageSize = 8;
-  const data = await getProductDataWithSort(id,sortid,pageno, pageSize);
+  const data = await getProductDataWithSort(id, sortid, pageno, pageSize);
   const formattedUserProducts = data.respdata;
   const productCount = formattedUserProducts.length;
   return res.json({
     status: '1',
     message: 'Success',
     respdata: formattedUserProducts,
-    productCount:productCount,
+    productCount: productCount,
     isLoggedIn: isLoggedIn
   });
 
@@ -1477,7 +1478,7 @@ exports.userUpdate = async function (req, res, next) {
     const updatedUser = await Users.findOneAndUpdate(
       { _id: user._id },
       { $set: updData },
-      { upsert: true, new: true } 
+      { upsert: true, new: true }
     );
     if (!updatedUser) {
       return res.status(500).json({
@@ -1499,7 +1500,7 @@ exports.userUpdate = async function (req, res, next) {
   }
 };
 exports.userNewCheckOutAddressAdd = async function (req, res, next) {
-  try{
+  try {
     const addr_name = req.body.addrType;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -1510,7 +1511,7 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
       });
     }
     const newAddress = new addressBook({
-      user_id: req.body.userId ? req.body.userId:req.session.user.userId,
+      user_id: req.body.userId ? req.body.userId : req.session.user.userId,
       street_name: req.body.address2,
       address1: req.body.address1,
       landmark: req.body.landmark,
@@ -1526,9 +1527,9 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
     const savedAddress = await newAddress.save();
     const user = await Users.findById(newAddress.user_id);
     const randomSuffix = Math.floor(Math.random() * 1000);
-    const pickupLocation = savedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;  
+    const pickupLocation = savedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;
     const PickupData = {
-     pickup_location: pickupLocation,
+      pickup_location: pickupLocation,
       name: user.name,
       email: user.email,
       phone: user.phone_no,
@@ -1545,7 +1546,7 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
       savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
       await savedAddress.save();
       res.redirect('/checkout-web');
-    }    
+    }
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -1714,7 +1715,7 @@ exports.addPostView = async function (req, res, next) {
       respdata: req.session.user,
       productcondition: productConditions,
       subcate: categoriesWithoutParentId,
-      genderList :genderList,
+      genderList: genderList,
       isLoggedIn: isLoggedIn,
     });
   } catch (error) {
@@ -1750,10 +1751,10 @@ exports.addNewPost = async function (req, res, next) {
     else {
       packaging = '0';
     }
-    if (req.body.gender ) {
+    if (req.body.gender) {
       gender = req.body.gender;
     }
-    else{
+    else {
       gender = '';
     }
     const newProduct = new Userproduct({
@@ -1774,7 +1775,7 @@ exports.addNewPost = async function (req, res, next) {
       percentage: req.body.percentage,
       original_invoice: invoice,
       original_packaging: packaging,
-      gender_id : gender,
+      gender_id: gender,
       added_dtime: moment().tz('Asia/Kolkata').format("YYYY-MM-DD HH:mm:ss"),
     });
     const savedProductdata = await newProduct.save();
@@ -1815,8 +1816,8 @@ exports.editUserWisePost = async function (req, res, next) {
 
     const parentCategoryId = "650444488501422c8bf24bdb";
     const categoriesWithoutParentId = await Category.find({ parent_id: { $ne: parentCategoryId } });
-     const brands = await Brand.find({ status: 1 });
-     const productsize = await Size.find();
+    const brands = await Brand.find({ status: 1 });
+    const productsize = await Size.find();
 
     const productId = req.params.id;
     const product = await Userproduct.findById(productId);
@@ -1845,9 +1846,9 @@ exports.editUserWisePost = async function (req, res, next) {
       productcondition: productConditions,
       subcate: categoriesWithoutParentId,
       productId: productId,
-      brands:brands,
-      productsize:productsize,
-      genderList :genderList,
+      brands: brands,
+      productsize: productsize,
+      genderList: genderList,
       isLoggedIn: isLoggedIn,
     });
 
@@ -1880,12 +1881,10 @@ exports.updatePostData = async function (req, res, next) {
     }
     existingProduct.category_id = req.body.category_id || existingProduct.category_id;
     existingProduct.user_id = req.body.user_id || existingProduct.user_id;
-    if(req.body.brand)
-    {
+    if (req.body.brand) {
       existingProduct.brand = ((req.body.brand || existingProduct.brand) ?? null);
     }
-    if(req.body.size)
-    {
+    if (req.body.size) {
       existingProduct.size = ((req.body.size || existingProduct.size) ?? null);
     }
     existingProduct.brand_id = ((req.body.brand_id || existingProduct.brand_id) ?? null);
@@ -1908,14 +1907,14 @@ exports.updatePostData = async function (req, res, next) {
       price: req.body.price,
       offer_price: req.body.offerprice,
       reseller_price: req.body.reseller_price,
-      percentage:  req.body.percentage,
-      original_invoice:  req.body.original_invoice,
-      original_packaging:  req.body.original_packaging,
-      added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"), 
+      percentage: req.body.percentage,
+      original_invoice: req.body.original_invoice,
+      original_packaging: req.body.original_packaging,
+      added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
     });
     existingProduct.updated_dtime = moment().format("YYYY-MM-DD HH:mm:ss");
     // if (req.files && req.files.length > 0) {
-    
+
     //   // await Productimage.deleteMany({ product_id: existingProduct._id });
 
     //   const imageUrls = [];
@@ -1940,8 +1939,8 @@ exports.updatePostData = async function (req, res, next) {
     //   }
     // }
     if (req.files && Object.keys(req.files).length > 0) {
-      
-        const requrl = url.format({
+
+      const requrl = url.format({
         protocol: req.protocol,
         host: req.get("host"),
       });
@@ -1967,7 +1966,7 @@ exports.updatePostData = async function (req, res, next) {
       ...updatedProduct.toObject(),
       images: productImages,
     };
-      res.redirect('/my-account');
+    res.redirect('/my-account');
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -1980,7 +1979,7 @@ exports.updatePostData = async function (req, res, next) {
 exports.signOut = async function (req, res, next) {
   //const banner = await Banner.find({ status: 1 });
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-  if(isLoggedIn != ''){
+  if (isLoggedIn != '') {
     Users.findOne({ _id: req.session.user.userId }).then((user) => {
       if (!user)
         res.status(404).json({
@@ -2010,9 +2009,9 @@ exports.signOut = async function (req, res, next) {
                   });
                 }
                 res.status(200).json({
-                    status: "success",                 
-                    message: "Sign out!",
-              });
+                  status: "success",
+                  message: "Sign out!",
+                });
                 // Session destroyed, redirect or render logout success message
                 // res.render("webpages/list", {
                 //   title: "Wish List Page",
@@ -2027,12 +2026,11 @@ exports.signOut = async function (req, res, next) {
       }
     });
   }
-  else
-  {
+  else {
     res.status(200).json({
       status: "error",
       message: "Unable to logout at this moment.",
-     
+
     });
   }
 };
@@ -2072,13 +2070,13 @@ exports.addToWishlistWeb = async function (req, res, next) {
       });
       const savedFavData = await newFavList.save();
 
-      const requestUrl =  req.headers.referer;
-     
-     await insertNotification(
-        'Wishlist Notification', 
-        `Item ${product.name} added to wishlist by ${user.name}`, 
-        user_id, 
-        requestUrl, 
+      const requestUrl = req.headers.referer;
+
+      await insertNotification(
+        'Wishlist Notification',
+        `Item ${product.name} added to wishlist by ${user.name}`,
+        user_id,
+        requestUrl,
         new Date()
       );
 
@@ -2111,7 +2109,7 @@ exports.viewWishListByUserId = async function (req, res, next) {
     const existingList = await Wishlist.find({ user_id: isLoggedIn })
       .populate('user_id', 'name')
       .exec();
-  
+
     if (existingList.length === 0) {
       res.render("webpages/wishlist", {
         title: "Wish List Page",
@@ -2124,8 +2122,7 @@ exports.viewWishListByUserId = async function (req, res, next) {
     } else {
       const formattedList = await Promise.all(existingList.map(async (item) => {
         const product = await Userproduct.findOne({ _id: item.product_id }).populate('category_id', 'name');
-        if(product)
-        {
+        if (product) {
           const productImages = await Productimage.find({ product_id: item.product_id }).limit(1);
           const date = moment(item.added_dtime, 'YYYY-MM-DDTHH:mm:ssZ');
           const addedDate = date.format('DD/MM/YYYY');
@@ -2137,7 +2134,7 @@ exports.viewWishListByUserId = async function (req, res, next) {
             product_id: item.product_id,
             product_name: product.name,
             product_price: product.price,
-            category_name: product.category_id ? product.category_id.name :'',
+            category_name: product.category_id ? product.category_id.name : '',
             images: productImages[0].image,
             status: item.status,
             added_dtime: addedDate,
@@ -2246,7 +2243,7 @@ exports.addToCart = async function (req, res, next) {
         __v: existingCart.__v,
       };
       setTimeout(() => {
-        removeItemAfterTime(existingCart._id); 
+        removeItemAfterTime(existingCart._id);
       }, 20 * 60 * 1000);
       return res.status(200).json({
         message: 'Item Added to Cart',
@@ -2285,10 +2282,10 @@ exports.addToCart = async function (req, res, next) {
         __v: savedCart.__v,
       };
       const cartRemove = await Cartremove.findOne({}, { name: 1, _id: 0 });
-      const durationInSeconds = cartRemove.name; 
+      const durationInSeconds = cartRemove.name;
       const durationInMilliseconds = durationInSeconds * 60 * 1000;
       setTimeout(() => {
-        removeItemAfterTime(savedCart._id); 
+        removeItemAfterTime(savedCart._id);
       }, durationInMilliseconds);
       res.status(200).json({
         cart_count: cartCount,
@@ -2464,85 +2461,85 @@ exports.changeProfileImgWeb = async function (req, res, next) {
 };
 exports.checkoutWeb = async function (req, res, next) {
   try {
-      let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-      if (isLoggedIn == "") {
-        return res.redirect("/registration");
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    if (isLoggedIn == "") {
+      return res.redirect("/registration");
+    }
+    const user_id = req.session.user.userId;
+    const existingCart = await Cart.findOne({ user_id, status: 0 });
+    if (!existingCart) {
+      res.render("webpages/addtocart", {
+        title: "Cart List Page",
+        message: "Cart is empty",
+        respdata: [],
+        respdata1: [],
+        user: user_id,
+        isLoggedIn: isLoggedIn,
+      });
+    } else {
+      const cartList = await CartDetail.find({ cart_id: existingCart._id, status: 0 })
+        .populate({
+          path: 'product_id',
+          model: Userproduct,
+          select: 'name images',
+        })
+        .exec();
+      // const addressUserList = await addressBook.find({user_id: user_id });
+      const addressUserList = await addressBook.find({
+        user_id: user_id,
+        default_status: 0
+      });
+      const user = await Users.findById(existingCart.user_id);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
       }
-      const user_id = req.session.user.userId;
-      const existingCart = await Cart.findOne({ user_id, status: 0 });
-      if (!existingCart) {
-        res.render("webpages/addtocart", {
-          title: "Cart List Page",
-          message: "Cart is empty",
-          respdata: [],
-          respdata1: [],
-          user: user_id,
-          isLoggedIn: isLoggedIn,
-        });
-      }else{
-        const cartList = await CartDetail.find({ cart_id: existingCart._id, status: 0 })
-          .populate({
-            path: 'product_id',
-            model: Userproduct,
-            select: 'name images',
-          })
-          .exec();
-        // const addressUserList = await addressBook.find({user_id: user_id });
-        const addressUserList = await addressBook.find({
-            user_id: user_id,
-            default_status: 0
-        });
-        const user = await Users.findById(existingCart.user_id);
-        if (!user) {
-          return res.status(404).json({ error: 'User not found' });
-        }
-        const formattedCartList = await Promise.all(cartList.map(async (cartItem) => {
-          const product = await Userproduct.findOne({ _id: cartItem.product_id._id }).populate('category_id', 'name');
-          const productImages = await Productimage.find({ product_id: cartItem.product_id._id }).limit(1);
-          const finalData = {
-            _id: cartItem._id,
-            cart_id: existingCart._id,
-            quantity: cartItem.qty,
-            product_id: cartItem.product_id._id,
-            product_name: cartItem.product_id.name,
-            product_price: product.offer_price,
-            product_est_price: product.price,
-            seller_id: product.user_id,
-            category_name: product.category_id.name,
-            images: productImages.length > 0 ? productImages[0].image : null,
-            user_name: user.name,
-            added_dtime: cartItem.added_dtime,
-            status: cartItem.status,
-          };
+      const formattedCartList = await Promise.all(cartList.map(async (cartItem) => {
+        const product = await Userproduct.findOne({ _id: cartItem.product_id._id }).populate('category_id', 'name');
+        const productImages = await Productimage.find({ product_id: cartItem.product_id._id }).limit(1);
+        const finalData = {
+          _id: cartItem._id,
+          cart_id: existingCart._id,
+          quantity: cartItem.qty,
+          product_id: cartItem.product_id._id,
+          product_name: cartItem.product_id.name,
+          product_price: product.offer_price,
+          product_est_price: product.price,
+          seller_id: product.user_id,
+          category_name: product.category_id.name,
+          images: productImages.length > 0 ? productImages[0].image : null,
+          user_name: user.name,
+          added_dtime: cartItem.added_dtime,
+          status: cartItem.status,
+        };
 
-          // const requestUrl =  req.headers.referer;
-          const requestUrl =  '/web-my-order';
-     
-          await insertNotification(
-             'Order Placed Successfully from Website', 
-             `Item ${cartItem.product_id.name} added to order list by ${user.name}`, 
-             user_id, 
-             requestUrl, 
-             new Date()
-          );
-          const product_price = finalData.product_price;
-          const gst = (product_price * 18) / 100;
-          const finalPrice = parseInt(product_price) + 250 + parseInt(gst);
-          res.render("webpages/mycheckoutweb", {
-            title: "Check Out Page",
-            status: '1',
-            is_orderPlaced: 1,
-            message: "Welcome to the Checkout page!",
-            respdata: finalData,
-            product_price:product_price,
-            finalPrice:finalPrice,
-            gst:gst,
-            isLoggedIn: isLoggedIn,
-            user: req.session.user,
-            addressUserList:addressUserList,
-          });
-        }));
-  }
+        // const requestUrl =  req.headers.referer;
+        const requestUrl = '/web-my-order';
+
+        await insertNotification(
+          'Order Placed Successfully from Website',
+          `Item ${cartItem.product_id.name} added to order list by ${user.name}`,
+          user_id,
+          requestUrl,
+          new Date()
+        );
+        const product_price = finalData.product_price;
+        const gst = (product_price * 18) / 100;
+        const finalPrice = parseInt(product_price) + 250 + parseInt(gst);
+        res.render("webpages/mycheckoutweb", {
+          title: "Check Out Page",
+          status: '1',
+          is_orderPlaced: 1,
+          message: "Welcome to the Checkout page!",
+          respdata: finalData,
+          product_price: product_price,
+          finalPrice: finalPrice,
+          gst: gst,
+          isLoggedIn: isLoggedIn,
+          user: req.session.user,
+          addressUserList: addressUserList,
+        });
+      }));
+    }
   }
   catch (error) {
     res.status(500).json({
@@ -2572,8 +2569,8 @@ exports.myOrderWeb = async (req, res) => {
 };
 exports.myOrderDetailsWeb = async (req, res) => {
   try {
-    const orderlistId = req.params.id; 
-    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : ""; 
+    const orderlistId = req.params.id;
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     if (!orderlistId) {
       return res.status(400).json({ message: 'Order ID is missing in the request' });
     }
@@ -2591,48 +2588,47 @@ exports.myOrderDetailsWeb = async (req, res) => {
     }
 
     const productDetails = await Userproduct.findById(productId);
-    
+
     if (!productDetails) {
       return res.status(404).json({ message: 'Product details not found' });
     }
 
     const productImage = await Productimage.findOne({ product_id: productId }).limit(1);
     const orderTrackStatusOne = await Ordertracking.find({ orderlistId, status: 1 });
-    
+
     let shiprocketResponse = [];
     let shiprocketResponselabel = [];
     let shiprocketResponseinvoice = [];
     let shiprocketResponsefortracking = [];
 
-  //   if (orderTrackStatusOne && orderTrackStatusOne.length > 0)  {
-  //     const trackingId = orderTrackStatusOne[0].tracking_id;
-  //     const trackDetails = await Track.findById(trackingId);
+    //   if (orderTrackStatusOne && orderTrackStatusOne.length > 0)  {
+    //     const trackingId = orderTrackStatusOne[0].tracking_id;
+    //     const trackDetails = await Track.findById(trackingId);
 
-  //     if(trackDetails.shiprocket_shipment_id)
-  //     {
+    //     if(trackDetails.shiprocket_shipment_id)
+    //     {
 
-  //       shiprocketResponselabel = await generateLabel(trackDetails.shiprocket_shipment_id);
+    //       shiprocketResponselabel = await generateLabel(trackDetails.shiprocket_shipment_id);
 
-  //       shiprocketResponseinvoice = await generateInvoice(trackDetails.shiprocket_order_id);
-  //     }
+    //       shiprocketResponseinvoice = await generateInvoice(trackDetails.shiprocket_order_id);
+    //     }
 
-  //     if (trackDetails.shiprocket_shipment_id) {
-  //       shiprocketResponse = await generateOrderDetails(trackDetails.shiprocket_order_id);
-  //     }
+    //     if (trackDetails.shiprocket_shipment_id) {
+    //       shiprocketResponse = await generateOrderDetails(trackDetails.shiprocket_order_id);
+    //     }
 
-  //     if (trackDetails.shiprocket_shipment_id) {
-  //       shiprocketResponsefortracking = await trackbyaorderid(trackDetails.shiprocket_order_id);
-  //     }
-  // }
-    const sellerAddress = await addressBook.findOne({ _id: order.billing_address_id});
+    //     if (trackDetails.shiprocket_shipment_id) {
+    //       shiprocketResponsefortracking = await trackbyaorderid(trackDetails.shiprocket_order_id);
+    //     }
+    // }
+    const sellerAddress = await addressBook.findOne({ _id: order.billing_address_id });
     const buyerAddress = await addressBook.findOne({ _id: order.shipping_address_id });
     const shippingKitData = await Shippingkit.findOne({ order_id: order._id });
     let shippingkit_details;
     let shipping_user_details;
-    if(shippingKitData)
-    {
-       shippingkit_details = await addressBook.findById({ _id: shippingKitData.shipping_address_id });
-       shipping_user_details = await Users.findById({ _id: shippingKitData.buyer_id });
+    if (shippingKitData) {
+      shippingkit_details = await addressBook.findById({ _id: shippingKitData.shipping_address_id });
+      shipping_user_details = await Users.findById({ _id: shippingKitData.buyer_id });
     }
     const orderDetails = {
       _id: order._id,
@@ -2646,7 +2642,7 @@ exports.myOrderDetailsWeb = async (req, res) => {
         _id: order.seller_id._id,
         name: order.seller_id.name,
       },
-      buyeraddress: buyerAddress ? buyerAddress: 'No Buyer Address Found',
+      buyeraddress: buyerAddress ? buyerAddress : 'No Buyer Address Found',
       user: {
         _id: order.user_id._id,
         name: order.user_id.name,
@@ -2655,14 +2651,14 @@ exports.myOrderDetailsWeb = async (req, res) => {
       selleraddress: sellerAddress ? sellerAddress : 'No Buyer Address Found',
       product: {
         name: productDetails ? productDetails.name : 'Unknown Product',
-        offer_price : productDetails ? productDetails.offer_price : 'Unknown Product',
+        offer_price: productDetails ? productDetails.offer_price : 'Unknown Product',
         image: productImage ? productImage.image : 'No Image',
       },
-      shippingKitData :shippingKitData || null,
-      shippingkit_details : shippingkit_details || null,
-      shipping_user_details :shipping_user_details || null
+      shippingKitData: shippingKitData || null,
+      shippingkit_details: shippingkit_details || null,
+      shipping_user_details: shipping_user_details || null
     };
-    res.render("webpages/myorderdetails",{
+    res.render("webpages/myorderdetails", {
       title: "Wish List Page",
       message: "Welcome to the Wish List page!",
       respdata: orderDetails,
@@ -2683,10 +2679,10 @@ exports.addShipmentData = async (req, res) => {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const order_id = req.params.id;
     const price = 350;
-    const gst = (price * 18)/100;
-    const final_price = price +  gst;
+    const gst = (price * 18) / 100;
+    const final_price = price + gst;
     const track = await Ordertracking.findOne({ order_id: order_id }).exec();
-    if (track == null)  {
+    if (track == null) {
       return res.status(200).json({
         status: "0",
         message: 'Order Delivery Partner Not chosse yet',
@@ -2711,8 +2707,8 @@ exports.addShipmentData = async (req, res) => {
       product_id: hubaddress.product_id,
       shipping_address_id: hubaddress.billing_address_id._id,
       order_id: order_id,
-      total_price : final_price,
-      payment_method : 1,
+      total_price: final_price,
+      payment_method: 1,
       added_dtime: new Date().toISOString(),
     });
     const savedOrder = await shippingkit.save();
@@ -2805,9 +2801,9 @@ exports.getWhatsHotProductsweb = async function (req, res) {
         brandList: brandList,
         sizeList: sizeList,
         conditionList: conditionList,
-        productCount:hotProductsCount,
+        productCount: hotProductsCount,
         isLoggedIn: isLoggedIn,
-        filter_basedon:"whatshot"
+        filter_basedon: "whatshot"
 
       });
 
@@ -2821,9 +2817,9 @@ exports.getWhatsHotProductsweb = async function (req, res) {
 
 exports.getJustSoldProductsweb = async function (req, res) {
 
-  const page = parseInt(req.query.page) || 1; 
+  const page = parseInt(req.query.page) || 1;
 
-  const pageSize = parseInt(req.query.pageSize) || 10; 
+  const pageSize = parseInt(req.query.pageSize) || 10;
 
 
 
@@ -2893,9 +2889,9 @@ exports.getJustSoldProductsweb = async function (req, res) {
         brandList: brandList,
         sizeList: sizeList,
         conditionList: conditionList,
-        productCount:soldItemsCount,
+        productCount: soldItemsCount,
         isLoggedIn: isLoggedIn,
-        filter_basedon:"justsold"
+        filter_basedon: "justsold"
 
       });
 
@@ -2907,9 +2903,9 @@ exports.getJustSoldProductsweb = async function (req, res) {
 
 exports.getBestDealProductsweb = async function (req, res) {
 
-  const page = parseInt(req.query.page) || 1; 
+  const page = parseInt(req.query.page) || 1;
 
-  const pageSize = parseInt(req.query.pageSize) || 10; 
+  const pageSize = parseInt(req.query.pageSize) || 10;
 
   try {
 
@@ -2935,7 +2931,7 @@ exports.getBestDealProductsweb = async function (req, res) {
       approval_status: 1,
       flag: 0
     });
-    
+
     const products = await Userproduct.find({ percentage: { $gte: percentageFilter }, approval_status: 1, flag: 0 }); // Adding approval_status filter
 
 
@@ -2984,9 +2980,9 @@ exports.getBestDealProductsweb = async function (req, res) {
         brandList: brandList,
         sizeList: sizeList,
         conditionList: conditionList,
-        productCount:count,
+        productCount: count,
         isLoggedIn: isLoggedIn,
-        filter_basedon:"bestDeal"
+        filter_basedon: "bestDeal"
       });
 
   } catch (error) {
@@ -2998,21 +2994,21 @@ exports.getBestDealProductsweb = async function (req, res) {
 
 exports.userPlacedOrder = async function (req, res) {
 
- try{
-     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-     let user_id = req.body.data.user_id;
-     let seller_id = req.body.data.seller_id;
-     let cart_id = req.body.data.cart_id;
-     let product_id = req.body.data.product_id;
-     let total_price = req.body.data.total_amt;
-     let payment_method = req.body.data.payment_method;
-     let gst = req.body.data.gst;
-     let order_status = '0';
-     let delivery_charges = '0';
-     let discount = '0';
-     let pickup_status = '0';
-     let delivery_status = '0';
-     let shipping_address_id = req.body.data.addressBookId;
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    let user_id = req.body.data.user_id;
+    let seller_id = req.body.data.seller_id;
+    let cart_id = req.body.data.cart_id;
+    let product_id = req.body.data.product_id;
+    let total_price = req.body.data.total_amt;
+    let payment_method = req.body.data.payment_method;
+    let gst = req.body.data.gst;
+    let order_status = '0';
+    let delivery_charges = '0';
+    let discount = '0';
+    let pickup_status = '0';
+    let delivery_status = '0';
+    let shipping_address_id = req.body.data.addressBookId;
 
     //Get Shipping Address id 
     // const shippingaddress = await addressBook.findOne({ user_id: seller_id });
@@ -3067,14 +3063,14 @@ exports.userPlacedOrder = async function (req, res) {
 
     if (savedOrder) {
       await Iptrnsaction.create({
-        user_id: savedOrder.user_id, 
+        user_id: savedOrder.user_id,
         Purpose: "Order Placement from Web",
-        ip_address: req.connection.remoteAddress, 
+        ip_address: req.connection.remoteAddress,
         created_dtime: new Date(),
       });
       const user = await Users.findById(savedOrder.user_id);
       const mailData = {
-        from: "Bid For Sale! <"+smtpUser+">",
+        from: "Bid For Sale! <" + smtpUser + ">",
         to: user.email,
         subject: "BFS - Bid For Sale  - Order Placed Successfully",
         text: "Server Email!",
@@ -3090,29 +3086,29 @@ exports.userPlacedOrder = async function (req, res) {
       // const deleteCart;
       //Delete Cart while place order
       const existingCart = await Cart.findOne({ user_id, status: 0 });
-        if (!existingCart) {
-          return res.status(404).json({
-            message: 'Cart not found',
-          });
-        }
-        const cartDetail = await CartDetail.findOne({
-          cart_id: existingCart._id,
-          product_id,
-          status: 0,
+      if (!existingCart) {
+        return res.status(404).json({
+          message: 'Cart not found',
         });
-    
-        /*if (!cartDetail) {
-          return res.status(404).json({
-            message: 'Product not found in cart',
-          });
-        }*/
-        await cartDetail.remove();
-    
-        const cartDetailsCount = await CartDetail.countDocuments({ cart_id: existingCart._id });
-    
-        if (cartDetailsCount === 0) {
-          await existingCart.remove();
-        }
+      }
+      const cartDetail = await CartDetail.findOne({
+        cart_id: existingCart._id,
+        product_id,
+        status: 0,
+      });
+
+      /*if (!cartDetail) {
+        return res.status(404).json({
+          message: 'Product not found in cart',
+        });
+      }*/
+      await cartDetail.remove();
+
+      const cartDetailsCount = await CartDetail.countDocuments({ cart_id: existingCart._id });
+
+      if (cartDetailsCount === 0) {
+        await existingCart.remove();
+      }
       const updatedProduct = await Userproduct.findOneAndUpdate(
         { _id: product_id },
         { $set: { flag: 1 } },
@@ -3125,9 +3121,9 @@ exports.userPlacedOrder = async function (req, res) {
         order: savedOrder
       });
     }
- } catch (error) {
-  return res.status(500).json({ message: 'Internal server error' });
-}
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
 };
 
 exports.forgotPassword = async function (req, res, next) {
@@ -3185,11 +3181,11 @@ exports.sendotp = async function (req, res, next) {
         message: "User not found!",
         respdata: {},
       });
-    else if(!req.body.otp){
+    else if (!req.body.otp) {
       var otp = randNumber(1000, 2000);
 
       const mailData = {
-        from: "Bid For Sale! <"+smtpUser+">", 
+        from: "Bid For Sale! <" + smtpUser + ">",
         to: user.email,
         subject: "BFS - Bids For Sale - Forgot password OTP",
         text: "Server Email!",
@@ -3229,8 +3225,7 @@ exports.sendotp = async function (req, res, next) {
         }
       );
     }
-    else
-    {
+    else {
       if (user.forget_otp == req.body.otp) {
         bcrypt.hash(req.body.newPassword, rounds, (error, hash) => {
           bcrypt.compare(req.body.confirmPassword, hash, (error, match) => {
@@ -3305,8 +3300,8 @@ exports.changePassword = async function (req, res, next) {
         respdata: {},
         is_passwordchnage: "false"
       });
-    else { 
-     bcrypt.compare(req.body.old_password, user.password, (error, match) => {
+    else {
+      bcrypt.compare(req.body.old_password, user.password, (error, match) => {
         if (error) {
           res.status(200).json({
             status: "0",
@@ -3374,4 +3369,22 @@ exports.changePassword = async function (req, res, next) {
       });
     }
   });
+};
+
+exports.reasonlistdata = async function (req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: "0",
+      message: "Validation error!",
+      respdata: errors.array(),
+    });
+  }
+  try {
+    const reasons = await Reasonlist.find();
+    console.log(reasons)
+    return res.json(reasons);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };

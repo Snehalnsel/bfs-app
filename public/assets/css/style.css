@@ -4156,6 +4156,69 @@ a#navbarDropdown {
     margin-right: 7px;
 }
 
+/*added by sneha*/
 .unread-notification {
     background-color: #f0f0f0;
+}
+
+.swal2-content-size {
+    width: 500px; 
+    height: auto; 
+}
+
+
+.two-rowbox {
+    flex-direction: column;
+    align-items: center;
+}
+
+.rcicon-2 a {
+    width: 35px;
+    height: 35px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border-radius: 50%;
+    color: #000;
+    transition: 0.5s;
+}
+
+.rcicon-2 a:hover {
+    transition: 0.5s;
+    background: #f0efef;
+}
+
+.return-order {
+    background: none;
+    color: #e3683d;
+    font-weight: 500;
+    border: solid 1px #e3683d;
+    padding: 5px 12px;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+.return-order:hover{
+    background: #e3683d;
+    color: #fff; 
+}
+
+.rd-select {
+    text-align: left;
+    display: flex;
+    align-items: flex-start;
+}
+.modal-select {
+    padding-top: 15px;
+}
+.rd-select input[type=radio]{
+    margin-top: 5px;
+    margin-right: 5px;
+}
+
+.rd-select label {
+    font-size: 13px;
+    font-weight: 400;
 }

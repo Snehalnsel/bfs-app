@@ -970,6 +970,13 @@ router.post(
 );
 
 router.post(
+  "/return-order", 
+  [],
+  OrderController.returnOrder
+);
+
+
+router.post(
   "/generate-awbno",
   auth.isAuthorized, 
   [
@@ -1283,16 +1290,12 @@ router.post("/user-relogin",cors(),
 router.post("/user-filter",cors(),
   WebsiteController.userFilter
 );
-
 router.get("/forgot-password",cors(),
   WebsiteController.forgotPassword
 );
-
 router.post("/forgotpassword-sendotp",cors(),
   WebsiteController.sendotp
 );
-
-
 router.post(
   "/resetpassword",
   [
@@ -1319,6 +1322,10 @@ router.post(
     }),
   ],
   WebsiteController.changePassword
+);
+
+router.get("/reason-list",cors(),
+  WebsiteController.reasonlistdata
 );
 
 module.exports = router;

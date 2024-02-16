@@ -25,17 +25,14 @@
                              <li class="nav-item">
                                <a class="nav-link" href="/web-my-order"><i class="fa fa-list-ul" aria-hidden="true"></i> <span>My Orders</span></a>
                              </li>
-               
                              <li class="nav-item">
                                  <% if(respdata != null && typeof respdata != "undefined" && typeof respdata.userId != "undefined") {%>
                                     <a class="nav-link" href="/my-post/<%=respdata.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Product</span></a>
                                  <% } %>
                               </li>
-               
                              <li class="nav-item">
                                <a class="nav-link" href="/bid-for-product"><i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> <span>My Bids</span></a>
                              </li>
-                             
                            </ul>
                            <div class="bottom-link">
                             <ul class="nav d-flex flex-column mb-2 ">
@@ -122,9 +119,9 @@
                   </div>
                 </div>
 
-                <div class="br-results ">                                            
+                <div class="br-results two-rowbox ">                                            
                               <div class="cart-action d-flex">
-                                 <div class="remove-cart">
+                                 <div class=" rcicon-2 watch-cart">
                                     <a href="/web-myorder-details/${item._id}" class="prd-btn wish-rem-button"
                                        data-id=""><i class="fa fa-eye" aria-hidden="true"></i></a>
                                  </div>`;
@@ -156,10 +153,18 @@
                                           </div>`;
                                        }
                                     }
-                                    hTml += `    
+                                    hTml += ` 
+                                      
+                              </div>
+
+                              <div class="cart-action d-flex">
+                                 <div class="return-cart">
+                                    <button class="prd-btn return-order"
+                                       data-id="${item._id}">Return Order</button>
+                                 </div> 
+                                 
                               </div>
                            </div>
-               
               </div>
               </div>`;
                $("#buyers-tab").append(hTml);

@@ -24,6 +24,7 @@ const Users = require("../../models/api/userModel");
 const Userproduct = require("../../models/api/userproductModel");
 const Productimage = require("../../models/api/productimageModel");
 const Order = require("../../models/api/orderModel");
+const ReturnOrder = require("../../models/api/returnorderModel");
 const Ordertracking = require("../../models/api/ordertrackModel");
 const Track = require("../../models/api/trackingModel");
 const AddressBook = require("../../models/api/addressbookModel");
@@ -1394,6 +1395,105 @@ exports.updateDeliveryaddressByOrderId = async function (req, res, next) {
     });
   }
 };
+
+
+exports.returnOrder = async function (req, res) {
+
+  try{
+      let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+
+      const orderId = req.params.order_id;
+      const existingOrder = await Order.findById(orderId);
+
+      if(!existingOrder)
+      {
+        return res.status(200).json({
+          message: 'Order not found',
+        });
+      }
+       
+     const now = new Date();
+     const currentHour = now.getHours().toString().padStart(2, '0');
+     const currentMinute = now.getMinutes().toString().padStart(2, '0');
+     const currentSecond = now.getSeconds().toString().padStart(2, '0');
+     const currentMillisecond = now.getMilliseconds().toString().padStart(3, '0');
+ 
+     const orderCode = `BFSORD${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
+     const order = new ReturnOrder({
+       order_code: orderCode,
+       user_id,
+       cart_id,
+       seller_id,
+       product_id,
+       billing_address_id,
+       shipping_address_id,
+       total_price,
+       payment_method,
+       order_status,
+       gst,
+       delivery_charges,
+       discount,
+       pickup_status,
+       delivery_status,
+       added_dtime: new Date().toISOString(),
+     });
+     const savedOrder = await order.save();
+ 
+     if (savedOrder) {
+       await Iptrnsaction.create({
+         user_id: savedOrder.user_id, 
+         Purpose: "Order Placement from Web",
+         ip_address: req.connection.remoteAddress, 
+         created_dtime: new Date(),
+       });
+       const user = await Users.findById(savedOrder.user_id);
+       const mailData = {
+         from: "Bid For Sale! <"+smtpUser+">",
+         to: user.email,
+         subject: "BFS - Bid For Sale  - Order Placed Successfully",
+         text: "Server Email!",
+         html:
+           "Hey " +
+           user.name +
+           ", <br> <p>Congratulations your order is placed.please wait for some times and the delivery details you will show on the app.</p>",
+       };
+       transporter.sendMail(mailData, function (err, info) {
+         if (err) console.log(err);
+         else console.log(info);
+       });
+       const existingCart = await Cart.findOne({ user_id, status: 0 });
+         if (!existingCart) {
+           return res.status(404).json({
+             message: 'Cart not found',
+           });
+         }
+         const cartDetail = await CartDetail.findOne({
+           cart_id: existingCart._id,
+           product_id,
+           status: 0,
+         });
+         await cartDetail.remove();
+         const cartDetailsCount = await CartDetail.countDocuments({ cart_id: existingCart._id });
+         if (cartDetailsCount === 0) {
+           await existingCart.remove();
+         }
+       const updatedProduct = await Userproduct.findOneAndUpdate(
+         { _id: product_id },
+         { $set: { flag: 1 } },
+         { new: true }
+       );
+       res.status(200).json({
+         status: "1",
+         is_orderPlaced: 1,
+         message: 'Order placed successfully',
+         order: savedOrder
+       });
+     }
+  } catch (error) {
+   return res.status(500).json({ message: 'Internal server error' });
+ }
+ };
+
 
 // exports.checkout = async (req, res) => {
 //   try {

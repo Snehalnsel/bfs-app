@@ -163,8 +163,8 @@
                                     </li>
                                     <li>
                                        <label class="form-check-label" for="cod-payments">
-                                          <input type="radio" class="form-check-input payment-method" id="cod-payments" name="optradio"
-                                             value="COD">Pay On Delivery
+                                          <input type="radio" class="form-check-input payment-method" id="cod-payments"
+                                             name="optradio" value="COD">Pay On Delivery
                                        </label>
                                     </li>
                                  </ul>
@@ -226,7 +226,6 @@
                $('.pmnt-hidebox').hide();
                var originalTotalAmount = parseFloat('<%= finalPrice %>');
 
-
                $(document).on('change', '.payment-method', function () {
                   if ($(this).val() === "COD") {
                      $('.pmnt-hidebox').show();
@@ -279,8 +278,8 @@
                e.preventDefault();
                $(".check-out").css("pointer-events", "none");
                let selectedMethod = $(".payment-method:checked").val();
-              if (selectedMethod== "COD") {selectedPaymentMethod = 0;}
-              else{ selectedPaymentMethod = 1; }
+               if (selectedMethod == "COD") { selectedPaymentMethod = 0; }
+               else { selectedPaymentMethod = 1; }
                let formData = {
                   cart_id: $('#cart_id').val(),
                   seller_id: $('#seller_id').val(),
@@ -292,44 +291,48 @@
                   addressBookId: $('#userAddressId').val()
                };
 
-               if(selectedPaymentMethod == 0){
-                  formData.pay_now = $('#pay-now-row th').text();
-                  formData.remaining_amount = $('#remaining-amount-row th').text();
+               if (selectedPaymentMethod == 0) {
+                  formData.pay_now = $('#pay-now-row th').text().replace(/[^\d.-]/g, '').trim();
+                  formData.remaining_amount = $('#remaining-amount-row th').text().replace(/[^\d.-]/g, '').trim();
                }
+
                let totalAmtText = $('#total-cod-amount-row th').text();
-               let totalAmtValue = parseFloat(totalAmtText.replace('₹ ', '')); 
+               let totalAmtValue = parseFloat(totalAmtText.replace('₹ ', ''));
                formData.total_amt = totalAmtValue;
-         
+
+               console.log(formData);
+               return;
+
                let addToCartreCookieAccessToken = await getCookieFunc(accessTokenVar);
                let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
                await userReLogin(addToCartreCookieAccessToken, addToCartreCookieRefreshToken);
-               $.ajax({
-                  type: 'POST',
-                  url: '/placed-order',
-                  data: { data: formData },
-                  dataType: "json",
-                  success: function (response) {
-                     if (response.is_orderPlaced == 1) {
-                        Swal.fire({
-                           title: response.message,
-                           iconHtml: '<img src="' + src + '">',
-                           customClass: {
-                              icon: 'alert-logo-item',
-                              popup: "bid-alert-modal"
-                           },
-                           confirmButtonText: "OK",
-                        });
-                        setTimeout(() => {
-                           window.location.href = '/';
-                        }, 3000);
-                     } else {
-                        $(".check-out").css("pointer-events", "auto");
-                     }
-                  },
-                  error: function (xhr, status, error) {
-                     $(".check-out").css("pointer-events", "auto");
-                  }
-               });
+            //    $.ajax({
+            //       type: 'POST',
+            //       url: '/placed-order',
+            //       data: { data: formData },
+            //       dataType: "json",
+            //       success: function (response) {
+            //          if (response.is_orderPlaced == 1) {
+            //             Swal.fire({
+            //                title: response.message,
+            //                iconHtml: '<img src="' + src + '">',
+            //                customClass: {
+            //                   icon: 'alert-logo-item',
+            //                   popup: "bid-alert-modal"
+            //                },
+            //                confirmButtonText: "OK",
+            //             });
+            //             setTimeout(() => {
+            //                window.location.href = '/';
+            //             }, 3000);
+            //          } else {
+            //             $(".check-out").css("pointer-events", "auto");
+            //          }
+            //       },
+            //       error: function (xhr, status, error) {
+            //          $(".check-out").css("pointer-events", "auto");
+            //       }
+            //    });
             });
 
          </script>

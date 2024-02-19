@@ -2634,6 +2634,8 @@ exports.myOrderDetailsWeb = async (req, res) => {
       _id: order._id,
       total_price: order.total_price,
       payment_method: order.payment_method,
+      pay_now: order.pay_now,
+      remaining_amount: order.remaining_amount,
       order_status: order.order_status,
       delete_by: order.delete_by,
       delete_status: order.delete_status,
@@ -3010,6 +3012,9 @@ exports.userPlacedOrder = async function (req, res) {
     let delivery_status = '0';
     let shipping_address_id = req.body.data.addressBookId;
 
+    let pay_now = req.body.data.pay_now || null;
+    let remaining_amount = req.body.data.remaining_amount || null;
+
     //Get Shipping Address id 
     // const shippingaddress = await addressBook.findOne({ user_id: seller_id });
     // if (!shippingaddress) {
@@ -3037,10 +3042,7 @@ exports.userPlacedOrder = async function (req, res) {
     const currentSecond = now.getSeconds().toString().padStart(2, '0');
     const currentMillisecond = now.getMilliseconds().toString().padStart(3, '0');
 
-    // Generate the unique code using the current time components
     const orderCode = `BFSORD${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
-
-    // Create value for saving data in order table
     const order = new Order({
       order_code: orderCode,
       user_id,
@@ -3057,6 +3059,8 @@ exports.userPlacedOrder = async function (req, res) {
       discount,
       pickup_status,
       delivery_status,
+      pay_now,
+      remaining_amount,
       added_dtime: new Date().toISOString(),
     });
     const savedOrder = await order.save();

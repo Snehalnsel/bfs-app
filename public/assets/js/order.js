@@ -97,38 +97,37 @@ $(document).on('click', ".return-order", async function (e) {
                     const { orderId, reasonId } = result.value;
                     console.log("Order ID:", orderId);
                     console.log("Selected Reason ID:", reasonId);
-                    // Send orderId and reasonId to the server
-                    // $.ajax({
-                    //     url: '/cancel-order',
-                    //     method: 'POST',
-                    //     data: {
-                    //         orderid: orderId,
-                    //         reasonid: reasonId
-                    //     },
-                    //     success: function (data) {
-                    //         if (data.is_cancelorder == true) {
-                    //             Swal.fire({
-                    //                 title: data.message,
-                    //                 iconHtml: '<img src="'+ src +'">',
-                    //                 customClass: {  
-                    //                     icon: 'alert-logo-item',
-                    //                     popup: "bid-alert-modal"
-                    //                 },
-                    //                 confirmButtonText: "OK",
-                    //             });
-                    //             $(e.target).closest('.remove-cart').hide().after('<p>Order canceled</p>');
-                    //         } else {
-                    //             Swal.fire({
-                    //                 html: data.message,
-                    //                 confirmButtonText: "OK",
-                    //                 customClass: { confirmButton: 'alert-box-button', popup: 'swal2-popup' }
-                    //             });
-                    //         }
-                    //     },
-                    //     error: function (err) {
-                    //         console.error('Error:', err);
-                    //     }
-                    // });
+                    $.ajax({
+                        url: '/cancel-order',
+                        method: 'POST',
+                        data: {
+                            orderid: orderId,
+                            reasonid: reasonId
+                        },
+                        success: function (data) {
+                            if (data.is_cancelorder == true) {
+                                Swal.fire({
+                                    title: data.message,
+                                    iconHtml: '<img src="'+ src +'">',
+                                    customClass: {  
+                                        icon: 'alert-logo-item',
+                                        popup: "bid-alert-modal"
+                                    },
+                                    confirmButtonText: "OK",
+                                });
+                                $(e.target).closest('.remove-cart').hide().after('<p>Order canceled</p>');
+                            } else {
+                                Swal.fire({
+                                    html: data.message,
+                                    confirmButtonText: "OK",
+                                    customClass: { confirmButton: 'alert-box-button', popup: 'swal2-popup' }
+                                });
+                            }
+                        },
+                        error: function (err) {
+                            console.error('Error:', err);
+                        }
+                    });
                 }
             });
         },

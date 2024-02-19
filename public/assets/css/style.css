@@ -4222,3 +4222,7 @@ a#navbarDropdown {
     font-size: 13px;
     font-weight: 400;
 }
+
+.error-msg {
+    color: red;
+  }

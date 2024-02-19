@@ -157,14 +157,14 @@
                                  <p>Select Payments Method </p>
                                  <ul>
                                     <li><label class="form-check-label">
-                                          <input type="radio" class="form-check-input payment-method" name="optradio"
+                                          <input type="radio" class="form-check-input payment-method" name="paymentmethod"
                                              value="Online">Pay Now
                                        </label>
                                     </li>
                                     <li>
                                        <label class="form-check-label" for="cod-payments">
                                           <input type="radio" class="form-check-input payment-method" id="cod-payments"
-                                             name="optradio" value="COD">Pay On Delivery
+                                             name="paymentmethod" value="COD">Pay On Delivery
                                        </label>
                                     </li>
                                  </ul>
@@ -276,7 +276,7 @@
             // });
             function displayErrorMessage(message) {
                console.log("kana"+message);
-               $("#error-message").html(message);
+               $("#error-message").html(message).addClass("error-msg"); 
             }
 
             $(document).on("click", ".check-out", async function (e) {

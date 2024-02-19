@@ -74,10 +74,10 @@ $(document).ready(async function(){
                         }, 500);
                         if((typeof obj.respdata.refreshReset != "undefined") && (obj.respdata.refreshReset)) {
                             let pathArray = window.location.pathname.split( '/' );
-                            if(pathArray[2] != "registration") {
+                            if(pathArray[1] != "registration") {
                                 location.reload();
                             } else {
-                                location.href= webSiteUrl + "/api/home";
+                                location.href= webSiteUrl + "/";
                             }
                         }
                     } else {

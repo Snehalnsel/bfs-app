@@ -98,7 +98,7 @@ $(document).on('click', ".return-order", async function (e) {
                     console.log("Order ID:", orderId);
                     console.log("Selected Reason ID:", reasonId);
                     $.ajax({
-                        url: '/cancel-order',
+                        url: '/return-order',
                         method: 'POST',
                         data: {
                             orderid: orderId,

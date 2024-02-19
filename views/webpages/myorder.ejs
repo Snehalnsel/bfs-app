@@ -1,69 +1,78 @@
 <%- include('../../public/assets/include/header'); %>
 
-<section class="dashboard-wrapper">
-    <div class="dashboard-container">
-        <div class="dashboard-sidbar">
-            <div class="dashboard-sidbar">        
-                <div class="sidbar-box user-profile">
-                   <div class="user-icon">
-                     <% if(respdata != null && typeof respdata != "undefined" && typeof respdata.image != "undefined") {%>
+   <section class="dashboard-wrapper">
+      <div class="dashboard-container">
+         <div class="dashboard-sidbar">
+            <div class="dashboard-sidbar">
+               <div class="sidbar-box user-profile">
+                  <div class="user-icon">
+                     <% if(respdata !=null && typeof respdata !="undefined" && typeof respdata.image !="undefined" ) {%>
                         <img src="<%=respdata.image%>" alt="user-image">
-                      <% } %>
-                   </div>
-                   <div class="user-info">
-                      <div class="sht-ui">Hello</div>
-                      <% if(respdata != null && typeof respdata != "undefined" && typeof respdata.title != "undefined") {%>
-                        <div class="user-name"><%=respdata.title%> <%=respdata.name%> </div>
-                     <% } %>
-                   </div>
-                </div>
-                <div class="sidbar-box sidbar-nav">
-                   <ul class="nav d-flex flex-column mb-2 ">
-                             <li class="nav-item">
-                               <a class="nav-link" href="/my-account"><i class="fa fa-user" aria-hidden="true"></i> <span>Profile</span></a>
-                             </li>
-                             <li class="nav-item">
-                               <a class="nav-link" href="/web-my-order"><i class="fa fa-list-ul" aria-hidden="true"></i> <span>My Orders</span></a>
-                             </li>
-                             <li class="nav-item">
-                                 <% if(respdata != null && typeof respdata != "undefined" && typeof respdata.userId != "undefined") {%>
-                                    <a class="nav-link" href="/my-post/<%=respdata.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Product</span></a>
-                                 <% } %>
-                              </li>
-                             <li class="nav-item">
-                               <a class="nav-link" href="/bid-for-product"><i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> <span>My Bids</span></a>
-                             </li>
-                           </ul>
-                           <div class="bottom-link">
-                            <ul class="nav d-flex flex-column mb-2 ">
-                               <!-- <li><a class="nav-link signout" id="signout" href="javascript:void(0)"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li> -->
-                               <li><a class="nav-link signout" id="signout" href="javascript:void(0)"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li>
-                            </ul>
-               
-                              
-                           </div>
-               
-                </div>         
-              </div>       
-       </div>
-        <div class="dashboard-content">
-          <div class="dashboard-infobox">
-             <div class="dashboard-title-arrow mb-25">
-                <h4 class="di-title mr-25">My Orders</h4>              
-             </div>
-             <div class="tabs-wrapper">
-               <ul class="nav nav-tabs">
-                   <li><a data-toggle="tab" href="#buyers-tab" class="">Buyers</a></li>   
-                    <li><a data-toggle="tab" href="#viewers-tab" class="active">Seller</a></li>
-               </ul>
-               <div class="tab-content theme-tab-content">
-                   <div id="buyers-tab" class="tab-pane fade "></div>                   
-                  <div id="viewers-tab" class="tab-pane fade active show"></div>                                    
+                        <% } %>
+                  </div>
+                  <div class="user-info">
+                     <div class="sht-ui">Hello</div>
+                     <% if(respdata !=null && typeof respdata !="undefined" && typeof respdata.title !="undefined" ) {%>
+                        <div class="user-name">
+                           <%=respdata.title%>
+                              <%=respdata.name%>
+                        </div>
+                        <% } %>
+                  </div>
+               </div>
+               <div class="sidbar-box sidbar-nav">
+                  <ul class="nav d-flex flex-column mb-2 ">
+                     <li class="nav-item">
+                        <a class="nav-link" href="/my-account"><i class="fa fa-user" aria-hidden="true"></i>
+                           <span>Profile</span></a>
+                     </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="/web-my-order"><i class="fa fa-list-ul" aria-hidden="true"></i>
+                           <span>My Orders</span></a>
+                     </li>
+                     <li class="nav-item">
+                        <% if(respdata !=null && typeof respdata !="undefined" && typeof respdata.userId !="undefined" )
+                           {%>
+                           <a class="nav-link" href="/my-post/<%=respdata.userId%>"><i class="fa fa-file-image-o"
+                                 aria-hidden="true"></i> <span>My Product</span></a>
+                           <% } %>
+                     </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="/bid-for-product"><i class="fa fa-arrow-circle-o-right"
+                              aria-hidden="true"></i> <span>My Bids</span></a>
+                     </li>
+                  </ul>
+                  <div class="bottom-link">
+                     <ul class="nav d-flex flex-column mb-2 ">
+                        <!-- <li><a class="nav-link signout" id="signout" href="javascript:void(0)"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li> -->
+                        <li><a class="nav-link signout" id="signout" href="javascript:void(0)"><i class="fa fa-sign-out"
+                                 aria-hidden="true"></i> <span>Sign Out</span></a></li>
+                     </ul>
+
+
+                  </div>
+
                </div>
             </div>
          </div>
-         
-      </div>
+         <div class="dashboard-content">
+            <div class="dashboard-infobox">
+               <div class="dashboard-title-arrow mb-25">
+                  <h4 class="di-title mr-25">My Orders</h4>
+               </div>
+               <div class="tabs-wrapper">
+                  <ul class="nav nav-tabs">
+                     <li><a data-toggle="tab" href="#buyers-tab" class="">Buyers</a></li>
+                     <li><a data-toggle="tab" href="#viewers-tab" class="active">Seller</a></li>
+                  </ul>
+                  <div class="tab-content theme-tab-content">
+                     <div id="buyers-tab" class="tab-pane fade "></div>
+                     <div id="viewers-tab" class="tab-pane fade active show"></div>
+                  </div>
+               </div>
+            </div>
+
+         </div>
    </section>
 
    <div class="modal theme_modal short-modal" id="short-modal">
@@ -74,37 +83,38 @@
                <h5 class="box-title">Shipping Kit <span><i class="fa fa-inr" aria-hidden="true"></i> 350 + GST</span>
                </h5>
                <p>(Contains Manifest, Tax Invoice, Shipping Label, Bubble Insulation, Courier Bag)</p>
-               <p class="text-center"><a href="javascript:void(0)" class="acb-btn order-shipping-kit">Buy Shipping Kit</a></p>
+               <p class="text-center"><a href="javascript:void(0)" class="acb-btn order-shipping-kit">Buy Shipping
+                     Kit</a></p>
             </div>
          </div>
       </div>
    </div>
    <%- include('../../public/assets/include/newsletter'); %>
-   <%- include('../../public/assets/include/footer'); %>
-   
-      </body>
+      <%- include('../../public/assets/include/footer'); %>
 
-      <script>
-         window.onload = fetchData();
-         window.onload = sellerList();
+         </body>
 
-         async function fetchData() {
-            const orderList = await fetch('/orderlist', {
-               method: 'POST',
-               headers: {
-                  'Content-Type': 'application/json' 
-               }
-            });
-            const orderListData = await orderList.json();
+         <script>
+            window.onload = fetchData();
+            window.onload = sellerList();
 
-            populateBuyerHtml(orderListData);
-         }
+            async function fetchData() {
+               const orderList = await fetch('/orderlist', {
+                  method: 'POST',
+                  headers: {
+                     'Content-Type': 'application/json'
+                  }
+               });
+               const orderListData = await orderList.json();
 
-         function populateBuyerHtml(data) {
+               populateBuyerHtml(orderListData);
+            }
 
-            data.orders.forEach(item => {
+            function populateBuyerHtml(data) {
 
-               var hTml = `<div class="cart-list wishlist-list" data-orderid="${item._id}" data-userby="3">
+               data.orders.forEach(item => {
+
+                  var hTml = `<div class="cart-list wishlist-list" data-orderid="${item._id}" data-userby="3">
         <div class="bids-row wishlist-row " >
               <div class="br-details">
                   <div class="bid-images"><img src="${item.product.image}" alt="images" class="img-fluid"></div>
@@ -125,67 +135,70 @@
                                     <a href="/web-myorder-details/${item._id}" class="prd-btn wish-rem-button"
                                        data-id=""><i class="fa fa-eye" aria-hidden="true"></i></a>
                                  </div>`;
-                                 if(item.delete_status == 0) {
-                                    hTml += `
+                  if (item.delete_status == 0) {
+                     hTml += `
                                        <div class="remove-cart">
                                           <a href="#" class="prd-btn remove-order"
                                              data-id="${item._id}" ><i class="fa fa-trash-o"
                                                 aria-hidden="true"></i></a>
                                        </div>`;
-                                    }
-                                    else if(item.delete_status == 1){
-                                       if(item.delete_by == 1) {
-                                          hTml += `
+                  }
+                  else if (item.delete_status == 1) {
+                     if (item.delete_by == 1) {
+                        hTml += `
                                           <div class="remove-cart">
                                              <span style="color: blue;">Canceled By Admin</span>
                                           </div>`;
-                                       }
-                                       else if(item.delete_by == 2) {
-                                          hTml += `
+                     }
+                     else if (item.delete_by == 2) {
+                        hTml += `
                                           <div class="remove-cart">
                                              <span style="color: rgb(5, 15, 73);">Canceled By Seller</span>
                                           </div>`;
-                                       }
-                                       else if(item.delete_by == 3) {
-                                          hTml += `
+                     }
+                     else if (item.delete_by == 3) {
+                        hTml += `
                                           <div class="remove-cart">
                                              <span style="color: rgb(45, 144, 226);">Canceled By You</span>
                                           </div>`;
-                                       }
-                                    }
-                                    hTml += ` 
-                                      
+                     }
+                  }
+                  hTml += `   
                               </div>
-
                               <div class="cart-action d-flex">
-                                 <div class="return-cart">
-                                    <button class="prd-btn return-order"
-                                       data-id="${item._id}">Return Order</button>
-                                 </div> 
-                                 
-                              </div>
-                           </div>
-              </div>
-              </div>`;
-               $("#buyers-tab").append(hTml);
-            });
+                                 <div class="return-cart">`;
+                  if (item.is_return == 1) {
+                     hTml += `
+                  <span style="color: green;">Return placed successfully</span>`;
+                  } else {
+                     hTml += `
+                  <button class="prd-btn return-order" data-id="${item._id}">Return Order</button>`;
+                  }
+                  hTml += `
+              </div> 
+            </div>
+          </div>
+        </div>
+      </div>`;
+                  $("#buyers-tab").append(hTml);
+               });
 
-         }
-         async function sellerList() {
-            const sellerList = await fetch('/selllist', {
-               method: 'POST',
-               headers: {
-                  'Content-Type': 'application/json' 
-               }
-            });
-            const sellerListData = await sellerList.json();
-            populateSellerHtml(sellerListData);
-         }
+            }
+            async function sellerList() {
+               const sellerList = await fetch('/selllist', {
+                  method: 'POST',
+                  headers: {
+                     'Content-Type': 'application/json'
+                  }
+               });
+               const sellerListData = await sellerList.json();
+               populateSellerHtml(sellerListData);
+            }
 
-         function populateSellerHtml(data) {
-            data.orders.forEach(item => {
+            function populateSellerHtml(data) {
+               data.orders.forEach(item => {
 
-               var hTml = `<div class="cart-list wishlist-list" data-orderid="${item._id}" data-userby="2">
+                  var hTml = `<div class="cart-list wishlist-list" data-orderid="${item._id}" data-userby="2">
     <div class="bids-row wishlist-row order-list">
         <div class="br-details">
             <div class="bid-images"><img src="${item.product.image}" alt="images" class="img-fluid"></div>
@@ -194,16 +207,16 @@
                 <div class="bd-title">${item.product.name}</div>
                 <div class="bd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>${item.total_price}</div>
                 <div class="cnbtn-group">`;
-                  if(item.shippingkit_status == 1) {
+                  if (item.shippingkit_status == 1) {
                      hTml += `<p>Shipping kit has already been bought.</p>`;
-                  } else if(item.delete_status == 0) {
+                  } else if (item.delete_status == 0) {
                      hTml += `
                         <p>Please Choose Either Option To Confirm Your Order.</p>
                         <div class="cg-row">
                            <a href="javascript:void(0)" data-toggle="modal" data-target="#short-modal" class="acb-btn rv-btn buy-shipping-kit" data-orderid="${item._id}">Buy Shipping Kit</a>
                            <a href="javascript:void(0)" class="acb-btn  grey-btn">Don't Buy Shipping Kit</a>
                         </div>
-                             `; 
+                             `;
                   }
                   hTml += `</div>
                 </div>
@@ -211,63 +224,63 @@
                   <div class="remove-cart">
                      <a href="/web-myorder-details/${item._id}"><i class="fa fa-info-circle"></i></a>  
                    </div>`;
-                   if(item.delete_status == 0) {
+                  if (item.delete_status == 0) {
                      hTml += `
                    <div class="remove-cart">
                      <a href="javascript:void(0)" id="erase" class ="remove-order"><i class="fa fa-trash-o"></i></a>  
                    </div> `;
                   }
-                  else if(item.delete_status == 1){
-                        if(item.delete_by == 1) {
-                              hTml += `
+                  else if (item.delete_status == 1) {
+                     if (item.delete_by == 1) {
+                        hTml += `
                                        <div class="remove-cart">
                                              <span style="color: blue;">Canceled By Admin</span>
                                           </div>`;
-                              }
-                              else if(item.delete_by == 2) {
-                                          hTml += `
+                     }
+                     else if (item.delete_by == 2) {
+                        hTml += `
                                           <div class="remove-cart">
                                              <span style="color: rgb(5, 15, 73);">Canceled By Seller</span>
                                           </div>`;
-                              }
-                              else if(item.delete_by == 3) {
-                                          hTml += `
+                     }
+                     else if (item.delete_by == 3) {
+                        hTml += `
                                           <div class="remove-cart">
                                              <span style="color: rgb(45, 144, 226);">Canceled By You</span>
                                           </div>`;
-                                       }
-                  }           
+                     }
+                  }
                   hTml += `
                 </div>
                      </div>
                      </div>
                      </div></div>`;
-               $("#viewers-tab").append(hTml);
+                  $("#viewers-tab").append(hTml);
+               });
+            }
+            $(document).on('click', '.buy-shipping-kit', function () {
+               var orderId = $(this).data('orderid');
+               $(".short-modal .buy-modal a.acb-btn").attr("data-orderid", orderId);
+               $(".cg-row").attr("id", orderId);
+               $('#short-modal').modal('show');
             });
-         }
-         $(document).on('click', '.buy-shipping-kit', function () {
-            var orderId = $(this).data('orderid');
-            $(".short-modal .buy-modal a.acb-btn").attr("data-orderid", orderId);
-            $(".cg-row").attr("id", orderId);
-            $('#short-modal').modal('show');
-         });
 
-         $(document).on('click', '.order-shipping-kit', function () {
-            var orderId = $(this).data('orderid');
-            var cgRowElement = $(`.cg-row[data-orderid="${orderId}"]`);
-           
-            $.ajax({
-               url: '/get-shipmentkitweb/' + orderId.trim(),
-               method: 'GET',
-               success: function (data) {
+            $(document).on('click', '.order-shipping-kit', function () {
+               var orderId = $(this).data('orderid');
+               var cgRowElement = $(`.cg-row[data-orderid="${orderId}"]`);
+
+               $.ajax({
+                  url: '/get-shipmentkitweb/' + orderId.trim(),
+                  method: 'GET',
+                  success: function (data) {
                      if (data.success) {
                         Swal.fire({
                            html: data.message,
                            confirmButtonText: "OK",
                            customClass: { confirmButton: 'alert-box-button' }
                         });
-                        $("#"+orderId).siblings("p").text("Shipping kit has already been bought");
-                        $("#"+orderId).hide();
+                        $("#" + orderId).siblings("p").text("Shipping kit has already been bought");
+                        $("#" + orderId).hide();
                      } else {
                         Swal.fire({
                            html: data.message,
@@ -278,8 +291,8 @@
                   },
                   error: function (err) {
                   }
+               });
             });
-         });
-      </script>
+         </script>
 
-      <script src="/public/assets/js/order.js"></script>
+         <script src="/public/assets/js/order.js"></script>

@@ -54,12 +54,6 @@ const model = mongoose.Schema({
     default: 0,
     required: true,
   },
-  payment_method: {
-    type: Number,
-    enum: [0, 1],
-    default: 0,
-    required: true,
-  },
   order_status: {
     type: Number,
     enum: [0,1,2,3,4],//0 for pending 1 for processing 2 for shipped 3 for delivered 4 for canceled

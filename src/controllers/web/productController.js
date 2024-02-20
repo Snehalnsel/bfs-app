@@ -375,8 +375,9 @@ exports.updatedetailsData = async function (req, res, next) {
       if (req.body.length) updData.length = req.body.length;
       if (req.body.breath) updData.breath = req.body.breath;
       if (req.body.gender_id) updData.gender_id = req.body.gender_id;
-      await Userproduct.findOneAndUpdate({ _id: req.body.product_id }, { $set: updData }, { upsert: true });
+      const exitsProductData= await Userproduct.findOneAndUpdate({ _id: req.body.product_id }, { $set: updData }, { upsert: true });
       if (req.body.remainingImages.length > 0) {
+        
         const remainingImages = req.body.remainingImages ? JSON.parse(req.body.remainingImages) : [];
         const imagesArray = [];
         for (const image of remainingImages) {
@@ -404,7 +405,7 @@ exports.updatedetailsData = async function (req, res, next) {
               const productimageDetail = new Productimage({
                 product_id: req.body.product_id,
                 category_id: req.body.subcategory_id,
-                user_id: req.body.user_id,
+                user_id: exitsProductData.user_id,
                 image: imageUrl,
                 added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
               });
@@ -442,7 +443,7 @@ exports.updatedetailsData = async function (req, res, next) {
               const productimageDetail = new Productimage({
                 product_id: req.body.product_id,
                 category_id: req.body.subcategory_id,
-                user_id: req.body.user_id,
+                user_id: exitsProductData.user_id,
                 image: imageUrl,
                 added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
               });
@@ -476,6 +477,7 @@ exports.updatedetailsData = async function (req, res, next) {
       res.redirect("/admin/productlist");
     }
   }).catch((err) => {
+    console.log(err);
     res.status(500).json({
       status: "0",
       message: "An error occurred while updating the product.",

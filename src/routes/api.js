@@ -926,13 +926,15 @@ router.post(
   "/cancel-order",
   OrderController.cancelOrderById
 );
-
+router.post(
+  "/return-order", 
+  [],
+  OrderController.returnOrder
+);
 router.get(
   "/cancelorderbybuyer/:order_id",
   OrderController.cancelOrderByBuyer
 );
-
-
 router.post(
   "/orderlist",
   //auth.isAuthorized, 
@@ -968,14 +970,6 @@ router.post(
   [],
   OrderController.updateDeliveryaddressByOrderId
 );
-
-router.post(
-  "/return-order", 
-  [],
-  OrderController.returnOrder
-);
-
-
 router.post(
   "/generate-awbno",
   auth.isAuthorized, 

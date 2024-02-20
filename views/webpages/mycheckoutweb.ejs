@@ -280,15 +280,11 @@
             }
 
             $(document).on("click", ".check-out", async function (e) {
-               console.log("helloo");
                e.preventDefault();
                $("#error-message").html("");
                let agreeCheckbox = $(".checkbox-input");
-               console.log(agreeCheckbox);
-               console.log(agreeCheckbox.prop("checked"));
-
+   
                if (!agreeCheckbox.prop("checked")) {
-                  console.log("hhhh");
                   displayErrorMessage("Please agree to the Terms & Conditions.");
                   return;
                }
@@ -328,38 +324,38 @@
                formData.total_amt = totalAmtValue;
 
                console.log(formData);
-               return;
+              
 
                let addToCartreCookieAccessToken = await getCookieFunc(accessTokenVar);
                let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
                await userReLogin(addToCartreCookieAccessToken, addToCartreCookieRefreshToken);
-               //    $.ajax({
-               //       type: 'POST',
-               //       url: '/placed-order',
-               //       data: { data: formData },
-               //       dataType: "json",
-               //       success: function (response) {
-               //          if (response.is_orderPlaced == 1) {
-               //             Swal.fire({
-               //                title: response.message,
-               //                iconHtml: '<img src="' + src + '">',
-               //                customClass: {
-               //                   icon: 'alert-logo-item',
-               //                   popup: "bid-alert-modal"
-               //                },
-               //                confirmButtonText: "OK",
-               //             });
-               //             setTimeout(() => {
-               //                window.location.href = '/';
-               //             }, 3000);
-               //          } else {
-               //             $(".check-out").css("pointer-events", "auto");
-               //          }
-               //       },
-               //       error: function (xhr, status, error) {
-               //          $(".check-out").css("pointer-events", "auto");
-               //       }
-               //    });
+                  $.ajax({
+                     type: 'POST',
+                     url: '/placed-order',
+                     data: { data: formData },
+                     dataType: "json",
+                     success: function (response) {
+                        if (response.is_orderPlaced == 1) {
+                           Swal.fire({
+                              title: response.message,
+                              iconHtml: '<img src="' + src + '">',
+                              customClass: {
+                                 icon: 'alert-logo-item',
+                                 popup: "bid-alert-modal"
+                              },
+                              confirmButtonText: "OK",
+                           });
+                           setTimeout(() => {
+                              window.location.href = '/';
+                           }, 3000);
+                        } else {
+                           $(".check-out").css("pointer-events", "auto");
+                        }
+                     },
+                     error: function (xhr, status, error) {
+                        $(".check-out").css("pointer-events", "auto");
+                     }
+                  });
             });
 
          </script>

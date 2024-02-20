@@ -512,6 +512,7 @@ exports.getData = async function (req, res, next) {
     //return false;
     const banner = await Banner.find({ status: 1 });
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    console.log("isLoggedIn",isLoggedIn);
     res.render("webpages/list", {
       title: "Home Page",
       requrl: req.app.locals.requrl,

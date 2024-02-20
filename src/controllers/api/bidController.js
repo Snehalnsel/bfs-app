@@ -193,77 +193,85 @@ exports.bidExistReccord = async (req, res, next) => {
       productId: (reqBody.productId != "") ? reqBody.productId : ""
     };
     let productDetails = await Userproduct.findOne({_id:queryData.productId});
-    queryData.sellerId = (productDetails.user_id.toString() != "") ? productDetails.user_id.toString() : "";
-    const currDateTime = new Date();
-    let timeMiliSeccond = currDateTime.valueOf();
-    let existData = await checkBidExist(queryData);
-    if(existData.length > 0) {
-      let bidId = existData[0].id;
-      let currIndex = parseInt(existData[0].currentOffer.offerIndex) + 1;
-      let currentOffer = {
-        bidId: bidId,
-        createdAt: timeMiliSeccond,
-        id:"offer_buyer_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond,
-        isFromBuyer:true,
-        offerIndex:currIndex,
-        price: (reqBody.bidAmount != "") ? reqBody.bidAmount : 0,
-        status: 0,
-        userId: queryData.userId,
-      };
-      let updateData = {
-        buyerId:queryData.userId,
-        id:bidId,
-        createdAt: timeMiliSeccond,
-        productId: queryData.productId,
-        withdrew: false,
-        status:1,
-        currentOffer: currentOffer,
-        sellerId:(productDetails.user_id.toString() != "") ? productDetails.user_id.toString() : "",
-      }; 
-      await updateBidData(updateData,bidId);
-      await insertBidOfferData(currentOffer,currentOffer.id);
-      return res.status(200).json({
-        isExist:true,
-        bidId:bidId,
-        data: updateData
+    if(productDetails.offer_price>= reqBody.bidAmount) {
+      queryData.sellerId = (productDetails.user_id.toString() != "") ? productDetails.user_id.toString() : "";
+      const currDateTime = new Date();
+      let timeMiliSeccond = currDateTime.valueOf();
+      let existData = await checkBidExist(queryData);
+      if(existData.length > 0) {
+        let bidId = existData[0].id;
+        let currIndex = parseInt(existData[0].currentOffer.offerIndex) + 1;
+        let currentOffer = {
+          bidId: bidId,
+          createdAt: timeMiliSeccond,
+          id:"offer_buyer_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond,
+          isFromBuyer:true,
+          offerIndex:currIndex,
+          price: (reqBody.bidAmount != "") ? reqBody.bidAmount : 0,
+          status: 0,
+          userId: queryData.userId,
+        };
+        let updateData = {
+          buyerId:queryData.userId,
+          id:bidId,
+          createdAt: timeMiliSeccond,
+          productId: queryData.productId,
+          withdrew: false,
+          status:1,
+          currentOffer: currentOffer,
+          sellerId:(productDetails.user_id.toString() != "") ? productDetails.user_id.toString() : "",
+        }; 
+        await updateBidData(updateData,bidId);
+        await insertBidOfferData(currentOffer,currentOffer.id);
+        return res.status(200).json({
+          isExist:true,
+          bidId:bidId,
+          data: updateData
+        });
+      } else if(existData.length == 0) {
+        //Insert First Bid For The User
+        let bidId = "bid_"+queryData.userId+"_"+queryData.productId+"_"+timeMiliSeccond;
+        let currentOffer = {
+          bidId: bidId,
+          createdAt: timeMiliSeccond,
+          id:"offer_buyer_0_"+queryData.userId+"_"+timeMiliSeccond,
+          isFromBuyer:true,
+          offerIndex:0,
+          price: (reqBody.bidAmount != "") ? reqBody.bidAmount : 0,
+          status: 0,
+          userId: queryData.userId,
+        };
+        let insertData = {
+          buyerId:queryData.userId,
+          id:bidId,
+          createdAt: timeMiliSeccond,
+          productId: queryData.productId,
+          withdrew: false,
+          status:1,
+          currentOffer: currentOffer,
+          sellerId:(productDetails.user_id.toString() != "") ? productDetails.user_id.toString() : "",
+        }; 
+        await insertBidData(insertData,bidId);
+        await insertBidOfferData(currentOffer,currentOffer.id);
+        return res.status(200).json({
+          isExist:false,
+          bidId:bidId,
+          data: insertData,
+          status:"success",
+          //message:"successfully bid created!"
+        });
+      }  
+    } else {
+      res.status(200).json({
+        status:"error",
+        message:"Invalid Amount!",
       });
-    } else if(existData.length == 0) {
-      //Insert First Bid For The User
-      let bidId = "bid_"+queryData.userId+"_"+queryData.productId+"_"+timeMiliSeccond;
-      let currentOffer = {
-        bidId: bidId,
-        createdAt: timeMiliSeccond,
-        id:"offer_buyer_0_"+queryData.userId+"_"+timeMiliSeccond,
-        isFromBuyer:true,
-        offerIndex:0,
-        price: (reqBody.bidAmount != "") ? reqBody.bidAmount : 0,
-        status: 0,
-        userId: queryData.userId,
-      };
-      let insertData = {
-        buyerId:queryData.userId,
-        id:bidId,
-        createdAt: timeMiliSeccond,
-        productId: queryData.productId,
-        withdrew: false,
-        status:1,
-        currentOffer: currentOffer,
-        sellerId:(productDetails.user_id.toString() != "") ? productDetails.user_id.toString() : "",
-      }; 
-      await insertBidData(insertData,bidId);
-      await insertBidOfferData(currentOffer,currentOffer.id);
-      return res.status(200).json({
-        isExist:false,
-        bidId:bidId,
-        data: insertData
-      });
-    }   
+    }
   } catch (error) {
     //console.log(error);
     res.status(500).json({
-      status: "0",
-      message: "An error occurred while checking exist freccord in db.",
-      error: error.message,
+      status: "error",
+      message: "An error occurred while checking exist reccord in db.",
     });
   }
 };

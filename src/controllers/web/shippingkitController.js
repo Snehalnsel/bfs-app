@@ -181,6 +181,8 @@ async function generateOrder(data) {
 }
 
 exports.getOrderList = function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Shipping Kit List";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
 
@@ -250,9 +252,9 @@ exports.getOrderList = function (req, res, next) {
             siteName: req.app.locals.siteName,
             pageName: pageName,
             pageTitle: pageTitle,
-            userFullName: req.session.user.name,
-            userImage: req.session.user.image_url,
-            userEmail: req.session.user.email,
+            userFullName:  req.session.admin.name,
+            userImage:  req.session.admin.image_url,
+            userEmail:  req.session.admin.email,
             year: moment().format("YYYY"),
             requrl: req.app.locals.requrl,
             status: 0,
@@ -260,6 +262,7 @@ exports.getOrderList = function (req, res, next) {
             respdata: {
               list: orderList,
             },
+            isAdminLoggedIn:isAdminLoggedIn
           });
         })
         .catch((err) => {
@@ -270,6 +273,8 @@ exports.getOrderList = function (req, res, next) {
 };
 
 exports.getShipmentKit = function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Shipping Kit List";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
 
@@ -346,9 +351,9 @@ exports.getShipmentKit = function (req, res, next) {
             siteName: req.app.locals.siteName,
             pageName: pageName,
             pageTitle: pageTitle,
-            userFullName: req.session.user.name,
-            userImage: req.session.user.image_url,
-            userEmail: req.session.user.email,
+            userFullName:  req.session.admin.name,
+            userImage:  req.session.admin.image_url,
+            userEmail:  req.session.admin.email,
             year: moment().format("YYYY"),
             requrl: req.app.locals.requrl,
             status: 0,
@@ -356,6 +361,7 @@ exports.getShipmentKit = function (req, res, next) {
             respdata: {
               list: orderList,
             },
+            isAdminLoggedIn:isAdminLoggedIn
           });
         })
         .catch((err) => {
@@ -366,6 +372,8 @@ exports.getShipmentKit = function (req, res, next) {
 };
 
 exports.getHublist = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const pageName = "Select Hub List";
   const pageTitle = req.app.locals.siteName + " - " + pageName;
   const orderId = req.params.id;
@@ -388,9 +396,9 @@ exports.getHublist = async function (req, res, next) {
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       message: "",
@@ -399,6 +407,7 @@ exports.getHublist = async function (req, res, next) {
         hublist: hubdata,
         trackdata : hubaddress
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while fetching data' });
@@ -410,8 +419,6 @@ async function generateLabel(shipment_id) {
   if (!token) {
     return Promise.reject('Token not available. Call generateToken first.');
   }
-
-
   const options = {
     method: 'POST',
     url: baseUrl + '/courier/generate/label',
@@ -438,11 +445,7 @@ async function generateLabel(shipment_id) {
       }
     });
   });
-
-
 }
-
-
 async function generateInvoice(order_id) {
   token = await generateToken(email, shipPassword);
   if (!token) {
@@ -480,8 +483,6 @@ async function generateRequestShipmentPickup(shipment_id) {
   if (!token) {
     return Promise.reject('Token not available. Call generateToken first.');
   }
-
-
   const options = {
     method: 'POST',
     url: baseUrl + '/courier/generate/pickup',
@@ -495,7 +496,6 @@ async function generateRequestShipmentPickup(shipment_id) {
       ]
     })
   };
-
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
       if (error) {
@@ -509,7 +509,6 @@ async function generateRequestShipmentPickup(shipment_id) {
       }
     });
   });
-
 }
 
 async function generateCouriresServiceability(pickup_postcode, delivery_postcode, cod, weight) {
@@ -517,8 +516,6 @@ async function generateCouriresServiceability(pickup_postcode, delivery_postcode
   if (!token) {
     return Promise.reject('Token not available. Call generateToken first.');
   }
-
-
   const options = {
     method: 'GET',
     url: `${baseUrl}/courier/serviceability/?pickup_postcode=${pickup_postcode}&delivery_postcode=${delivery_postcode}&cod=${cod}&weight=${weight}`,
@@ -527,7 +524,6 @@ async function generateCouriresServiceability(pickup_postcode, delivery_postcode
       'Authorization': `Bearer ${token}`
     }
   };
-
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
       if (error) {
@@ -541,50 +537,50 @@ async function generateCouriresServiceability(pickup_postcode, delivery_postcode
       }
     });
   });
-
-
 }
 
 exports.updateData = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
-
   try {
     const orderID = req.body.order_id;
     const hubAddressID = req.body.hub_address; 
-
     const shippingKit = await Shippingkit.findById(orderID);
-
     if (!shippingKit) {
       return res.status(404).json({
         status: "0",
         message: "Shipping kit not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
     shippingKit.hub_address_id = hubAddressID;
     await shippingKit.save();
-
-    res.redirect("/shippingkitlist"); // Redirect after successful update
+    res.redirect("/admin/shippingkitlist"); 
   } catch (error) {
     res.status(500).json({
       status: "0",
       message: "An error occurred while updating the shipping kit.",
       respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
 
 exports.getShipmentList = function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Shipment List";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-
   var orderId = req.params.id;
   Order.aggregate([
     {
@@ -632,9 +628,9 @@ exports.getShipmentList = function (req, res, next) {
         siteName: req.app.locals.siteName,
         pageName: pageName,
         pageTitle: pageTitle,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         year: moment().format("YYYY"),
         requrl: req.app.locals.requrl,
         status: 0,
@@ -642,6 +638,7 @@ exports.getShipmentList = function (req, res, next) {
         respdata: {
           list: orderList
         },
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   });
@@ -650,30 +647,32 @@ exports.getShipmentList = function (req, res, next) {
 
 exports.deleteData = async function (req, res, next) {
   try {
+
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
         status: "0",
         message: "Validation error!",
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
-
     const order = await Order.findOne({ _id: req.params.id });
     if (!order) {
       return res.status(404).json({
         status: "0",
         message: "Not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
-
     await Order.deleteOne(
       { _id: req.params.id },
       { w: "majority", wtimeout: 100 }
     );
 
-    await OrderTracking.deleteMany({ order_id: req.params.id });
+    await Ordertracking.deleteMany({ order_id: req.params.id });
 
     // Delete the order from the Order table
     await Order.deleteOne(
@@ -681,13 +680,14 @@ exports.deleteData = async function (req, res, next) {
       { w: "majority", wtimeout: 100 }
     );
 
-    res.redirect("/orderlist");
+    res.redirect("/admin/orderlist");
   } catch (error) {
 
     return res.status(500).json({
       status: "0",
       message: "Error occurred while deleting the category!",
       respdata: error.message,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
@@ -717,9 +717,9 @@ exports.deleteData = async function (req, res, next) {
 //           siteName: req.app.locals.siteName,
 //           pageName: pageName,
 //           pageTitle: pageTitle,
-//           userFullName: req.session.user.name,
-//           userImage: req.session.user.image_url,
-//           userEmail: req.session.user.email,
+//           userFullName:  req.session.admin.name,
+//           userImage:  req.session.admin.image_url,
+//           userEmail:  req.session.admin.email,
 //           year: moment().format("YYYY"),
 //           requrl: req.app.locals.requrl,
 //           message: "",
@@ -739,6 +739,8 @@ exports.deleteData = async function (req, res, next) {
 
 exports.kitorderplaced = async (req, res) => {
   try {
+
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const order_id = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(order_id)) {
@@ -828,8 +830,8 @@ exports.kitorderplaced = async (req, res) => {
       return res.status(404).json({ error: 'Order not found' });
     }
     else {
-      //res.redirect("/orderlist");
-      res.redirect(`/couriresserviceability/${order_id}`);
+      //res.redirect("/admin/orderlist");
+      res.redirect(`/admin/couriresserviceability/${order_id}`);
     }
 
 
@@ -840,6 +842,8 @@ exports.kitorderplaced = async (req, res) => {
 
 
 exports.checkCourierServiceability = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   var pageName = "Check Courier Serviceability";
   var pageTitle = req.app.locals.siteName + " - List " + pageName;
@@ -849,6 +853,7 @@ exports.checkCourierServiceability = async function (req, res, next) {
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -862,6 +867,7 @@ exports.checkCourierServiceability = async function (req, res, next) {
         status: "0",
         message: "Order not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -888,14 +894,15 @@ exports.checkCourierServiceability = async function (req, res, next) {
             siteName: req.app.locals.siteName,
             pageName: pageName,
             pageTitle: pageTitle,
-            userFullName: req.session.user.name,
-            userImage: req.session.user.image_url,
-            userEmail: req.session.user.email,
+            userFullName:  req.session.admin.name,
+            userImage:  req.session.admin.image_url,
+            userEmail:  req.session.admin.email,
             year: moment().format("YYYY"),
             requrl: req.app.locals.requrl,
             message: "",
             respdata: existingOrder,
-            error: shiprocketResponse.error
+            error: shiprocketResponse.error,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         }
 
@@ -905,15 +912,16 @@ exports.checkCourierServiceability = async function (req, res, next) {
           siteName: req.app.locals.siteName,
           pageName: pageName,
           pageTitle: pageTitle,
-          userFullName: req.session.user.name,
-          userImage: req.session.user.image_url,
-          userEmail: req.session.user.email,
+          userFullName:  req.session.admin.name,
+          userImage:  req.session.admin.image_url,
+          userEmail:  req.session.admin.email,
           year: moment().format("YYYY"),
           requrl: req.app.locals.requrl,
           message: "",
           respdata: existingOrder,
           shiprocketResponse: shiprocketResponse,
-          error: null
+          error: null,
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
   } catch (error) {
@@ -921,18 +929,22 @@ exports.checkCourierServiceability = async function (req, res, next) {
       status: "0",
       message: "Error!",
       respdata: error,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
 
 
 exports.getAWBnoById = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -948,6 +960,7 @@ exports.getAWBnoById = async function (req, res, next) {
         status: "0",
         message: "Order not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
     if (existingOrder) {
@@ -957,7 +970,7 @@ exports.getAWBnoById = async function (req, res, next) {
         existingOrder.pickup_awb = shiprocketResponse.response.data.awb_code;
         existingOrder.shiprocket_delivery_partner = shiprocketResponse.response.courier_company_id;
         await existingOrder.save();
-        res.redirect("/shippingkitlist");
+        res.redirect("/admin/shippingkitlist");
       }
     }
   } catch (error) {
@@ -965,17 +978,21 @@ exports.getAWBnoById = async function (req, res, next) {
       status: "0",
       message: "Error!",
       respdata: error,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
 
 exports.getGenerateLabelforkit = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -988,6 +1005,7 @@ exports.getGenerateLabelforkit = async function (req, res, next) {
         status: "0",
         message: "Order not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -1009,6 +1027,7 @@ exports.getGenerateLabelforkit = async function (req, res, next) {
                   status: "0",
                   message: "Error downloading the file!",
                   respdata: err,
+                  isAdminLoggedIn:isAdminLoggedIn
                 });
               }
               // File downloaded and response sent successfully
@@ -1025,6 +1044,7 @@ exports.getGenerateLabelforkit = async function (req, res, next) {
           status: "0",
           message: "Error downloading the file!",
           respdata: error,
+          isAdminLoggedIn:isAdminLoggedIn
         });
       });
     } else {
@@ -1032,6 +1052,7 @@ exports.getGenerateLabelforkit = async function (req, res, next) {
         status: "0",
         message: "Label URL not found!",
         respdata: shiprocketResponse,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   } catch (error) {
@@ -1040,18 +1061,22 @@ exports.getGenerateLabelforkit = async function (req, res, next) {
       status: "0",
       message: "Error!",
       respdata: error,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
 
 
 exports.getGenerateInvoiceforkit = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -1064,6 +1089,7 @@ exports.getGenerateInvoiceforkit = async function (req, res, next) {
         status: "0",
         message: "Order not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -1075,6 +1101,7 @@ exports.getGenerateInvoiceforkit = async function (req, res, next) {
         status: "0",
         message: "Invoice not found!",
         respdata: shiprocketResponse,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -1092,6 +1119,7 @@ exports.getGenerateInvoiceforkit = async function (req, res, next) {
                 status: "0",
                 message: "Error downloading the file!",
                 respdata: err,
+                isAdminLoggedIn:isAdminLoggedIn
               });
             }
             // File downloaded and response sent successfully
@@ -1109,6 +1137,7 @@ exports.getGenerateInvoiceforkit = async function (req, res, next) {
         status: "0",
         message: "Error downloading the file!",
         respdata: error,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
   } catch (error) {
@@ -1116,18 +1145,22 @@ exports.getGenerateInvoiceforkit = async function (req, res, next) {
       status: "0",
       message: "Error!",
       respdata: error,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
 
 
 exports.getShipmentPickup = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -1141,6 +1174,7 @@ exports.getShipmentPickup = async function (req, res, next) {
         status: "0",
         message: "Order not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -1167,14 +1201,15 @@ exports.getShipmentPickup = async function (req, res, next) {
           siteName: req.app.locals.siteName,
           pageName: pageName,
           pageTitle: pageTitle,
-          userFullName: req.session.user.name,
-          userImage: req.session.user.image_url,
-          userEmail: req.session.user.email,
+          userFullName:  req.session.admin.name,
+          userImage:  req.session.admin.image_url,
+          userEmail:  req.session.admin.email,
           year: moment().format("YYYY"),
           requrl: req.app.locals.requrl,
           message: "",
           respdata: existingOrder,
-          error: shiprocketResponse.error
+          error: shiprocketResponse.error,
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
 
@@ -1184,15 +1219,16 @@ exports.getShipmentPickup = async function (req, res, next) {
         siteName: req.app.locals.siteName,
         pageName: pageName,
         pageTitle: pageTitle,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         year: moment().format("YYYY"),
         requrl: req.app.locals.requrl,
         message: "",
         respdata: existingOrder,
         shiprocketResponse: shiprocketResponse,
-        error: null
+        error: null,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   } catch (error) {
@@ -1200,12 +1236,15 @@ exports.getShipmentPickup = async function (req, res, next) {
       status: "0",
       message: "Error!",
       respdata: error,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
 
 
 exports.getList = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   var pageName = "Schedule pickup";
   var pageTitle = req.app.locals.siteName + " - Schedule Your Pick Up " + pageName;
@@ -1215,6 +1254,7 @@ exports.getList = async function (req, res, next) {
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -1228,12 +1268,13 @@ exports.getList = async function (req, res, next) {
         siteName: req.app.locals.siteName,
         pageName: pageName,
         pageTitle: pageTitle,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         year: moment().format("YYYY"),
         requrl: req.app.locals.requrl,
         message: "not found",
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -1243,24 +1284,22 @@ exports.getList = async function (req, res, next) {
       const shippingaddress = await Hublist.findById(existingOrder.hub_address_id);
 
       const shipment_id = existingOrder.shiprocket_shipment_id;
-
-
-
       res.render("pages/order/schedule", {
         status: "1",
         message: "Order canceled successfully!",
         siteName: req.app.locals.siteName,
         pageName: pageName,
         pageTitle: pageTitle,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         year: moment().format("YYYY"),
         requrl: req.app.locals.requrl,
         message: "",
         respdata: existingOrder,
         billingaddress: billingaddress,
-        shippingaddress: shippingaddress
+        shippingaddress: shippingaddress,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   } catch (error) {
@@ -1268,12 +1307,15 @@ exports.getList = async function (req, res, next) {
       status: "0",
       message: "Error!",
       respdata: error,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
 
 exports.huborderplaced = async (req, res) => {
   try {
+
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const orderid = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(orderid)) {
@@ -1292,7 +1334,6 @@ exports.huborderplaced = async (req, res) => {
     const order_id = order._id;
     const order_code = order.order_code;
     const buyer_id = order.user_id;
-    // const seller_id = order.seller_id;
     const product_id = order.product_id;
     const shipping_address_id = order.shipping_address_id;
     const total_price = order.total_price;
@@ -1434,7 +1475,7 @@ exports.huborderplaced = async (req, res) => {
       return res.status(404).json({ error: 'Order not found' });
     }
     else {
-      res.redirect("/orderlist");
+      res.redirect("/admin/orderlist");
     }
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while placing the order' });

@@ -36,14 +36,15 @@ const ShippingkitController = require("../controllers/api/shippingkitController"
 const dateTime = moment().format("YYYY-MM-DD h:mm:ss");
 
 //apis
-
-router.get("/", function (req, res) {
+router.get("/",[],DashboardController.getData);
+/*router.get("/", function (req, res) {
   res.status(401).json({
     status: "0",
     message: "401 - Unauthorised!",
     respdata: {},
   });
-});
+});*/
+
 
 router.post(
   "/signup",
@@ -633,8 +634,6 @@ router.post(
 
 const checkLogin = (req, res, next) => {
     
-    console.log('Check Login>>>>>>>>>>');
-    console.log(req.isAuthenticated());
   // Check if the user is authenticated/logged in
   if (req.isAuthenticated()) {
     // User is authenticated, proceed to the next middleware
@@ -927,13 +926,15 @@ router.post(
   "/cancel-order",
   OrderController.cancelOrderById
 );
-
+router.post(
+  "/return-order", 
+  [],
+  OrderController.returnOrder
+);
 router.get(
   "/cancelorderbybuyer/:order_id",
   OrderController.cancelOrderByBuyer
 );
-
-
 router.post(
   "/orderlist",
   //auth.isAuthorized, 
@@ -969,7 +970,6 @@ router.post(
   [],
   OrderController.updateDeliveryaddressByOrderId
 );
-
 router.post(
   "/generate-awbno",
   auth.isAuthorized, 
@@ -1095,8 +1095,8 @@ router.post("/notificationslist", auth.isAuthorized, [],NotificationsController.
 router.post("/readnotification", auth.isAuthorized, [],NotificationsController.getNotificationById);
 router.post("/updatenotification", auth.isAuthorized, [],NotificationsController.updateNotificationById);
 router.post("/deletenotification", auth.isAuthorized, [],NotificationsController.deleteNotificationById);
-
-
+router.get("/webnotificationslist",[],NotificationsController.listofWebNotification);
+router.post("/markNotificationAsRead",[],NotificationsController.markNotificationAsRead);
 // generate 
 router.post("/get-shipmentkit", auth.isAuthorized,[],ShippingkitController.addShipmentData);
 
@@ -1284,16 +1284,12 @@ router.post("/user-relogin",cors(),
 router.post("/user-filter",cors(),
   WebsiteController.userFilter
 );
-
 router.get("/forgot-password",cors(),
   WebsiteController.forgotPassword
 );
-
 router.post("/forgotpassword-sendotp",cors(),
   WebsiteController.sendotp
 );
-
-
 router.post(
   "/resetpassword",
   [
@@ -1320,6 +1316,10 @@ router.post(
     }),
   ],
   WebsiteController.changePassword
+);
+
+router.get("/reason-list",cors(),
+  WebsiteController.reasonlistdata
 );
 
 module.exports = router;

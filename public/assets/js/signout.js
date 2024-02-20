@@ -2,7 +2,7 @@ $(document).ready(async function(){
     $(document).on('click', '.signout',async function() {
         $.ajax({
             type: 'POST',
-            url:  webSiteUrl + "/api/sign-out",
+            url:  webSiteUrl + "/sign-out",
             success: async function(obj){                
                 let error_success = obj.status;
                 //return false;
@@ -10,9 +10,7 @@ $(document).ready(async function(){
                     await setCookeiFunc(accessTokenVar,'',0);
                     await setCookeiFunc(refreshTokenVar,'',0);
                     location.href = webSiteUrl + "/api/home";
-                } else {
-
-                    
+                } else {                    
                 }
             },
             error: function(response){

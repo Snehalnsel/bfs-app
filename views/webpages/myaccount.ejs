@@ -31,7 +31,7 @@
                   <div class="modal-content">
                      <div class="loginform-box short-box">
                         <h5 class="box-title">Change Profile Picture</h5>
-                        <form action="/api/change-profile-image-web" method="POST" enctype="multipart/form-data">
+                        <form action="/change-profile-image-web" method="POST" enctype="multipart/form-data">
                              <div class="inner-formbox">
                                 <div class="profile-chnage-box">
                                    <div class="user-icon">
@@ -53,24 +53,24 @@
          <div class="sidbar-box sidbar-nav">
             <ul class="nav d-flex flex-column mb-2 ">
                       <li class="nav-item">
-                        <a class="nav-link" href="/api/my-account"><i class="fa fa-user" aria-hidden="true"></i> <span>Profile</span></a>
+                        <a class="nav-link" href="/my-account"><i class="fa fa-user" aria-hidden="true"></i> <span>Profile</span></a>
                       </li>
                       <li class="nav-item">
-                        <a class="nav-link" href="/api/web-my-order"><i class="fa fa-list-ul" aria-hidden="true"></i> <span>My Orders</span></a>
-                      </li>
-        
-                      <li class="nav-item">
-                        <a class="nav-link" href="/api/my-post/<%=respdata.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Product</span></a>
+                        <a class="nav-link" href="/web-my-order"><i class="fa fa-list-ul" aria-hidden="true"></i> <span>My Orders</span></a>
                       </li>
         
                       <li class="nav-item">
-                        <a class="nav-link" href="/api/bid-for-product"><i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> <span>My Bids</span></a>
+                        <a class="nav-link" href="/my-post/<%=respdata.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Product</span></a>
+                      </li>
+        
+                      <li class="nav-item">
+                        <a class="nav-link" href="/bid-for-product"><i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> <span>My Bids</span></a>
                       </li>
                       
                     </ul>
                     <div class="bottom-link">
                      <ul class="nav d-flex flex-column mb-2 ">
-                        <!--<li><a class="nav-link" href="/api/sign-out"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li>-->
+                        <!--<li><a class="nav-link" href="/sign-out"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li>-->
                         <li><a class="nav-link signout" id="signout" href="javascript:void(0)"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li>
                      </ul>
         
@@ -83,7 +83,7 @@
           <div class="dashboard-infobox">
              <div class="dashboard-title-arrow mb-25">
                 <h4 class="di-title mr-25">Account Setting </h4>
-                <div class="edit-link"><a href="/api/edit-profile">Edit</a></div>
+                <div class="edit-link"><a href="/edit-profile">Edit</a></div>
              </div>
              
              <div class="dsh-shortbox">
@@ -114,7 +114,7 @@
           <div class="dashboard-infobox mt-50">
              <div class="dashboard-title-arrow mb-25">
                 <h4 class="di-title mr-25">Address </h4>
-                <div class="edit-link"><a href="/api/add-address">Add Address</a></div>
+                <div class="edit-link"><a href="/add-address">Add Address</a></div>
              </div>
              
  
@@ -122,26 +122,24 @@
                 <form >
                    
                    <div class="div-row">
-                     <% respdata1.forEach(function(item) { %>
-                        <% console.log(respdata1); %>
-                        
+                     <% respdata1.forEach(function(item) { %>                        
                       <% if(item.address_name == 'Home' && item.default_status == '0') {%>
                       <div class="div-12">
-                         <label>Home: <div class="edit-link"><a href="/api/delete-address/<%=item._id%>">Delete Address</a></div></label>                        
+                         <label>Home: <div class="edit-link"><a href="/delete-address/<%=item._id%>">Delete Address</a></div></label>                        
                          <textarea class="ds-form-control" value="" disabled><%=item.address1%>, <%=item.street_name%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>
                          <input type="hidden" name="address_home" value="">
                         </div>
                       <% } %>
                       <%if(item.address_name == 'Office' && item.default_status == '0') {%>
                         <div class="div-12">
-                           <label>Office:</label> <div class="edit-link"><a href="/api/delete-address/<%=item._id%>">Delete Address</a></div>                       
+                           <label>Office:</label> <div class="edit-link"><a href="/delete-address/<%=item._id%>">Delete Address</a></div>                       
                            <textarea class="ds-form-control" value="" disabled><%=item.address1%>, <%=item.street_name%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>
                            <input type="hidden" name="address_office" value="">
                         </div>
                         <% } %>
                         <%if(item.address_name == 'Other' && item.default_status == '0'){%>
                            <div class="div-12">
-                              <label>Others:</label> <div class="edit-link"><a href="/api/delete-address/<%=item._id%>">Delete Address</a></div>                       
+                              <label>Others:</label> <div class="edit-link"><a href="/delete-address/<%=item._id%>">Delete Address</a></div>                       
                               <textarea class="ds-form-control" value="" disabled><%=item.address1%>, <%=item.street_name%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>
                               <input type="hidden" name="address_others" value="">
                            </div>

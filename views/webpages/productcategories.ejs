@@ -6,7 +6,7 @@
           <div class="breadcum-product">
              <ul>
                  
-                <li><a href="/api/home">Home</a></li>               
+                <li><a href="/">Home</a></li>               
                 <li>All Categories</li>
              </ul>
           </div>        
@@ -118,7 +118,7 @@
 
 <script>
   async function fetchData() {
-      const apiCall = await fetch('/api/subcategory');
+      const apiCall = await fetch('/subcategory');
        const responseData = await apiCall.json();
 
        const finalData = responseData.respdata;
@@ -128,15 +128,13 @@
 
    function populateHtml(data)
    {
-      // console.log('HELLO WORLD');
-      // console.log(data);
       data.forEach(item => {
          var hTml = `<div class="product-box">
             <div class="product-image">
-                <a href="/api/websubcategoriesproducts/${item._id}"><img src="${item.images}" alt="images" class="img-fluid"></a>
+                <a href="/websubcategoriesproducts/${item._id}"><img src="${item.images}" alt="images" class="img-fluid"></a>
             </div>
             <div class="prd-short-info">
-               <div class="prd-name"><a href="/api/websubcategoriesproducts/${item._id}">${item.name}</a></div>                 
+               <div class="prd-name"><a href="/websubcategoriesproducts/${item._id}">${item.name}</a></div>                 
             </div> 
          </div>`;
          $("#render-div").append(hTml);

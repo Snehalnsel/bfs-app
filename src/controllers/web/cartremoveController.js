@@ -28,15 +28,15 @@ exports.getData = async function (req, res, next) {
 
   var pageName = "Cart Remove Time";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   Cartremove.find().sort({ _id: -1 }).then((size) => {
     res.render("pages/cartitime/list", {
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       status: 0,
@@ -44,6 +44,7 @@ exports.getData = async function (req, res, next) {
       respdata: {
         list: size,
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
   });
 };
@@ -52,19 +53,20 @@ exports.addData = async function (req, res, next) {
 
   var pageName = "Cart Remove";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   res.render("pages/cartitime/create", {
     status: 1,
     siteName: req.app.locals.siteName,
     pageName: pageName,
     pageTitle: pageTitle,
-    userFullName: req.session.user.name,
-    userImage: req.session.user.image_url,
-    userEmail: req.session.user.email,
+    userFullName:  req.session.admin.name,
+    userImage:  req.session.admin.image_url,
+    userEmail:  req.session.admin.email,
     year: moment().format("YYYY"),
     requrl: req.app.locals.requrl,
     message: "",
     respdata: {},
+    isAdminLoggedIn:isAdminLoggedIn
   });
  
 };
@@ -72,21 +74,22 @@ exports.addData = async function (req, res, next) {
 exports.createData = async function (req, res, next) {
   var pageName = "Cart Remove";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   Cartremove.findOne({ name: req.body.time }).then((size) => {
     if (size) {
       res.render("pages/cartitime/create", {
         status: 0,
         siteName: req.app.locals.siteName,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         pageName: pageName,
         pageTitle: pageTitle,
         year: moment().format("YYYY"),
         message: "Already exists!",
         requrl: req.app.locals.requrl,
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     } else {
     
@@ -102,13 +105,14 @@ exports.createData = async function (req, res, next) {
             siteName: req.app.locals.siteName,
             pageName: pageName,
             pageTitle: pageTitle,
-            userFullName: req.session.user.name,
-            userImage: req.session.user.image_url,
-            userEmail: req.session.user.email,
+            userFullName:  req.session.admin.name,
+            userImage:  req.session.admin.image_url,
+            userEmail:  req.session.admin.email,
             year: moment().format("YYYY"),
             message: "Added!",
             requrl: req.app.locals.requrl,
             respdata: size,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         })
         .catch((error) => {
@@ -116,14 +120,15 @@ exports.createData = async function (req, res, next) {
             status: 0,
             pageName: pageName,
             siteName: req.app.locals.siteName,
-            userFullName: req.session.user.name,
-            userImage: req.session.user.image_url,
-            userEmail: req.session.user.email,
+            userFullName:  req.session.admin.name,
+            userImage:  req.session.admin.image_url,
+            userEmail:  req.session.admin.email,
             pageTitle: pageTitle,
             year: moment().format("YYYY"),
             requrl: req.app.locals.requrl,
             message: "Error!",
             respdata: error,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         });
     }
@@ -132,11 +137,10 @@ exports.createData = async function (req, res, next) {
 
 
 exports.editData = async function (req, res, next) {
-  
-  
+
   var pageName = "Cart Remove";
   var pageTitle = req.app.locals.siteName + " - Edit " + pageName;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const id = mongoose.Types.ObjectId(req.params.id);
 
   Cartremove.findOne({ _id: id }).then((details) => {
@@ -145,13 +149,14 @@ exports.editData = async function (req, res, next) {
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       message: "",
       respdata: details,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   });
 };
@@ -159,11 +164,13 @@ exports.editData = async function (req, res, next) {
 
 exports.updateData = async function (req, res, next) {
   const errors = validationResult(req);
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -173,6 +180,7 @@ exports.updateData = async function (req, res, next) {
         status: "0",
         message: "Not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     } else {
       const requrl = req.app.locals.requrl;
@@ -189,7 +197,7 @@ exports.updateData = async function (req, res, next) {
           if (err) {
             throw err;
           } else {
-            res.redirect("/carttime");
+            res.redirect("/admin/carttime");
           }
         }
       );

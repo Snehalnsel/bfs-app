@@ -9,6 +9,7 @@ const path = require("path");
 const fs = require("fs");
 const mime = require("mime");
 const Users = require("../../models/api/userModel");
+const Iptrnsaction = require("../../models/api/ipTransactionModel");
 // const helper = require("../helpers/helper");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -107,8 +108,6 @@ exports.signUp = async function (req, res, next) {
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   let userCount = await Users.countDocuments();
   let userCode = `BFS${(userCount + 1).toString().padStart(5, '0')}`;
-
-  console.log(userCode);
   bcrypt.hash(req.body.password, rounds, (error, hash) => {
     if (error) {
       res.status(400).json({
@@ -122,7 +121,9 @@ exports.signUp = async function (req, res, next) {
       var trial_date = moment(today, "YYYY-MM-DD").add(14, "days");
       trial_date = trial_date.format("YYYY-MM-DD");
 
-      Users.findOne({ email: req.body.email , status: "0" }).then((user) => {
+      const userIpAddress = req.connection.remoteAddress;
+
+      Users.findOne({ $or: [{ email: req.body.email }, { phone_no: req.body.phone_no }], status: "0" }).then((user) => {
         if (!user) {
           const newUser = Users({
             email: req.body.email,
@@ -143,11 +144,19 @@ exports.signUp = async function (req, res, next) {
             app_user_id: userCode,
             trial_end_date: trial_date,
             image: "na",
+            ip_address: userIpAddress, 
           });
 
           newUser
-            .save()
-            .then((user) => {
+          .save()
+          .then((user) => {
+            Iptrnsaction.create({
+              user_id: user._id,
+              Purpose: "Registration",
+              ip_address: userIpAddress,
+              created_dtime: new Date(),
+            })
+            .then(() => {
               res.status(200).json({
                 status: "1",
                 message: "Added!",
@@ -162,6 +171,14 @@ exports.signUp = async function (req, res, next) {
                 respdata: error,
               });
             });
+          })
+          .catch((error) => {
+            res.status(400).json({
+              status: "0",
+              message: "Error!",
+              respdata: error,
+            });
+          });
         } else {
           res.status(400).json({
             status: "0",
@@ -559,7 +576,6 @@ exports.uploadImage = async function (req, res, next) {
       const path = Date.now() + ".png";
     
       fs.writeFileSync(folderPath + path, imgData, "base64", function (err) {
-        console.log(err);
       });
 
       var image_url = req.app.locals.requrl + "/public/images/" + path;
@@ -880,7 +896,6 @@ exports.deleteData = async function (req, res, next) {
 };
 
 exports.deleteuser = async function (req, res, next) {
-  console.log('req.body:', req.body);
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

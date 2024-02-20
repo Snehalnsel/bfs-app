@@ -28,19 +28,17 @@ const { log } = require("console");
 
 //methods
 exports.getData = async function (req, res, next) {
-  
-
   var pageName = "Category";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   Category.find().sort({ _id: -1 }).then((category) => {
     res.render("pages/body-focus/list", {
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       status: 0,
@@ -48,6 +46,7 @@ exports.getData = async function (req, res, next) {
       respdata: {
         list: category,
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
   });
 };
@@ -90,9 +89,9 @@ exports.getData = async function (req, res, next) {
 //       siteName: req.app.locals.siteName,
 //       pageName: pageName,
 //       pageTitle: pageTitle,
-//       userFullName: req.session.user.name,
-//       userImage: req.session.user.image_url,
-//       userEmail: req.session.user.email,
+//       userFullName:  req.session.admin.name,
+//       userImage:  req.session.admin.image_url,
+//       userEmail:  req.session.admin.email,
 //       year: moment().format("YYYY"),
 //       requrl: req.app.locals.requrl,
 //       status: 0,
@@ -118,7 +117,7 @@ exports.getData = async function (req, res, next) {
 exports.getSubcatData = async function (page,searchType, searchValue, req, res, next) {
   var pageName = "Sub Category";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   try {
     const item_per_page = 40;
     await Category.ensureIndexes({ parent_id: 1 }); 
@@ -155,9 +154,9 @@ exports.getSubcatData = async function (page,searchType, searchValue, req, res, 
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       status: 0,
@@ -170,13 +169,15 @@ exports.getSubcatData = async function (page,searchType, searchValue, req, res, 
       item_per_page: item_per_page,
       currentPage: currentPage,
       searchType:searchType ? searchType : '',
-      searchValue:searchValue ? searchValue : ''
+      searchValue:searchValue ? searchValue : '',
+      isAdminLoggedIn:isAdminLoggedIn
     });
   } catch (error) {
     return res.status(500).json({
       status: "0",
       message: "An error occurred while fetching the Sub Category data.",
       respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 }
@@ -184,7 +185,7 @@ exports.getSubcatData = async function (page,searchType, searchValue, req, res, 
 exports.getSubcatDataBySearches = async function (req, res, next) {
   var pageName = "Sub Category";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   try {
     const item_per_page = 40;
 
@@ -228,7 +229,6 @@ exports.getSubcatDataBySearches = async function (req, res, next) {
     }
     else
     {
-      
       const collection = await Category.find({
         parent_id: '650444488501422c8bf24bdb',
         name:{'$regex' : `${sreach_product}`, '$options' : 'i'}
@@ -236,28 +236,21 @@ exports.getSubcatDataBySearches = async function (req, res, next) {
       .skip(skip)
       .limit(item_per_page)
       .exec();
-
-      
       for(let element of collection)
       {
        const childCategory = await Category.find({ parent_id: element._id }).exec();
-
         // subcategoryList.push({
         //   parentCategoryName: element.name,
         //   subcategory: childCategory,
         // });
-
         subcategoryList.push(
           ...childCategory.map(subcategory => ({
               parentCategoryName: element.name,
               subcategory: subcategory,
           }))
       );
-        
       }
-
        totalSubcategoriesCount = subcategoryList.length;
-
     }
     // return;
 
@@ -265,9 +258,9 @@ exports.getSubcatDataBySearches = async function (req, res, next) {
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       status: 1,
@@ -278,7 +271,8 @@ exports.getSubcatDataBySearches = async function (req, res, next) {
       totalSubcategoriesCount: totalSubcategoriesCount,
       skip: skip, 
       item_per_page:item_per_page,
-      currentPage :currentPage
+      currentPage :currentPage,
+      isAdminLoggedIn:isAdminLoggedIn
     });
 
   } catch (error) {
@@ -286,17 +280,15 @@ exports.getSubcatDataBySearches = async function (req, res, next) {
       status: '0',
       message: 'An error occurred while fetching products with matching parent_id.',
       error: error.message,
+      isAdminLoggedIn:isAdminLoggedIn
     };
   }
 };
 
 exports.addData = async function (req, res, next) {
- 
-
   var pageName = "Category";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   Category.find().sort({ _id: -1 }).then((category) => {
     
   res.render("pages/body-focus/create", {
@@ -304,15 +296,16 @@ exports.addData = async function (req, res, next) {
     siteName: req.app.locals.siteName,
     pageName: pageName,
     pageTitle: pageTitle,
-    userFullName: req.session.user.name,
-    userImage: req.session.user.image_url,
-    userEmail: req.session.user.email,
+    userFullName:  req.session.admin.name,
+    userImage:  req.session.admin.image_url,
+    userEmail:  req.session.admin.email,
     year: moment().format("YYYY"),
     requrl: req.app.locals.requrl,
     message: "",
     respdata: {
       category: category,
     },
+    isAdminLoggedIn:isAdminLoggedIn
   });
 });
  
@@ -321,36 +314,40 @@ exports.addData = async function (req, res, next) {
 exports.createData = async function (req, res, next) {
   var pageName = "Category";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-
-  if (!req.file) {
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+  // if (!req.file) {
     
-    return res.status(400).json({
-      status: "0",
-      message: "Image is required!",
-      respdata: []
-    });
+  //   return res.status(400).json({
+  //     status: "0",
+  //     message: "Image is required!",
+  //     respdata: [],
+  //     isAdminLoggedIn:isAdminLoggedIn
+  //   });
+  // }
+  let imagePath;
+  if(req.file)
+  {
+    const requrl = req.protocol + '://' + req.get('host');
+    imagePath = requrl + '/public/images/' + req.file.filename;
   }
-  const requrl = req.protocol + '://' + req.get('host');
-  const imagePath = requrl + '/public/images/' + req.file.filename;
   Category.findOne({ name: req.body.focus_name }).then((category) => {
     if (category) {
       res.render("pages/body-focus/create", {
         status: 0,
         siteName: req.app.locals.siteName,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         pageName: pageName,
         pageTitle: pageTitle,
         year: moment().format("YYYY"),
         message: "Already exists!",
         requrl: req.app.locals.requrl,
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     } else {
-    
       const parent1 = '650444488501422c8bf24bdb';
-      
       const parent =  req.body.parent_id !== '0' ? req.body.parent_id : parent1;
       const newCat = Category({
         name: req.body.focus_name,
@@ -359,7 +356,6 @@ exports.createData = async function (req, res, next) {
         parent_id: parent,
         added_dtime: dateTime,
       });
-      
       newCat
         .save()
         .then((category) => {
@@ -368,13 +364,14 @@ exports.createData = async function (req, res, next) {
             siteName: req.app.locals.siteName,
             pageName: pageName,
             pageTitle: pageTitle,
-            userFullName: req.session.user.name,
-            userImage: req.session.user.image_url,
-            userEmail: req.session.user.email,
+            userFullName:  req.session.admin.name,
+            userImage:  req.session.admin.image_url,
+            userEmail:  req.session.admin.email,
             year: moment().format("YYYY"),
             message: "Added!",
             requrl: req.app.locals.requrl,
             respdata: category,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         })
         .catch((error) => {
@@ -382,14 +379,15 @@ exports.createData = async function (req, res, next) {
             status: 0,
             pageName: pageName,
             siteName: req.app.locals.siteName,
-            userFullName: req.session.user.name,
-            userImage: req.session.user.image_url,
-            userEmail: req.session.user.email,
+            userFullName:  req.session.admin.name,
+            userImage:  req.session.admin.image_url,
+            userEmail:  req.session.admin.email,
             pageTitle: pageTitle,
             year: moment().format("YYYY"),
             requrl: req.app.locals.requrl,
             message: "Error!",
             respdata: error,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         });
     }
@@ -400,7 +398,7 @@ exports.editData = async function (req, res, next) {
 
   var pageName = "Category";
   var pageTitle = req.app.locals.siteName + " - Edit " + pageName;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const user_id = mongoose.Types.ObjectId(req.params.id);
   Category.findOne({ _id: user_id }).then((category) => {
     res.render("pages/body-focus/edit", {
@@ -408,13 +406,14 @@ exports.editData = async function (req, res, next) {
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       message: "",
       respdata: category,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   });
 };
@@ -423,11 +422,13 @@ exports.editData = async function (req, res, next) {
 exports.updateData = async function (req, res, next) {
   try {
     const errors = validationResult(req);
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     if (!errors.isEmpty()) {
       return res.status(400).json({
         status: "0",
         message: "Validation error!",
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -438,6 +439,7 @@ exports.updateData = async function (req, res, next) {
         status: "0",
         message: "Category not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -463,14 +465,16 @@ exports.updateData = async function (req, res, next) {
         status: "0",
         message: "Brand not updated!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
-    res.redirect("/body-focus");
+    res.redirect("/admin/body-focus");
   } catch (error) {
     return res.status(500).json({
       status: "0",
       message: "An error occurred while updating the brand.",
       respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
@@ -480,11 +484,13 @@ exports.updateData = async function (req, res, next) {
 exports.deleteData = async function (req, res, next) {
   try {
     const errors = validationResult(req);
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     if (!errors.isEmpty()) {
       return res.status(400).json({
         status: "0",
         message: "Validation error!",
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -495,6 +501,7 @@ exports.deleteData = async function (req, res, next) {
         status: "0",
         message: "Not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -504,12 +511,12 @@ exports.deleteData = async function (req, res, next) {
     );
 
     if (referer && referer.includes("/body-focus")) {
-      res.redirect("/body-focus");
+      res.redirect("/admin/body-focus");
     } else if (referer && referer.includes("/body-focus-subcat")) {
-      res.redirect("/body-focus-subcat");
+      res.redirect("/admin/body-focus-subcat");
     } else {
       
-      res.redirect("/body-focus");
+      res.redirect("/admin/body-focus");
     }
   } catch (error) {
     // Handle any errors that occur during the deletion process
@@ -517,6 +524,7 @@ exports.deleteData = async function (req, res, next) {
       status: "0",
       message: "Error occurred while deleting the category!",
       respdata: error.message, // Include the error message for debugging purposes
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
@@ -524,7 +532,7 @@ exports.deleteData = async function (req, res, next) {
 exports.editSubCatData = async function (req, res, next) {
   var pageName = "Sub Category";
   var pageTitle = req.app.locals.siteName + " - Edit " + pageName;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const user_id = mongoose.Types.ObjectId(req.params.id);
   try {
     const category = await Category.findOne({ _id: user_id }).exec();
@@ -534,6 +542,7 @@ exports.editSubCatData = async function (req, res, next) {
         status: "0",
         message: "Sub Category not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -544,9 +553,9 @@ exports.editSubCatData = async function (req, res, next) {
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       message: "",
@@ -554,12 +563,14 @@ exports.editSubCatData = async function (req, res, next) {
         list: category,
         parentCategories: parentCategories,
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
   } catch (error) {
     return res.status(500).json({
       status: "0",
       message: "An error occurred while fetching the Sub Category data.",
       respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
@@ -569,11 +580,13 @@ exports.editSubCatData = async function (req, res, next) {
 exports.updateSubCatData = async function (req, res, next) {
   try {
     const errors = validationResult(req);
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     if (!errors.isEmpty()) {
       return res.status(400).json({
         status: "0",
         message: "Validation error!",
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -584,6 +597,7 @@ exports.updateSubCatData = async function (req, res, next) {
         status: "0",
         message: "Sub Category not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -611,15 +625,17 @@ exports.updateSubCatData = async function (req, res, next) {
         status: "0",
         message: "Sub Category not updated!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
-    res.redirect("/body-focus-subcat");
+    res.redirect("/admin/body-focus-subcat");
   } catch (error) {
     return res.status(500).json({
       status: "0",
       message: "An error occurred while updating the Sub Category.",
       respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
@@ -627,7 +643,7 @@ exports.updateSubCatData = async function (req, res, next) {
 
 exports.updateStatusData = async function (req, res, next) {
   const Id = req.params.id;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   Category.findById(Id)
     .then((category) => {
       if (!category) {
@@ -635,6 +651,7 @@ exports.updateStatusData = async function (req, res, next) {
           status: "0",
           message: "Brand not found!",
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
 
@@ -647,15 +664,17 @@ exports.updateStatusData = async function (req, res, next) {
               status: "0",
               message: "Category status not updated!",
               respdata: {},
+              isAdminLoggedIn:isAdminLoggedIn
             });
           }
-          res.redirect("/body-focus"); 
+          res.redirect("/admin/body-focus"); 
         })
         .catch((error) => {
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the brand status.",
             respdata: {},
+            isAdminLoggedIn:isAdminLoggedIn
           });
         });
     })
@@ -664,6 +683,7 @@ exports.updateStatusData = async function (req, res, next) {
         status: "0",
         message: "An error occurred while finding the brand.",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
 };
@@ -672,7 +692,7 @@ exports.updateStatusData = async function (req, res, next) {
 exports.statusData = async function (req, res, next) {
   const Id = req.params.id;
   const referer = req.headers.referer; // Extracting the Referer header
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   Category.findById(Id)
     .then((category) => {
       if (!category) {
@@ -680,11 +700,10 @@ exports.statusData = async function (req, res, next) {
           status: "0",
           message: "Category not found!",
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
-
       category.status = category.status === 0 ? 1 : 0;
-
       category
         .save()
         .then((updatedCategory) => {
@@ -693,16 +712,17 @@ exports.statusData = async function (req, res, next) {
               status: "0",
               message: "Category status not updated!",
               respdata: {},
+              isAdminLoggedIn:isAdminLoggedIn
             });
           }
          
-          if (referer && referer.includes("/body-focus")) {
-            res.redirect("/body-focus");
-          } else if (referer && referer.includes("/body-focus-subcat")) {
-            res.redirect("/body-focus-subcat");
+          if (referer && referer.includes("/admin/body-focus")) {
+            res.redirect("/admin/body-focus");
+          } else if (referer && referer.includes("/admin/body-focus-subcat")) {
+            res.redirect("/admin/body-focus-subcat");
           } else {
             
-            res.redirect("/body-focus");
+            res.redirect("/admin/body-focus");
           }
         })
         .catch((error) => {
@@ -710,6 +730,7 @@ exports.statusData = async function (req, res, next) {
             status: "0",
             message: "An error occurred while updating the brand status.",
             respdata: {},
+            isAdminLoggedIn:isAdminLoggedIn
           });
         });
     })
@@ -718,6 +739,7 @@ exports.statusData = async function (req, res, next) {
         status: "0",
         message: "An error occurred while finding the brand.",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
 };

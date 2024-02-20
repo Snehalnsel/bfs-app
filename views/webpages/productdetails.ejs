@@ -4,9 +4,8 @@
       <div class="container">
          <div class="breadcum-product">
             <ul>
-               <%console.log(respdata); %>
-               <li><a href="/api/home">Home</a></li>
-               <li><a href="/api/websubcategoriesproducts/<%=category._id%>">
+               <li><a href="/home">Home</a></li>
+               <li><a href="/websubcategoriesproducts/<%=category._id%>">
                      <%=category.name%>
                   </a></li>
                   <% if (respdata && Object.keys(respdata).length > 0) { %>
@@ -98,26 +97,26 @@
                                           <span class="close-icon"><i class="fa fa-times" aria-hidden="true"></i></span>
                                           <ul>
                                              <li><a target="_blank"
-                                                   href="https://api.whatsapp.com/send?text=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>"
+                                                   href="https://api.whatsapp.com/send?text=<%=websiteUrl%>/productdeatils/<%=respdata._id%>"
                                                    data-action="share/whatsapp/share" class="slc-btn wa-btn "><i
                                                       class="fa fa-whatsapp" aria-hidden="true"></i></a>
                                              </li>
                                              <li>
                                                 <a target="_blank"
-                                                   href="https://twitter.com/share?url=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>&text=<%=respdata.name%>via=<%=respdata.name%>"
+                                                   href="https://twitter.com/share?url=<%=websiteUrl%>/productdeatils/<%=respdata._id%>&text=<%=respdata.name%>via=<%=respdata.name%>"
                                                    class="slc-btn tw-btn "><i class="fa fa-twitter"
                                                       aria-hidden="true"></i></a>
                                              </li>
                                              <li>
                                                 <a target="_blank"
-                                                   href="https://www.facebook.com/sharer/sharer.php?u=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>"
+                                                   href="https://www.facebook.com/sharer/sharer.php?u=<%=websiteUrl%>/productdeatils/<%=respdata._id%>"
                                                    class="slc-btn fb-btn ">
                                                    <i class="fa fa-facebook" aria-hidden="true"></i>
                                                 </a>
                                              </li>
                                              <li>
                                                 <a target="_blank"
-                                                   href="https://www.linkedin.com/shareArticle?url=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>&title=<%=respdata.name%>&summary=<%=respdata.name%>&source=<%=websiteUrl%>"
+                                                   href="https://www.linkedin.com/shareArticle?url=<%=websiteUrl%>/productdeatils/<%=respdata._id%>&title=<%=respdata.name%>&summary=<%=respdata.name%>&source=<%=websiteUrl%>"
                                                    class="slc-btn lnk-btn ">
                                                    <i class="fa fa-linkedin" aria-hidden="true"></i>
                                                 </a>
@@ -251,9 +250,8 @@
             $(document).ready(function () {
                /*$(document).on('click', ".buy-btn", function (e) {
                   var id = $(this).data('id');
-                  console.log(id);
                   $.ajax({
-                     url: '/api/addtocart/' + id.trim(),
+                     url: '/addtocart/' + id.trim(),
                      method: 'POST',
                      success: function (data) {
                         if (data.is_added) {
@@ -272,7 +270,6 @@
                         }
                      },
                      error: function (err) {
-                        console.error('Error:', err);
                      }
                   });
                });*/

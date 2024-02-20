@@ -30,7 +30,7 @@
                   <div class="modal-content">
                      <div class="loginform-box short-box">
                         <h5 class="box-title">Change Profile Picture</h5>
-                        <form action="/api/change-profile-image-web" method="POST" enctype="multipart/form-data">
+                        <form action="/change-profile-image-web" method="POST" enctype="multipart/form-data">
                              <div class="inner-formbox">
                                 <div class="profile-chnage-box">
                                    <div class="user-icon">
@@ -51,14 +51,14 @@
          <div class="sidbar-box sidbar-nav">
             <ul class="nav d-flex flex-column mb-2 ">
                 <li class="nav-item">
-                  <a class="nav-link" href="/api/my-account"><i class="fa fa-user" aria-hidden="true"></i> <span>Profile</span></a>
+                  <a class="nav-link" href="/my-account"><i class="fa fa-user" aria-hidden="true"></i> <span>Profile</span></a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="#"><i class="fa fa-list-ul" aria-hidden="true"></i> <span>My Orders</span></a>
                 </li>
   
                 <li class="nav-item">
-                  <a class="nav-link" href="/api/my-post/<%=respdata.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Products</span></a>
+                  <a class="nav-link" href="/my-post/<%=respdata.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Products</span></a>
                 </li>
   
                 <li class="nav-item">
@@ -68,24 +68,20 @@
               </ul>
               <div class="bottom-link">
                <ul class="nav d-flex flex-column mb-2 ">
-                  <li><a class="nav-link" href="/api/sign-out"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li>
+                  <!-- <li><a class="nav-link" href="/sign-out"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li> -->
+                  <li><a class="nav-link signout" id="signout" href="javascript:void(0)"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li>
                </ul>
-
-                       
                     </div>
-
          </div>        
        </div>
-
        <div class="dashboard-content">
           <div class="dashboard-infobox">
              <div class="dashboard-title-arrow mb-25">
                 <h4 class="di-title mr-25">Add Your Product</h4>
-                <div class="edit-link"><a href="/api/my-account">Back </a></div>
+                <div class="edit-link"><a href="/my-account">Back </a></div>
              </div>
-             
              <div class="dsh-shortbox">
-                <form action="/api/addnewpost" method="post" enctype="multipart/form-data" id="addPostForm">
+                <form action="/addnewpost" method="post" enctype="multipart/form-data" id="addPostForm">
                    <div class="div-row">
                    <div class="div-12">
                       <div class="post-imagebox">
@@ -127,14 +123,8 @@
                       </div>
  
                       <div class="div-6">
-                         <label>Product Category <span class="required">*</span></label>
-                        <!-- <select class="ds-form-control" name="product_cate">-->
-                        <!-- <option >Select Category</option>-->
-                        <!-- <% //subcate.forEach(function(subcatitems){%>-->
-                        <!--  <option value="<%//=subcatitems._id%>"><%//=subcatitems.name%></option>-->
-                        <!--  <% //}); %>-->
-                        <!--</select>-->
-                        <input type="type" name="product_cate" class="ds-form-control" placeholder="Enter Category" required>
+                         <label>Product Category </label>
+                        <input type="type" name="product_cate" class="ds-form-control" placeholder="Enter Category">
                       </div>
  
                       <div class="div-6">
@@ -154,8 +144,8 @@
                     
  
                       <div class="div-6">
-                         <label>Product Size <span class="required">*</span></label>
-                         <input type="type" name="size" class="ds-form-control" placeholder="Product Size" required>
+                         <label>Product Size</label>
+                         <input type="type" name="size" class="ds-form-control" placeholder="Product Size">
                       </div>
  
                       <div class="div-6">
@@ -168,31 +158,47 @@
                       </div>
  
                       <div class="div-6">
-                         <label>Original Packaging</label>
+                        <label>Original Packaging</label>
                         <label class="switch ">
                            <input type="checkbox" name="original_package">
                              <span class="tg-slider round"></span>
                          </label>
                       </div>
-                      
+
+                      <div class="div-6">
+                        <label>Gender</label>
+                        <div class=" inlineflex" >
+                           <% if(genderList){%>
+                              <% genderList.forEach(function(item) { %>
+                                 <span>
+                                    <input type="radio" id="<%= item._id %>" name="gender" value="<%= item._id %>">
+                                    <label for="<%= item._id %>"><%= item.name %></label>
+                                 </span>
+                                 
+                              <% }); %>   
+                           <% } %>
+                        </div>
+                     </div>
+
+    
                       <div class="div-6">
                          <label>Height</label>
-                        <input type="type" name="height" class="ds-form-control" placeholder="Height">
+                        <input type="type" name="height" class="ds-form-control" placeholder="Height in cm">
                       </div>
                       
                       <div class="div-6">
                          <label>Weight</label>
-                        <input type="type" name="weight" class="ds-form-control" placeholder="Weight">
+                        <input type="type" name="weight" class="ds-form-control" placeholder="Weight in Kg">
                       </div>
                       
                       <div class="div-6">
                          <label>Length</label>
-                        <input type="type" name="length" class="ds-form-control" placeholder="Length">
+                        <input type="type" name="length" class="ds-form-control" placeholder="Length in cm">
                       </div>
                       
                       <div class="div-6">
                          <label>Breadth</label>
-                        <input type="type" name="breath" class="ds-form-control" placeholder="Breadth">
+                        <input type="type" name="breath" class="ds-form-control" placeholder="Breadth in cm">
                       </div>
                       
                       <div class="div-6">

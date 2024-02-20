@@ -28,6 +28,7 @@ async function searchByFilter(priceList = '',pageId = '') {
     let brandList = [];
     let sizeList = [];
     let conditionList = [];
+    let genderList = [];
     let optionId = $("#sortBy").val();
     let productcategoryId = $("#product_category_id").val();
     let pageNo = (pageId != "") ? pageId : 1;
@@ -43,14 +44,20 @@ async function searchByFilter(priceList = '',pageId = '') {
     $(".searchByCondition:checked").each(function () {
         conditionList.push($(this).data("id"));
     });
+
+    $(".searchByGender:checked").each(function () {
+        genderList.push($(this).data("id"));
+    });
+   
    
     $.ajax({
         type: 'POST',
-        url: webSiteUrl + "/api/user-filter",
+        url: webSiteUrl + "/user-filter",
         data: {
             brandList: brandList,
             sizeList: sizeList,
             conditionList: conditionList,
+            genderList: genderList,
             priceList: priceList ? priceList : null,
             optionId: optionId,
             productcategoryId: productcategoryId,
@@ -87,7 +94,10 @@ async function searchByFilter(priceList = '',pageId = '') {
 $(document).on('change', ".sortBy", function (e) {
 
     if ($('.filterByChecked').is(':checked') || ($('.input-max').val() && $('.input-min').val())) {
-        searchByFilter();
+        const max = $('.input-max').val();
+        const min = $('.input-min').val();
+        let priceList = min + '-' + max;
+        searchByFilter(priceList);
     } else {
         let categoryId = $("#product_category_id").val();
         if (categoryId === "whatshot") {
@@ -108,7 +118,7 @@ $(document).on('change', ".sortBy", function (e) {
             optionId = 0;
         }
         $.ajax({
-            url: `/api/websubcategoriesproductswithsort/${categoryId}/${optionId.trim()}`,
+            url: `/websubcategoriesproductswithsort/${categoryId}/${optionId.trim()}`,
             method: 'GET',
             success: async function (data) {
                 let htmlContent = '';
@@ -141,13 +151,13 @@ async function makeHtml(data,totalPages, currentPage, categoryId, webUrl, brandL
         htmlContent += `
             <div class="product-box">
                 <div class="product-image">
-                    <a href="/api/productdeatils/${item._id}">
+                    <a href="/productdeatils/${item._id}">
                         <img src="${item.product_images[0].image}" alt="images" class="img-fluid">
                     </a>
                 </div>
                 <div class="prd-short-info">
                     <div class="prd-name">
-                        <a href="/api/productdeatils/${item._id}">${item.name}</a>
+                        <a href="/productdeatils/${item._id}">${item.name}</a>
                     </div>
                     <div class="prd-price">
                         <span><i class="fa fa-inr" aria-hidden="true"></i></span>${item.offer_price}

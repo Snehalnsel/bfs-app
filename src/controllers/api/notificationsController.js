@@ -114,7 +114,6 @@ exports.getNotificationById = async function (req, res, next) {
     });
   }
 };
-
 exports.updateNotificationById = async function (req, res, next) {
   try {
     const { notification_id, title, content } = req.body; 
@@ -169,8 +168,60 @@ exports.deleteNotificationById = async function (req, res, next) {
   }
 };
 
+exports.listofWebNotification = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
 
+    const notifications = await Notifications.find({ userId }).sort({ added_dtime: -1 ,is_read: 0 ,status : 0});
+    const notificationCount = await Notifications.countDocuments({ userId, is_read: 0 ,status : 0});
+    if (!notifications || notifications.length === 0) {
+      return res.status(404).json({
+        status: "0",
+        message: "Notifications not found",
+        respdata: {},
+      });
+    }
+    res.render("webpages/notificationlist",
+      {
+        title: "Users Notificartion List",
+        message: "Users Data of the Notifications!",
+        respdata: notifications,
+        notificationCount: notificationCount,
+        websiteUrl: process.env.SITE_URL,
+        isLoggedIn: isLoggedIn,
+      });
+    //res.status(200).json({ status: "1", notification_data: notifications });
+  } catch (error) {
+    //console.error(error);
+    res.status(500).json({
+      status: "0",
+      message: "Internal server error",
+      respdata: error,
+    });
+  }
+};
 
+exports.markNotificationAsRead = async function (req, res, next) {
+  const notificationId = req.body.notificationId;
+  try {
+      const notification = await Notifications.findById(notificationId);
+      if (!notification) {
+          return res.status(404).json({ message: 'Notification not found' });
+      }
+      notification.is_read = 1;
+      await notification.save();
+      res.status(200).json({
+        message: 'Notification marked as read',
+        notification : true
+      });
+  } catch (error) {
+    return {
+      message: 'Notification not marked as read',
+      notification : false
+    };
+  }
+};
 
 
 

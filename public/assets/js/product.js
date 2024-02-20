@@ -2,20 +2,32 @@ let productId = "";
 let isLoggedIn2 = $("#userReloggedIn").val();
 
 $(document).on("click",".bidNowAmountBtn",function() {
+    $(".valid-amount").html("");
     let bidAmount = $("#bid_amount").val();
     if(productId !== "" && bidAmount != "") {
         $.ajax({
-        url: '/api/bid-check-exist-reccord', // Request to bid for first time or update the bid amount
-        data: {productId:productId,bidAmount:bidAmount},
-        method: 'POST',
-        success: function(data) {
-            window.location.href = "/api/bid-for-product/"+data.bidId;
-            //console.log('Danger Alert');
-        },
-        error: function(err) {
-                console.error('Error:', err);
-        } 
-    });
+            url: '/bid-check-exist-reccord', // Request to bid for first time or update the bid amount
+            data: {productId:productId,bidAmount:bidAmount},
+            method: 'POST',
+            success: function(data) {
+                if(typeof data.message != "undefined") {
+                    $(".valid-amount").html(data.message);
+                }
+                if(data.status == "success") {
+                    window.location.href = "/bid-for-product/"+data.bidId;
+                } else {
+                    setTimeout(function(){ 
+                        $(".valid-amount").html("");
+                    }, 3000);
+                }
+                //console.log('Danger Alert');
+            },
+            error: function(err) {
+                setTimeout(function(){ 
+                    $(".valid-amount").html("");
+                }, 5000);
+            } 
+        });
     }
 });
 
@@ -23,9 +35,7 @@ $(document).on("click",".bidButton",function() {
     if(isLoggedIn2 != "") {
         productId = $(this).siblings('a').data("id");
         $('#bid_modal').modal('show'); 
-        //window.location.href = "/api/bid-for-product";
     } else {
-        //$('.loginModal').trigger('click');
         $('#login_modal').modal('show'); 
     }
 });
@@ -33,19 +43,21 @@ $(document).on("click",".bidButton",function() {
 $(document).on('click', ".buy-btn", function(e){
     if(isLoggedIn2 != "") {
        var id = $(this).data('id');
-       //console.log(id);
        $.ajax({
-            url: '/api/addtocart/'+id.trim(), 
+            url: '/addtocart/'+id.trim(), 
             method: 'POST',
             success: function(data) 
             {
                 if (data.is_added) {
                     Swal.fire({
-                            html: data.message,  
-                            confirmButtonText: "OK",
-                            customClass: { confirmButton: 'alert-box-button' }
-                            
-                            });
+                        title: data.message,
+                        iconHtml: '<img src="'+ src +'">',
+                        customClass: {  
+                            icon: 'alert-logo-item',
+                            popup: "bid-alert-modal"
+                        },
+                        confirmButtonText: "OK",
+                      });
                 getHeaderData();
                 } else {
                     Swal.fire({
@@ -74,14 +86,18 @@ $(document).on('click', ".wish-btn", async function (e) {
         var id = $(this).data('id');
         console.log(id);
         $.ajax({
-            url: '/api/add-to-wishlist-web/' + id.trim(),
+            url: '/add-to-wishlist-web/' + id.trim(),
             method: 'POST',
             success: function (data) {
                 if (data.is_wishlisted) {
                 Swal.fire({
-                    html: data.message,
+                    title: data.message,
+                    iconHtml: '<img src="'+ src +'">',
+                    customClass: {  
+                        icon: 'alert-logo-item',
+                        popup: "bid-alert-modal"
+                    },
                     confirmButtonText: "OK",
-                    customClass: { confirmButton: 'alert-box-button' }
                 });
                 $(".wish-btn").addClass("wish-rem-btn").find("i").removeClass("fa fa-heart-o").addClass("fa fa-heart");
                 setTimeout(() => {
@@ -114,15 +130,19 @@ $(document).on('click', ".wish-rem-btn", async function (e) {
         var id = $(this).data('id');
         console.log(id);
         $.ajax({
-            url: '/api/remove-wishlist-web/' + id.trim(),
+            url: '/remove-wishlist-web/' + id.trim(),
             method: 'GET',
             success: function (data) {
                 if (data.success) {
-                Swal.fire({
-                    html: data.message,
-                    confirmButtonText: "OK",
-                    customClass: { confirmButton: 'alert-box-button' }
-                });
+                    Swal.fire({
+                        title: data.message,
+                        iconHtml: '<img src="'+ src +'">',
+                        customClass: {  
+                            icon: 'alert-logo-item',
+                            popup: "bid-alert-modal"
+                        },
+                        confirmButtonText: "OK",
+                      });
                 $(".wish-rem-btn").addClass("wish-btn").find("i").removeClass("fa fa-heart").addClass("fa fa-heart-o");
                 setTimeout(() => {
                     $(".wish-btn").removeClass("wish-rem-btn");
@@ -168,15 +188,19 @@ $(document).on('click', ".wish-rem-button", async function (e) {
 
             var id = $(this).data('id');
             $.ajax({
-            url: '/api/remove-wishlist-web/' + id.trim(),
+            url: '/remove-wishlist-web/' + id.trim(),
             method: 'GET',
             success: function (data) {
                 if (data.success) {
                     Swal.fire({
-                        html: data.message,
+                        title: data.message,
+                        iconHtml: '<img src="'+ src +'">',
+                        customClass: {  
+                            icon: 'alert-logo-item',
+                            popup: "bid-alert-modal"
+                        },
                         confirmButtonText: "OK",
-                        customClass: { confirmButton: 'alert-box-button' }
-                    });
+                      });
                     $("#" + divid).remove();
                     if(data.count == 0)
                     {
@@ -237,38 +261,38 @@ range = document.querySelector(".slider .progress");
 let priceGap = 1000;
 
 priceInput.forEach((input) => {
-input.addEventListener("input", (e) => {
-  let minPrice = parseInt(priceInput[0].value),
-    maxPrice = parseInt(priceInput[1].value);
+    input.addEventListener("input", (e) => {
+    let minPrice = parseInt(priceInput[0].value),
+        maxPrice = parseInt(priceInput[1].value);
 
-  if (maxPrice - minPrice >= priceGap && maxPrice <= rangeInput[1].max) {
-    if (e.target.className === "input-min") {
-      rangeInput[0].value = minPrice;
-      range.style.left = (minPrice / rangeInput[0].max) * 100 + "%";
-    } else {
-      rangeInput[1].value = maxPrice;
-      range.style.right = 100 - (maxPrice / rangeInput[1].max) * 100 + "%";
+    if (maxPrice - minPrice >= priceGap && maxPrice <= rangeInput[1].max) {
+        if (e.target.className === "input-min") {
+        rangeInput[0].value = minPrice;
+        range.style.left = (minPrice / rangeInput[0].max) * 100 + "%";
+        } else {
+        rangeInput[1].value = maxPrice;
+        range.style.right = 100 - (maxPrice / rangeInput[1].max) * 100 + "%";
+        }
     }
-  }
-});
+    });
 });
 
 rangeInput.forEach((input) => {
-input.addEventListener("input", (e) => {
-  let minVal = parseInt(rangeInput[0].value),
-    maxVal = parseInt(rangeInput[1].value);
+    input.addEventListener("input", (e) => {
+    let minVal = parseInt(rangeInput[0].value),
+        maxVal = parseInt(rangeInput[1].value);
 
-  if (maxVal - minVal < priceGap) {
-    if (e.target.className === "range-min") {
-      rangeInput[0].value = maxVal - priceGap;
+    if (maxVal - minVal < priceGap) {
+        if (e.target.className === "range-min") {
+        rangeInput[0].value = maxVal - priceGap;
+        } else {
+        rangeInput[1].value = minVal + priceGap;
+        }
     } else {
-      rangeInput[1].value = minVal + priceGap;
+        priceInput[0].value = minVal;
+        priceInput[1].value = maxVal;
+        range.style.left = (minVal / rangeInput[0].max) * 100 + "%";
+        range.style.right = 100 - (maxVal / rangeInput[1].max) * 100 + "%";
     }
-  } else {
-    priceInput[0].value = minVal;
-    priceInput[1].value = maxVal;
-    range.style.left = (minVal / rangeInput[0].max) * 100 + "%";
-    range.style.right = 100 - (maxVal / rangeInput[1].max) * 100 + "%";
-  }
-});
+    });
 });

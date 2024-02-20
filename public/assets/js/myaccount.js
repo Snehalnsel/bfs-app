@@ -41,7 +41,7 @@ $(document).ready(async function(){
         },
         submitHandler: function() {
             $.ajax({
-                url: '/api/resetpassword',
+                url: '/resetpassword',
                 method: 'POST',
                 data:{
                     old_password :$('.oldpassword').val(),

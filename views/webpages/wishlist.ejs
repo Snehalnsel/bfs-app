@@ -1,25 +1,25 @@
 <%- include('../../public/assets/include/header'); %>
 
-<% if (respdata && respdata.length> 0) { %>
-   <section class="bids-wrapper ">
-      <div class="container">
-       
-         <div class="title-box title-with-count">
-            <h1>My Wishlist</h1>
-            <span class="wishlist-count">(<%= itemCount %>)</span>
-         </div>
-         <div class="wishlist-group-box">
-            <% respdata.forEach(function(item , index) { %>
-               <div class="bids-lists cart-wrapper">
-                  <div class="cart-list wishlist-list ">
-                 
+   <% if (respdata && respdata.length> 0) { %>
+      <section class="bids-wrapper ">
+         <div class="container">
+
+            <div class="title-box title-with-count">
+               <h1>My Wishlist</h1>
+               <span class="wishlist-count">(<%= itemCount %>)</span>
+            </div>
+            <div class="wishlist-group-box">
+               <% respdata.forEach(function(item , index) { %>
+                  <div class="bids-lists cart-wrapper">
+                     <div class="cart-list wishlist-list ">
+
                         <div class="bids-row wishlist-row overflow-visible" id="<%=item._id%>">
                            <div class="br-details">
-                              <div class="bid-images"><a href="/api/productdeatils/<%=item.product_id%>"><img
+                              <div class="bid-images"><a href="/productdeatils/<%=item.product_id%>"><img
                                        src="<%=item.images%>" alt="images" class="img-fluid"></a></div>
                               <div class="bid-info">
                                  <div class="bd-title">
-                                    <a href="/api/productdeatils/<%=item.product_id%>">
+                                    <a href="/productdeatils/<%=item.product_id%>">
                                        <%=item.product_name%>
                                     </a>
                                  </div>
@@ -39,72 +39,64 @@
                                        data-id="<%=item.product_id%>"><i class="fa fa-trash-o"
                                           aria-hidden="true"></i></a>
                                  </div>
-                                 
+
                                  <div class="remove-cart addcart-button single-button-group">
-                               
-                                    <a href="javascript:void(0)" class="prd-btn" id="share-product-icon-wish" data-index="<%= index %>"><i
-                                       class="fa fa-share-alt" aria-hidden="true"></i></a>
-                                       
-                                       <div class="share-linksbox">
-                                          <span class="close-icon"><i class="fa fa-times" aria-hidden="true"></i></span>
-                                          <ul>
-                                             <li><a target="_blank"
-                                                   href="https://api.whatsapp.com/send?text=<%=websiteUrl%>/api/productdeatils/<%=item.product_id%>"
-                                                   data-action="share/whatsapp/share" class="slc-btn-wish wa-btn "><i
-                                                      class="fa fa-whatsapp" aria-hidden="true"></i></a>
-                                             </li>
-                                             <li>
-                                                <a target="_blank"
-                                                   href="https://twitter.com/share?url=<%=websiteUrl%>/api/productdeatils/<%=item.product_id%>&text=<%=item.product_name%>via=<%=item.product_name%>"
-                                                   class="slc-btn-wish tw-btn "><i class="fa fa-twitter"
-                                                      aria-hidden="true"></i></a>
-                                             </li>
-                                             <li>
-                                                <a target="_blank"
-                                                   href="https://www.facebook.com/sharer/sharer.php?u=<%=websiteUrl%>/api/productdeatils/<%=item.product_id%>"
-                                                   class="slc-btn-wish fb-btn ">
-                                                   <i class="fa fa-facebook" aria-hidden="true"></i>
-                                                </a>
-                                             </li>
-                                             <li>
-                                                <a target="_blank"
-                                                   href="https://www.linkedin.com/shareArticle?url=<%=websiteUrl%>/api/productdeatils/<%=item.product_id%>&title=<%=item.product_name%>&summary=<%=item.product_name%>&source=<%=websiteUrl%>"
-                                                   class="slc-btn-wish lnk-btn ">
-                                                   <i class="fa fa-linkedin" aria-hidden="true"></i>
-                                                </a>
-                                             </li>
-                                          </ul>
-                                       </div>
-                                    <!-- <a href="/api/addtocart/<%=item.product_id%>" class="acb-btn">Add to Cart</a> -->
+
+                                    <a href="javascript:void(0)" class="prd-btn" id="share-product-icon-wish"
+                                       data-index="<%= index %>"><i class="fa fa-share-alt" aria-hidden="true"></i></a>
+
+                                    <div class="share-linksbox">
+                                       <span class="close-icon"><i class="fa fa-times" aria-hidden="true"></i></span>
+                                       <ul>
+                                          <li><a target="_blank"
+                                                href="https://api.whatsapp.com/send?text=<%=websiteUrl%>/productdeatils/<%=item.product_id%>"
+                                                data-action="share/whatsapp/share" class="slc-btn-wish wa-btn "><i
+                                                   class="fa fa-whatsapp" aria-hidden="true"></i></a>
+                                          </li>
+                                          <li>
+                                             <a target="_blank"
+                                                href="https://twitter.com/share?url=<%=websiteUrl%>/productdeatils/<%=item.product_id%>&text=<%=item.product_name%>via=<%=item.product_name%>"
+                                                class="slc-btn-wish tw-btn "><i class="fa fa-twitter"
+                                                   aria-hidden="true"></i></a>
+                                          </li>
+                                          <li>
+                                             <a target="_blank"
+                                                href="https://www.facebook.com/sharer/sharer.php?u=<%=websiteUrl%>/productdeatils/<%=item.product_id%>"
+                                                class="slc-btn-wish fb-btn ">
+                                                <i class="fa fa-facebook" aria-hidden="true"></i>
+                                             </a>
+                                          </li>
+                                          <li>
+                                             <a target="_blank"
+                                                href="https://www.linkedin.com/shareArticle?url=<%=websiteUrl%>/productdeatils/<%=item.product_id%>&title=<%=item.product_name%>&summary=<%=item.product_name%>&source=<%=websiteUrl%>"
+                                                class="slc-btn-wish lnk-btn ">
+                                                <i class="fa fa-linkedin" aria-hidden="true"></i>
+                                             </a>
+                                          </li>
+                                       </ul>
+                                    </div>
                                  </div>
                               </div>
                            </div>
-
                         </div>
-                        
-
+                     </div>
+                  </div>
+                  <% }); %>
+            </div>
+         </div>
+      </section>
+      <% } else { %>
+         <section class="empty-content ">
+            <div class="container ">
+               <div class="">
+                  <div class="ec-box ">
+                     <h6>Wishlist</h6>
+                     <p>There in no product in wishlist</p>
+                     <a href="/webSubCategories" class="bc-btn">CONTINUE SHOPPING</a>
                   </div>
                </div>
-            <% }); %>
-         </div>
-      </div>
-   </section> 
-                        
-   <% } else { %>
-      <section class="empty-content ">
-                               <div class="container ">
-                                 <div class="">
-                                    <div class="ec-box ">
-                                       <h6>Wishlist</h6>
-                                       <p>There in no Product in wishlist</p>
-                                       <a href="/api/webSubCategories" class="bc-btn">CONTINUE SHOPPING</a>
-                                    </div> 
-                                 </div>
-                               </div>
-                              
-                              <% } %>
-
-                           </section>   
-
-   <%- include('../../public/assets/include/newsletter'); %>
-      <%- include('../../public/assets/include/footer'); %>
+            </div>
+         </section>
+      <% } %>
+<%- include('../../public/assets/include/newsletter'); %>
+<%- include('../../public/assets/include/footer'); %>

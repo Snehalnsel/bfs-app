@@ -27,6 +27,8 @@ const upload = multer({ dest: 'public/images/' });
 
 //methods
 exports.getData = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Product";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
 
@@ -35,9 +37,9 @@ exports.getData = async function (req, res, next) {
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       status: 0,
@@ -45,12 +47,15 @@ exports.getData = async function (req, res, next) {
       respdata: {
         list: subcat,
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
     
   });
 };
 
 exports.addData = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Product";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
 
@@ -59,9 +64,9 @@ exports.addData = async function (req, res, next) {
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       status: 1,
@@ -69,12 +74,15 @@ exports.addData = async function (req, res, next) {
       respdata: {
         category: category,
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
   });
 };
 
 
 exports.createData = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Product";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
 
@@ -86,15 +94,16 @@ exports.createData = async function (req, res, next) {
     res.render("pages/sub-filter/create", {
       status: 0,
       siteName: req.app.locals.siteName,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       pageName: pageName,
       pageTitle: pageTitle,
       year: moment().format("YYYY"),
       message: "Validation error!",
       requrl: req.app.locals.requrl,
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -105,15 +114,16 @@ exports.createData = async function (req, res, next) {
       res.render("pages/sub-filter/create", {
         status: 0,
         siteName: req.app.locals.siteName,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         pageName: pageName,
         pageTitle: pageTitle,
         year: moment().format("YYYY"),
         message: "Already exists!",
         requrl: req.app.locals.requrl,
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     } else {
      
@@ -137,13 +147,14 @@ exports.createData = async function (req, res, next) {
             siteName: req.app.locals.siteName,
             pageName: pageName,
             pageTitle: pageTitle,
-            userFullName: req.session.user.name,
-            userImage: req.session.user.image_url,
-            userEmail: req.session.user.email,
+            userFullName:  req.session.admin.name,
+            userImage:  req.session.admin.image_url,
+            userEmail:  req.session.admin.email,
             year: moment().format("YYYY"),
             message: "Added!",
             requrl: req.app.locals.requrl,
             respdata: subCategory,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         })
         .catch((error) => {
@@ -151,14 +162,15 @@ exports.createData = async function (req, res, next) {
             status: 0,
             pageName: pageName,
             siteName: req.app.locals.siteName,
-            userFullName: req.session.user.name,
-            userImage: req.session.user.image_url,
-            userEmail: req.session.user.email,
+            userFullName:  req.session.admin.name,
+            userImage:  req.session.admin.image_url,
+            userEmail:  req.session.admin.email,
             pageTitle: pageTitle,
             year: moment().format("YYYY"),
             requrl: req.app.locals.requrl,
             message: "Error!",
             respdata: error,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         });
     }

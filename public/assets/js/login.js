@@ -38,7 +38,7 @@ $(document).ready(async function(){
             // form_data.append("email", $('#email').val());
             $.ajax({
                 type: 'POST',
-                url:  webSiteUrl + "/api/ajax-userlogin",
+                url:  webSiteUrl + "/ajax-userlogin",
                 data: {
                     email: $('#email').val(),
                     password:$('#pwd').val(),
@@ -60,10 +60,10 @@ $(document).ready(async function(){
                         }, 500);
                         if((typeof obj.respdata.refreshReset != "undefined") && (obj.respdata.refreshReset)) {
                             let pathArray = window.location.pathname.split( '/' );
-                            if(pathArray[2] != "registration") {
+                            if(pathArray[1] != "registration") {
                                 location.reload();
                             } else {
-                                location.href= webSiteUrl + "/api/home";
+                                location.href= webSiteUrl + "/home";
                             }
                         }
                     } else {

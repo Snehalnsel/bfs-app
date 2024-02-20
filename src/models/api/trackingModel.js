@@ -48,14 +48,6 @@ const model = mongoose.Schema({
     type: String,
     required: true,
   },
-  delivery_charges: {
-    type: Number,
-    required: true,
-  },
-  discount: {
-    type: String,
-    required: true,
-  },
   pickup_status: {
     type: Number,
     enum: [0,1,2],//0 for pending 1 for coming for pickup 2 for delivered

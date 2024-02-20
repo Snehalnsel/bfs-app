@@ -36,7 +36,7 @@
                 </div>
                 <div class="cart-action">
                    <div class="remove-cart">
-                      <a href="/api/delete-cart/<%=respdata._id%>"><i class="fa fa-times" aria-hidden="true"></i></a>
+                      <a href="/delete-cart/<%=respdata._id%>"><i class="fa fa-times" aria-hidden="true"></i></a>
                    </div>
                 </div>
              </div>
@@ -60,7 +60,7 @@
                      <tr>
                         
                        <td>GST<small>(18% Packing & Handling Charges)</small></td>
-                        <th><i class="fa fa-inr" aria-hidden="true"></i> <%=(respdata.product_price*28)/100;%></th> 
+                        <th><i class="fa fa-inr" aria-hidden="true"></i> <%=(respdata.product_price*18)/100;%></th> 
                      </tr>
                      <tr class="border-top total-table">
                        <td><strong>Total Amount</strong></td>
@@ -86,7 +86,7 @@
               <div class="ec-box">
                  <h6>Your shopping cart is empty</h6>
                  <p>Please browse products to add in your cart!</p>
-                 <a href="/api/webSubCategories" class="bc-btn">Continue Shopping</a>
+                 <a href="/webSubCategories" class="bc-btn">Continue Shopping</a>
               </div> 
             </div>
            </section> 
@@ -101,7 +101,7 @@ $(document).on("click", ".check-out", async function(e) {
    
     //e.preventDefault();
 
-    window.location.href = '/api/checkout-web';
+    window.location.href = '/checkout-web';
 
    //  let formData = {
    //      cart_id: $('#cart_id').val(),       
@@ -119,7 +119,7 @@ $(document).on("click", ".check-out", async function(e) {
 
    /* $.ajax({
         type: 'POST',
-        url: '/api/checkout-web', // URL to submit the form data to (process.php in this case)
+        url: '/checkout-web', // URL to submit the form data to (process.php in this case)
         data: { data: formData },
         //dataType: "json",
       //   success: function(response) {
@@ -131,13 +131,12 @@ $(document).on("click", ".check-out", async function(e) {
       //            customClass: { confirmButton: 'alert-box-button' }
       //         });
       //         setTimeout(() => {
-      //            window.location.href = '/api/home';
+      //            window.location.href = '/home';
       //         }, 5000);
       //      }
       //   },
       //   error: function(xhr, status, error) {
       //       // Handle errors
-      //       console.error(xhr.responseText);
       //   }
     });*/
 });

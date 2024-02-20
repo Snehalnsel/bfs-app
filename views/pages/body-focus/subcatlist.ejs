@@ -71,8 +71,6 @@
                                                     <th>Description</th>
                                                     <th>Category Type</th>
                                                     <th>Image</th>
-                                                    <!-- <th>Status</th> -->
-                                                    <!-- <th>Created On</th> -->
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -101,17 +99,17 @@
 
                                                                 <td style="vertical-align: middle;">
                                                                     <div class="action-admin">
-                                                                        <a href="/edit-sub-cat/<%= value.subcategory._id %>"
+                                                                        <a href="/admin/edit-sub-cat/<%= value.subcategory._id %>"
                                                                             class="btn btn-info btn-circle btn-sm"
                                                                             title="Edit">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
-                                                                        <a href="/body-focus-status/<%= value.subcategory._id %>"
+                                                                        <a href="/admin/body-focus-status/<%= value.subcategory._id %>"
                                                                             class="btn btn-outline-success btn-circle btn-sm"
                                                                             title="Status change">
                                                                             <i class="fa fa-solid fa-refresh"></i>
                                                                         </a>
-                                                                        <a href="/delete-body-focus/<%= value.subcategory._id %>"
+                                                                        <a href="/admin/delete-body-focus/<%= value.subcategory._id %>"
                                                                             class="btn btn-danger btn-circle btn-sm"
                                                                             title="Delete">
                                                                             <i class="fas fa-trash"></i>
@@ -158,14 +156,14 @@
                                                                     <ul class="pagination">
                                                                         <% if (startPage> 1) { %>
                                                                           <li>
-                                                                            <a href="/body-focus-subcat?page=<%= startPage - 1 %><% if (searchType && searchValue) { %>&searchType=<%= searchType %>&searchValue=<%= searchValue %><% } %>">&laquo;</a>
+                                                                            <a href="/admin/body-focus-subcat?page=<%= startPage - 1 %><% if (searchType && searchValue) { %>&searchType=<%= searchType %>&searchValue=<%= searchValue %><% } %>">&laquo;</a>
                                                                           </li>
                                                                             <% } %>
 
                                                                                 <% for (let i=startPage; i <=endPage;
                                                                                     i++) { %>
                                                                                     <li>
-                                                                                        <a href="/body-focus-subcat?page=<%= i %><% if (searchType && searchValue) { %>&searchType=<%= searchType %>&searchValue=<%= searchValue %><% } %>">
+                                                                                        <a href="/admin/body-focus-subcat?page=<%= i %><% if (searchType && searchValue) { %>&searchType=<%= searchType %>&searchValue=<%= searchValue %><% } %>">
                                                                                             class="<%= i === parseInt(currentPage) ? 'active' : '' %>">
                                                                                             <%= i %>
                                                                                         </a>
@@ -175,35 +173,19 @@
                                                                                         <% if (endPage < totalPages) {
                                                                                             %>
                                                                                             <li><a
-                                                                                                    href="/body-focus-subcat?page=<%= endPage + 1 %><% if (searchType && searchValue) { %>&searchType=<%= searchType %>&searchValue=<%= searchValue %><% } %>">&raquo;</a>
+                                                                                                    href="/admin/body-focus-subcat?page=<%= endPage + 1 %><% if (searchType && searchValue) { %>&searchType=<%= searchType %>&searchValue=<%= searchValue %><% } %>">&raquo;</a>
                                                                                             </li>
                                                                                             <% } %>
                                                                     </ul>
                                         </div>
                                     </div>
-
-
-                                    <!-- ... existing code ... -->
-
                                 </div>
                             </div>
                         </div>
-                        <!-- /.container-fluid -->
-
                 </div>
-                <!-- End of Main Content -->
-
-                <!-- Footer -->
                 <%- include('../../partials/footer', {year: year, siteName: siteName}); %>
-                    <!-- End of Footer -->
-
             </div>
-            <!-- End of Content Wrapper -->
-
     </div>
-    <!-- End of Page Wrapper -->
-
-    <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
@@ -245,11 +227,8 @@
                 searchValue: productName,
             },
             success: function (response) {
-                console.log("hi");
-                console.log(response);
             },
             error: function (error) {
-                console.error('Error:', error);
             }
         });
 
@@ -277,10 +256,4 @@
     if (searchValue) {
         $('#productNameInput').val(searchValue);
     }
-
-    // Log the values to the console (you can do further processing here)
-    console.log('Page:', page);
-    console.log('Search Type:', searchType);
-    console.log('Search Value:', searchValue);
-
 </script>

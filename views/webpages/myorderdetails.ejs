@@ -1,5 +1,4 @@
 <%- include('../../public/assets/include/header'); %>
-<% console.log(respdata);%>
 <% if(respdata.shippingKitData){%>
    <section class="bids-wrapper">
       <div class="container">
@@ -136,6 +135,16 @@
                     <%}%>
                </div> 
                <div class="od-box">
+                  <%if(respdata.payment_method == 0 ){%>
+                     <%if(respdata.pay_now){%>
+                        <h5 class="short-title" >PAID :<%=respdata.pay_now ;%> </h5>
+                     <%}%>
+                     <%if(respdata.remaining_amount!= null){%>
+                        <h5 class="short-title">Remaining Amount : <%=respdata.remaining_amount ;%></h5>
+                     <%}%>
+                  <%}%>
+              </div>     
+               <div class="od-box">
                   <%if(respdata.delete_status == 1 ){%>
                      <%if(respdata.delete_by == 1 ){%>
                         <h5 class="short-title" style="color: blue;">Order Deleted BY Admin</h5>
@@ -160,7 +169,6 @@
                   </div>                   
                </div>                            
             </div>
-
              <div class="col-md-9">
                <div class="od-box">
                   <h5 class="short-title">Order Tracking</h5>

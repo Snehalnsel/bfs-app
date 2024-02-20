@@ -23,10 +23,11 @@ var ObjectId = require("mongodb").ObjectId;
 
 
 exports.getData = async function (req, res) {
-  if (req.session.user) {
+  
+  if ( req.session.admin) {
     try {
       var pageTitle = req.app.locals.siteName + " - Dashboard";
-
+      let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
       const totalProducts = await Userproduct.countDocuments();
       const totalUsers = await Users.countDocuments();
       const totalSoldProduct = await Userproduct.countDocuments({ flag: 1 });
@@ -34,9 +35,9 @@ exports.getData = async function (req, res) {
       res.render("pages/dashboard", {
         siteName: req.app.locals.siteName,
         pageTitle: pageTitle,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         year: moment().format("YYYY"),
         requrl: req.app.locals.requrl,
         respdata: {
@@ -44,6 +45,7 @@ exports.getData = async function (req, res) {
           users: totalUsers,
           sold: totalSoldProduct
         },
+        isAdminLoggedIn:isAdminLoggedIn
       });
     } catch (error) {
       res.status(500).send("Internal Server Error");

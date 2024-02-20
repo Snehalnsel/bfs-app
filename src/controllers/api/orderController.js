@@ -24,11 +24,15 @@ const Users = require("../../models/api/userModel");
 const Userproduct = require("../../models/api/userproductModel");
 const Productimage = require("../../models/api/productimageModel");
 const Order = require("../../models/api/orderModel");
+const ReturnOrder = require("../../models/api/returnorderModel");
 const Ordertracking = require("../../models/api/ordertrackModel");
 const Track = require("../../models/api/trackingModel");
 const AddressBook = require("../../models/api/addressbookModel");
 const Shippingkit = require("../../models/api/shippingkitModel");
+const insertNotification = require("../../models/api/insertNotification");
+const Iptrnsaction = require("../../models/api/ipTransactionModel");
 const nodemailer = require("nodemailer");
+const { log } = require("console");
 // const axios = require('axios');
 // const bodyParser = require('body-parser'); 
 //const smtpUser = "sneha.lnsel@gmail.com";
@@ -646,10 +650,8 @@ exports.checkout = async (req, res) => {
 
     const billing_address_id = billingaddress._id;
 
-    // Find the count of existing orders or calculate it based on your requirements
     //const existingOrdersCount = await Order.countDocuments();
 
-    // Generate a unique order code
     //const orderCode = `BFSORD${(existingOrdersCount + 1).toString().padStart(3, '0')}`;
     const now = new Date();
     const currentHour = now.getHours().toString().padStart(2, '0');
@@ -877,30 +879,25 @@ exports.updateOrderById = async function (req, res, next) {
 exports.getOrderListByUser = async (req, res) => {
   try {
     let  user_id  = typeof req.body.user_id != "undefined"  ? req.body.user_id : req.session.user.userId;
-    
-
     const orders = await Order.find({ user_id: user_id }).populate('seller_id', 'name').populate('user_id', 'name');
-
+   
     if (!orders || orders.length === 0) {
       return res.status(404).json({ message: 'No orders found for this seller' });
     }
-
     const ordersWithProductDetails = [];
-
     for (const order of orders) {
+      const orderCreationTime = moment(order.createdAt); 
+      const isOrderWithin24Hours = moment(new Date().toISOString()).diff(orderCreationTime, 'hours') < 24;
+      const is_deletedtime = isOrderWithin24Hours ? 0 : 1;
+      await Order.updateOne({ _id: order._id }, { is_deletedtime });
       const productDetails = await Userproduct.find({ _id: order.product_id });
       const productId = order.product_id.toString();
       const productImage = await Productimage.find({ product_id: productId }).limit(1);
-      
       const shipdetails = await Ordertracking.find({ order_id: order._id });
-
       let shipping_details = {}; 
-      
-
       if (typeof shipdetails !="undefined" && shipdetails.length > 0) {
           shipping_details = await Track.find({ _id: shipdetails[0].tracking_id });
       }
-
       const orderDetails = {
         _id: order._id,
         total_price: order.total_price,
@@ -911,22 +908,23 @@ exports.getOrderListByUser = async (req, res) => {
         user_id: order.user_id,
         delete_by: order.delete_by,
         delete_status: order.delete_status,
+        is_return: order.is_return,
+        is_deletedtime: is_deletedtime,
         product: {
           name: productDetails.length ? productDetails[0].name : 'Unknown Product',
           image: productImage.length ? productImage[0].image : 'No Image',
         },
         shippingkit_status: (Object.keys(shipping_details).length > 0) ? shipping_details[0].shippingkit_status : 2, 
       };
-
       ordersWithProductDetails.push(orderDetails);
     }
-
-
     res.status(200).json({
       message: 'Orders retrieved successfully',
       orders: ordersWithProductDetails,
     });
   } catch (error) {
+    console.log(error);
+    return;
     res.status(500).json({ error: 'An error occurred while fetching orders' });
   }
 };
@@ -934,35 +932,25 @@ exports.getOrderListByUser = async (req, res) => {
 exports.getOrdersBySeller = async (req, res) => {
   try {
     //const { seller_id } = req.body;
-    
     let  seller_id  = typeof req.body.user_id != "undefined"  ? req.body.user_id : req.session.user.userId;
-
     const orders = await Order.find({ seller_id }).populate('seller_id', 'name').populate('user_id', 'name');
-
     if (!orders || orders.length === 0) {
       return res.status(404).json({ message: 'No orders found for this seller' });
     }
-    
-
     const ordersWithProductDetails = [];
-
     for (const order of orders) {
+      const orderCreationTime = moment(order.createdAt); 
+      const isOrderWithin24Hours = moment(new Date().toISOString()).diff(orderCreationTime, 'hours') < 24;
+      const is_deletedtime = isOrderWithin24Hours ? 0 : 1;
       const productDetails = await Userproduct.find({ _id: order.product_id });
       const productId = order.product_id.toString();
       const productImage = await Productimage.find({ product_id: productId }).limit(1);
-
       const shipdetails = await Ordertracking.find({ order_id: order._id });
-
       let shipping_details = {}; 
-      
-
       if (typeof shipdetails !="undefined" && shipdetails.length > 0) {
           shipping_details = await Track.find({ _id: shipdetails[0].tracking_id });
       }
-
-      // Check if there's any ShippingKit data for this order
       //const shippingKitData = await Shippingkit.findOne({ order_id: order._id });
-
       const orderDetails = {
         _id: order._id,
         total_price: order.total_price,
@@ -973,16 +961,15 @@ exports.getOrdersBySeller = async (req, res) => {
         user_id: order.user_id,
         delete_by: order.delete_by,
         delete_status: order.delete_status,
+        is_deletedtime: is_deletedtime,
         product: {
           name: productDetails.length ? productDetails[0].name : 'Unknown Product',
           image: productImage.length ? productImage[0].image : 'No Image',
         },
         shippingkit_status: (Object.keys(shipping_details).length > 0) ? shipping_details[0].shippingkit_status : 2, 
       };
-
       ordersWithProductDetails.push(orderDetails);
     }
-
     res.status(200).json({
       message: 'Orders retrieved successfully',
       orders: ordersWithProductDetails,
@@ -1109,6 +1096,7 @@ exports.cancelOrderById = async function (req, res, next) {
     });
   }
   try {
+    const user_id = req.session.user.userId;
     const orderId = req.body.orderid;
     const deleteby = req.body.deleteby;
     const existingOrder = await Order.findById(orderId);
@@ -1120,10 +1108,37 @@ exports.cancelOrderById = async function (req, res, next) {
         is_cancelorder: true,
       });
     }
+    const orderCreationTime = moment(existingOrder.createdAt);
+    const isOrderWithin24Hours = moment().diff(orderCreationTime, 'hours') < 24;
+
+    if (!isOrderWithin24Hours) {
+      existingOrder.is_deletedtime = '1';
+      existingOrder.updated_dtime = new Date().toISOString();
+      const canceledOrder = await existingOrder.save();
+      if (canceledOrder) {
+        return res.status(403).json({
+          status: "0",
+          message: "Order cannot be canceled as it has been over 24 hours since creation!",
+          respdata: {},
+          is_cancelorder: false,
+        });
+      }
+    }
     existingOrder.delete_status = '1';
     existingOrder.delete_by = deleteby;
     existingOrder.updated_dtime = new Date().toISOString();
     const canceledOrder = await existingOrder.save();
+
+    const requestUrl =  '/web-my-order';
+     
+    await insertNotification(
+       'Order Cancelled', 
+       `YOUR ORDER HAS BEEN CANCELED`, 
+       user_id, 
+       requestUrl, 
+       new Date()
+    );
+
     if (canceledOrder) {
         return res.status(200).json({
           status: "1",
@@ -1380,6 +1395,53 @@ exports.updateDeliveryaddressByOrderId = async function (req, res, next) {
     });
   }
 };
+
+
+exports.returnOrder = async function (req, res) {
+
+  try{
+      let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+
+      const order_id = req.body.orderid;
+      const return_reason = req.body.reasonid;
+      const existingOrder = await Order.findById(order_id);
+      let status = 0;
+
+      if(!existingOrder)
+      {
+        return res.status(200).json({
+          message: 'Order not found',
+        });
+      }
+     const returnorder = new ReturnOrder({
+      order_id,
+      return_reason,
+      status,
+       added_dtime: new Date().toISOString(),
+     });
+     const savedOrder = await returnorder.save();
+ 
+     if (savedOrder) {
+       await Iptrnsaction.create({
+         user_id: req.session.user.userId, 
+         purpose: "Retuen Order Placement from Web",
+         ip_address: req.connection.remoteAddress, 
+         created_dtime: new Date(),
+       });
+       await Order.updateOne({ _id: order_id }, { is_return: 1 });
+      
+       res.render("webpages/myorder", {
+        title: "Wish List Page",
+        message: "Welcome to the Wish List page!",
+        respdata: req.session.user,
+        isLoggedIn: isLoggedIn,
+      });
+     }
+  } catch (error) {
+   return res.status(500).json({ message: 'Internal server error' });
+ }
+ };
+
 
 // exports.checkout = async (req, res) => {
 //   try {

@@ -45,7 +45,7 @@ const ReturnOrder = require("../../models/api/returnorderModel");
 const Reasonlist = require("../../models/api/reasonlistModel");
 const Iptrnsaction = require("../../models/api/ipTransactionModel");
 const insertNotification = require("../../models/api/insertNotification");
-//const smtpUser = "sneha.lnsel@gmail.com";
+//const smtpUser = "welcome@bidforsale.com";
 const smtpUser = "hello@bidforsale.com";
 const nodemailer = require("nodemailer");
 const app = express();
@@ -67,14 +67,23 @@ const { create } = require('xmlbuilder2');
 
 const transporter = nodemailer.createTransport({
   port: 465,
-  host: "bidforsale.com",
+  host: "mail.bidforsale.com",
   auth: {
     user: smtpUser,
-    pass: "India_2023",
+    pass: "aI)q#z@xJQ+u",
   },
   secure: true,
 });
 
+// const transporter = nodemailer.createTransport({
+//     port: 465,
+//     host: "mail.bidforsale.com",
+//     auth: {
+//       user: smtpUser,
+//       pass: "A6K9JAQD%m!s",
+//     },
+//     secure: true,
+// });
 function randNumber(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
@@ -3220,123 +3229,7 @@ exports.forgotPassword = async function (req, res, next) {
 
 };
 
-exports.sendotp = async function (req, res, next) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(200).json({
-      status: "0",
-      message: "Validation error!",
-      respdata: errors.array(),
-    });
-  }
-
-  try {
-    const user = await Users.findOne({ email: req.body.email });
-    if (!user) {
-      return res.status(200).json({
-        status: "0",
-        message: "User not found!",
-        respdata: {},
-      });
-    }
-
-    if (!req.body.otp) {
-      const otp = randNumber(1000, 2000);
-
-      //SEND SMS
-      const smsRandNumber = Math.floor((Math.random() * 1000000) + 1);
-      const smsData = {
-        textId: "test",
-        toMobile: "917044289770",
-        text: "You have been tagged with an invoice " + smsRandNumber + ". Please use OTP " + smsRandNumber + " for approving the invoice. Do not share your OTP with anyone. RJSSLT",
-      };
-      let smsReturnData = await sendSms(smsData);
-      let smsHistoryData = new ApiCallHistory({
-        userId: mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"),
-        called_for: "sms",
-        api_link: process.env.SITE_URL,
-        api_param: smsData,
-        api_response: smsReturnData,
-        send_status: 'send',
-      });
-      await smsHistoryData.save();
-
-      //SEND WHATSAPP
-      const root = create({ version: '1.0', encoding: "ISO-8859-1" })
-        .ele('MESSAGE', { VER: '1.2' })
-        .ele('USER', { USERNAME: process.env.WP_SMS_USER_NAME, PASSWORD: process.env.WP_PASSWORD })
-        .ele('SMS', { UDH: "0", CODING: "1", TEXT: "Hi", PROPERTY: "0", ID: "1", TEMPLATE: "bfstest" })
-        .ele('ADDRESS', { FROM: process.env.WP_SMS_SENDER_MOBILE, TO: "917044289770", SEQ: "1" });
-
-      // convert the XML tree to string
-      const xml = root.end({ prettyPrint: true });
-      const whatsappData = xml;
-      let whatsappReturnData = await sendWhatsapp(whatsappData);
-      let whatsappHistoryData = await new ApiCallHistory({
-        userId: mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"),
-        called_for: "whatsapp",
-        api_link: process.env.SITE_URL,
-        api_param: whatsappData,
-        api_response: whatsappReturnData,
-        send_status: 'send',
-      });
-      await whatsappHistoryData.save();
-
-      // Sending email
-      const mailData = {
-        from: "Bid For Sale! <" + smtpUser + ">",
-        to: user.email,
-        subject: "BFS - Bids For Sale - Forgot password OTP",
-        text: "Server Email!",
-        html:
-          "Hey " +
-          user.name +
-          ", <br> <p> Please use this OTP : <b>" +
-          otp +
-          "</b> to reset your password! </p>",
-      };
-
-      transporter.sendMail(mailData, function (err, info) {
-        if (err) console.log(err);
-        else console.log(info);
-      });
-
-      const updData = {
-        forget_otp: otp,
-      };
-      await Users.findOneAndUpdate(
-        { _id: user._id },
-        { $set: updData },
-        { upsert: true }
-      );
-
-      return res.status(200).json({
-        status: "1",
-        message: "OTP sent!",
-        resdpata: user,
-        is_forgetpassword: true
-      });
-    } else {
-      // Handle OTP verification and password update logic here
-    }
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      status: "0",
-      message: "Internal server error",
-      respdata: error.message || "Unknown error",
-    });
-  }
-};
-
-
 // exports.sendotp = async function (req, res, next) {
-//   // let info = await transporter.sendMail({
-//   //   from:'"Palash" <hello@bidforsale.com>',
-//   //   to:"sneha.lnsel@gmail.com",
-//   //   subject: "Hiii",
-//   //   html:"<p>Hello!!</p>"
-//   // });
 //   const errors = validationResult(req);
 //   if (!errors.isEmpty()) {
 //     return res.status(200).json({
@@ -3346,78 +3239,57 @@ exports.sendotp = async function (req, res, next) {
 //     });
 //   }
 
-//   Users.findOne({ email: req.body.email }).then((user) => {
-//     if (!user)
-//       res.status(200).json({
+//   try {
+//     const user = await Users.findOne({ email: req.body.email });
+//     if (!user) {
+//       return res.status(200).json({
 //         status: "0",
 //         message: "User not found!",
 //         respdata: {},
 //       });
-//     else if (!req.body.otp) {
-//       var otp = randNumber(1000, 2000);
+//     }
+
+//     if (!req.body.otp) {
+//       //const otp = randNumber(1000, 2000);
 
 //       //SEND SMS
-//       await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
-//         if (err) {
-//           // return {
-//           //   status:false,
-//           //   data:err
-//           // };
-//         }
-//         //let obj = JSON.parse(data);
-//         let randNumber = Math.floor((Math.random() * 1000000) + 1);
-//         let smsData = {
-//           textId: "test",
-//           toMobile: "917044289770",
-//           text: "You have been tagged with an invoice " + randNumber + ". Please use OTP " + randNumber + " for approving the invoice. Do not share your OTP with anyone. RJSSLT",
-//         };
-//         let returnData;
-//         returnData = await sendSms(smsData);
-//         const historyData = new ApiCallHistory({
-//           userId: mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"),
-//           called_for: "sms",
-//           api_link: process.env.SITE_URL,
-//           api_param: smsData,
-//           api_response: returnData,
-//           send_status: 'send',
-//         });
-//         await historyData.save();
+//       const smsRandNumber = Math.floor((Math.random() * 1000000) + 1);
+//       const smsData = {
+//         textId: "test",
+//         toMobile: "917044289770",
+//         text: "You have been tagged with an invoice " + smsRandNumber + ". Please use OTP " + smsRandNumber + " for approving the invoice. Do not share your OTP with anyone. RJSSLT",
+//       };
+//       let smsReturnData = await sendSms(smsData);
+//       let smsHistoryData = new ApiCallHistory({
+//         userId: mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"),
+//         called_for: "sms",
+//         api_link: process.env.SITE_URL,
+//         api_param: smsData,
+//         api_response: smsReturnData,
+//         send_status: 'send',
 //       });
-//       //SEND SMS
+//       await smsHistoryData.save();
+
 //       //SEND WHATSAPP
 //       const root = create({ version: '1.0', encoding: "ISO-8859-1" })
 //         .ele('MESSAGE', { VER: '1.2' })
 //         .ele('USER', { USERNAME: process.env.WP_SMS_USER_NAME, PASSWORD: process.env.WP_PASSWORD })
 //         .ele('SMS', { UDH: "0", CODING: "1", TEXT: "Hi", PROPERTY: "0", ID: "1", TEMPLATE: "bfstest" })
-//         .ele('ADDRESS', { FROM: process.env.WP_SMS_SENDER_MOBILE, TO: "917044289770", SEQ: "1" })
-//       //.up()
-//       //.up();
+//         .ele('ADDRESS', { FROM: process.env.WP_SMS_SENDER_MOBILE, TO: "917044289770", SEQ: "1" });
 
 //       // convert the XML tree to string
 //       const xml = root.end({ prettyPrint: true });
-//       await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
-//         if (err) {
-//           // return {
-//           //   status:false,
-//           //   data:err
-//           // };
-//         }
-//         //let obj = JSON.parse(data);
-//         //let randNumber = Math.floor((Math.random() * 1000000) + 1);
-//         let smsData = xml;
-//         let returnData;
-//         returnData = await sendWhatsapp(smsData);
-//         const historyData = await new ApiCallHistory({
-//           userId: mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"),
-//           called_for: "whatsapp",
-//           api_link: process.env.SITE_URL,
-//           api_param: smsData,
-//           api_response: returnData,
-//           send_status: 'send',
-//         });
-//         await historyData.save();
+//       const whatsappData = xml;
+//       let whatsappReturnData = await sendWhatsapp(whatsappData);
+//       let whatsappHistoryData = await new ApiCallHistory({
+//         userId: mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"),
+//         called_for: "whatsapp",
+//         api_link: process.env.SITE_URL,
+//         api_param: whatsappData,
+//         api_response: whatsappReturnData,
+//         send_status: 'send',
 //       });
-//       //SEND WHATSAPP
+//       await whatsappHistoryData.save();
 
 //       const mailData = {
 //         from: "Bid For Sale! <" + smtpUser + ">",
@@ -3428,7 +3300,7 @@ exports.sendotp = async function (req, res, next) {
 //           "Hey " +
 //           user.name +
 //           ", <br> <p> Please use this OTP : <b>" +
-//           otp +
+//           smsRandNumber +
 //           "</b> to reset your password! </p>",
 //       };
 
@@ -3437,84 +3309,182 @@ exports.sendotp = async function (req, res, next) {
 //         else console.log(info);
 //       });
 
-//       var updData = {
+//       const updData = {
 //         forget_otp: otp,
 //       };
-//       Users.findOneAndUpdate(
+//       await Users.findOneAndUpdate(
 //         { _id: user._id },
 //         { $set: updData },
-//         { upsert: true },
-//         function (err, doc) {
-//           if (err) {
-//             throw err;
-//           } else {
-//             Users.findOne({ _id: user._id }).then((user) => {
-//               res.status(200).json({
-//                 status: "1",
-//                 message: "OTP sent!",
-//                 resdpata: user,
-//                 is_forgetpassword: true
-//               });
-//             });
-//           }
-//         }
+//         { upsert: true }
 //       );
+
+//       return res.status(200).json({
+//         status: "1",
+//         message: "OTP sent!",
+//         resdpata: user,
+//         is_forgetpassword: true
+//       });
+//     } else {
+//       // Handle OTP verification and password update logic here
 //     }
-//     else {
-//       if (user.forget_otp == req.body.otp) {
-//         bcrypt.hash(req.body.newPassword, rounds, (error, hash) => {
-//           bcrypt.compare(req.body.confirmPassword, hash, (error, match) => {
-//             if (error) {
-//               res.status(200).json({
-//                 status: "0",
-//                 message: "Error!",
-//                 respdata: error,
-//               });
-//             } else if (match) {
-//               var updData = {
-//                 password: hash,
-//                 forget_otp: "0",
-//               };
-//               Users.findOneAndUpdate(
-//                 { email: req.body.email },
-//                 { $set: updData },
-//                 { upsert: true },
-//                 function (err, doc) {
-//                   if (err) {
-//                     throw err;
-//                   } else {
-//                     Users.findOne({ email: req.body.email }).then((user) => {
-//                       res.status(200).json({
-//                         status: "1",
-//                         message: "Successfully updated! Please login with your new password",
-//                         respdata: user,
-//                         is_forgetpassword: true,
-//                         is_changepassword: true
-//                       });
-//                     });
-//                   }
-//                 }
-//               );
-//             } else {
-//               res.status(200).json({
-//                 status: "0",
-//                 message: "New and Repeat password does not match!",
-//                 respdata: {},
-//                 is_changepassword: false
-//               });
-//             }
-//           });
-//         });
-//       } else {
-//         res.status(200).json({
-//           status: "0",
-//           message: "OTP does not match!",
-//           respdata: {},
-//         });
-//       }
-//     }
-//   });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({
+//       status: "0",
+//       message: "Internal server error",
+//       respdata: error.message || "Unknown error",
+//     });
+//   }
 // };
+
+
+exports.sendotp = async function (req, res, next) {
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(200).json({
+      status: "0",
+      message: "Validation error!",
+      respdata: errors.array(),
+    });
+  }
+
+  Users.findOne({ email: req.body.email }).then(async (user) => {
+    if (!user)
+      res.status(200).json({
+        status: "0",
+        message: "User not found!",
+        respdata: {},
+      });
+    else if (!req.body.otp) {
+      let randNumber = Math.floor((Math.random() * 1000000) + 1);
+      //SEND SMS
+      await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
+        if (err) {
+          // return {
+          //   status:false,
+          //   data:err
+          // };
+        }
+        //let obj = JSON.parse(data);
+        //let randNumber = Math.floor((Math.random() * 1000000) + 1);
+        let smsData = {
+          textId: "test",
+          toMobile: "91"+user.phone_no,
+          text: "You have been tagged with an invoice " + randNumber + ". Please use OTP " + randNumber + " for approving the invoice. Do not share your OTP with anyone. RJSSLT",
+        };
+        let returnData = "";
+        //returnData = await sendSms(smsData);
+        const historyData = new ApiCallHistory({
+          userId: mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"),
+          called_for: "sms",
+          api_link: process.env.SITE_URL,
+          api_param: smsData,
+          api_response: returnData,
+          send_status: 'send',
+        });
+        await historyData.save();
+      });
+      //SEND SMS
+      
+
+      const mailData = {
+        from: "Bid For Sale! <" + smtpUser + ">",
+        to: "sneha.lnsel@gmail.com",
+        //to: user.email,
+        subject: "BFS - Bids For Sale - Forgot password OTP",
+        text: "Server Email!",
+        html:
+          "Hey " +
+          user.name +
+          ", <br> <p> Please use this OTP : <b>" +
+          randNumber +
+          "</b> to reset your password! </p>",
+      };
+
+      transporter.sendMail(mailData, function (err, info) {
+        if (err) console.log("err",err);
+        else console.log("info", info);
+      });
+
+      var updData = {
+        forget_otp: randNumber,
+      };
+      Users.findOneAndUpdate(
+        { _id: user._id },
+        { $set: updData },
+        { upsert: true },
+        function (err, doc) {
+          if (err) {
+            throw err;
+          } else {
+            Users.findOne({ _id: user._id }).then((user) => {
+              res.status(200).json({
+                status: "1",
+                message: "OTP sent!",
+                resdpata: user,
+                is_forgetpassword: true
+              });
+            });
+          }
+        }
+      );
+    }
+    else {
+      if (user.forget_otp == req.body.otp) {
+        bcrypt.hash(req.body.newPassword, rounds, (error, hash) => {
+          bcrypt.compare(req.body.confirmPassword, hash, (error, match) => {
+            if (error) {
+              res.status(200).json({
+                status: "0",
+                message: "Error!",
+                respdata: error,
+              });
+            } else if (match) {
+              var updData = {
+                password: hash,
+                forget_otp: "0",
+              };
+              Users.findOneAndUpdate(
+                { email: req.body.email },
+                { $set: updData },
+                { upsert: true },
+                function (err, doc) {
+                  if (err) {
+                    throw err;
+                  } else {
+                    Users.findOne({ email: req.body.email }).then((user) => {
+                      res.status(200).json({
+                        status: "1",
+                        message: "Successfully updated! Please login with your new password",
+                        respdata: user,
+                        is_forgetpassword: true,
+                        is_changepassword: true
+                      });
+                    });
+                  }
+                }
+              );
+            } else {
+              res.status(200).json({
+                status: "0",
+                message: "New and Repeat password does not match!",
+                respdata: {},
+                is_changepassword: false
+              });
+            }
+          });
+        });
+      } else {
+        res.status(200).json({
+          status: "0",
+          message: "OTP does not match!",
+          respdata: {},
+        });
+      }
+    }
+  });
+};
 
 exports.changePassword = async function (req, res, next) {
   const errors = validationResult(req);

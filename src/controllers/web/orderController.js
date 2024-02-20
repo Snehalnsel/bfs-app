@@ -287,22 +287,23 @@ exports.getOrderList = function (req, res, next) {
       
     Promise.all(shipmentPromises)
     .then((shipments) => {
-      // Loop through orderList and associate shipments (if found) with respective orders
+      
       orderList.forEach((order, index) => {
         if (shipments[index]) {
           order.shipment = shipments[index];
         } else {
-          order.shipment = null; // Set as null or any default value for orders without shipments
+          order.shipment = null; 
         }
       });
 
-      return Promise.all(imagePromises); // Proceed to fetch product images
+      return Promise.all(imagePromises); 
     })
     .then((productImages) => {
 
           orderList.forEach((order, index) => {
             order.productImage = productImages[index];
           });
+          console.log(orderList);
           res.render("pages/order/list", {
             siteName: req.app.locals.siteName,
             pageName: pageName,

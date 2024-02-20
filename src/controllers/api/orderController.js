@@ -650,10 +650,8 @@ exports.checkout = async (req, res) => {
 
     const billing_address_id = billingaddress._id;
 
-    // Find the count of existing orders or calculate it based on your requirements
     //const existingOrdersCount = await Order.countDocuments();
 
-    // Generate a unique order code
     //const orderCode = `BFSORD${(existingOrdersCount + 1).toString().padStart(3, '0')}`;
     const now = new Date();
     const currentHour = now.getHours().toString().padStart(2, '0');

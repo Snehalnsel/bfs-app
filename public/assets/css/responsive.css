@@ -65,6 +65,10 @@ nav.nav-link ul li a {
 .theme-logo {
     width: 120px;
 }
+.ctg-icon img {
+   max-height: 40px;
+    max-width: 40px;
+}
 
 }
 

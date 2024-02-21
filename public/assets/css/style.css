@@ -271,9 +271,13 @@ nav.nav-link ul li a:hover {
     justify-content: center;
 }
 
-.ctg-icon img {
+/*.ctg-icon img {
     max-height: 90%;
     max-width: 35px;
+}*/
+.ctg-icon img {
+    max-height: 125%;
+    max-width: 100px;
 }
 
 .sld-iconbox h6 {

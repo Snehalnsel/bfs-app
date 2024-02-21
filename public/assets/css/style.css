@@ -2408,6 +2408,7 @@ span.wishlist-count {
     color: #2c2c2c;
     font-size: 15px;
     line-height: 25px;
+    font-family: 'Poppins', sans-serif;
 }
 
 .content-wrapper h6 {
@@ -2431,9 +2432,9 @@ span.wishlist-count {
 .cw-info ul li,
 .cw-info ol li {
     color: #2c2c2c;
-    font-size: 14px;
+    font-size: 15px;
     line-height: 25px;
-    margin: 2px 0px;
+    margin: 3px 0px;
     list-style-type: square;
 }
 
@@ -4662,4 +4663,13 @@ a#navbarDropdown {
 
 .error-msg {
     color: red;
+  }
+
+
+  ul.notlist-behavior {
+    padding-left: 0px;
+    list-style-type: none;
+}
+  ul.notlist-behavior li{
+    list-style-type: none;
   }

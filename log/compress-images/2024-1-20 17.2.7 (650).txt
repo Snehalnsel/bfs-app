@@ -1,0 +1,13 @@
+File from: [https://localhost:3000/public/images/image-1707226138206-993760751.webp]
+
+File to: [public/compress_images/image-1707226138206-993760751.webp]
+
+Compression algorithm: [-]
+
+Description: File does not exist!File from: [/public/images/image-1708428727377-774343814.webp]
+
+File to: [public/compress_images/image-1708428727377-774343814.webp]
+
+Compression algorithm: [-]
+
+Description: File does not exist!

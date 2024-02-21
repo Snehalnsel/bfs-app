@@ -30,7 +30,9 @@ const Notifications = require("../../models/api/notificationModel");
 const sendSms = require("../../models/thirdPartyApi/sendSms");
 const sendWhatsapp = require("../../models/thirdPartyApi/sendWhatsapp");
 const ApiCallHistory = require("../../models/thirdPartyApi/ApiCallHistory");
+const Demo = require("../../models/api/demoModel");
 const { create } = require('xmlbuilder2');
+const { log } = require("console");
 
 exports.homedetails = async function (req, res) {
   try {
@@ -280,12 +282,6 @@ exports.getJustSoldProducts = async function (req, res) {
 
 };
 
-
-
-
-
-
-
 // exports.homedetails = async function (req, res) {
 
 //   try {
@@ -436,9 +432,13 @@ exports.getJustSoldProducts = async function (req, res) {
 
 // };
 
-
-
-
+function extractFilename(url) {
+  const matches = url.match(/\/([^\/?#]+)[^\/]*$/);
+  if (matches && matches.length >= 2) {
+    return matches[1]; 
+  }
+  return null;
+}
 
 exports.getData = async function (req, res, next) {
   try {
@@ -506,6 +506,17 @@ exports.getData = async function (req, res, next) {
       });*/
     //SEND WHATSAPP
 
+    const allImages = await Demo.find();
+    // Update each document with only the image name and save the changes
+    for (const image of allImages) {
+      console.log(image.image)
+      const imageName = extractFilename(image.image);
+      image.image = imageName ? imageName : '';
+     await image.save();
+    }
+
+   // return;
+
     const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : ""
     var cartCount = (userId != "") ? await Cart.countDocuments({ user_id: mongoose.Types.ObjectId(userId) }) : 0;
     //console.log("userId", userId); 
@@ -529,13 +540,7 @@ exports.getData = async function (req, res, next) {
       error: error.message,
     });
   }
-
 };
-
-
-
-
-
 exports.bannerlist = async function (req, res) {
 
   try {
@@ -594,6 +599,8 @@ exports.getHeaderData = async function (req, res, next) {
   }
 
 };
+
+
 
 
 

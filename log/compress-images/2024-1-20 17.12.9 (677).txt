@@ -1,0 +1,8 @@
+File from: [./public/images/1704180316332.png]
+
+File to: [./public/compress_images/1704180316332.png]
+
+Compression algorithm: [pngquant]
+
+Description: Error: Command failed: D:\Project\Updated\bfs-app\node_modules\pngquant-bin\vendor\pngquant.exe --quality=20-50 -o ./public/compress_images/1704180316332.png ./public/images/1704180316332.png
+  error: failed writing image to ./public/compress_images/1704180316332.png (16)

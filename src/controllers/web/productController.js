@@ -31,6 +31,7 @@ var crypto = require("crypto");
 var randId = crypto.randomBytes(20).toString("hex");
 const multer = require("multer");
 const upload = multer({ dest: 'public/images/' });
+const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 
 exports.getData = async function (req, res, next) {
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
@@ -331,7 +332,8 @@ exports.detailsData = async function (req, res, next) {
       genderList: genderList,
       productImages: productImages,
       parentCategory: productdetails.hasOwnProperty("category_id") ? parentCategory : null,
-      isAdminLoggedIn:isAdminLoggedIn
+      isAdminLoggedIn:isAdminLoggedIn,
+      requrl:requrl
     });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred' });
@@ -392,7 +394,7 @@ exports.updatedetailsData = async function (req, res, next) {
               protocol: req.protocol,
               host: req.get("host"),
             });
-            return requrl + "/public/images/" + file.filename;
+            return file.filename;
           }));
           const countAllImages = allImages.length;
           await Productimage.deleteMany({ product_id: req.body.product_id });
@@ -401,7 +403,11 @@ exports.updatedetailsData = async function (req, res, next) {
             const remainingSlots = 5 - countAllImages;
             const imagesToInsert = allImages.slice(0, Math.min(5, allImages.length));
 
-            const imageDetails = imagesToInsert.map(imageUrl => {
+            const imageDetails = imagesToInsert.map(async imageUrl => {
+              // let extension = path.extname(imageUrl);
+              // if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){ 
+              //   await CompressImage("./public/images/"+imageUrl,"./public/compress_images/");
+              // }
               const productimageDetail = new Productimage({
                 product_id: req.body.product_id,
                 category_id: req.body.subcategory_id,
@@ -418,6 +424,10 @@ exports.updatedetailsData = async function (req, res, next) {
           await Productimage.deleteMany({ product_id: req.body.product_id });
           const imagesToUpload = imagesArray.slice(0, 5);
           for (const image of imagesToUpload) {
+            //let extension = path.extname(imageUrl);
+            // if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){
+            //   await CompressImage("./public/images/"+image,"./public/compress_images/");
+            // }
             const productimageDetail = new Productimage({
               product_id: req.body.product_id,
               category_id: req.body.subcategory_id,

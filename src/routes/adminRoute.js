@@ -33,15 +33,17 @@ const compress_images = require("compress-images");
 
 
 //Compress Image
-// compress_images("./public/images/1704180316332.png", "./public/compress_images/", { compress_force: false, statistic: true, autoupdate: true }, false,
-//   {jpg: {engine: 'mozjpeg', command: ['-quality', '75']}},
-//   //{webp: {engine: 'webp', command: false}},
-//   { png: { engine: "pngquant", command: ["--quality=20-50", "-o"] } },
-//   { svg: { engine: "svgo", command: "--multipass" } },
-//   { gif: { engine: "gifsicle", command: ["--colors", "64", "--use-col=web"] } },
-//   function (error, completed, statistic) {
-//   }
-// );
+async function compressYourImages(fromUrl, toUrl) {
+  compress_images("./public/images/1704180316332.png", "./public/compress_images/", { compress_force: false, statistic: true, autoupdate: true }, false,
+    {jpg: {engine: 'mozjpeg', command: ['-quality', '75']}},
+    //{webp: {engine: 'webp', command: false}},
+    { png: { engine: "pngquant", command: ["--quality=20-50", "-o"] } },
+    { svg: { engine: "svgo", command: "--multipass" } },
+    { gif: { engine: "gifsicle", command: ["--colors", "64", "--use-col=web"] } },
+    function (error, completed, statistic) {
+    }
+  );
+}
 
 router.get("/dashboard", cors(), DashboardController.getData);
 

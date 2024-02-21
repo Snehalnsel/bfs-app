@@ -643,7 +643,7 @@ exports.searchByKeyword = async function (req, res, next) {
       for(let element of allProductName) {
         if(i < 5) {
           let name = element.name;
-          let link = "/api/productdeatils/" + element._id.toString();
+          let link = "/productdeatils/" + element._id.toString();
           let newElement = {
             name: name,
             link: link,
@@ -657,7 +657,7 @@ exports.searchByKeyword = async function (req, res, next) {
     for(let element of allBrandName) {
       if(allData.length < 10) {
         let name = element.name;
-        let link = "/api/websubcategoriesproducts/"+element._id.toString();
+        let link = "/websubcategoriesproducts/"+element._id.toString();
         let newElement = {
           name: name,
           link: link

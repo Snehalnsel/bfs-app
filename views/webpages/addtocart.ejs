@@ -3,18 +3,18 @@
 <section class="bids-wrapper">
     <div class="container"> 
        <div class="bids-lists cart-wrapper">
-       <div class="cart-list">
-         <form id="orderPlace"> 
-            <input type="hidden" id="user_id" name="user_id" value="<%=user%>">
-            <input type="hidden" id="seller_id" name="seller_id" value="<%=respdata.seller_id%>">
-            <input type="hidden" id="cart_id" name="cart_id" value="<%=respdata.cart_id%>">
-            <input type="hidden" id="product_id" name="product_id" value="<%=respdata.product_id%>">
-            <input type="hidden" id="total_amt" name="total_amt" value="<%=respdata1%>">
-            <input type="hidden" id="gst" name="gst" value="28">
-            <input type="hidden" id="product_price" name="product_price" value="<%=respdata.product_price%>">
-            <input type="hidden" id="payment_method" name="payment_method" value="0">
-         </form> 
-          <div class="bids-row cart-row">             
+         <div class="cart-list">
+            <form id="orderPlace"> 
+               <input type="hidden" id="user_id" name="user_id" value="<%=user%>">
+               <input type="hidden" id="seller_id" name="seller_id" value="<%=respdata.seller_id%>">
+               <input type="hidden" id="cart_id" name="cart_id" value="<%=respdata.cart_id%>">
+               <input type="hidden" id="product_id" name="product_id" value="<%=respdata.product_id%>">
+               <input type="hidden" id="total_amt" name="total_amt" value="<%=respdata1%>">
+               <input type="hidden" id="gst" name="gst" value="28">
+               <input type="hidden" id="product_price" name="product_price" value="<%=respdata.product_price%>">
+               <input type="hidden" id="payment_method" name="payment_method" value="0">
+            </form> 
+            <div class="bids-row cart-row">             
              <div class="br-details">
                 <div class="bid-images">
                     <img src="<%=respdata.images%>" alt="images" class="img-fluid"> 

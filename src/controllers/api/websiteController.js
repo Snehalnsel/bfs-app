@@ -10,6 +10,8 @@ const request = require('request');
 const twilio = require('twilio');
 const crypto = require('crypto');
 const path = require("path");
+const ejs = require('ejs');
+const helper = require("../../helpers/helper");
 const fs = require("fs");
 const mime = require("mime");
 const cors = require('cors');
@@ -1132,13 +1134,24 @@ exports.myAccount = async function (req, res, next) {
     else {
       var userData = req.session.user;
       const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId) });
-      res.render("webpages/myaccount", {
+
+      const html = await ejs.renderFile("./views/webpages/myaccount", {
+        helper: helper,
         title: "My Account",
         message: "Welcome to the privacy policy page!",
         respdata: req.session.user,
         respdata1: address,
         isLoggedIn: isLoggedIn,
-      });
+      }, {async: true});
+      res.send(html);
+      // res.render("webpages/myaccount", {
+      //   helper: helper,
+      //   title: "My Account",
+      //   message: "Welcome to the privacy policy page!",
+      //   respdata: req.session.user,
+      //   respdata1: address,
+      //   isLoggedIn: isLoggedIn,
+      // },{async: true});
     }
   } catch (error) {
     res.status(500).json({
@@ -1403,7 +1416,7 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
         approval_status: userproduct.approval_status,
         added_dtime: userproduct.added_dtime,
         __v: userproduct.__v,
-        product_images: productImages,
+        product_images: (typeof productImages != "undefined") ? productImages: "",
         status_name: productCondition ? productCondition.name : '',
       };
       formattedUserProducts.push(formattedUserProduct);
@@ -1431,7 +1444,6 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
 }
 exports.getSubCategoriesProducts = async function (page, req, res, next) {
   try {
-
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const id = req.params.id;
     const pageno = page || 1;
@@ -1439,62 +1451,61 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
     const sortid = req.params.sortid || 0;
     const data = await getProductDataWithSort(id, sortid, pageno, pageSize);
     const productCount = data.count;
-    console.log(productCount);
     const formattedUserProducts = data.respdata;
     const filterproductCount = formattedUserProducts.length;
     const totalPages = data.totalPages;
     const currentPage = data.currentPage;
     const categoryName = await Category.find({ _id: id }).populate('name');
     const userProducts = await Userproduct.find({
-      category_id: id,
-      approval_status: 1,
-      flag: 0,
-    })
-      .select('brand_id size_id status');
-
-    const result = await Userproduct.aggregate([
-      {
-        $match: {
-          category_id: mongoose.Types.ObjectId(id),
-          approval_status: 1,
-          flag: 0
+        category_id: id,
+        approval_status: 1,
+        flag: 0,
+      })
+        .select('brand_id size_id status'); 
+    if(userProducts.length > 0) {
+      const result = await Userproduct.aggregate([
+        {
+          $match: {
+            category_id: mongoose.Types.ObjectId(id),
+            approval_status: 1,
+            flag: 0
+          }
+        },
+        {
+          $group: {
+            _id: id,
+            maxPrice: { $max: "$offer_price" },
+            minPrice: { $min: "$offer_price" }
+          }
         }
-      },
-      {
-        $group: {
-          _id: id,
-          maxPrice: { $max: "$offer_price" },
-          minPrice: { $min: "$offer_price" }
-        }
-      }
-    ]);
-    const brandIds = userProducts.map(product => product.brand_id).filter(Boolean);
-    const sizeIds = userProducts.map(product => product.size_id).filter(Boolean);
-    const statusIds = userProducts.map(product => product.status).filter(Boolean);
-    const brandList = await brandModel.find({ _id: { $in: brandIds } });
-    const sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
-    const conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
-    const genderList = await Gender.find();
-    res.render("webpages/subcategoryproduct",
-      {
-        title: "Product Sub Categories",
-        message: "Welcome to the Product Sub Categories!",
-        respdata: formattedUserProducts,
-        product_category_id: id,
-        brandList: brandList,
-        sizeList: sizeList,
-        categoryName: categoryName,
-        conditionList: conditionList,
-        productCount: productCount,
-        genderList: genderList,
-        filterproductCount: filterproductCount,
-        totalPages: totalPages,
-        currentPage: currentPage,
-        pageSize: pageSize,
-        isLoggedIn: isLoggedIn,
-        maxvalue: result[0].maxPrice,
-        minvalue: result[0].minPrice
-      });
+      ]);
+      const brandIds = userProducts.map(product => product.brand_id).filter(Boolean);
+      const sizeIds = userProducts.map(product => product.size_id).filter(Boolean);
+      const statusIds = userProducts.map(product => product.status).filter(Boolean);
+      const brandList = await brandModel.find({ _id: { $in: brandIds } });
+      const sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
+      const conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
+      const genderList = await Gender.find();
+    }
+    res.render("webpages/subcategoryproduct", {
+      title: "Product Sub Categories",
+      message: "Welcome to the Product Sub Categories!",
+      isLoggedIn: isLoggedIn,
+      categoryName: categoryName,
+      brandList: typeof brandList != "undefined" ? brandList : [],
+      sizeList: typeof sizeList != "undefined" ? sizeList : [],
+      conditionList: typeof conditionList != "undefined" ? conditionList : [],
+      genderList: typeof genderList != "undefined" ? genderList : [],
+      maxvalue: typeof result != "undefined" ? result[0].maxPrice : "0",
+      minvalue: typeof result != "undefined" ? result[0].minvalue : "0",
+      filterproductCount: typeof filterproductCount != "undefined" ? filterproductCount : "0",
+      productCount: typeof productCount != "undefined" ? productCount : "",
+      respdata: typeof formattedUserProducts != "undefined" ? formattedUserProducts : "",
+      product_category_id: id,
+      totalPages: totalPages,
+      currentPage: currentPage,
+      pageSize: pageSize,
+    });
 
   }
   catch (error) {

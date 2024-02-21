@@ -26,6 +26,7 @@
     "express-session": "^1.17.3",
     "express-validator": "^6.14.2",
     "firebase-admin": "^12.0.0",
+    "firebase-functions": "^4.7.0",
     "fs": "^0.0.1-security",
     "gifsicle": "^5.2.1",
     "helmet": "^5.1.0",

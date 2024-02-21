@@ -15,6 +15,9 @@ const session = require('express-session');
 app.use("/public", express.static(path.join(__dirname, "public")));
 require('dotenv').config();
 
+//Import Bids watcher Model
+const checkChangesInField = require("./src/models/fireDbServices/checkChangesInField");
+
 const Userproduct = require("./src/models/api/userproductModel");
 
 app.locals.siteName = "BFS - Bid For Sale";
@@ -193,6 +196,12 @@ const formatMessage = require("./src/utils/messages");
 const botName = "Bid Chatbot";
 
 io.on("connection", (socket) => {
+  /*let reqData = {
+    userId: "65d32286b7cc28e479341711",
+    productId: "65659ed980149f0cc691ccb1",
+    sellerId: "654f368443db200178350161"
+  };
+  checkChangesInField(reqData);*/
   socket.on("joinRoom", async ({ username, currRoom }) => {
     let room = currRoom;
     const user = userJoin(socket.id, username, room);

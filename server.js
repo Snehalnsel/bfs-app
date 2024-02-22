@@ -16,6 +16,7 @@ app.use("/public", express.static(path.join(__dirname, "public")));
 require('dotenv').config();
 
 //Import Bids watcher Model
+const { getFirestore, Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
 const checkChangesInField = require("./src/models/fireDbServices/checkChangesInField");
 
 const Userproduct = require("./src/models/api/userproductModel");
@@ -195,12 +196,40 @@ const { userJoin, getCurrentUser, userLeave, getRoomUsers} = require("./src/mode
 const formatMessage = require("./src/utils/messages");
 const botName = "Bid Chatbot";
 
-io.on("connection", async (socket) => {
-  let reqData = {
-    bidId: "bid_65d32286b7cc28e479341711_65659ed980149f0cc691ccb1_1708421970111"
+//let changesInDb = checkChangesInField();
+
+const initializeApp = require("./src/DB/firebaseInitialize");
+const dbFdb = getFirestore();
+(async function () {
+  const bidsRef = await dbFdb.collection('bids').doc("bid_65d32286b7cc28e479341711_65659ed980149f0cc691ccb1_1708421970111");
+  const observer = bidsRef.onSnapshot(docSnapshot => {
+    let newData = docSnapshot.data();
+      io.to("bid_65d32286b7cc28e479341711_65659ed980149f0cc691ccb1_1708421970111").emit("message",formatMessage("Antu Dhara",newData.currentOffer.price, "65d32286b7cc28e479341711", "bid_65d32286b7cc28e479341711_65659ed980149f0cc691ccb1_1708421970111"));
+    //return true;
+  }, err => {
+      //return false;
+      //console.log(`Encountered error: ${err}`);
+  });
+})();
+const checkChangesInField1 = async (reqData) =>{
+    //const bidsRef = await dbFdb.collection('bids').doc(reqData.bidId);
+    const bidsRef = await dbFdb.collection('bids').doc("bid_65d32286b7cc28e479341711_65659ed980149f0cc691ccb1_1708421970111");
+    const observer = bidsRef.onSnapshot(docSnapshot => {
+        return true;
+      }, err => {
+        return false;
+        //console.log(`Encountered error: ${err}`);
+    });
+};
+//console.log(changesInDb);
+
+io.on("connection", (socket) => {
+  /*let reqData = {
+    userId: "65d32286b7cc28e479341711",
+    productId: "65659ed980149f0cc691ccb1",
+    sellerId: "654f368443db200178350161"
   };
-  let newBidExist = await checkChangesInField(reqData);
-  console.log(newBidExist);
+  checkChangesInField(reqData);*/
   socket.on("joinRoom", async ({ username, currRoom }) => {
     let room = currRoom;
     const user = userJoin(socket.id, username, room);

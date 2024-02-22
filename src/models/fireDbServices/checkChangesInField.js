@@ -5,12 +5,11 @@ const { onCustomEventPublished} = require("firebase-functions/v2/eventarc");
 const initializeApp = require("../../DB/firebaseInitialize");
 const db = getFirestore();
 const checkChangesInField = async (reqData) =>{
-    const bidsRef = await db.collection('bids').doc(reqData.bidId);
+    //const bidsRef = await db.collection('bids').doc(reqData.bidId);
+    const bidsRef = await db.collection('bids').doc("bid_65d32286b7cc28e479341711_65659ed980149f0cc691ccb1_1708421970111");
     const observer = bidsRef.onSnapshot(docSnapshot => {
-        console.log(11111);
         return true;
       }, err => {
-        console.log(222222);
         return false;
         //console.log(`Encountered error: ${err}`);
     });

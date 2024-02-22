@@ -206,7 +206,7 @@
         var productName = $('#productNameInput').val();
         var page = 1;
         // window.location.href = '/body-focus-subcat?page='+page+'productName='+productName+'selectedCategory='+selectedCategory'if
-        let url = '/body-focus-subcat?';
+        let url = '/admin/body-focus-subcat?';
         if(page && !isNaN(page)){
             url = url+'page='+page;
         }
@@ -219,7 +219,7 @@
         window.location.href = url;
 
         $.ajax({
-            url: `/body-focus-subcat`,
+            url: `/admin/body-focus-subcat`,
             type: 'GET',
             data: {
                 page: page,

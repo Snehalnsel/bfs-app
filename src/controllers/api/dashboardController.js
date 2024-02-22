@@ -475,8 +475,8 @@ exports.getData = async function (req, res, next) {
       /*const root = create({ version: '1.0',encoding:"ISO-8859-1" })
       .ele('MESSAGE', { VER: '1.2' })
         .ele('USER',{USERNAME:process.env.WP_SMS_USER_NAME,PASSWORD:process.env.WP_PASSWORD})
-          .ele('SMS',{UDH:"0",CODING:"1",TEXT:"Hi",PROPERTY:"0",ID:"1",TEMPLATE:"bfstest"})
-            .ele('ADDRESS',{FROM:process.env.WP_SMS_SENDER_MOBILE,TO:"917044289770",SEQ:"1"})
+          .ele('SMS',{UDH:"0",CODING:"1",TEMPLATEINFO:"",TEXT:"Hi",MEDIADATA:"",MSGTYPE:"1",TYPE:"",CONTENTTYPE:"",PROPERTY:"0",ID:"1",TEMPLATE:"",EMAILTEXT:"", ATTACHMENT:""})
+            .ele('ADDRESS',{FROM:process.env.WP_SMS_SENDER_MOBILE,TO:"918017757640",EMAIL:"",SEQ:"1",TAG:""})
         //.up()
       //.up();
     
@@ -506,14 +506,14 @@ exports.getData = async function (req, res, next) {
       });*/
     //SEND WHATSAPP
 
-    const allImages = await Demo.find();
-    // Update each document with only the image name and save the changes
-    for (const image of allImages) {
-      console.log(image.image)
-      const imageName = extractFilename(image.image);
-      image.image = imageName ? imageName : '';
-     await image.save();
-    }
+    // const allImages = await Demo.find();
+    // // Update each document with only the image name and save the changes
+    // for (const image of allImages) {
+    //   console.log(image.image)
+    //   const imageName = extractFilename(image.image);
+    //   image.image = imageName ? imageName : '';
+    //  await image.save();
+    // }
 
    // return;
 

@@ -1135,23 +1135,25 @@ exports.myAccount = async function (req, res, next) {
       var userData = req.session.user;
       const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId) });
 
-      const html = await ejs.renderFile("./views/webpages/myaccount", {
-        helper: helper,
-        title: "My Account",
-        message: "Welcome to the privacy policy page!",
-        respdata: req.session.user,
-        respdata1: address,
-        isLoggedIn: isLoggedIn,
-      }, {async: true});
-      res.send(html);
-      // res.render("webpages/myaccount", {
+      // const html = await ejs.renderFile("views/webpages/myaccount.ejs", {
       //   helper: helper,
       //   title: "My Account",
       //   message: "Welcome to the privacy policy page!",
       //   respdata: req.session.user,
       //   respdata1: address,
       //   isLoggedIn: isLoggedIn,
-      // },{async: true});
+      // }, {async: true});
+      // res.send(html);
+
+      res.render("webpages/myaccount", {
+        helper: helper,
+        //async: true,
+        title: "My Account",
+        message: "Welcome to the privacy policy page!",
+        respdata: req.session.user,
+        respdata1: address,
+        isLoggedIn: isLoggedIn,
+      });
     }
   } catch (error) {
     res.status(500).json({

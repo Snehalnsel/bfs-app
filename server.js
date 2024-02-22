@@ -195,13 +195,12 @@ const { userJoin, getCurrentUser, userLeave, getRoomUsers} = require("./src/mode
 const formatMessage = require("./src/utils/messages");
 const botName = "Bid Chatbot";
 
-io.on("connection", (socket) => {
-  /*let reqData = {
-    userId: "65d32286b7cc28e479341711",
-    productId: "65659ed980149f0cc691ccb1",
-    sellerId: "654f368443db200178350161"
+io.on("connection", async (socket) => {
+  let reqData = {
+    bidId: "bid_65d32286b7cc28e479341711_65659ed980149f0cc691ccb1_1708421970111"
   };
-  checkChangesInField(reqData);*/
+  let newBidExist = await checkChangesInField(reqData);
+  console.log(newBidExist);
   socket.on("joinRoom", async ({ username, currRoom }) => {
     let room = currRoom;
     const user = userJoin(socket.id, username, room);

@@ -228,7 +228,7 @@ exports.productData = async function (req, res, next) {
           approval_status: userproduct1.approval_status,
           added_dtime: userproduct1.added_dtime,
           __v: userproduct1.__v,
-          product_images: productImages1,
+          product_images: typeof productImages1 != "undefined" ? productImages1 : [],
         };
 
         formattedUserProducts1.push(formattedUserProduct1);
@@ -272,7 +272,7 @@ exports.productData = async function (req, res, next) {
       added_dtime: userproducts.added_dtime,
       hitCount: userproducts.hitCount || 0,
       __v: userproducts.__v,
-      product_images: productImages,
+      product_images: typeof productImages != "undefined" ? productImages : [],
     };
     res.render("webpages/productdetails", {
       title: "Product Details",
@@ -1135,25 +1135,25 @@ exports.myAccount = async function (req, res, next) {
       var userData = req.session.user;
       const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId) });
 
-      // const html = await ejs.renderFile("views/webpages/myaccount.ejs", {
-      //   helper: helper,
-      //   title: "My Account",
-      //   message: "Welcome to the privacy policy page!",
-      //   respdata: req.session.user,
-      //   respdata1: address,
-      //   isLoggedIn: isLoggedIn,
-      // }, {async: true});
-      // res.send(html);
-
-      res.render("webpages/myaccount", {
+      const html = await ejs.renderFile("views/webpages/myaccount.ejs", {
         helper: helper,
-        //async: true,
         title: "My Account",
         message: "Welcome to the privacy policy page!",
         respdata: req.session.user,
         respdata1: address,
         isLoggedIn: isLoggedIn,
-      });
+      }, {async: true});
+      res.send(html);
+
+      // res.render("webpages/myaccount", {
+      //   helper: helper,
+      //   //async: true,
+      //   title: "My Account",
+      //   message: "Welcome to the privacy policy page!",
+      //   respdata: req.session.user,
+      //   respdata1: address,
+      //   isLoggedIn: isLoggedIn,
+      // });
     }
   } catch (error) {
     res.status(500).json({
@@ -1447,6 +1447,13 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
 exports.getSubCategoriesProducts = async function (page, req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    let brandIds = [];
+    let sizeIds = [];
+    let statusIds = [];
+    let brandList = [];
+    let sizeList = [];
+    let result;
+    let conditionList = [];
     const id = req.params.id;
     const pageno = page || 1;
     const pageSize = 8;
@@ -1465,7 +1472,7 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
       })
         .select('brand_id size_id status'); 
     if(userProducts.length > 0) {
-      const result = await Userproduct.aggregate([
+      result = await Userproduct.aggregate([
         {
           $match: {
             category_id: mongoose.Types.ObjectId(id),
@@ -1481,13 +1488,13 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
           }
         }
       ]);
-      const brandIds = userProducts.map(product => product.brand_id).filter(Boolean);
-      const sizeIds = userProducts.map(product => product.size_id).filter(Boolean);
-      const statusIds = userProducts.map(product => product.status).filter(Boolean);
-      const brandList = await brandModel.find({ _id: { $in: brandIds } });
-      const sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
-      const conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
-      const genderList = await Gender.find();
+      brandIds = userProducts.map(product => product.brand_id).filter(Boolean);
+      sizeIds = userProducts.map(product => product.size_id).filter(Boolean);
+      statusIds = userProducts.map(product => product.status).filter(Boolean);
+      brandList = await brandModel.find({ _id: { $in: brandIds } });
+      sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
+      conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
+      genderList = await Gender.find();
     }
     res.render("webpages/subcategoryproduct", {
       title: "Product Sub Categories",
@@ -1499,7 +1506,7 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
       conditionList: typeof conditionList != "undefined" ? conditionList : [],
       genderList: typeof genderList != "undefined" ? genderList : [],
       maxvalue: typeof result != "undefined" ? result[0].maxPrice : "0",
-      minvalue: typeof result != "undefined" ? result[0].minvalue : "0",
+      minvalue: typeof result != "undefined" ? result[0].minPrice : "0",
       filterproductCount: typeof filterproductCount != "undefined" ? filterproductCount : "0",
       productCount: typeof productCount != "undefined" ? productCount : "",
       respdata: typeof formattedUserProducts != "undefined" ? formattedUserProducts : "",

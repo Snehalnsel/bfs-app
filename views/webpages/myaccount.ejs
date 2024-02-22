@@ -1,5 +1,5 @@
-<%- include('../../public/assets/include/header'); %>
-<!--<%-helper.checkImageExist("image-1708429829497-616768594.jpg") %>-->
+<%- await include('../../public/assets/include/header'); %>
+<!--<%-await helper.checkImageExist("image-1708429829497-616768594.jpg") %>-->
 <section class="dashboard-wrapper">
     <div class="dashboard-container">
        <div class="dashboard-sidbar">        
@@ -12,7 +12,7 @@
                
                <div class="user-name"><%=respdata.title%> <%=respdata.name%></div>
             </div>
-   <!-- Profile Image Modal Start -->   
+            <!-- Profile Image Modal Start -->   
    
             <div class="userimage-edit">
               <!--  <a href="javascript:void(0)" data-toggle="modal" data-target="#profile-change-modal"><i class="fa fa-pencil" aria-hidden="true"></i></a> -->
@@ -189,7 +189,7 @@
        </div>
     </div>
  </section>
-   <%- include('../../public/assets/include/newsletter'); %>
-      <%- include('../../public/assets/include/footer'); %>
+   <%- await include('../../public/assets/include/newsletter'); %>
+      <%- await include('../../public/assets/include/footer'); %>
 </body>
 <script src="/public/assets/js/myaccount.js"></script>

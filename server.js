@@ -201,27 +201,48 @@ const botName = "Bid Chatbot";
 const initializeApp = require("./src/DB/firebaseInitialize");
 const dbFdb = getFirestore();
 (async function () {
-  const bidsRef = await dbFdb.collection('bids').doc("bid_65d32286b7cc28e479341711_65659ed980149f0cc691ccb1_1708421970111");
+  const bidsRef = await dbFdb.collection('bids');
   const observer = bidsRef.onSnapshot(docSnapshot => {
-    let newData = docSnapshot.data();
-      io.to("bid_65d32286b7cc28e479341711_65659ed980149f0cc691ccb1_1708421970111").emit("message",formatMessage("Antu Dhara",newData.currentOffer.price, "65d32286b7cc28e479341711", "bid_65d32286b7cc28e479341711_65659ed980149f0cc691ccb1_1708421970111"));
+    docSnapshot.docChanges().forEach(async change => {
+      const changeDoc = change.doc.data();
+      let changeDocDetails = changeDoc.id.split("_");
+      // let chatBuyerId = changeDoc.buyerId;
+      // let chatSellerId = changeDoc.sellerId;
+      // let chatProductId = changeDoc.productId;
+      let chatPrice = changeDoc.currentOffer.price;
+      const queryData = {
+        bidId:changeDoc.id
+      };
+      let currUserDetails = "";
+      let sendFromUserId = changeDoc.currentOffer.userId;
+      if(changeDocDetails[1] != "undefined" && changeDocDetails[1] != "") {
+        currUserDetails = await UserModel.findOne({_id:sendFromUserId});
+      }
+      if (change.type === 'added') {
+        //console.log('New Doc: ', change.doc.data());
+      }
+      if (change.type === 'modified') {
+        io.to(changeDoc.id).emit("message", formatMessage(currUserDetails.name, chatPrice,sendFromUserId, changeDoc.id));
+        //console.log('Modified Doc: ', change.doc.data());
+      }
+      if (change.type === 'removed') {
+        //console.log('Removed Doc: ', change.doc.data());
+      }
+    });
+    // let allData = [];
+    // docSnapshot.forEach(function(doc) {
+    //   allData.push(doc.data());
+    // });
+    //console.log(allData);
+    //let newData = docSnapshot.data();
+    
+    //io.to("bid_65d32286b7cc28e479341711_65659ed980149f0cc691ccb1_1708421970111").emit("message",formatMessage("Antu Dhara",newData.currentOffer.price, "65d32286b7cc28e479341711", "bid_65d32286b7cc28e479341711_65659ed980149f0cc691ccb1_1708421970111"));
     //return true;
   }, err => {
       //return false;
       //console.log(`Encountered error: ${err}`);
   });
 })();
-const checkChangesInField1 = async (reqData) =>{
-    //const bidsRef = await dbFdb.collection('bids').doc(reqData.bidId);
-    const bidsRef = await dbFdb.collection('bids').doc("bid_65d32286b7cc28e479341711_65659ed980149f0cc691ccb1_1708421970111");
-    const observer = bidsRef.onSnapshot(docSnapshot => {
-        return true;
-      }, err => {
-        return false;
-        //console.log(`Encountered error: ${err}`);
-    });
-};
-//console.log(changesInDb);
 
 io.on("connection", (socket) => {
   /*let reqData = {
@@ -293,7 +314,8 @@ io.on("connection", (socket) => {
       await updateBidData(updateData,bidId);
       await insertBidOfferData(currentOffer,currentOffer.id);
       let currUserDetails = await UserModel.findOne({_id:username});
-      io.to(roomName).emit("message",formatMessage(currUserDetails.name, msg,username, roomName));
+      //Below line has commented out due to a observer written on the above
+      //io.to(roomName).emit("message",formatMessage(currUserDetails.name, msg,username, roomName));
     }
   });
   //Get old messages form database

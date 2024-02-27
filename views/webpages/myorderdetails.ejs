@@ -8,7 +8,9 @@
                <div class="col-md-5">
                   <div class="br-details ob-details">
                      <% if(respdata.product.image){%>
-                     <div class="bid-images"><img src="<%=respdata.product.image%>" alt="images" class="img-fluid"></div>
+                     <div class="bid-images">
+                        <img src="<%=websiteUrl %>/public/compress_images/<%=respdata.product.image%>" alt="images" class="img-fluid">
+                     </div>
                      <%} else {%>
                         <div class="bid-images"><img src="" alt="images" class="img-fluid"></div>
                      <% } %>
@@ -105,7 +107,7 @@
             <div class="col-md-5">
               <div class="br-details ob-details">
                  <% if(respdata.product.image){%>
-                  <div class="bid-images"><img src="<%=respdata.product.image%>" alt="images" class="img-fluid"></div>
+                  <div class="bid-images"><img src="<%=websiteUrl %>/public/compress_images/<%=respdata.product.image%>" alt="images" class="img-fluid"></div>
                   <%} else {%>
                     <div class="bid-images"><img src="" alt="images" class="img-fluid"></div>
                   <% } %>

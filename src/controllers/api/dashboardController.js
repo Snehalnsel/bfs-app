@@ -5,8 +5,12 @@ const mongoose = require("mongoose");
 const db = mongoose.connection;
 const http = require("http");
 const path = require("path");
-const fs = require("fs");
+// const fs = require("fs");
+const fs = require('fs-extra');
 const mime = require("mime");
+const ejs = require('ejs');
+const { CompressImage } = require("../../models/thirdPartyApi/CompressImage");
+const helper = require("../../helpers/helper");
 // const helper = require("../helpers/helper");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -30,7 +34,7 @@ const Notifications = require("../../models/api/notificationModel");
 const sendSms = require("../../models/thirdPartyApi/sendSms");
 const sendWhatsapp = require("../../models/thirdPartyApi/sendWhatsapp");
 const ApiCallHistory = require("../../models/thirdPartyApi/ApiCallHistory");
-const Demo = require("../../models/api/demoModel");
+// const Demo = require("../../models/api/demoModel");
 const { create } = require('xmlbuilder2');
 const { log } = require("console");
 
@@ -44,9 +48,9 @@ exports.homedetails = async function (req, res) {
     }
     const percentageFilter = parseInt(appSettings.best_deal);
     const products = await Userproduct.find({ percentage: { $gte: percentageFilter }, approval_status: 1, flag: 0 }); // Adding approval_status filter
-    if (!products || products.length === 0) {
-      return res.status(404).json({ message: 'No products meet the percentage filter criteria' });
-    }
+    // if (!products || products.length === 0) {
+    //   return res.status(404).json({ message: 'No products meet the percentage filter criteria' });
+    // }
     const bestDealProducts = [];
     for (const product of products) {
       const productImage = await Productimage.findOne({ product_id: product._id });
@@ -121,6 +125,8 @@ exports.homedetails = async function (req, res) {
         just_sold: justSoldProducts
       },
       isLoggedIn: isLoggedIn,
+      helper: helper,
+      fs: fs
     });
   } catch (error) {
     //console.error('Error fetching best deal and whats hot products with images:', error);
@@ -213,65 +219,33 @@ exports.getJustSoldProducts = async function (req, res) {
       .limit(pageSize);
     const justSoldProducts = [];
     for (const product of solditems) {
-
       const productImage = await Productimage.findOne({ product_id: product._id });
-
       if (productImage) {
-
         const productCondition = await Productcondition.findById(product.status);
-
-
-
         justSoldProducts.push({
-
           _id: product._id,
-
           name: product.name,
-
           price: product.price,
-
           offer_price: product.offer_price,
-
           original_packaging: product.original_packaging,
-
           original_invoice: product.original_invoice,
-
           status_name: productCondition ? productCondition._id : '',
-
           status: productCondition ? productCondition.name : '',
-
           image: productImage.image,
-
         });
-
       }
-
     }
-
-
-
     return res.status(200).json({
-
       status: "1",
-
       message: "Just sold products",
-
       pagination: {
-
         totalItems: soldItemsCount,
-
         totalPages: totalPages,
-
         currentPage: page,
-
         pageSize: pageSize,
-
       },
-
       respdata: justSoldProducts,
-
     });
-
   } catch (error) {
 
     //console.error('Error fetching just sold products:', error);
@@ -442,6 +416,7 @@ function extractFilename(url) {
 
 exports.getData = async function (req, res, next) {
   try {
+       //await copyAndCompressImageFolders();
     //const requrl = req.protocol + '://' + req.get('host');
     //SEND SMS
       /*await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
@@ -505,7 +480,6 @@ exports.getData = async function (req, res, next) {
         await historyData.save();
       });*/
     //SEND WHATSAPP
-
     // const allImages = await Demo.find();
     // // Update each document with only the image name and save the changes
     // for (const image of allImages) {
@@ -514,24 +488,31 @@ exports.getData = async function (req, res, next) {
     //   image.image = imageName ? imageName : '';
     //  await image.save();
     // }
-
    // return;
-
     const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : ""
     var cartCount = (userId != "") ? await Cart.countDocuments({ user_id: mongoose.Types.ObjectId(userId) }) : 0;
-    //console.log("userId", userId); 
-    //return false;
     const banner = await Banner.find({ status: 1 });
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-    console.log("isLoggedIn",isLoggedIn);
-    res.render("webpages/list", {
+    const html = await ejs.renderFile("views/webpages/list.ejs", {
+      helper: helper,
+      websiteUrl: process.env.SITE_URL,
       title: "Home Page",
-      requrl: req.app.locals.requrl,
       message: "Welcome to the Dashboard page!",
+      respdata: req.session.user,
+      banner:banner,
       cart: cartCount,
       isLoggedIn: isLoggedIn,
-      banner:banner
-    });
+    }, {async: true});
+    res.send(html);
+    // res.render("webpages/list", {
+    //   title: "Home Page",
+    //   websiteUrl: process.env.SITE_URL,
+    //   requrl: req.app.locals.requrl,
+    //   message: "Welcome to the Dashboard page!",
+    //   cart: cartCount,
+    //   isLoggedIn: isLoggedIn,
+    //   banner:banner
+    // });
   } catch (error) {
     //console.error(error);
     res.status(500).json({
@@ -542,35 +523,19 @@ exports.getData = async function (req, res, next) {
   }
 };
 exports.bannerlist = async function (req, res) {
-
   try {
-
     const banner = await Banner.find({ status: 1 });
-
-
-
     return res.status(200).json({
-
       status: "1",
-
       message: "Top categories",
-
       respdata: banner,
-
     });
-
   } catch (error) {
-
     //console.error('Error fetching top categories:', error);
-
     return res.status(500).json({ message: 'Internal server error' });
-
   }
-
 };
-
 exports.getHeaderData = async function (req, res, next) {
-
   try {
        //const requrl = req.protocol + '://' + req.get('host');
         let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -587,18 +552,18 @@ exports.getHeaderData = async function (req, res, next) {
              isLoggedIn: isLoggedIn,
          });
   } catch (error) {
-
     //console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the dashboard.",
       error: error.message,
-
     });
-
   }
-
 };
+
+
+
+
 
 
 

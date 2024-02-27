@@ -26,6 +26,7 @@ const Productsize = require("../../models/api/catsizeModel");
 const Userproduct = require("../../models/api/userproductModel");
 const Productimage = require("../../models/api/productimageModel");
 const Productcondition = require("../../models/api/productconditionModel");
+const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 const multer = require("multer");
 const upload = multer({ dest: 'public/images/' }); 
 
@@ -186,8 +187,6 @@ exports.getBrandData = async function (req, res, next) {
 //   }
 // };
 
-
-
 exports.getProductconditionList = async function (req, res, next) {
   try {
     const productConditions = await Productcondition.find();
@@ -199,7 +198,6 @@ exports.getProductconditionList = async function (req, res, next) {
         respdata: {},
       });
     }
-
     res.status(200).json({ status: "1", productConditions: productConditions });
   } catch (error) {
     res.status(500).json({
@@ -209,8 +207,6 @@ exports.getProductconditionList = async function (req, res, next) {
     });
   }
 };
-
-
 
 exports.addData = async function (req, res, next) {
   const errors = validationResult(req);
@@ -296,8 +292,23 @@ exports.addData = async function (req, res, next) {
       const imageDetails = [];
 
       req.files.forEach(async (file) => {
-        const imageUrl = requrl + "/public/images/" + file.filename;
-        //const imageUrl = file.filename;
+        //const imageUrl = requrl + "/public/images/" + file.filename;
+        const imageUrl = file.filename;
+
+        if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){
+          await CompressImage("./public/images/"+image,"./public/compress_images/");
+        }
+        else
+        {
+          await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
+            if (err) {
+                console.log("Error Found:", err);
+            }
+            else {
+                console.log("File copied successfully!");
+            }
+          });
+        }
 
         const productimageDetail = new Productimage({
           product_id: savedProductdata._id,

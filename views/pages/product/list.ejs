@@ -98,7 +98,7 @@
                                 <%= (index + 1) %>
                               </td>
                               <td>
-                                <% value.productImages.forEach(function(image) { %>
+                                <%  value.productImages.forEach(function(image) { %>
                                   <% if (/^(ftp|http|https):\/\/[^ "]+$/.test(image.image)) { %>
                                     <% const imagePathParts = image.image.split('/public/images/'); %>
                                     <% if (imagePathParts.length > 1) { %>
@@ -107,7 +107,7 @@
                                       67px; width: 100px;">
                                       <% } else { %>
 
-                                        <img src="<%= requrl %>/public/images/<%= image.image %>"
+                                        <img src="<%= requrl %>/public/compress_images/<%= image.image %>"
                                           style="height: 67px; width: 100px;">
                                         <% } %>
                                           <% } else { %>

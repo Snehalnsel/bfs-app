@@ -142,8 +142,10 @@
    });
    $("body").on('DOMSubtreeModified', ".chat-messages", function() {
       $(".message-box-holder").each(async function() {
-         if($(this).children("div").hasClass("outgoing-message")){
+         if($(this).children("div.message-box").hasClass("outgoing-message")){
             $("#acceptButton").css({"pointer-events":"none"});
+         } else {
+            $("#acceptButton").css({"pointer-events":"auto"});
          }
       });
    });

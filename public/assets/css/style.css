@@ -307,15 +307,15 @@ nav.nav-link ul li a:hover {
 }
 
 .short-box a {
-    color: var(--black-color);
-    font-size: 14px;
-    font-weight: 400;
+    color: #e3683d;   
+    font-size: 13px;
+    font-weight: 600;
     text-decoration: none;
     transition: 0.5s;
 }
 
 .short-box a:hover {
-    color: #e3683d;
+     color: #383838;
     transition: 0.5s;
 }
 
@@ -362,8 +362,8 @@ nav.nav-link ul li a:hover {
 }
 
 .rtl-price {
-    font-size: 15px;
-    color: #959494;
+    font-size: 14px;
+    color: #383838;
 }
 
 .prd-button-group {
@@ -1767,8 +1767,9 @@ button.accordion-button {
 }
 
 .product-result h5 {
-    color: #010101;
-    font-size: 15px;
+    color: #383838;
+    font-size: 14px;
+    font-weight: 600;
 }
 
 .aling-center {
@@ -1776,9 +1777,10 @@ button.accordion-button {
 }
 
 .short-label {
-    color: #1e1e1e;
     font-size: 14px;
     margin-right: 10px;
+    color: #383838;
+    font-weight: 600;
 }
 
 .short-dropdown select {
@@ -2501,13 +2503,23 @@ span.wishlist-count {
 }
 
 .sht-ui {
-    font-size: 12px;
-    font-weight: 300;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.user-info .sht-ui {
+    font-size: 14px;
 }
 
 .user-name {
     font-size: 15px;
     font-weight: 600;
+    line-height: normal;
+}
+
+.user-info  .user-name {
+    font-size: 14px;
+    font-weight: 400;
     line-height: normal;
 }
 
@@ -2578,8 +2590,7 @@ h4.di-title {
 
 .div-row {
     display: flex;
-    flex-wrap: wrap;
-    width: 100%;
+    flex-wrap: wrap;   
     margin: 0px -10px;
 }
 
@@ -2644,10 +2655,13 @@ label.full-label {
     width: 100%;
 }
 
-.userimage-edit {
+/*.userimage-edit {
     position: absolute;
     right: 10px;
     top: 10px;
+}*/
+.userimage-edit {
+    position: relative;    
 }
 
 .userimage-edit label {
@@ -2665,9 +2679,12 @@ label.full-label {
     cursor: pointer;
 }
 
-.userimage-edit label:hover {
+/*.userimage-edit label:hover {
     background: #eee;
     transition: 0.5s;
+}*/
+.userimage-edit label{
+    background: none; 
 }
 
 .short-box {
@@ -2776,9 +2793,9 @@ a.edit-postbox {
 .switch {
     position: relative;
     display: inline-block;
-    width: 60px;
+    width: 60px !important;
     height: 26px;
-    margin-left: 15px;
+    margin-left: 0px;
     margin-bottom: 15px;
 }
 
@@ -2865,9 +2882,10 @@ input:checked+.tg-slider:before {
 }
 
 .post-imagebox {
-    display: flex;
+   display: flex;
     flex-wrap: wrap;
     grid-gap: 10px;
+    justify-content: space-between;
 }
 
 .upload-post h6 {
@@ -4217,7 +4235,7 @@ span.close-icon {
 .price-rangebox .slider .progress {
     height: 100%;
     left: 0%;
-    right: 25%;
+    right: 0%;
     position: absolute;
     border-radius: 5px;
     background: #e3683d;
@@ -4347,7 +4365,7 @@ span.close-icon {
     position: static;
 }
 
-.header-group .dropdown-menu {
+/*.header-group .dropdown-menu {
     width: 100%;
     left: 0;
     right: 0;
@@ -4355,7 +4373,7 @@ span.close-icon {
     display: block;
     visibility: hidden;
     opacity: 0;
-    transition: visibility 0s, opacity 0.3s linear;
+    transition: visibility 0s, opacity 0s linear;
     padding: 30px 15px;
     margin-top: 15px;
 
@@ -4367,7 +4385,35 @@ span.close-icon {
     opacity: 1;
     top: 40px;
     margin-top: 0px;
-    transition: visibility 0s, opacity 0.3s linear;
+    transition: visibility 0s, opacity 0s linear;
+}*/
+
+
+
+.header-group .dropdown-menu {
+    width: 100%;
+    left: 0;
+    right: 0;
+    top: 33px;
+    display: none;
+     visibility: hidden;
+    opacity: 0;    
+    padding: 30px 15px; 
+    margin-top: 15px;
+    transition: visibility 0s, opacity 0s linear;
+    transition-duration: 3s;
+    transition-delay: 0.5s;
+
+}
+
+.header-group .dropdown:hover .dropdown-menu {
+    display: block;
+     visibility: visible;
+    opacity: 1; 
+    margin-top: 0px;
+    transition: visibility 0s, opacity 0s linear;
+    transition-duration: 3s;
+    transition-delay: 0.5s;
 }
 
 .header-group .dropdown-menu {
@@ -4677,3 +4723,53 @@ a#navbarDropdown {
   ul.notlist-behavior li{
     list-style-type: none;
   }
+
+
+  .dsh-shortbox form .edit-link {
+    float: right;
+}
+
+  .dsh-shortbox form label{
+    width: 100%;
+  }
+
+  .bids-productbox .bs-group .br-details {
+    border-bottom: solid 1px #cdcdcd;
+}
+.bids-productbox .bs-group .br-details:last-child {
+    border-bottom: 0px;
+}
+
+.userimage-edit a.edit_link {
+    color: #e96a3f;
+    font-size: 12px;
+    text-decoration: underline;
+    font-weight: 400;
+}
+
+.shortedit-btn a {
+    padding: 5px 10px;
+    border: solid 1px #ddd;
+    background: #eee;
+    border-radius: 4px;
+    color: #505050;
+    font-weight: 400;
+    font-size: 13px;
+}
+.divseparetor {
+    margin-bottom: 15px;
+}
+
+.inlineflex {
+    display: flex;
+    align-items: center;
+}
+.inlineflex span {
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    grid-gap: 5px;
+}
+.inlineflex span label {
+    margin-bottom: 0px;
+}

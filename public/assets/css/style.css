@@ -2655,10 +2655,13 @@ label.full-label {
     width: 100%;
 }
 
-.userimage-edit {
+/*.userimage-edit {
     position: absolute;
     right: 10px;
     top: 10px;
+}*/
+.userimage-edit {
+    position: relative;    
 }
 
 .userimage-edit label {
@@ -2676,9 +2679,12 @@ label.full-label {
     cursor: pointer;
 }
 
-.userimage-edit label:hover {
+/*.userimage-edit label:hover {
     background: #eee;
     transition: 0.5s;
+}*/
+.userimage-edit label{
+    background: none; 
 }
 
 .short-box {
@@ -2787,9 +2793,9 @@ a.edit-postbox {
 .switch {
     position: relative;
     display: inline-block;
-    width: 60px;
+    width: 60px !important;
     height: 26px;
-    margin-left: 15px;
+    margin-left: 0px;
     margin-bottom: 15px;
 }
 
@@ -2876,9 +2882,10 @@ input:checked+.tg-slider:before {
 }
 
 .post-imagebox {
-    display: flex;
+   display: flex;
     flex-wrap: wrap;
     grid-gap: 10px;
+    justify-content: space-between;
 }
 
 .upload-post h6 {
@@ -4228,7 +4235,7 @@ span.close-icon {
 .price-rangebox .slider .progress {
     height: 100%;
     left: 0%;
-    right: 25%;
+    right: 0%;
     position: absolute;
     border-radius: 5px;
     background: #e3683d;
@@ -4731,4 +4738,38 @@ a#navbarDropdown {
 }
 .bids-productbox .bs-group .br-details:last-child {
     border-bottom: 0px;
+}
+
+.userimage-edit a.edit_link {
+    color: #e96a3f;
+    font-size: 12px;
+    text-decoration: underline;
+    font-weight: 400;
+}
+
+.shortedit-btn a {
+    padding: 5px 10px;
+    border: solid 1px #ddd;
+    background: #eee;
+    border-radius: 4px;
+    color: #505050;
+    font-weight: 400;
+    font-size: 13px;
+}
+.divseparetor {
+    margin-bottom: 15px;
+}
+
+.inlineflex {
+    display: flex;
+    align-items: center;
+}
+.inlineflex span {
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    grid-gap: 5px;
+}
+.inlineflex span label {
+    margin-bottom: 0px;
 }

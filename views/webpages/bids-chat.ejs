@@ -72,9 +72,6 @@
                      <% } %>
                   </div>
                </div>
-
-              
-              
             </div>
 
             <div class="chatbid-box">
@@ -110,6 +107,7 @@
    const socket = io("<%=siteUrl; %>");
    let msgSendStatus = false;
    let selectedBid = ``;
+   const username = $("#userId").val();
    async function updateSendMessage() {
       if(!msgSendStatus) {
          $(".sendMessageButton").attr("disabled", true);
@@ -134,12 +132,13 @@
       });
    });
    $(document).on("click","#acceptButton", async function() {
-      /*$(".clickOnProduct").each(async function(index) {
+      $(".clickOnProduct").each(async function(index) {
          if($(".clickOnProduct").hasClass("selectedProduct")){
-            let acceptBidId = this.id;
-            
+            let roomName = this.id;
+            socket.emit('acceptation', {username,roomName});
+            //console.log(acceptBidId);
          }
-      });*/
+      });
    });
    $("body").on('DOMSubtreeModified', ".chat-messages", function() {
       $(".message-box-holder").each(async function() {
@@ -176,7 +175,6 @@
    // ignoreQueryPrefix: true,
    // });
 
-   const username = $("#userId").val();
    $('.clickOnProduct').each(async function() {
         let currRoom = this.id;
       // Join chatroom

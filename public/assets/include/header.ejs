@@ -19,11 +19,16 @@
     <link rel="stylesheet" href="/public/assets/css/responsive.css" />
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
+    
+    
 </head>
 
 <body>
+    <%
+    const websiteUrl = "https://localhost:3000";
+    const imageUrl = "/public/compress_images";
+    const imageanotherUrl = "/public/images";
+    %>
     <input type="hidden" name="userReloggedIn" id="userReloggedIn" value="<%=isLoggedIn;%>" />
     <section class="theme_header hide-mobile">
         <div class="container p-relative">
@@ -58,56 +63,26 @@
                                 <ul class="main-nav">
                                     <li class="nav-item"><a href="/">Home</a></li>
                                     <!-- <li class="nav-item"><a href="javascript:void(0)">About Us</a></li> -->
-                                    <li class="nav-item"><a href="/webSubCategories">Categories</a></li>
+                                    <!-- <li class="nav-item"><a href="/webSubCategories">Categories</a></li> -->
                                     <li class="nav-item dropdown">
                                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Categories
                                         </a>
 
                                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-
-                                            <!-- <div class="row">
-                                        <div class="col-md-2">
-                                            <ul id="listing-data"><h4>Men</h4>            
-                                            </ul>
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <ul id="listing-data"><h4>Women</h4>         
-                                            </ul>
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <ul id="listing-data"><h4>Kids</h4>                  
-                                            </ul>
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <ul id="listing-data"><h4>Others</h4>                        
-                                            </ul>
-                                        </div>
-
-                                        <div class="col-md-2">
-                                             <div class="menu-icon">
-                                                <img src="/public/assets/images/menu-banner.png" alt="images">
-                                            </div>
-                                        </div>
-                                        
-                                    </div> -->
-
                                             <div class="row">
                                                 <div class="col-md-3">
-                                                    <ul id="men-list" class="listing-data">
+                                                    <ul id="men-list" class="men-list">
                                                         <h4>Men</h4>
                                                     </ul>
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <ul id="women-list" class="listing-data">
+                                                    <ul id="women-list" class="women-list">
                                                         <h4>Women</h4>
                                                     </ul>
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <ul id="kids-list" class="listing-data">
+                                                    <ul id="kids-list" class="kids-list">
                                                         <h4>Kids</h4>
                                                     </ul>
                                                 </div>
@@ -386,15 +361,54 @@
     </section>
     <script>
         window.onload = fetchData1();
+        window.onload = womenlistData();
+        window.onload = kidlistData1();
+        window.onload = menlistData1();
         window.onload = getHeaderData();
         var hTml = ``;
         async function fetchData1() {
             try {
+                response1 = await fetch('/otherwise-list');
+                const data1 = await response1.json();
+                const topmenu1 = data1.categories;
                 const response = await fetch('/top-categoriesweb');
                 const data = await response.json();
                 const topmenu = data.respdata;
                 populateSlider1(topmenu);
-                megamenu(topmenu);
+                megamenu(topmenu1);
+            }
+            catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+        async function womenlistData() {
+            try {
+                response = await fetch('/womengender-list');
+                const data = await response.json();
+                const topmenu = data.categories;
+                womenmenu(topmenu);
+            }
+            catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+        async function menlistData1() {
+            try {
+                response = await fetch('/mengender-list');
+                const data = await response.json();
+                const topmenu = data.categories;
+                menmenu(topmenu);
+            }
+            catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+        async function kidlistData1() {
+            try {
+                response = await fetch('/kidgender-list');
+                const data = await response.json();
+                const topmenu = data.categories;
+                kidmenu(topmenu);
             }
             catch (error) {
                 console.error('Error fetching data:', error);
@@ -419,6 +433,33 @@
             data.forEach(item => {
                 var hTml1 = `<li><a href="/websubcategoriesproducts/${item._id}">${item.name}</a></li>`;
                 var ulElements = document.getElementsByClassName('listing-data');
+                for (var i = 0; i < ulElements.length; i++) {
+                    ulElements[i].innerHTML += hTml1;
+                }
+            });
+        }
+        function womenmenu(data) {
+            data.forEach(item => {
+                var hTml1 = `<li><a href="/websubcategoriesproducts/${item._id}">${item.name}</a></li>`;
+                var ulElements = document.getElementsByClassName('women-list');
+                for (var i = 0; i < ulElements.length; i++) {
+                    ulElements[i].innerHTML += hTml1;
+                }
+            });
+        }
+        function menmenu(data) {
+            data.forEach(item => {
+                var hTml1 = `<li><a href="/websubcategoriesproducts/${item._id}">${item.name}</a></li>`;
+                var ulElements = document.getElementsByClassName('men-list');
+                for (var i = 0; i < ulElements.length; i++) {
+                    ulElements[i].innerHTML += hTml1;
+                }
+            });
+        }
+        function kidmenu(data) {
+            data.forEach(item => {
+                var hTml1 = `<li><a href="/websubcategoriesproducts/${item._id}">${item.name}</a></li>`;
+                var ulElements = document.getElementsByClassName('kids-list');
                 for (var i = 0; i < ulElements.length; i++) {
                     ulElements[i].innerHTML += hTml1;
                 }

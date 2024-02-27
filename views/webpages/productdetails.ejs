@@ -26,7 +26,9 @@
                         <ul class='exzoom_img_ul'>
                            <% if (respdata.product_images) { %>
                               <% respdata.product_images.forEach(function (item) { %>
-                                 <li><img src="<%= item.image %>" /></li>
+                                 <li>
+                                    <img src="<%=websiteUrl %>/public/compress_images/<%= item.image %>" alt="images" class="img-fluid">
+                                 </li>
                                  <% }); %>
                                     <% } %>
                         </ul>
@@ -126,7 +128,7 @@
                      </div>
                   </div>
                   <br>
-                  <h6>Product Details</h6>
+                  <!-- <h6>Product Details</h6> -->
                   <h6>Specifications:</h6>
                   <div class="featured-list">
                      <ul>
@@ -175,7 +177,7 @@
                      <h6>Specifications:</h6>
                      <div class="featured-list">
                         <ul>
-                           <li><span>Brand:</span>
+                           <li><span>Category:</span>
                               <%= respdata.category %>
                            </li>
                            <li><span>Brand:</span>

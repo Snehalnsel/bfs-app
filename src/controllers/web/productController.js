@@ -35,7 +35,7 @@ const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 
 exports.getData = async function (req, res, next) {
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-  var pageName = "Product List";
+  var pageName = "Product";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
   Userproduct.aggregate([
     {
@@ -95,6 +95,7 @@ exports.getData = async function (req, res, next) {
         as: 'productCondition',
       },
     },
+    /*
     {
       $unwind: '$category',
     },
@@ -105,8 +106,19 @@ exports.getData = async function (req, res, next) {
         foreignField: '_id',
         as: 'category.parent'
       }
-    }
+    },*/
+    {
+      $lookup: {
+        from: 'mt_genders',
+        localField: 'gender_id',
+        foreignField: '_id',
+        as: 'gender',
+      },
+    },
   ]).exec(function (error, productList) {
+
+    const totalCount = productList.length;
+    console.log(totalCount);
     if (error) {
       return res.status(500).json({ error: 'An error occurred' });
     }
@@ -406,10 +418,21 @@ exports.updatedetailsData = async function (req, res, next) {
             const imagesToInsert = allImages.slice(0, Math.min(5, allImages.length));
 
             const imageDetails = imagesToInsert.map(async imageUrl => {
-              // let extension = path.extname(imageUrl);
-              // if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){ 
-              //   await CompressImage("./public/images/"+imageUrl,"./public/compress_images/");
-              // }
+              let extension = path.extname(imageUrl);
+              if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){ 
+                await CompressImage("./public/images/"+imageUrl,"./public/compress_images/");
+              }
+              else
+              {
+                await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
+                  if (err) {
+                      console.log("Error Found:", err);
+                  }
+                  else {
+                      console.log("File copied successfully!");
+                  }
+                });
+              }
               const productimageDetail = new Productimage({
                 product_id: req.body.product_id,
                 category_id: req.body.subcategory_id,
@@ -426,10 +449,21 @@ exports.updatedetailsData = async function (req, res, next) {
           await Productimage.deleteMany({ product_id: req.body.product_id });
           const imagesToUpload = imagesArray.slice(0, 5);
           for (const image of imagesToUpload) {
-            //let extension = path.extname(imageUrl);
-            // if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){
-            //   await CompressImage("./public/images/"+image,"./public/compress_images/");
-            // }
+            let extension = path.extname(imageUrl);
+            if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){
+              await CompressImage("./public/images/"+image,"./public/compress_images/");
+            }
+            else
+            {
+              await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
+                if (err) {
+                    console.log("Error Found:", err);
+                }
+                else {
+                    console.log("File copied successfully!");
+                }
+              });
+            }
             const productimageDetail = new Productimage({
               product_id: req.body.product_id,
               category_id: req.body.subcategory_id,
@@ -446,12 +480,27 @@ exports.updatedetailsData = async function (req, res, next) {
         const count = await Productimage.countDocuments({ product_id: req.body.product_id });
         if (count !== 5 || count < 5) {
           if (req.files && req.files.length > 0) {
-            const imageDetails = req.files.slice(0, 5 - count).map((file) => {
-              const requrl = url.format({
-                protocol: req.protocol,
-                host: req.get("host"),
-              });
-              const imageUrl = requrl + "/public/images/" + file.filename;
+            const imageDetails = req.files.slice(0, 5 - count).map(async (file) => {
+              // const requrl = url.format({
+              //   protocol: req.protocol,
+              //   host: req.get("host"),
+              // });
+               const imageUrl = file.filename;
+                let extension = path.extname(imageUrl);
+                if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){
+                  await CompressImage("./public/images/"+imageUrl,"./public/compress_images/");
+                } else
+                {
+                  await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
+                    if (err) {
+                        console.log("Error Found:", err);
+                    }
+                    else {
+                        console.log("File copied successfully!");
+                    }
+                  });
+                }
+             
               const productimageDetail = new Productimage({
                 product_id: req.body.product_id,
                 category_id: req.body.subcategory_id,

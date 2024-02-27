@@ -250,7 +250,7 @@ router.get("/body-focus-status/:id", cors(), BodyFocusController.statusData);
 
 // router.get("/body-focus-subcat/:page", cors(), BodyFocusController.getSubcatData);
 
-router.get("/body-focus-subcat", cors(), (req, res) => {
+router.get("/subactegorylist", cors(), (req, res) => {
   const page = req.query.page;
   const searchType = req.query.searchType;
   const searchValue = req.query.searchValue;
@@ -259,7 +259,7 @@ router.get("/body-focus-subcat", cors(), (req, res) => {
 
 router.get("/sreach-subcat/:sreach_category/:sreach_product/:page", cors(), BodyFocusController.getSubcatDataBySearches);
 
-router.get("/edit-sub-cat/:id", cors(), BodyFocusController.editSubCatData);
+router.get("/edit-subcategory/:id", cors(), BodyFocusController.editSubCatData);
 
 router.post(
   "/update-sub-cat",

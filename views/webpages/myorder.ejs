@@ -97,8 +97,9 @@
          <script>
             window.onload = fetchData();
             window.onload = sellerList();
-
+         
             async function fetchData() {
+         
                const orderList = await fetch('/orderlist', {
                   method: 'POST',
                   headers: {
@@ -114,10 +115,14 @@
 
                data.orders.forEach(item => {
 
+                  let currImagesUrl = `/public/images/${item.image}`;
+
                   var hTml = `<div class="cart-list wishlist-list" data-orderid="${item._id}" data-userby="3">
         <div class="bids-row wishlist-row " >
               <div class="br-details">
-                  <div class="bid-images"><img src="${item.product.image}" alt="images" class="img-fluid"></div>
+                  <div class="bid-images">
+                     <img src="${(currImagesUrl.startsWith('/public/compress_images/') ? (webSiteUrl + '/public/compress_images/' + item.product.image) : webSiteUrl + currImagesUrl)}" alt="images" class="img-fluid">
+                  </div>
                   <div class="bid-info">
                      <div class="bd-title">
                         <a href="/web-myorder-details/${item._id}">${item.product.name}</a>
@@ -185,6 +190,7 @@
 
             }
             async function sellerList() {
+
                const sellerList = await fetch('/selllist', {
                   method: 'POST',
                   headers: {
@@ -198,10 +204,13 @@
             function populateSellerHtml(data) {
                data.orders.forEach(item => {
 
+                  let currImagesUrl = `/public/images/${item.image}`;
                   var hTml = `<div class="cart-list wishlist-list" data-orderid="${item._id}" data-userby="2">
     <div class="bids-row wishlist-row order-list">
         <div class="br-details">
-            <div class="bid-images"><img src="${item.product.image}" alt="images" class="img-fluid"></div>
+            <div class="bid-images">
+               <img src="${(currImagesUrl.startsWith('/public/compress_images/') ? (webSiteUrl + '/public/compress_images/' + item.product.image) : webSiteUrl + currImagesUrl)}" alt="images" class="img-fluid">
+            </div>
             <div class="bid-info bi-iconbox">
                <div class="bid-left">
                 <div class="bd-title">${item.product.name}</div>

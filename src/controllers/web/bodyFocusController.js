@@ -148,8 +148,6 @@ exports.getSubcatData = async function (page,searchType, searchValue, req, res, 
         parentCategoryName: parentCategoryName,
       });
     }
-
-
     res.render("pages/body-focus/subcatlist", {
       siteName: req.app.locals.siteName,
       pageName: pageName,

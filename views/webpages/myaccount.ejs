@@ -11,19 +11,20 @@
                <div class="sht-ui">Hello</div>
                
                <div class="user-name"><%=respdata.title%> <%=respdata.name%></div>
+               <div class="userimage-edit">
+                  <!--  <a href="javascript:void(0)" data-toggle="modal" data-target="#profile-change-modal"><i class="fa fa-pencil" aria-hidden="true"></i></a> -->
+                    <!--<label for="file"><i class="fa fa-pencil" aria-hidden="true"></i></label>-->
+                    <!--<input id="file" class="file-line" type="file" onchange="loadFile(event)">-->
+                    <label>
+                        <a href="javascript:void(0)" data-toggle="modal" data-target="#upload-profile-modal" class="edit_link">
+                         Edit
+                        </a>
+                    </label>
+                 </div>
             </div>
             <!-- Profile Image Modal Start -->   
    
-            <div class="userimage-edit">
-              <!--  <a href="javascript:void(0)" data-toggle="modal" data-target="#profile-change-modal"><i class="fa fa-pencil" aria-hidden="true"></i></a> -->
-                <!--<label for="file"><i class="fa fa-pencil" aria-hidden="true"></i></label>-->
-                <!--<input id="file" class="file-line" type="file" onchange="loadFile(event)">-->
-                <label>
-                    <a href="javascript:void(0)" data-toggle="modal" data-target="#upload-profile-modal" class="edit_link">
-                        <i class="fa fa-pencil" aria-hidden="true"></i>
-                    </a>
-                </label>
-             </div>
+            
 
             <div class="modal theme_modal short-modal change-profile-update" id="upload-profile-modal">
                <div class="modal-dialog">
@@ -125,22 +126,22 @@
                      <% respdata1.forEach(function(item) { %>                        
                       <% if(item.address_name == 'Home' && item.default_status == '0') {%>
                       <div class="div-12">
-                         <label>Home: <div class="edit-link shortedit-btn"><a href="/delete-address/<%=item._id%>"><i class="fa fa-trash-o" aria-hidden="true"></i> </a></div></label>                        
-                         <textarea class="ds-form-control" value="" disabled><%=item.address1%>, <%=item.street_name%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>
+                         <div class="edit-link"><a href="/delete-address/<%=item._id%>"><i class="fa fa-trash-o" aria-hidden="true"></i></a></div>                      
+                         <textarea class="ds-form-control" value="" disabled>Home:<%=item.address1%>, <%=item.street_name%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>
                          <input type="hidden" name="address_home" value="">
                         </div>
                       <% } %>
                       <%if(item.address_name == 'Office' && item.default_status == '0') {%>
                         <div class="div-12">
-                           <label>Office:</label> <div class="edit-link"><a href="/delete-address/<%=item._id%>"><i class="fa fa-trash-o" aria-hidden="true"></i></a></div>                       
-                           <textarea class="ds-form-control" value="" disabled><%=item.address1%>, <%=item.street_name%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>
+                           <label></label> <div class="edit-link"><a href="/delete-address/<%=item._id%>"><i class="fa fa-trash-o" aria-hidden="true"></i></a></div>                       
+                           <textarea class="ds-form-control" value="" disabled>Office:<%=item.address1%>, <%=item.street_name%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>
                            <input type="hidden" name="address_office" value="">
                         </div>
                         <% } %>
                         <%if(item.address_name == 'Other' && item.default_status == '0'){%>
                            <div class="div-12">
-                              <label>Others:</label> <div class="edit-link"><a href="/delete-address/<%=item._id%>"><i class="fa fa-trash-o" aria-hidden="true"></i></a></div>                       
-                              <textarea class="ds-form-control" value="" disabled><%=item.address1%>, <%=item.street_name%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>
+                              <label></label> <div class="edit-link"><a href="/delete-address/<%=item._id%>"><i class="fa fa-trash-o" aria-hidden="true"></i></a></div>                       
+                              <textarea class="ds-form-control" value="" disabled>Others:<%=item.address1%>, <%=item.street_name%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>
                               <input type="hidden" name="address_others" value="">
                            </div>
                            <% } %>

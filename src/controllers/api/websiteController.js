@@ -64,6 +64,7 @@ const Track = require("../../models/api/trackingModel");
 const sendSms = require("../../models/thirdPartyApi/sendSms");
 const sendWhatsapp = require("../../models/thirdPartyApi/sendWhatsapp");
 const ApiCallHistory = require("../../models/thirdPartyApi/ApiCallHistory");
+const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 const { log, Console } = require("console");
 const { create } = require('xmlbuilder2');
 
@@ -1495,10 +1496,14 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
       sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
       conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
       genderList = await Gender.find();
+      // genderIds = userProducts.map(product => product.gender_id).filter(Boolean);
+      // genderList = await Gender.find({ _id: { $in: genderIds } });
     }
+    
     res.render("webpages/subcategoryproduct", {
       title: "Product Sub Categories",
       message: "Welcome to the Product Sub Categories!",
+      websiteUrl: process.env.SITE_URL,
       isLoggedIn: isLoggedIn,
       categoryName: categoryName,
       brandList: typeof brandList != "undefined" ? brandList : [],
@@ -1538,6 +1543,7 @@ exports.getSubCategoriesProductswithSort = async function (page, req, res, next)
   return res.json({
     status: '1',
     message: 'Success',
+    websiteUrl: process.env.SITE_URL,
     respdata: formattedUserProducts,
     productCount: productCount,
     isLoggedIn: isLoggedIn
@@ -1783,6 +1789,7 @@ exports.userWisePost = async function (req, res, next) {
         respdata: formattedUserProducts,
         userData: req.session.user,
         isLoggedIn: isLoggedIn,
+        websiteUrl: process.env.SITE_URL,
       });
     }
   } catch (error) {
@@ -1812,6 +1819,7 @@ exports.addPostView = async function (req, res, next) {
       subcate: categoriesWithoutParentId,
       genderList: genderList,
       isLoggedIn: isLoggedIn,
+      websiteUrl: process.env.SITE_URL,
     });
   } catch (error) {
     res.status(500).json({
@@ -1882,7 +1890,21 @@ exports.addNewPost = async function (req, res, next) {
     if (req.files && req.files.length > 0) {
       const imageDetails = [];
       req.files.forEach(async (file) => {
-        const imageUrl = requrl + "/public/images/" + file.filename;
+        const imageUrl = file.filename;
+         let extension = path.extname(imageUrl);
+            if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){
+              await CompressImage("./public/images/"+imageUrl,"./public/compress_images/");
+            } else
+            {
+              await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
+                if (err) {
+                    console.log("Error Found:", err);
+                }
+                else {
+                    console.log("File copied successfully!");
+                }
+              });
+            }
         const productimageDetail = new Productimage({
           product_id: savedProductdata._id,
           user_id: req.session.user.userId,
@@ -1945,8 +1967,8 @@ exports.editUserWisePost = async function (req, res, next) {
       productsize: productsize,
       genderList: genderList,
       isLoggedIn: isLoggedIn,
+      websiteUrl: process.env.SITE_URL,
     });
-
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -2033,8 +2055,21 @@ exports.updatePostData = async function (req, res, next) {
     //     const savedImage = await productImageDetail.save();
     //   }
     // }
-    if (req.files && Object.keys(req.files).length > 0) {
 
+     const previousImages = await Productimage.find({ product_id: existingProduct._id });
+     for (const image of previousImages) {
+       const imagePath = path.resolve(__dirname,'../../../public/compress_images/'+image.image);
+       const imagePathreal = path.resolve(__dirname,'../../../public/images/'+image.image);
+          if (fs.existsSync(imagePath)) {
+              fs.unlinkSync(imagePath);
+          }
+          if (fs.existsSync(imagePathreal)) {
+              fs.unlinkSync(imagePathreal);
+          }
+        await Productimage.findByIdAndDelete(image._id);
+      }
+ 
+    if (req.files && Object.keys(req.files).length > 0) {
       const requrl = url.format({
         protocol: req.protocol,
         host: req.get("host"),
@@ -2042,7 +2077,22 @@ exports.updatePostData = async function (req, res, next) {
       for (const fieldName in req.files) {
         const files = req.files[fieldName];
         for (const file of files) {
-          const imageUrl = `${requrl}/public/images/${file.filename}`;
+          const imageUrl = file.filename;
+          let extension = path.extname(imageUrl);
+             if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){
+               await CompressImage("./public/images/"+imageUrl,"./public/compress_images/");
+             }
+             else
+             {
+               await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
+                 if (err) {
+                     console.log("Error Found:", err);
+                 }
+                 else {
+                     console.log("File copied successfully!");
+                 }
+               });
+             }
           const productImageDetail = new Productimage({
             product_id: existingProduct._id,
             category_id: existingProduct.category_id,
@@ -2425,7 +2475,7 @@ exports.viewCartListByUserId = async function (req, res, next) {
         respdata1: [],
         user: user_id,
         isLoggedIn: isLoggedIn,
-
+        websiteUrl: process.env.SITE_URL,
       });
     }
     else {
@@ -2468,6 +2518,7 @@ exports.viewCartListByUserId = async function (req, res, next) {
           respdata1: finalPrice,
           user: user_id,
           isLoggedIn: isLoggedIn,
+          websiteUrl: process.env.SITE_URL,
         });
       }));
     }
@@ -2530,7 +2581,22 @@ exports.changeProfileImgWeb = async function (req, res, next) {
     if (req.files && req.files.length > 0) {
       const imageDetails = [];
       req.files.forEach(async (file) => {
-        const imageUrl = requrl + "/public/images/" + file.filename;
+        // const imageUrl = requrl + "/public/images/" + file.filename;
+        const imageUrl = file.filename;
+        let extension = path.extname(imageUrl);
+           if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){
+             await CompressImage("./public/images/"+imageUrl,"./public/compress_images/");
+           } else
+           {
+             await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
+               if (err) {
+                   console.log("Error Found:", err);
+               }
+               else {
+                   console.log("File copied successfully!");
+               }
+             });
+           }
         const updData = {
           image: imageUrl,
         };
@@ -2652,6 +2718,7 @@ exports.myOrderWeb = async (req, res) => {
       message: "Welcome to the Wish List page!",
       respdata: typeof req.session.user != "undefined" ? req.session.user : null,
       isLoggedIn: isLoggedIn,
+      websiteUrl: process.env.SITE_URL,
     });
   }
   catch (error) {
@@ -2761,6 +2828,7 @@ exports.myOrderDetailsWeb = async (req, res) => {
       respdata: orderDetails,
       //respdata1: orderlistId,
       isLoggedIn: isLoggedIn,
+      websiteUrl: process.env.SITE_URL,
     });
   }
   catch (error) {
@@ -2823,6 +2891,7 @@ exports.addShipmentData = async (req, res) => {
         is_shippingkit: true,
         order: savedOrder,
         isLoggedIn: isLoggedIn,
+        websiteUrl: process.env.SITE_URL,
       });
     }
   } catch (error) {
@@ -2900,8 +2969,8 @@ exports.getWhatsHotProductsweb = async function (req, res) {
         conditionList: conditionList,
         productCount: hotProductsCount,
         isLoggedIn: isLoggedIn,
-        filter_basedon: "whatshot"
-
+        filter_basedon: "whatshot",
+        websiteUrl: process.env.SITE_URL,
       });
 
   } catch (error) {
@@ -2930,54 +2999,25 @@ exports.getJustSoldProductsweb = async function (req, res) {
     const brandList = await brandModel.find({});
     const sizeList = await sizeModel.find({});
     const conditionList = await productconditionModel.find({});
-
-
-
-
     const solditems = await Userproduct.find({ approval_status: 1, flag: 1 });
-
     const justSoldProducts = [];
-
-
-
     for (const product of solditems) {
-
       const productImage = await Productimage.findOne({ product_id: product._id });
-
-
-
       if (productImage) {
-
         const productCondition = await Productcondition.findById(product.status);
-
-
-
         justSoldProducts.push({
-
           _id: product._id,
-
           name: product.name,
-
           price: product.price,
-
           offer_price: product.offer_price,
-
           original_packaging: product.original_packaging,
-
           original_invoice: product.original_invoice,
-
           status_name: productCondition ? productCondition._id : '',
-
           status: productCondition ? productCondition.name : '',
-
           image: productImage,
-
         });
-
       }
-
     }
-
     res.render("webpages/allhomeproduct",
       {
         title: "Product Sub Categories",
@@ -2988,8 +3028,8 @@ exports.getJustSoldProductsweb = async function (req, res) {
         conditionList: conditionList,
         productCount: soldItemsCount,
         isLoggedIn: isLoggedIn,
-        filter_basedon: "justsold"
-
+        filter_basedon: "justsold",
+        websiteUrl: process.env.SITE_URL,
       });
 
   } catch (error) {
@@ -3611,5 +3651,111 @@ exports.reasonlistdata = async function (req, res, next) {
     return res.json(reasons);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+
+
+exports.genderwomenlistdata = async function (req, res, next) {
+  try {
+    const genderId = "65c5dd7c949c7a8b6173f1a9"; 
+    const userProducts = await Userproduct.find({
+      approval_status: 1,
+      flag: 0,
+      gender_id: genderId, 
+    }).distinct('category_id');
+
+    const categoryList = await Category.find({ _id: { $in: userProducts } });
+
+    res.json({
+      status: '1',
+      message: 'Categories fetched successfully.',
+      categories: categoryList,
+    });
+  } catch (error) {
+    console.error(error); 
+    res.status(500).json({
+      status: '0',
+      message: 'An error occurred while fetching categories by gender_id.',
+      error: error.message,
+    });
+  }
+};
+
+exports.gendermenlistdata = async function (req, res, next) {
+  try {
+    const genderId = "65c5df544f66e281a6393737"; 
+    const userProducts = await Userproduct.find({
+      approval_status: 1,
+      flag: 0,
+      gender_id: genderId, 
+    }).distinct('category_id');
+
+    const categoryList = await Category.find({ _id: { $in: userProducts } });
+
+    res.json({
+      status: '1',
+      message: 'Categories fetched successfully.',
+      categories: categoryList,
+    });
+  } catch (error) {
+    console.error(error); 
+    res.status(500).json({
+      status: '0',
+      message: 'An error occurred while fetching categories by gender_id.',
+      error: error.message,
+    });
+  }
+};
+
+
+exports.genderkidlistdata = async function (req, res, next) {
+  try {
+    const genderId = "65c5df684f66e281a639373a"; 
+    const userProducts = await Userproduct.find({
+      approval_status: 1,
+      flag: 0,
+      gender_id: genderId, 
+    }).distinct('category_id');
+
+    const categoryList = await Category.find({ _id: { $in: userProducts } });
+
+    res.json({
+      status: '1',
+      message: 'Categories fetched successfully.',
+      categories: categoryList,
+    });
+  } catch (error) {
+    console.error(error); 
+    res.status(500).json({
+      status: '0',
+      message: 'An error occurred while fetching categories by gender_id.',
+      error: error.message,
+    });
+  }
+};
+
+exports.otherlistdata = async function (req, res, next) {
+  try {
+    const genderId = "65c5e0db8e59ce8c9788301c"; 
+    const userProducts = await Userproduct.find({
+      approval_status: 1,
+      flag: 0,
+      gender_id: genderId, 
+    }).distinct('category_id');
+
+    const categoryList = await Category.find({ _id: { $in: userProducts } });
+
+    res.json({
+      status: '1',
+      message: 'Categories fetched successfully.',
+      categories: categoryList,
+    });
+  } catch (error) {
+    console.error(error); 
+    res.status(500).json({
+      status: '0',
+      message: 'An error occurred while fetching categories by gender_id.',
+      error: error.message,
+    });
   }
 };

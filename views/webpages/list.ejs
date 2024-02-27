@@ -1,4 +1,4 @@
-<%- include('../../public/assets/include/header'); %>
+<%- await include('../../public/assets/include/header'); %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -122,8 +122,8 @@
        </div>
     </div>
    </section>
- <%- include('../../public/assets/include/newsletter'); %>
-  <%- include('../../public/assets/include/footer'); %>
+ <%- await include('../../public/assets/include/newsletter'); %>
+  <%- await include('../../public/assets/include/footer'); %>
 </body>
 <script>
    async function fetchData() {
@@ -131,29 +131,21 @@
        const response = await fetch('/app-home');
        const data = await response.json();
 
-         isLoggedIn = data.isLoggedIn;
+      isLoggedIn = data.isLoggedIn;
      // Best deal populate
        const bestDeals = data.respdata.best_deal;
-       
        const bestDealsSlider = document.getElementById('best-deals-slider');
+       console.log(bestDealsSlider);
        populateSlider(bestDealsSlider, bestDeals);
 
-        // whats hot populate
         const whatshot = data.respdata.whats_hot;
-        
         const whatshotSlider = document.getElementById('whats-hot-slider');
         populateSlider(whatshotSlider, whatshot);
-        
-        
-        // Just sold populate
+      
         const justsold = data.respdata.just_sold;
-        
         const justsoldSlider = document.getElementById('just-sold-slider');
         populateSlider(justsoldSlider, justsold);
         
-        
-        
-      
       $('.product_Slider1').removeClass("slick-initialized slick-slider");
       $('.product_Slider1').slick({
          dots: false,
@@ -184,15 +176,18 @@
      }
    }
 
-   function populateSlider(sliderElement, data, isLoggedIn = "") {
-         data.forEach(item => {
+   async function populateSlider(sliderElement, data, isLoggedIn = "") {
+         data.forEach(async item => {
          const sliderItem = document.createElement('div');
          sliderItem.classList.add('slider-item');
+         let currImagesUrl = `/public/images/${item.image}`;
          let html = ``;
          html += `
          <div class="product-box">
             <div class="product-image">
-               <a href="/productdeatils/${item._id}"><img src="${item.image}" alt="images" class="img-fluid"></a>
+               <a href="/productdeatils/${item._id}">
+                  <img src="${(currImagesUrl.startsWith('/public/compress_images/') ? (webSiteUrl + '/public/compress_images/' + item.image) : webSiteUrl + currImagesUrl)}" alt="images" class="img-fluid">
+                  </a>
             </div>
             <div class="prd-short-info">
                <div class="prd-name"><a href="javascript:void(0)">${item.name}</a></div>
@@ -217,8 +212,10 @@
 
    }
 
-
-   window.onload = fetchData;
+$(document).ready(async function(){
+   fetchData();
+});
+   //window.onload = fetchData;
    
   
     $(document).ready(async function(){
@@ -229,7 +226,7 @@
         await userReLogin(cartListreCookieAccessToken, cartListreCookieRefreshToken);
         
         $.ajax({
-                 url: '/cart-list', // Route on the server to handle the request
+                 url: '/cart-list', 
                  data: {id1:id1},
                  method: 'POST',
                  success: function(data) 
@@ -241,5 +238,6 @@
         });
    });
 
+// <img src="${ (baseURL + '/public/compress_images/' + item.image) ? (baseURL + '/public/compress_images/' + item.image) : (baseURL + '/public/images/' + item.image) }" alt="images" class="img-fluid">
 
 </script>

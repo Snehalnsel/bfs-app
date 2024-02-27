@@ -5,7 +5,7 @@
          <div class="dashboard-sidbar">
             <div class="sidbar-box user-profile">
                <div class="user-icon">
-                  <img src="<%=userData.image%>" alt="user-image" id="output">
+                  <img src="<%=websiteUrl %>/public/compress_images/<%=userData.image%>" alt="user-image" id="output">
                </div>
                <div class="user-info">
                   <div class="sht-ui">Hello</div>
@@ -68,7 +68,7 @@
                            <div class="post-imagebox">
                               <% respdata.images.forEach(function(img, index) { %>
                                  <div class="upload-post full-post-image">
-                                    <img src="<%= img.image %>" style="width:50%; height:80%;">
+                                    <img src="<%=websiteUrl %>/public/compress_images/<%= img.image %>" style="width:50%; height:80%;">
                                     <input type="file" name="img<%= index %>" />
                                  </div>
                                  <% }); %>

@@ -1322,4 +1322,20 @@ router.get("/reason-list",cors(),
   WebsiteController.reasonlistdata
 );
 
+router.get("/womengender-list",cors(),
+  WebsiteController.genderwomenlistdata
+);
+
+router.get("/mengender-list",cors(),
+  WebsiteController.gendermenlistdata
+);
+
+router.get("/kidgender-list",cors(),
+  WebsiteController.genderkidlistdata
+);
+
+router.get("/otherwise-list",cors(),
+  WebsiteController.otherlistdata
+);
+
 module.exports = router;

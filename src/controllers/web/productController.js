@@ -394,7 +394,9 @@ exports.updatedetailsData = async function (req, res, next) {
               protocol: req.protocol,
               host: req.get("host"),
             });
-            return file.filename;
+            const imageUrl = requrl + "/public/images/" + file.filename;
+            // return file.filename;
+            return imageUrl;
           }));
           const countAllImages = allImages.length;
           await Productimage.deleteMany({ product_id: req.body.product_id });

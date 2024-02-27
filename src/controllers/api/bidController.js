@@ -249,6 +249,9 @@ exports.bidExistReccord = async (req, res, next) => {
           withdrew: false,
           status:1,
           currentOffer: currentOffer,
+          //Added Two Field  Due To Accept Logic
+          acceptedByBuyer:false,
+          acceptedBySeller:false,
           sellerId:(productDetails.user_id.toString() != "") ? productDetails.user_id.toString() : "",
         }; 
         await insertBidData(insertData,bidId);

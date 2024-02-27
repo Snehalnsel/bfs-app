@@ -307,16 +307,64 @@ io.on("connection", (socket) => {
         createdAt: timeMiliSeccond,
         productId: (bidOldData.productId != "") ? bidOldData.productId : "",
         withdrew: false,
+        acceptedByBuyer:false,
+        acceptedBySeller:false,
         status:1,
         currentOffer: currentOffer,
         sellerId:(bidOldData.sellerId != "") ? bidOldData.sellerId : "",
       }; 
       await updateBidData(updateData,bidId);
       await insertBidOfferData(currentOffer,currentOffer.id);
-      let currUserDetails = await UserModel.findOne({_id:username});
+      //let currUserDetails = await UserModel.findOne({_id:username});
       //Below line has commented out due to a observer written on the above
       //io.to(roomName).emit("message",formatMessage(currUserDetails.name, msg,username, roomName));
     }
+  });
+  // Buyer Seller Acceptation
+  socket.on("acceptation", async ({username,roomName,}) => {
+    //Save the accpetence in db
+    let bidId = roomName;
+    let queryData = {
+      id:bidId,
+      userId:username
+    };
+    let bidOldData = await getBidData(queryData);
+    bidOldData = bidOldData[0];
+    let currIndex = parseInt(bidOldData.currentOffer.offerIndex) + 1;
+      const currDateTime = new Date();
+      let timeMiliSeccond = currDateTime.valueOf();
+      let currentOffer = {
+        bidId: bidId,
+        createdAt: timeMiliSeccond,
+        id:(username == bidOldData.buyerId) ? "offer_buyer_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond : "offer_seller_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond,
+        isFromBuyer:(username == bidOldData.buyerId) ? true: false,
+        offerIndex:currIndex,
+        price: " Has Accepted Your Offer!!",
+        status: 0,
+        userId: queryData.userId,
+      };
+      let updateData = {
+        //buyerId:queryData.userId,
+        buyerId:(bidOldData.buyerId != "") ? bidOldData.buyerId : "",
+        id:bidId,
+        createdAt: timeMiliSeccond,
+        productId: (bidOldData.productId != "") ? bidOldData.productId : "",
+        withdrew: false,
+        status:1,
+        acceptedByBuyer:(username == bidOldData.buyerId) ? true : false,
+        acceptedBySeller:(username == bidOldData.sellerId) ? true : false,
+        currentOffer: currentOffer,
+        sellerId:(bidOldData.sellerId != "") ? bidOldData.sellerId : "",
+      }; 
+      //Write code for both side acceptation
+      if(((bidOldData.acceptedByBuyer == true) && (updateData.acceptedBySeller == true)) || ((bidOldData.acceptedBySeller == true) && (updateData.acceptedByBuyer == true))) {
+        //Item added to the cart
+        
+      }
+
+      await updateBidData(updateData,bidId);
+      await insertBidOfferData(currentOffer,currentOffer.id);
+    //io.to(socket.id).emit("message", formatMessage(currUserDetails.name, "--Has Accepted the latest bid",username, roomName));
   });
   //Get old messages form database
   socket.on("getOldMessages", async ({ roomName,username }) => {

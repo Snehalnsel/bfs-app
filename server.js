@@ -14,6 +14,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 app.use("/public", express.static(path.join(__dirname, "public")));
 require('dotenv').config();
+const axios = require("axios")
 
 //Import Bids watcher Model
 const { getFirestore, Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
@@ -359,12 +360,29 @@ io.on("connection", (socket) => {
       //Write code for both side acceptation
       if(((bidOldData.acceptedByBuyer == true) && (updateData.acceptedBySeller == true)) || ((bidOldData.acceptedBySeller == true) && (updateData.acceptedByBuyer == true))) {
         //Item added to the cart
-        
+        /*axios({
+          method: 'post',
+          url: process.env.SITE_URL + "/api/add-to-cart",
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '
+          },
+          body: {
+            user_id: email,
+            product_id: password,
+            qty: 1,
+            status: 0,
+          }
+        })
+        .then((response) => {
+          //currentOffer.price = " Item added to the cart.";
+          //console.log(response);
+        });*/
       }
-
       await updateBidData(updateData,bidId);
       await insertBidOfferData(currentOffer,currentOffer.id);
-    //io.to(socket.id).emit("message", formatMessage(currUserDetails.name, "--Has Accepted the latest bid",username, roomName));
+      //let currUserDetails = await UserModel.findOne({_id:username});
+      //io.to(socket.id).emit("message", formatMessage(currUserDetails.name, " Has Accepted the latest bid",username, roomName));
   });
   //Get old messages form database
   socket.on("getOldMessages", async ({ roomName,username }) => {

@@ -31,6 +31,7 @@ const WebsiteController = require("../controllers/api/websiteController");
 const HubController = require("../controllers/api/hubController");
 const NotificationsController = require("../controllers/api/notificationsController");
 const ShippingkitController = require("../controllers/api/shippingkitController");
+const PaymentController = require("../controllers/api/paymentController");
 // const helper = require("../helpers/helper");
 //others
 const dateTime = moment().format("YYYY-MM-DD h:mm:ss");
@@ -1336,6 +1337,10 @@ router.get("/kidgender-list",cors(),
 
 router.get("/otherwise-list",cors(),
   WebsiteController.otherlistdata
+);
+
+router.get("/payment",cors(),
+PaymentController.getData
 );
 
 module.exports = router;

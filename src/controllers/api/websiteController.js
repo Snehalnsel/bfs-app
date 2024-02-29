@@ -2057,17 +2057,17 @@ exports.updatePostData = async function (req, res, next) {
     // }
 
      const previousImages = await Productimage.find({ product_id: existingProduct._id });
-     for (const image of previousImages) {
-       const imagePath = path.resolve(__dirname,'../../../public/compress_images/'+image.image);
-       const imagePathreal = path.resolve(__dirname,'../../../public/images/'+image.image);
-          if (fs.existsSync(imagePath)) {
-              fs.unlinkSync(imagePath);
-          }
-          if (fs.existsSync(imagePathreal)) {
-              fs.unlinkSync(imagePathreal);
-          }
-        await Productimage.findByIdAndDelete(image._id);
-      }
+     //for (const image of previousImages) {
+      //  const imagePath = path.resolve(__dirname,'../../../public/compress_images/'+image.image);
+      //  const imagePathreal = path.resolve(__dirname,'../../../public/images/'+image.image);
+      //     if (fs.existsSync(imagePath)) {
+      //         fs.unlinkSync(imagePath);
+      //     }
+      //     if (fs.existsSync(imagePathreal)) {
+      //         fs.unlinkSync(imagePathreal);
+      //     }
+      //   await Productimage.findByIdAndDelete(image._id);
+      // }
  
     if (req.files && Object.keys(req.files).length > 0) {
       const requrl = url.format({
@@ -3434,7 +3434,7 @@ exports.sendotp = async function (req, res, next) {
           text: "You have been tagged with an invoice " + randNumber + ". Please use OTP " + randNumber + " for approving the invoice. Do not share your OTP with anyone. RJSSLT",
         };
         let returnData = "";
-        //returnData = await sendSms(smsData);
+        // returnData = await sendSms(smsData);
         const historyData = new ApiCallHistory({
           userId: mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"),
           called_for: "sms",

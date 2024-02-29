@@ -45,6 +45,26 @@
                             <!-- Page Heading -->
                             <h1 class="h3 mb-2 text-gray-800"><%-pageName%></h1>
                             <p class="mb-4">View / edit <%-pageName%> details</p>
+                            <div class="search-container">
+                                <form>
+                                  <div class="searchlist-rowbox">
+                                    <div class="fld-part">
+                                      <select id="categorySelect" class="custom-select sr-field" required>
+                                        <option selected>Select Category</option>
+                                        <option value="orderid">Order Id</option>
+                                        <option value="name">Name</option>
+                                        <option value="soldprice">Sold Price</option>
+                                        <option value="sellername">Seller Name</option>
+                                        <option value="buyername">Buyer Name</option>
+                                      </select>
+                                      <input type="text" placeholder="Product Name" id="productNameInput" class="sr-field">
+                                    </div>
+                                    <div class="sb-box"><button type="button" onclick="searchNow()" placeholder="Submit"
+                                        class="sr-button">Search Now</button>
+                                    </div>
+                                  </div>
+                                </form>
+                              </div>
                             <button id="downloadExcelBtn" class="btn btn-primary">Download Excel</button>
                             <!-- DataTales Example -->
                             <div class="card shadow mb-4">
@@ -54,7 +74,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
-                                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                        <table class="table table-bordered"  width="100%" cellspacing="0">
                                             <thead>
                                                 <tr>
                                                     <th>Sl No</th>
@@ -317,14 +337,70 @@
 
 <script>
     $(document).ready(function () {
-        $('#dataTable').DataTable({
-            "paging": true,
-            "ordering": true,
-            "searching": true
-        });
+        // $('#dataTable').DataTable({id="dataTable"                                                                                                                                                                                                                                                                                                                                                                                    
+        //     "paging": true,
+        //     "ordering": true,
+        //     "searching": true
+        // });
 
         document.getElementById('downloadExcelBtn').addEventListener('click', function() {
             window.location.href = '/admin/download-order-excel';
         });
     });
 </script>
+<script>
+
+    function searchNow() {
+      var selectedCategory = $('#categorySelect').val();
+      var productName = $('#productNameInput').val();
+      var page = 1;
+      let url = '/admin/orderlist?';
+      if (page && !isNaN(page)) {
+        url = url + 'page=' + page;
+      }
+      if (selectedCategory && (selectedCategory !== '')) {
+        url = url + '&searchType=' + selectedCategory;
+      }
+      if (productName && (productName !== '')) {
+        url = url + '&searchValue=' + productName;
+      }
+      window.location.href = url;
+  
+      $.ajax({
+        url: `/admin/orderlist`,
+        type: 'GET',
+        data: {
+          page: page,
+          searchType: selectedCategory,
+          searchValue: productName,
+        },
+        success: function (response) {
+        },
+        error: function (error) {
+        }
+      });
+  
+    }
+  
+    function getParameterByName(name, url) {
+      if (!url) url = window.location.href;
+      name = name.replace(/[\[\]]/g, "\\$&");
+      var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+      if (!results) return null;
+      if (!results[2]) return '';
+      return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+  
+    var page = getParameterByName('page');
+    var searchType = getParameterByName('searchType');
+    var searchValue = getParameterByName('searchValue');
+  
+    if (searchType) {
+      $('#categorySelect').val(searchType);
+    }
+  
+    if (searchValue) {
+      $('#productNameInput').val(searchValue);
+    }
+  </script>

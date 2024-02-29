@@ -380,7 +380,6 @@ router.get("/app-settings", cors(), AppSettingController.getData);
 
 router.get("/add-app-settings", cors(), AppSettingController.addData);
 
-
 router.post(
   "/create-app-settings",
   cors(),
@@ -399,7 +398,13 @@ router.post("/updatebiddetails", cors(), [check("bid_id", "This is a required fi
 router.get("/delete-biddetails/:id", cors(), BidController.deleteData);
 
 //Order Management
-router.get("/orderlist", cors(), OrderController.getOrderList);
+// router.get("/orderlist", cors(), OrderController.getOrderList);
+router.get("/orderlist", cors(), (req, res) => {
+  const page = req.query.page;
+  const searchType = req.query.searchType;
+  const searchValue = req.query.searchValue;
+  OrderController.getOrderList(page, searchType, searchValue, req, res);
+});
 router.get("/orderdetails/:id", cors(), OrderController.getOrderDetails);
 router.post("/update-orderdetails", cors(), [], OrderController.updateData);
 router.get("/shipmentdetails/:id", cors(), OrderController.getShipmentList);

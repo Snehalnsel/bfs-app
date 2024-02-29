@@ -9,7 +9,7 @@ const path = require("path");
 const fs = require('fs-extra');
 const mime = require("mime");
 const ejs = require('ejs');
-const { CompressImage } = require("../../models/thirdPartyApi/CompressImage");
+const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 const helper = require("../../helpers/helper");
 // const helper = require("../helpers/helper");
 const bcrypt = require("bcrypt");
@@ -48,9 +48,6 @@ exports.homedetails = async function (req, res) {
     }
     const percentageFilter = parseInt(appSettings.best_deal);
     const products = await Userproduct.find({ percentage: { $gte: percentageFilter }, approval_status: 1, flag: 0 }); // Adding approval_status filter
-    // if (!products || products.length === 0) {
-    //   return res.status(404).json({ message: 'No products meet the percentage filter criteria' });
-    // }
     const bestDealProducts = [];
     for (const product of products) {
       const productImage = await Productimage.findOne({ product_id: product._id });
@@ -59,7 +56,7 @@ exports.homedetails = async function (req, res) {
         bestDealProducts.push({
           _id: product._id,
           name: product.name,
-          flag: (typeof product.flag != "undefined") ? product.flag : 0, //Added By Palash 13-01-2024
+          flag: (typeof product.flag != "undefined") ? product.flag : 0, 
           price: product.price,
           offer_price: product.offer_price,
           original_packaging: product.original_packaging,
@@ -79,7 +76,7 @@ exports.homedetails = async function (req, res) {
         whatsHotProducts.push({
           _id: product._id,
           name: product.name,
-          flag: (typeof product.flag != "undefined") ? product.flag : 0,//Added By Palash 13-01-2024
+          flag: (typeof product.flag != "undefined") ? product.flag : 0,
           price: product.price,
           offer_price: product.offer_price,
           original_packaging: product.original_packaging,
@@ -416,7 +413,7 @@ function extractFilename(url) {
 
 exports.getData = async function (req, res, next) {
   try {
-       //await copyAndCompressImageFolders();
+       //await copyImages();
     //const requrl = req.protocol + '://' + req.get('host');
     //SEND SMS
       /*await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
@@ -480,10 +477,10 @@ exports.getData = async function (req, res, next) {
         await historyData.save();
       });*/
     //SEND WHATSAPP
-    // const allImages = await Demo.find();
+    // const allImages = await Productimage.find();
     // // Update each document with only the image name and save the changes
     // for (const image of allImages) {
-    //   console.log(image.image)
+    //   // console.log(image.image)
     //   const imageName = extractFilename(image.image);
     //   image.image = imageName ? imageName : '';
     //  await image.save();
@@ -561,6 +558,37 @@ exports.getHeaderData = async function (req, res, next) {
   }
 };
 
+
+async function copyImages() {
+  const publicImagesDir = path.join('D:', 'Project', 'bfs-app', 'public', 'images');
+  const compressImagesDir = path.join('D:', 'Project', 'bfs-app', 'public', 'compress_images');
+
+  try {
+      await fs.ensureDir(compressImagesDir);
+
+      const files = await fs.readdir(publicImagesDir);
+
+      for (const file of files) {
+          const fileExtension = path.extname(file).toLowerCase();
+          const filePath = path.join(publicImagesDir, file);
+          const compressedFilePath = path.join(compressImagesDir, file);
+          const stat = await fs.stat(filePath);
+           if (stat.isFile() && fileExtension === '.webp') {
+              console.log('Copying image:', file);
+              await fs.copyFile(filePath, compressedFilePath);
+          }
+          else
+          {
+            // console.log("filePath",filePath);
+            // console.log("compressImagesDir",compressImagesDir);
+            await CompressImage("./public/images/"+file,"./public/compress_images/");
+          }
+      }
+      //console.log('Images copied successfully!');
+  } catch (err) {
+      //console.error('Error copying images:', err);
+  }
+}
 
 
 

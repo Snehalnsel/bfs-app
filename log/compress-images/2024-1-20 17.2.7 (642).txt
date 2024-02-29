@@ -1,7 +1,0 @@
-File from: [https://localhost:3000/public/images/image-1707070738577-927843899.jpg]
-
-File to: [public/compress_images/image-1707070738577-927843899.jpg]
-
-Compression algorithm: [-]
-
-Description: File does not exist!

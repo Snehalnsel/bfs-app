@@ -42,16 +42,12 @@
                   <div>
                     <button id="downloadExcelBtn" class="btn btn-primary">Download Excel</button>
                     <div class="search-container">
-                      <!-- <input type="text" placeholder="Search.." id="searchInput"
-                            class="search_by" name="search">
-                        <button type="submit"><i class="fa fa-search"></i></button> -->
                       <form>
-                        <!-- <div class="searchlist-rowbox">
+                        <div class="searchlist-rowbox">
                           <div class="fld-part">
                             <select id="categorySelect" class="custom-select sr-field" required>
                               <option selected>Select Category</option>
                               <option value="name">Name</option>
-                              <option value="category_name">Category Name</option>
                               <option value="brand_name">Brand Name</option>
                               <option value="user_name">User Name</option>
                               <option value="size_name">Size</option>
@@ -64,14 +60,14 @@
                           <div class="sb-box"><button type="button" onclick="searchNow()" placeholder="Submit"
                               class="sr-button">Search Now</button>
                           </div>
-                        </div> -->
+                        </div>
                       </form>
                     </div>
                   </div>
                 </div>
                 <div class="card-body">
                   <div class="table-responsive">
-                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <table class="table table-bordered"  id="dataTable" width="100%" cellspacing="0">
                       <thead>
                         <tr>
                           <th>Sl No</th>
@@ -225,13 +221,13 @@
 </script>
 
 </html>
-<!-- <script>
+<script>
 
   function searchNow() {
     var selectedCategory = $('#categorySelect').val();
     var productName = $('#productNameInput').val();
     var page = 1;
-    let url = '/productlist?';
+    let url = '/admin/productlist?';
     if (page && !isNaN(page)) {
       url = url + 'page=' + page;
     }
@@ -244,7 +240,7 @@
     window.location.href = url;
 
     $.ajax({
-      url: `/productlist`,
+      url: `/admin/productlist`,
       type: 'GET',
       data: {
         page: page,
@@ -269,7 +265,6 @@
     return decodeURIComponent(results[2].replace(/\+/g, " "));
   }
 
-  // Usage
   var page = getParameterByName('page');
   var searchType = getParameterByName('searchType');
   var searchValue = getParameterByName('searchValue');
@@ -281,4 +276,4 @@
   if (searchValue) {
     $('#productNameInput').val(searchValue);
   }
-</script> -->
+</script>

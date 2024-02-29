@@ -144,7 +144,7 @@ exports.getData = async function (req, res, next) {
 // exports.getData = function (page, searchType, searchValue,req, res, next) {
 //   var pageName = "Product List";
 //   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-
+//   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
 //   let query = {};
 
 //   if (searchValue) {
@@ -288,6 +288,7 @@ exports.getData = async function (req, res, next) {
 //       respdata: {
 //         list: productList
 //       },
+//       isAdminLoggedIn:isAdminLoggedIn
 //     });
 //   });
 // };
@@ -314,6 +315,7 @@ exports.detailsData = async function (req, res, next) {
       const parentCategory = await Category.findById(CategoryDetails.parent_id);
     }
     const productImages = await Productimage.find({ product_id: productId });
+    console.log(productImages);
     const brandList = await Brand.find();
     const categoryList = await Category.find({ parent_id: '650444488501422c8bf24bdb' });
     const subcategoryList = await Category.find({ parent_id: { $ne: '650444488501422c8bf24bdb' } });

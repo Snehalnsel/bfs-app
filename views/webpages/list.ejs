@@ -186,7 +186,7 @@
          <div class="product-box">
             <div class="product-image">
                <a href="/productdeatils/${item._id}">
-                  <img src="${(currImagesUrl.startsWith('/public/compress_images/') ? (webSiteUrl + '/public/compress_images/' + item.image) : webSiteUrl + currImagesUrl)}" alt="images" class="img-fluid">
+                  <img src="${webSiteUrl}/public/compress_images/${item.image}" alt="images" class="img-fluid">
                   </a>
             </div>
             <div class="prd-short-info">

@@ -92,8 +92,6 @@ async function generateCouriresList() {
   if (!token) {
     return Promise.reject('Token not available. Call generateToken first.');
   }
-
-
   const options = {
     method: 'GET',
     url: baseUrl + '/courier/courierListWithCounts',
@@ -125,7 +123,6 @@ async function generateAWBno(shipment_id, courier_id) {
   if (!token) {
     return Promise.reject('Token not available. Call generateToken first.');
   }
-
 
   const options = {
     method: 'POST',
@@ -162,8 +159,6 @@ async function generateOrder(data) {
   if (!token) {
     return Promise.reject('Token not available. Call generateToken first.');
   }
-
-
   const options = {
     method: 'POST',
     url: baseUrl + '/orders/create/adhoc',
@@ -327,6 +322,106 @@ exports.getOrderList = function (req, res, next) {
     }
   });
 };
+
+exports.getOrderList = function (page, searchType, searchValue, req, res, next) {
+  var pageName = "Order List";
+  var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+  let query = {};
+
+  if (searchValue) {
+    if (searchType === 'name') {
+      query['product.name'] = { $regex: `${searchValue}`, $options: 'i' };
+    }
+  }
+      Order.aggregate([
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'user_id',
+            foreignField: '_id',
+            as: 'user',
+          },
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'seller_id',
+            foreignField: '_id',
+            as: 'seller',
+          },
+        },
+        {
+          $lookup: {
+            from: 'addressbook_lists',
+            localField: 'billing_address_id',
+            foreignField: '_id',
+            as: 'billing_address',
+          },
+        },
+        {
+          $lookup: {
+            from: 'addressbook_lists',
+            localField: 'shipping_address_id',
+            foreignField: '_id',
+            as: 'shipping_address',
+          },
+        },
+        {
+          $lookup: {
+            from: 'mt_userproducts',
+            localField: 'product_id',
+            foreignField: '_id',
+            as: 'product',
+          },
+        },
+        {
+          $lookup: {
+            from: 'order_trackings',
+            localField: '_id',
+            foreignField: 'order_id',
+            as: 'trackingDetails',
+          },
+        },
+        {
+          $lookup: {
+            from: 'mt_tracks',
+            localField: 'trackingDetails.tracking_id',
+            foreignField: '_id',
+            as: 'trackDetails',
+          },
+        },
+        {
+          $sort: {
+            added_dtime: -1
+          }
+        },
+    { $match: query }, 
+    { $limit: 20 }
+  ]).exec(function (error, orderList) {
+    if (error) {
+      return res.status(500).json({ error: 'An error occurred' });
+    }
+
+    res.render("pages/order/list", {
+      siteName: req.app.locals.siteName,
+      pageName: pageName,
+      pageTitle: pageTitle,
+      userFullName: req.session.admin.name,
+      userImage: req.session.admin.image_url,
+      userEmail: req.session.admin.email,
+      year: moment().format("YYYY"),
+      requrl: req.app.locals.requrl,
+      status: 0,
+      message: "Found!",
+      respdata: {
+        list: orderList,
+      },
+      isAdminLoggedIn: isAdminLoggedIn
+    });
+  });
+};
+
 
 exports.getOrderDetails = function (req, res, next) {
 

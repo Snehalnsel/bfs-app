@@ -29,5 +29,5 @@ const model = mongoose.Schema({
   },
 });
 
-// module.exports = new mongoose.model("mt_product_images", model);
-module.exports = new mongoose.model("demo_images", model);
+ module.exports = new mongoose.model("mt_product_images", model);
+//module.exports = new mongoose.model("demo_images", model);

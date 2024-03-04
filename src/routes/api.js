@@ -1339,7 +1339,15 @@ router.get("/otherwise-list",cors(),
   WebsiteController.otherlistdata
 );
 
-router.get("/payment",cors(),
+router.post("/payment",cors(),
+PaymentController.getData
+);
+
+router.post("/pay",cors(),
+PaymentController.getPaymentData
+);
+
+router.post("/payment-status",cors(),
 PaymentController.getData
 );
 

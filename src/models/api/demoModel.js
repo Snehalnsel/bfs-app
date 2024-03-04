@@ -1,27 +1,38 @@
 const mongoose = require("mongoose");
 
 const model = mongoose.Schema({
-  category_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'mt_categories', 
-  },
-  product_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'mt_userproduct', 
+  marchanttransactionId: {
+    type: String,
     required: true,
-  },
-  brand_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'mt_brands', 
   },
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'users', 
     required: true,
   },
-  image: {
+  total_price: {
+    type: Number,
+    required: true,
+  },
+  product_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'mt_userproducts', 
+    required: true,
+  },
+  status: {
+    type: Number,
+    enum: [0,1,2],
+    default: 0,
+    required: true,
+  },
+  pay_response: {
+    type: Object,
+  },
+  checkstatus_response: {
+    type: Object,
+  },
+  checkstatus_status: {
     type: String,
-   required: true,
   },
   added_dtime: {
     type: String,
@@ -29,4 +40,4 @@ const model = mongoose.Schema({
   },
 });
 
-module.exports = new mongoose.model("demo_images", model);
+module.exports = new mongoose.model("demoorder", model);

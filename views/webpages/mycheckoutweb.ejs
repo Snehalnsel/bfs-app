@@ -329,33 +329,80 @@
                let addToCartreCookieAccessToken = await getCookieFunc(accessTokenVar);
                let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
                await userReLogin(addToCartreCookieAccessToken, addToCartreCookieRefreshToken);
-                  $.ajax({
-                     type: 'POST',
-                     url: '/placed-order',
-                     data: { data: formData },
-                     dataType: "json",
-                     success: function (response) {
-                        if (response.is_orderPlaced == 1) {
-                           Swal.fire({
-                              title: response.message,
-                              iconHtml: '<img src="' + src + '">',
-                              customClass: {
-                                 icon: 'alert-logo-item',
-                                 popup: "bid-alert-modal"
-                              },
-                              confirmButtonText: "OK",
-                           });
-                           setTimeout(() => {
-                              window.location.href = '/';
-                           }, 3000);
-                        } else {
-                           $(".check-out").css("pointer-events", "auto");
-                        }
-                     },
-                     error: function (xhr, status, error) {
-                        $(".check-out").css("pointer-events", "auto");
+
+               $.ajax({
+                  type: 'POST',
+                  url: '/pay',
+                  data: formData, 
+                  dataType: "json",
+                  success: function (paymentResponse) {
+                     if (statusResponse.code === "PAYMENT_SUCCESS") 
+                     {
+                        console.log("success");
+                     //    $.ajax({
+                     //    type: 'POST',
+                     //    url: '/placed-order',
+                     //    data: { data: formData },
+                     //    dataType: "json",
+                     //    success: function (response) {
+                     //       if (response.is_orderPlaced == 1) {
+                     //          Swal.fire({
+                     //             title: response.message,
+                     //             iconHtml: '<img src="' + src + '">',
+                     //             customClass: {
+                     //                icon: 'alert-logo-item',
+                     //                popup: "bid-alert-modal"
+                     //             },
+                     //             confirmButtonText: "OK",
+                     //          });
+                     //          setTimeout(() => {
+                     //             window.location.href = '/';
+                     //          }, 3000);
+                     //       } else {
+                     //          $(".check-out").css("pointer-events", "auto");
+                     //       }
+                     //    },
+                     //    error: function (xhr, status, error) {
+                     //       $(".check-out").css("pointer-events", "auto");
+                     //    }
+                     // });
                      }
-                  });
+                     
+                  },
+                  error: function (xhr, status, error) {
+                     // Handle error if GET request to "/payment" fails
+                     console.error("Error fetching payment data:", error);
+                  }
+               });
+
             });
+                  // $.ajax({
+                  //    type: 'POST',
+                  //    url: '/placed-order',
+                  //    data: { data: formData },
+                  //    dataType: "json",
+                  //    success: function (response) {
+                  //       if (response.is_orderPlaced == 1) {
+                  //          Swal.fire({
+                  //             title: response.message,
+                  //             iconHtml: '<img src="' + src + '">',
+                  //             customClass: {
+                  //                icon: 'alert-logo-item',
+                  //                popup: "bid-alert-modal"
+                  //             },
+                  //             confirmButtonText: "OK",
+                  //          });
+                  //          setTimeout(() => {
+                  //             window.location.href = '/';
+                  //          }, 3000);
+                  //       } else {
+                  //          $(".check-out").css("pointer-events", "auto");
+                  //       }
+                  //    },
+                  //    error: function (xhr, status, error) {
+                  //       $(".check-out").css("pointer-events", "auto");
+                  //    }
+                  // });
+            //});
 
          </script>

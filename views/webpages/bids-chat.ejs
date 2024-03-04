@@ -6,49 +6,58 @@
    <link rel="stylesheet" href="../../public/assets/css/chat.css" />
 </head>
 <body>
-   <div class="chat-container">
-      <main class="chat-main">
-        <div class="chat-sidebar">
-          <h2 id="room-name">
-            Buyer:
-            <% for(let i=0; i<buyerData.length; i++) {%>
-               <section class="bids-wrapper clickOnProduct" id="<%=buyerData[i].id %>">
-                  <div class="container">
-                     <div class="bids-chatbox">
-                        <div class="bids-productbox">
-                           <div class="br-details">
-                              <div class="bid-images"><img src="<%=buyerData[i].product_image %>" alt="images" class="img-fluid"></div>
-                              <div class="bid-info">
-                                 <div class="bd-title"><%=buyerData[i].product_details.name %></div>
-                                 <div class="bd-price">
-                                    <span><i class="fa fa-inr" aria-hidden="true"></i></span>
-                                    <%=buyerData[i].product_details.price %>
-                                 </div>
-                                 <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i> <%=buyerData[i].product_details.offer_price %></div>
-                                 <div class="bidding-box">
-                                    <div class="highlight-title">Bid Price</div>
-                                    <div class="bidding-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%= buyerData[i].currentOffer.price%></div>
+   <section class="bids-wrapper">
+      <div class="container">
+         <div class="breadcum-product">
+            <ul>
+               <li><a href="/">Home</a></li>
+               <li><a href="/my-account">My Account</a></li>
+               <li>My Bids</li>
+            </ul>
+         </div>
+         <div class="bids-chatbox">
+            <div class="bids-productbox">
+               <div class="bib-box">
+                  <h6 class="buyer-heading">Buyer</h6>
+                  <div class="bs-group">   
+                     <% if(buyerData.length > 0) {%>                           
+                        <% for(let i=0; i<buyerData.length; i++) {%> 
+                           <%if(buyerData[i].product_details.length > 0) {%>                                                   
+                              <div class="br-details clickOnProduct" id="<%=buyerData[i].id %>">
+                                 <div class="bid-images"><img src="<%=buyerData[i].product_image %>" alt="images" class="img-fluid"></div>
+                                 <div class="bid-info">
+                                    <div class="bd-title"><%=buyerData[i].product_details.name %></div>
+                                    <div class="bd-price">
+                                       <span><i class="fa fa-inr" aria-hidden="true"></i></span>
+                                       <%=buyerData[i].product_details.offer_price %>
+                                    </div>
+                                    <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i> <%=buyerData[i].product_details.price %></div>
+                                    <div class="bidding-box">
+                                       <div class="highlight-title">Bid Price</div>
+                                       <div class="bidding-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%= buyerData[i].currentOffer.price%></div>
+                                    </div>
                                  </div>
                               </div>
-                           </div>
-                        </div>
-                     </div>
+                           <% } %>
+                        <% } %>
+                     <% } else { %>
+                        <p>No Reccords Yet!</p>
+                     <% } %>
                   </div>
-               </section>
-            <% } %>
-            Seller:
-            <% for(let i=0; i<sellerData.length; i++) {%>
-               <section class="bids-wrapper clickOnProduct" id="<%=sellerData[i].id %>">
-                  <div class="container">
-                     <div class="bids-chatbox">
-                        <div class="bids-productbox">
-                           <div class="br-details">
+               </div>
+
+               <div class="bib-box">
+                  <h6 class="buyer-heading">Seller</h6>
+                  <div class="bs-group">      
+                     <% if(sellerData.length > 0) {%>                          
+                        <% for(let i=0; i<sellerData.length; i++) {%>                             
+                           <div class="br-details clickOnProduct" id="<%=sellerData[i].id %>">
                               <div class="bid-images"><img src="<%=sellerData[i].product_image %>" alt="images" class="img-fluid"></div>
                               <div class="bid-info">
                                  <div class="bd-title"><%=sellerData[i].product_details.name %></div>
                                  <div class="bd-price">
                                     <span><i class="fa fa-inr" aria-hidden="true"></i></span>
-                                    <%=sellerData[i].product_details.price %>
+                                    <%=sellerData[i].product_details.offer_price %>
                                  </div>
                                  <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i> <%=sellerData[i].product_details.price %></div>
                                  <div class="bidding-box">
@@ -57,37 +66,89 @@
                                  </div>
                               </div>
                            </div>
-                        </div>
-                     </div>
+                        <% } %>
+                     <% } else { %>
+                        <p>No Reccords Yet!</p>
+                     <% } %>
                   </div>
-               </section>
-            <% } %>
-          </h2>
-          <!--<h3><i class="fas fa-users"></i> Users</h3>
-          <ul id="users"></ul>-->
-        </div>
-        <div class="chat-messages"></div>
-      </main>
-      <div class="chat-form-container">
-        <form id="chat-form">
-          <input
-            id="msg"
-            type="text"
-            placeholder="Enter Message"
-            required
-            autocomplete="off"
-          />
-          <button class="btn"><i class="fas fa-paper-plane"></i> Send</button>
-        </form>
+               </div>
+            </div>
+
+            <div class="chatbid-box">
+               <div class="chat-title">Enter Your Price</div>
+               <div class="chat-messages">
+               </div>
+               <div class="chat-input-holder">  
+                  <form id="chat-form"> 
+                     <div class="chat-field">
+                        <input id="msg" type="number"name="msg" placeholder="Enter Amount" class="chat-input sendMessageField" required autocomplete="off"/>
+                     </div>                                 
+                     <button class="btn message-send sendMessageButton">Send</button>
+                  </form>
+               </div>
+               <div class="action-botton-group">
+                  <ul class="resultlist">
+                     <li><a href="javascript:void(0)" class="chatbox-btn" id="reBidButton">Re Bid</a></li>
+                     <li><a href="javascript:void(0)" class="chatbox-btn" id="acceptButton">Accept</a></li>
+                     <!--<li><a href="javascript:void(0)" class="chatbox-btn black-btn" id="withdrawButton">Withdraw</a></li>-->
+                  </ul>
+               </div>
+            </div>
+         </div>
       </div>
-   </div>
+   </section>
    <input type="hidden" name="userId" id="userId" value="<%=userId%>" />  
   <%- include('../../public/assets/include/newsletter'); %>
   <%- include('../../public/assets/include/footer'); %>
+  <script src="/public/assets/js/bids.js"></script>
 </body>
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
-   const socket = io("https://localhost:3000");
+   const socket = io("<%=siteUrl; %>");
+   let msgSendStatus = false;
+   let selectedBid = ``;
+   const username = $("#userId").val();
+   async function updateSendMessage() {
+      if(!msgSendStatus) {
+         $(".sendMessageButton").attr("disabled", true);
+         $(".sendMessageField").attr("disabled", true);
+         $(".errorMsgClass").html("");
+      } else {
+         $(".sendMessageButton").attr("disabled", false);
+         $(".sendMessageField").attr("disabled", false);
+         $(".errorMsgClass").html("");
+      }
+   }
+   (async function(){
+      await updateSendMessage();
+   })();
+   $(document).on("click","#reBidButton", async function() {
+      $(".clickOnProduct").each(async function(index) {
+         if($(".clickOnProduct").hasClass("selectedProduct")){
+            selectedBid = this.id;
+            msgSendStatus = true;
+            await updateSendMessage();
+         }
+      });
+   });
+   $(document).on("click","#acceptButton", async function() {
+      $(".clickOnProduct").each(async function(index) {
+         if($(".clickOnProduct").hasClass("selectedProduct")){
+            let roomName = this.id;
+            socket.emit('acceptation', {username,roomName});
+            //console.log(acceptBidId);
+         }
+      });
+   });
+   $("body").on('DOMSubtreeModified', ".chat-messages", function() {
+      $(".message-box-holder").each(async function() {
+         if($(this).children("div.message-box").hasClass("outgoing-message")){
+            $("#acceptButton").css({"pointer-events":"none"});
+         } else {
+            $("#acceptButton").css({"pointer-events":"auto"});
+         }
+      });
+   });
 </script>
 <script>
    $( document ).ready(function() {
@@ -116,7 +177,6 @@
    // ignoreQueryPrefix: true,
    // });
 
-   const username = $("#userId").val();
    $('.clickOnProduct').each(async function() {
         let currRoom = this.id;
       // Join chatroom
@@ -130,10 +190,16 @@
    });*/
 
    // Message from server
-   socket.on('message', (message) => {
-      //console.log(message);
-      outputMessage(message);
-
+   socket.on('message', async (message) => {
+      //outputMessage(message, "outgoing-message");
+      if(message.username == username) {
+         outputMessage(message, "outgoing-message");
+      } else {
+         outputMessage(message, "incoming-message");
+      }
+      //dDieble The Send Button
+      msgSendStatus = false;
+      await updateSendMessage();
       // Scroll down
       chatMessages.scrollTop = chatMessages.scrollHeight;
    });
@@ -147,10 +213,11 @@
 
       msg = msg.trim();
 
-      if (!msg) {
+      if (!msg && !isNaN(msg)) {
          return false;
       }
-
+      //Hide error message
+      $(".errorMsgClass").html("");
       // Emit message to server
       socket.emit('chatMessage', {username,roomName,msg});
 
@@ -160,20 +227,34 @@
    });
 
    // Output message to DOM
-   function outputMessage(message) {
+   function outputMessage(message, inOutClass="outgoing-message") {
       let currRoom = message.room;
       if(roomName == currRoom) {
          const div = document.createElement('div');
          div.classList.add('message');
+         div.classList.add('message-box-holder');
+         const div2 = document.createElement('div');
+         div2.classList.add('message-box');
+         if(message.username == username) {
+            div2.classList.add("outgoing-message");
+         } else {
+            div2.classList.add("incoming-message");
+         }
+         div2.innerText = message.name;
+         const i = document.createElement('i');
+         i.classList.add('fa');
+         i.classList.add('fa-inr');
+         const span = document.createElement('span');
+         span.appendChild(i);
+         const label = document.createElement('label');
+         label.classList.add('bid-amount');
+         label.appendChild(span);
+         //label.innerText = message.text;
          const p = document.createElement('p');
-         p.classList.add('meta');
-         p.innerText = message.username;
-         //p.innerHTML += ` <span>${message.time}</span>`;
-         div.appendChild(p);
-         const para = document.createElement('p');
-         para.classList.add('text');
-         para.innerText = message.text;
-         div.appendChild(para);
+         p.innerText = message.text;
+         label.appendChild(p);
+         div2.appendChild(label);
+         div.appendChild(div2);
          document.querySelector('.chat-messages').appendChild(div);
       }
    }

@@ -37,6 +37,7 @@ const model = mongoose.Schema({
   },
   address_name: {
     type: String,
+    required: true,
   },
   shiprocket_address: {
     type: String,

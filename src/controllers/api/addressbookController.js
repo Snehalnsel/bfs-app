@@ -49,7 +49,7 @@ function generateToken(email, password) {
         const token = responseBody.token;
         resolve(token);
       } else {
-        console.error('Error:', response.body);
+        //console.error('Error:', response.body);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -59,7 +59,7 @@ function generateToken(email, password) {
 async function generateSellerPickup(data) {
   token = await generateToken(email,shipPassword);
  if (!token) {
-   console.error('Token not available. Call generateToken first.');
+   //console.error('Token not available. Call generateToken first.');
    return Promise.reject('Token not available. Call generateToken first.');
  }
 
@@ -80,12 +80,12 @@ async function generateSellerPickup(data) {
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = JSON.parse(body);
-       console.log(responseBody);
-       console.log("hi");
+       //console.log(responseBody);
+       //console.log("hi");
        const token = responseBody;
        resolve(token);
      } else {
-       console.error('Errottr:', response);
+       //console.error('Errottr:', response);
        reject(new Error(`Error: ${response.statusCode}`));
      }
    });
@@ -154,8 +154,8 @@ exports.addAddress = async function (req, res, next) {
       });
     }
 
-    console.log('req.body:', req.body);
-    console.log(req.body.street_name);
+    //console.log('req.body:', req.body);
+    //console.log(req.body.street_name);
     const newAddress = new AddressBook({
       user_id: req.body.user_id,
       street_name: req.body.street_name,
@@ -171,7 +171,7 @@ exports.addAddress = async function (req, res, next) {
       created_dtime: dateTime,
     });
 
-    console.log(newAddress);
+    //console.log(newAddress);
 
     const savedAddress = await newAddress.save();
     const user = await Users.findById(req.body.user_id);
@@ -189,12 +189,12 @@ exports.addAddress = async function (req, res, next) {
       pin_code: savedAddress.pin_code
     };
 
-    console.log(PickupData);
+    //console.log(PickupData);
 
     
       const shiprocketResponse = await generateSellerPickup(PickupData);
 
-      console.log(shiprocketResponse);
+      //console.log(shiprocketResponse);
 
       if (shiprocketResponse) {
         savedAddress.shiprocket_address = savedAddress.address_name + ' - ' + user.name;
@@ -226,7 +226,7 @@ exports.addAddress = async function (req, res, next) {
 
 
 exports.getAddressesByUser = async function (req, res, next) {
-  console.log('req.body:', req.body);
+  //console.log('req.body:', req.body);
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -239,7 +239,7 @@ exports.getAddressesByUser = async function (req, res, next) {
 
     const { user_id } = req.body;
 
-console.log(user_id);
+    //console.log(user_id);
     const addresses = await AddressBook.find({ user_id });
 
     if (!addresses || addresses.length === 0) {
@@ -266,7 +266,7 @@ console.log(user_id);
 
 
 exports.getAddressdetails = async function (req, res, next) {
-  console.log('req.body:', req.body);
+  //console.log('req.body:', req.body);
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -362,7 +362,7 @@ exports.updateAddress = async function (req, res, next) {
 
 
 exports.deleteAddress = async function (req, res, next) {
-  console.log('req.body:', req.body);
+  //console.log('req.body:', req.body);
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

@@ -30,7 +30,7 @@ const upload = multer({ dest: 'public/images/' });
 exports.getData = function (req, res, next) {
   var pageName = "Product Size List";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   Productsize.aggregate([
     {
       $lookup: {
@@ -58,7 +58,6 @@ exports.getData = function (req, res, next) {
     }
   ]).exec(function (error, productList) {
     if (error) {
-      console.error(error);
       res.status(500).json({ error: 'An error occurred' });
     } else {
     
@@ -66,9 +65,9 @@ exports.getData = function (req, res, next) {
         siteName: req.app.locals.siteName,
         pageName: pageName,
         pageTitle: pageTitle,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         year: moment().format("YYYY"),
         requrl: req.app.locals.requrl,
         status: 0,
@@ -76,6 +75,7 @@ exports.getData = function (req, res, next) {
         respdata: {
           list: productList
         },
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   });
@@ -87,7 +87,7 @@ exports.addData = async function (req, res, next) {
   
   var pageName = "Product Size";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   try {
     const [category, brand, size] = await Promise.all([
       Category.find(),
@@ -100,9 +100,9 @@ exports.addData = async function (req, res, next) {
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       status: 1,
@@ -112,6 +112,7 @@ exports.addData = async function (req, res, next) {
         brand: brand,
         size: size
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
   } catch (error) {
     next(error);
@@ -121,9 +122,7 @@ exports.addData = async function (req, res, next) {
 exports.createData = async function (req, res, next) {
   var pageName = "Add Category Size";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-
-
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
       const newSize = Productsize({
         category_id : req.body.category_id,
         brand_id : req.body.brand_id,
@@ -139,13 +138,14 @@ exports.createData = async function (req, res, next) {
             siteName: req.app.locals.siteName,
             pageName: pageName,
             pageTitle: pageTitle,
-            userFullName: req.session.user.name,
-            userImage: req.session.user.image_url,
-            userEmail: req.session.user.email,
+            userFullName:  req.session.admin.name,
+            userImage:  req.session.admin.image_url,
+            userEmail:  req.session.admin.email,
             year: moment().format("YYYY"),
             message: "Added!",
             requrl: req.app.locals.requrl,
             respdata: size,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         })
         .catch((error) => {
@@ -153,14 +153,15 @@ exports.createData = async function (req, res, next) {
             status: 0,
             pageName: pageName,
             siteName: req.app.locals.siteName,
-            userFullName: req.session.user.name,
-            userImage: req.session.user.image_url,
-            userEmail: req.session.user.email,
+            userFullName:  req.session.admin.name,
+            userImage:  req.session.admin.image_url,
+            userEmail:  req.session.admin.email,
             pageTitle: pageTitle,
             year: moment().format("YYYY"),
             requrl: req.app.locals.requrl,
             message: "Error!",
             respdata: error,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         });
   
@@ -170,7 +171,7 @@ exports.editData = async function (req, res, next) {
   
   var pageName = "Brand";
   var pageTitle = req.app.locals.siteName + " - Edit " + pageName;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   try {
     const [category, brand, size] = await Promise.all([
       Category.find(),
@@ -178,18 +179,15 @@ exports.editData = async function (req, res, next) {
       Size.find()   
     ]);
   const productsize_id = mongoose.Types.ObjectId(req.params.id);
-
-  console.log(category);
-
   Productsize.findOne({ _id: productsize_id }).then((productsize) => {
     res.render("pages/catbrand/edit", {
       status: 1,
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       message: "",
@@ -199,6 +197,7 @@ exports.editData = async function (req, res, next) {
         category : category,
         size : size
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
   });
 } catch (error) {
@@ -209,11 +208,13 @@ exports.editData = async function (req, res, next) {
 
 exports.updateData = async function (req, res, next) {
   const errors = validationResult(req);
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -224,6 +225,7 @@ exports.updateData = async function (req, res, next) {
           status: "0",
           message: "Product Size not found!",
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
 
@@ -244,26 +246,27 @@ exports.updateData = async function (req, res, next) {
               status: "0",
               message: "Product Size not updated!",
               respdata: {},
+              isAdminLoggedIn:isAdminLoggedIn
             });
           }
 
-          res.redirect("/catbrand");
+          res.redirect("/admin/catbrand");
         })
         .catch((error) => {
-          console.error(error);
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the Product Size.",
             respdata: {},
+            isAdminLoggedIn:isAdminLoggedIn
           });
         });
     })
     .catch((error) => {
-      console.error(error);
       return res.status(500).json({
         status: "0",
         message: "An error occurred while finding the Product Size.",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
 };
@@ -271,7 +274,7 @@ exports.updateData = async function (req, res, next) {
 
 exports.updateStatusData = async function (req, res, next) {
   const Id = req.params.id;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   Productsize.findById(Id)
     .then((size) => {
       if (!size) {
@@ -279,6 +282,7 @@ exports.updateStatusData = async function (req, res, next) {
           status: "0",
           message: "Brand not found!",
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
 
@@ -291,25 +295,26 @@ exports.updateStatusData = async function (req, res, next) {
               status: "0",
               message: "Product Size status not updated!",
               respdata: {},
+              isAdminLoggedIn:isAdminLoggedIn
             });
           }
-          res.redirect("/catbrand"); 
+          res.redirect("/admin/catbrand"); 
         })
         .catch((error) => {
-          console.error(error);
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the brand status.",
             respdata: {},
+            isAdminLoggedIn:isAdminLoggedIn
           });
         });
     })
     .catch((error) => {
-      console.error(error);
       return res.status(500).json({
         status: "0",
         message: "An error occurred while finding the Product Size.",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
 };
@@ -317,12 +322,14 @@ exports.updateStatusData = async function (req, res, next) {
 
 exports.deleteData = async function (req, res, next) {
   try {
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
         status: "0",
         message: "Validation error!",
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -332,6 +339,7 @@ exports.deleteData = async function (req, res, next) {
         status: "0",
         message: "Not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -341,13 +349,14 @@ exports.deleteData = async function (req, res, next) {
     );
 
     
-    res.redirect("/catbrand");
+    res.redirect("/admin/catbrand");
   } catch (error) {
     
     return res.status(500).json({
       status: "0",
       message: "Error occurred while deleting the category!",
-      respdata: error.message, 
+      respdata: error.message,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };

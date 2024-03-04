@@ -9,6 +9,7 @@ const path = require("path");
 const fs = require("fs");
 const mime = require("mime");
 const Users = require("../../models/api/userModel");
+const Iptrnsaction = require("../../models/api/ipTransactionModel");
 // const helper = require("../helpers/helper");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -26,25 +27,36 @@ var ObjectId = require("mongodb").ObjectId;
 const url = require("url");
 const nodemailer = require("nodemailer");
 // const smtpUser = "snigdho.lnsel@gmail.com";onaonfajcxjjwoow
-const smtpUser = "sneha.lnsel@gmail.com";
+// const smtpUser = "sneha.lnsel@gmail.com";
+const smtpUser = "hello@bidforsale.com";
 
 const accountSid = 'ACa1b71e8226f3a243196beeee233311a9';
 const authToken = 'ea9a24bf2a9ca43a95b991c9c471ba93';
 const twilioClient = new twilio(accountSid, authToken);
 
+// const transporter = nodemailer.createTransport({
+//   port: 587,
+//   host: "smtp.gmail.com",
+//   auth: {
+//     user: smtpUser,
+//     pass: "iysxkkaexpkmfagh",
+//   },
+//   secure: false, // Setting 'secure' to false
+//   tls: {
+//     rejectUnauthorized: false, // Avoids specifying a TLS version
+//   },
+// });
+
+
 const transporter = nodemailer.createTransport({
-  port: 587,
-  host: "smtp.gmail.com",
+  port: 465,
+  host: "bidforsale.com",
   auth: {
     user: smtpUser,
-    pass: "iysxkkaexpkmfagh",
+    pass: "India_2023",
   },
-  secure: false, // Setting 'secure' to false
-  tls: {
-    rejectUnauthorized: false, // Avoids specifying a TLS version
-  },
+  secure: true,
 });
-
 
 
 
@@ -72,13 +84,13 @@ function randNumber(min, max) {
 }
 
 exports.getUsers = async function (req, res, next) {
-  
-
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   Users.find().then((users) => {
     res.status(200).json({
       status: "1",
       message: "Found!",
       respdata: users,
+      isLoggedIn: isLoggedIn,
     });
   });
 };
@@ -93,10 +105,9 @@ exports.signUp = async function (req, res, next) {
     });
   }
 
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   let userCount = await Users.countDocuments();
   let userCode = `BFS${(userCount + 1).toString().padStart(5, '0')}`;
-
-  console.log(userCode);
   bcrypt.hash(req.body.password, rounds, (error, hash) => {
     if (error) {
       res.status(400).json({
@@ -110,7 +121,9 @@ exports.signUp = async function (req, res, next) {
       var trial_date = moment(today, "YYYY-MM-DD").add(14, "days");
       trial_date = trial_date.format("YYYY-MM-DD");
 
-      Users.findOne({ email: req.body.email , status: "0" }).then((user) => {
+      const userIpAddress = req.connection.remoteAddress;
+
+      Users.findOne({ $or: [{ email: req.body.email }, { phone_no: req.body.phone_no }], status: "0" }).then((user) => {
         if (!user) {
           const newUser = Users({
             email: req.body.email,
@@ -131,15 +144,24 @@ exports.signUp = async function (req, res, next) {
             app_user_id: userCode,
             trial_end_date: trial_date,
             image: "na",
+            ip_address: userIpAddress, 
           });
 
           newUser
-            .save()
-            .then((user) => {
+          .save()
+          .then((user) => {
+            Iptrnsaction.create({
+              user_id: user._id,
+              Purpose: "Registration",
+              ip_address: userIpAddress,
+              created_dtime: new Date(),
+            })
+            .then(() => {
               res.status(200).json({
                 status: "1",
                 message: "Added!",
                 respdata: user,
+                isLoggedIn: isLoggedIn,
               });
             })
             .catch((error) => {
@@ -149,6 +171,14 @@ exports.signUp = async function (req, res, next) {
                 respdata: error,
               });
             });
+          })
+          .catch((error) => {
+            res.status(400).json({
+              status: "0",
+              message: "Error!",
+              respdata: error,
+            });
+          });
         } else {
           res.status(400).json({
             status: "0",
@@ -301,10 +331,8 @@ exports.getLogin = async function (req, res, next) {
     });
   }
 
-  //const { email, password, deviceid, devicename, fcm_token } = req.body;
-
   const { email, password, deviceid, devicename, fcm_token, phone_no } = req.body;
-
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   let query = {};
 
   if (email) {
@@ -354,16 +382,29 @@ exports.getLogin = async function (req, res, next) {
                 respdata: err,
               });
             } else {
+              // const mailData = {
+              //   from: smtpUser,
+              //   to: user.email,
+              //   subject: "BFS - Bid For Sale  - Welcome Email",
+              //   text: "Server Email!",
+              //   html:
+              //     "Hey " +
+              //     user.name +
+              //     ", <br> <p>Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items </p>",
+              // };
+
+              const loginHtmlPath = 'views/webpages/mailbody.html';  
+              const loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+
               const mailData = {
-                from: smtpUser,
+                from: "Bid For Sale! <"+smtpUser+">",
                 to: user.email,
-                subject: "BFS - Bid For Sale  - Welcome Email",
-                text: "Server Email!",
-                html:
-                  "Hey " +
-                  user.name +
-                  ", <br> <p>Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items </p>",
+                subject: "Welcome to Bid For Sale!",
+                name:"Bid For Sale!",
+                text:"welocome",
+                html:loginHtmlContent
               };
+
 
               transporter.sendMail(mailData, function (err, info) {
                 if (err) console.log(err);
@@ -418,6 +459,7 @@ exports.getLogin = async function (req, res, next) {
                         status: "1",
                         message: "Successful!",
                         respdata: updatedUser,
+                        isLoggedIn: isLoggedIn,
                       });
                     });
                   }
@@ -534,7 +576,6 @@ exports.uploadImage = async function (req, res, next) {
       const path = Date.now() + ".png";
     
       fs.writeFileSync(folderPath + path, imgData, "base64", function (err) {
-        console.log(err);
       });
 
       var image_url = req.app.locals.requrl + "/public/images/" + path;
@@ -712,7 +753,7 @@ exports.forgotPassword = async function (req, res, next) {
       var otp = randNumber(1000, 2000);
     
       const mailData = {
-        from: smtpUser, 
+        from: "Bid For Sale! <"+smtpUser+">", 
         to: user.email,
         subject: "BFS - Bids For Sale - Forgot password OTP",
         text: "Server Email!",
@@ -855,7 +896,6 @@ exports.deleteData = async function (req, res, next) {
 };
 
 exports.deleteuser = async function (req, res, next) {
-  console.log('req.body:', req.body);
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

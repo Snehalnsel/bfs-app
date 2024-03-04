@@ -14,11 +14,7 @@
         <%- include('../../partials/sidebar', {siteName: siteName}); %>
 
             <div id="content-wrapper" class="d-flex flex-column">
-
-
                 <div id="content">
-
-
                     <%- include('../../partials/header', {siteName: siteName, userFullName: userFullName, userImage:
                         userImage}); %>
 
@@ -33,13 +29,13 @@
                                     <h6 class="m-0 font-weight-bold text-primary"><%-pageName%></h6>
                                 </div>
                                 <div class="card-body">
-                                    <form class="user" action="/updateproductdetails" method="post"
+                                    <form class="user" action="/admin/updateproductdetails" method="post"
                                         enctype="multipart/form-data">
-
                                         <div class="form-group row">
                                             <div class="col-sm-6 mb-3 mb-sm-0">
                                                 <input type="hidden" name="product_id" value="<%- respdata._id %>">
-                                                <input type="hidden" name="user_id" value="<%- respdata.user_id._id %>">
+
+                                                <input type="hidden" name="user_id" value="<%- respdata.user_id %>">
                                                 <input type="text" class="form-control form-control-user"
                                                     id="product_name" name="product_name" placeholder="Name"
                                                     value="<%-respdata.name%>" required>
@@ -137,7 +133,8 @@
                                                                     <select class="form-control" name="size_id"
                                                                         id="size_id" required
                                                                         onchange="handleSizeSelection(event)">
-                                                                        <option value="" disabled selected>Select Size</option>
+                                                                        <option value="" disabled selected>Select Size
+                                                                        </option>
                                                                         <% if(size){ %>
                                                                             <% size.forEach(function(value, index) { %>
                                                                                 <option value="<%= value._id %>"
@@ -152,10 +149,7 @@
                                                                 </div>
                                             </div>
 
-
                                             <div class=" form-group row">
-
-
                                                 <div class="col-sm-6 mb-3 mb-sm-0">
                                                     <select class="form-control" name="status" id="status" required>
                                                         <option value="" selected>Select Condition</option>
@@ -169,11 +163,24 @@
                                                                     <% } %>
                                                     </select>
                                                 </div>
-
-
-
                                             </div>
 
+                                            <div class="form-group row">
+                                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                                    <select class="form-control" name="gender_id" id="gender_id"
+                                                        required>
+                                                        <option value="" selected>Select Gender</option>
+                                                        <% if (genderList) { %>
+                                                            <% genderList.forEach(function(value, index) { %>
+                                                                <option value="<%= value._id %>" <%=(respdata.gender_id
+                                                                    && respdata.gender_id.equals(value._id))
+                                                                    ? 'selected' : '' %>><%= value.name%>
+                                                                </option>
+                                                                <% }); %>
+                                                                    <% } %>
+                                                    </select>
+                                                </div>
+                                            </div>
                                             <div class="form-group row">
                                                 <div class="col-sm-6 mb-3 mb-sm-0">
                                                     <select class="form-control" name="flag" id="flag" required>
@@ -215,26 +222,30 @@
 
                                             <div class="form-group row">
                                                 <div class="col-sm-6 mb-3 mb-sm-0">
-                                                    <input type="text" class="form-control form-control-user" id="height"
-                                                        name="height" placeholder="The height of the item in cms." value="<%-respdata.height%>"
-                                                        required>
+                                                    <input type="text" class="form-control form-control-user"
+                                                        id="height" name="height"
+                                                        placeholder="The height of the item in cms."
+                                                        value="<%-respdata.height%>" required>
                                                 </div>
                                                 <div class="col-sm-6 mb-3 mb-sm-0">
                                                     <input type="text" class="form-control form-control-user"
-                                                        id="weight" name="weight" placeholder="The weight of the item in kgs."
+                                                        id="weight" name="weight"
+                                                        placeholder="The weight of the item in kgs."
                                                         value="<%-respdata.weight%>" required>
                                                 </div>
                                             </div>
 
                                             <div class="form-group row">
                                                 <div class="col-sm-6 mb-3 mb-sm-0">
-                                                    <input type="text" class="form-control form-control-user" id="length"
-                                                        name="length" placeholder="The length of the item in cms." value="<%-respdata.length%>"
-                                                        required>
+                                                    <input type="text" class="form-control form-control-user"
+                                                        id="length" name="length"
+                                                        placeholder="The length of the item in cms."
+                                                        value="<%-respdata.length%>" required>
                                                 </div>
                                                 <div class="col-sm-6 mb-3 mb-sm-0">
                                                     <input type="text" class="form-control form-control-user"
-                                                        id="breath" name="breath" placeholder="The breadth of the item in cms"
+                                                        id="breath" name="breath"
+                                                        placeholder="The breadth of the item in cms"
                                                         value="<%-respdata.breath%>" required>
                                                 </div>
                                             </div>
@@ -250,7 +261,7 @@
                                                         id="hsn_code" name="hsn_code" placeholder="Please enter product HSN Code here"
                                                         value="<%-respdata.hsn_code%>" >
                                                 </div> -->
-                                               
+
                                             </div>
 
                                             <div class="form-group row">
@@ -265,27 +276,35 @@
                                                                     id="image-item" data-id="<%= image._id %>">
                                                                     <% if (/^(ftp|http|https):\/\/[^ "]+$/.test(image.image)) { %>
                                                                         <!-- Valid URL: Render the image -->
-                                                                        <img src="<%= image.image %>"
-                                                                        alt="<%= respdata.name %>" class="product-image"
-                                                                        style="padding:10px; height:100px; width:100;">
-                                                                      <% } else { %>
-                                                                        <!-- Invalid URL or empty URL -->
-                                                                        <img src="<%= requrl %>/public/images/<%= image.image %>"
-                                                                        alt="<%= respdata.name %>" class="product-image"
-                                                                        style="padding:10px; height:100px; width:100;">
-                                                                      <% } %>
-                                                                    
-                                                                    <a href="<%= image.image %>"
-                                                                        download="<%= respdata.name %>_<%= index + 1 %>.jpg"
-                                                                        class="btn btn-success btn-sm mt-2"
-                                                                        title="Download">
-                                                                        <i class="fas fa-download"></i> Download <%=
-                                                                            respdata.name %>_<%= index + 1 %>.jpg
-                                                                    </a>
-                                                                    <button class="close-button" id="close-button"
-                                                                        type="button" style="float: right;"
-                                                                        data-index="<%= index %>"
-                                                                        onclick='handleCloseButtonClick("<%= image._id %>")'>&times;close</button>
+                                                                        <img src=" <%=requrl %>/public/compress_images/
+                                                                        <%= image.image %>"
+                                                                            alt="<%= respdata.name %>"
+                                                                                class="product-image"
+                                                                                style="padding:10px; height:100px;
+                                                                                width:100;">
+                                                                                <% } else { %>
+                                                                                    <!-- Invalid URL or empty URL -->
+                                                                                    <img src="<%= requrl %>/public/images/<%= image.image %>"
+                                                                                        alt="<%= respdata.name %>"
+                                                                                        class="product-image"
+                                                                                        style="padding:10px; height:100px; width:100;">
+                                                                                    <% } %>
+
+                                                                                        <a href="<%= requrl %>/public/images/<%= image.image %>"
+                                                                                            download="<%= respdata.name %>_<%= index + 1 %>.jpg"
+                                                                                            class="btn btn-success btn-sm mt-2"
+                                                                                            title="Download">
+                                                                                            <i
+                                                                                                class="fas fa-download"></i>
+                                                                                            Download <%= respdata.name
+                                                                                                %>_<%= index + 1 %>.jpg
+                                                                                        </a>
+                                                                                        <button class="close-button"
+                                                                                            id="close-button"
+                                                                                            type="button"
+                                                                                            style="float: right;"
+                                                                                            data-index="<%= index %>"
+                                                                                            onclick='handleCloseButtonClick("<%= image._id %>")'>&times;close</button>
                                                                 </div>
                                                                 <% }); %>
                                                                     <% } %>
@@ -341,13 +360,11 @@
 
 <script>
     var productImages = JSON.parse('<%- JSON.stringify(productImages) %>');
-    console.log(productImages);
     const remainingImagesField = document.getElementById('remainingImages');
-        remainingImagesField.value =[];
+    remainingImagesField.value = [];
     uploadbuttonShowhide();
 
     function handleCloseButtonClick(id) {
-        console.log('Close button clicked for index:', id);
         let filteredImageIndex = -1;
         productImages.forEach((image, index) => {
             if (image._id === id) {
@@ -356,22 +373,16 @@
         });
         if (filteredImageIndex !== -1) {
             const removedImage = productImages.splice(filteredImageIndex, 1)[0];
-            console.log('Removed Image:', removedImage);
         }
-
         const imageContainer = document.querySelector(`[data-id="${id}"]`);
-
         if (imageContainer) {
             imageContainer.remove();
-
         }
 
         uploadbuttonShowhide();
 
-        console.log('Remaining Images:', productImages);
         const remainingImagesField = document.getElementById('remainingImages');
-        remainingImagesField.value =JSON.stringify(productImages);
-        console.log(remainingImagesField.value)
+        remainingImagesField.value = JSON.stringify(productImages);
     }
 
 
@@ -416,8 +427,6 @@
             categoryNameField.style.display = 'block';
         }
     }
-
-
     const form = document.querySelector('form');
     // Add a submit event listener to the form
     form.addEventListener('submit', handleFormSubmit);

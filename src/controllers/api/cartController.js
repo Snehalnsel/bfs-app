@@ -241,7 +241,7 @@ exports.addToCart = async (req, res) => {
 
     const existingCart = await Cart.findOne({ user_id: req.body.user_id, status: 0 });
 
-    console.log(existingCart);
+    //console.log(existingCart);
 
     if (existingCart) {
       const existingCartItem = await CartDetail.findOne({
@@ -289,7 +289,7 @@ exports.addToCart = async (req, res) => {
 
       setTimeout(() => {
         removeItemAfterTime(existingCart._id); // savedata._id contains the ID of the added item
-      }, 2 * 60 * 1000);
+      }, 20 * 60 * 1000);
 
       return res.status(200).json({
         message: 'Item added to existing cart successfully',
@@ -298,7 +298,7 @@ exports.addToCart = async (req, res) => {
     } 
     else {
 
-      console.log("new");
+      //console.log("new");
       const newCart = new Cart({
         user_id,
         status: 0,
@@ -317,7 +317,7 @@ exports.addToCart = async (req, res) => {
       });
 
       const savedata = await cartDetail.save();
-      console.log(savedata);
+      //console.log(savedata);
 
       const user = await Users.findById(user_id);
       const product = await Userproduct.findById(product_id);
@@ -338,18 +338,18 @@ exports.addToCart = async (req, res) => {
 
       const durationInSeconds = cartRemove.name; // Assuming 'name' holds a duration in seconds
 
-      console.log("removal time");
-      console.log(durationInSeconds);
+      //console.log("removal time");
+      //console.log(durationInSeconds);
 
       // Convert duration from seconds to milliseconds
       const durationInMilliseconds = durationInSeconds * 60 * 1000;
 
-      console.log("removal time in miliseond");
-      console.log(durationInMilliseconds);
+      //console.log("removal time in miliseond");
+      //console.log(durationInMilliseconds);
 
       setTimeout(() => {
         removeItemAfterTime(savedCart._id); // savedata._id contains the ID of the added item
-       console.log('welcome')
+       //console.log('welcome')
       }, durationInMilliseconds);
       
       res.status(200).json({
@@ -415,16 +415,16 @@ exports.getCartListByUserId = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Error while fetching cart list:', error);
+    //console.error('Error while fetching cart list:', error);
     res.status(500).json({ error: 'An error occurred while fetching cart list' });
   }
 };
 
 
 const removeItemAfterTime = async (cartId) => {
-  console.log('hi'+cartId)
+  //console.log('hi'+cartId)
   try {
-    console.log("Timer expired for cart:", cartId);
+    //console.log("Timer expired for cart:", cartId);
 
     await Cart.findByIdAndDelete(cartId);
     // Perform logic to remove items from the cart after 1 minute (for testing purposes)
@@ -432,10 +432,10 @@ const removeItemAfterTime = async (cartId) => {
 
     for (const cartItem of cartItems) {
       await CartDetail.findByIdAndDelete(cartItem._id);
-      console.log(`Item ${cartItem._id} removed from the cart after 1 minute (test).`);
+      //console.log(`Item ${cartItem._id} removed from the cart after 1 minute (test).`);
     }
   } catch (error) {
-    console.error('Error while removing item from cart:', error);
+    //console.error('Error while removing item from cart:', error);
   }
 };
 
@@ -474,7 +474,7 @@ exports.deleteProductFromCart = async (req, res) => {
       message: 'Product removed from cart successfully',
     });
   } catch (error) {
-    console.error('Error while deleting product from cart:', error);
+    //console.error('Error while deleting product from cart:', error);
     res.status(500).json({
       error: 'An error occurred while deleting product from cart',
     });

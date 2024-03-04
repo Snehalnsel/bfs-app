@@ -69,7 +69,6 @@ function generateToken(email, password) {
         const token = responseBody.token;
         resolve(token);
       } else {
-        console.error('Error:', response.body);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -79,7 +78,6 @@ function generateToken(email, password) {
 async function generateCouriresList() {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -99,11 +97,9 @@ async function generateCouriresList() {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Errottr:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -115,7 +111,6 @@ async function generateCouriresList() {
 async function generateAWBno(shipment_id, courier_id) {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -133,7 +128,6 @@ async function generateAWBno(shipment_id, courier_id) {
     })
   };
 
-  console.log(options);
 
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
@@ -141,12 +135,9 @@ async function generateAWBno(shipment_id, courier_id) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Errottr:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -158,7 +149,6 @@ async function generateAWBno(shipment_id, courier_id) {
 async function generateOrder(data) {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -179,12 +169,9 @@ async function generateOrder(data) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Errottr:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -194,6 +181,8 @@ async function generateOrder(data) {
 }
 
 exports.getOrderList = function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Shipping Kit List";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
 
@@ -237,7 +226,6 @@ exports.getOrderList = function (req, res, next) {
     }
   ]).exec(function (error, orderList) {
     if (error) {
-      console.error(error);
       res.status(500).json({ error: 'An error occurred' });
     } else {
 
@@ -259,15 +247,14 @@ exports.getOrderList = function (req, res, next) {
             order.productImage = productImages[index];
           });
 
-           console.log(orderList);
 
           res.render("pages/shippingkit/list", {
             siteName: req.app.locals.siteName,
             pageName: pageName,
             pageTitle: pageTitle,
-            userFullName: req.session.user.name,
-            userImage: req.session.user.image_url,
-            userEmail: req.session.user.email,
+            userFullName:  req.session.admin.name,
+            userImage:  req.session.admin.image_url,
+            userEmail:  req.session.admin.email,
             year: moment().format("YYYY"),
             requrl: req.app.locals.requrl,
             status: 0,
@@ -275,10 +262,10 @@ exports.getOrderList = function (req, res, next) {
             respdata: {
               list: orderList,
             },
+            isAdminLoggedIn:isAdminLoggedIn
           });
         })
         .catch((err) => {
-          console.error(err);
           res.status(500).json({ error: 'Error fetching product images' });
         });
     }
@@ -286,6 +273,8 @@ exports.getOrderList = function (req, res, next) {
 };
 
 exports.getShipmentKit = function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Shipping Kit List";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
 
@@ -336,7 +325,6 @@ exports.getShipmentKit = function (req, res, next) {
     }
   ]).exec(function (error, orderList) {
     if (error) {
-      console.error(error);
       res.status(500).json({ error: 'An error occurred' });
     } else {
 
@@ -358,15 +346,14 @@ exports.getShipmentKit = function (req, res, next) {
             order.productImage = productImages[index];
           });
 
-           console.log(orderList);
 
           res.render("pages/shippingkit/shipmentpage", {
             siteName: req.app.locals.siteName,
             pageName: pageName,
             pageTitle: pageTitle,
-            userFullName: req.session.user.name,
-            userImage: req.session.user.image_url,
-            userEmail: req.session.user.email,
+            userFullName:  req.session.admin.name,
+            userImage:  req.session.admin.image_url,
+            userEmail:  req.session.admin.email,
             year: moment().format("YYYY"),
             requrl: req.app.locals.requrl,
             status: 0,
@@ -374,10 +361,10 @@ exports.getShipmentKit = function (req, res, next) {
             respdata: {
               list: orderList,
             },
+            isAdminLoggedIn:isAdminLoggedIn
           });
         })
         .catch((err) => {
-          console.error(err);
           res.status(500).json({ error: 'Error fetching product images' });
         });
     }
@@ -385,6 +372,8 @@ exports.getShipmentKit = function (req, res, next) {
 };
 
 exports.getHublist = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const pageName = "Select Hub List";
   const pageTitle = req.app.locals.siteName + " - " + pageName;
   const orderId = req.params.id;
@@ -407,9 +396,9 @@ exports.getHublist = async function (req, res, next) {
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       message: "",
@@ -418,9 +407,9 @@ exports.getHublist = async function (req, res, next) {
         hublist: hubdata,
         trackdata : hubaddress
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: 'An error occurred while fetching data' });
   }
 };
@@ -428,11 +417,8 @@ exports.getHublist = async function (req, res, next) {
 async function generateLabel(shipment_id) {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
-
-
   const options = {
     method: 'POST',
     url: baseUrl + '/courier/generate/label',
@@ -446,38 +432,25 @@ async function generateLabel(shipment_id) {
       ]
     })
   };
-
-  console.log(options);
-
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
       if (error) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Errottr:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
   });
-
-
 }
-
-
 async function generateInvoice(order_id) {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
-
-
   const options = {
     method: 'POST',
     url: baseUrl + '/orders/print/invoice',
@@ -491,37 +464,25 @@ async function generateInvoice(order_id) {
       ]
     })
   };
-
-  console.log(options);
-
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
       if (error) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Errottr:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
   });
-
-
 }
-
 async function generateRequestShipmentPickup(shipment_id) {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
-
-
   const options = {
     method: 'POST',
     url: baseUrl + '/courier/generate/pickup',
@@ -535,35 +496,26 @@ async function generateRequestShipmentPickup(shipment_id) {
       ]
     })
   };
-
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
       if (error) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Errottr:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
   });
-
 }
 
 async function generateCouriresServiceability(pickup_postcode, delivery_postcode, cod, weight) {
   token = await generateToken(email, shipPassword);
-  console.log(token);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
-
-
   const options = {
     method: 'GET',
     url: `${baseUrl}/courier/serviceability/?pickup_postcode=${pickup_postcode}&delivery_postcode=${delivery_postcode}&cod=${cod}&weight=${weight}`,
@@ -572,68 +524,63 @@ async function generateCouriresServiceability(pickup_postcode, delivery_postcode
       'Authorization': `Bearer ${token}`
     }
   };
-
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
       if (error) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        //  console.log(responseBody);
-        //  console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Errottr:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
   });
-
-
 }
 
 exports.updateData = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
-
   try {
     const orderID = req.body.order_id;
     const hubAddressID = req.body.hub_address; 
-
     const shippingKit = await Shippingkit.findById(orderID);
-
     if (!shippingKit) {
       return res.status(404).json({
         status: "0",
         message: "Shipping kit not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
     shippingKit.hub_address_id = hubAddressID;
     await shippingKit.save();
-
-    res.redirect("/shippingkitlist"); // Redirect after successful update
+    res.redirect("/admin/shippingkitlist"); 
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while updating the shipping kit.",
       respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
 
 exports.getShipmentList = function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Shipment List";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-
   var orderId = req.params.id;
   Order.aggregate([
     {
@@ -675,18 +622,15 @@ exports.getShipmentList = function (req, res, next) {
     },
   ]).exec(function (error, orderList) {
     if (error) {
-      console.error(error);
       res.status(500).json({ error: 'An error occurred' });
     } else {
-
-      console.log(orderList);
       res.render("pages/order/shipmentlist", {
         siteName: req.app.locals.siteName,
         pageName: pageName,
         pageTitle: pageTitle,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         year: moment().format("YYYY"),
         requrl: req.app.locals.requrl,
         status: 0,
@@ -694,6 +638,7 @@ exports.getShipmentList = function (req, res, next) {
         respdata: {
           list: orderList
         },
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   });
@@ -702,30 +647,32 @@ exports.getShipmentList = function (req, res, next) {
 
 exports.deleteData = async function (req, res, next) {
   try {
+
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
         status: "0",
         message: "Validation error!",
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
-
     const order = await Order.findOne({ _id: req.params.id });
     if (!order) {
       return res.status(404).json({
         status: "0",
         message: "Not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
-
     await Order.deleteOne(
       { _id: req.params.id },
       { w: "majority", wtimeout: 100 }
     );
 
-    await OrderTracking.deleteMany({ order_id: req.params.id });
+    await Ordertracking.deleteMany({ order_id: req.params.id });
 
     // Delete the order from the Order table
     await Order.deleteOne(
@@ -733,13 +680,14 @@ exports.deleteData = async function (req, res, next) {
       { w: "majority", wtimeout: 100 }
     );
 
-    res.redirect("/orderlist");
+    res.redirect("/admin/orderlist");
   } catch (error) {
 
     return res.status(500).json({
       status: "0",
       message: "Error occurred while deleting the category!",
       respdata: error.message,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
@@ -764,17 +712,14 @@ exports.deleteData = async function (req, res, next) {
 //     CartDetail.find({ cart_id: cartId })
 //       .populate('product_id', 'name')
 //       .then((cartDetails) => {
-
-
-//         console.log(cartDetails);
 //         res.render("pages/order/details", {
 //           status: 1,
 //           siteName: req.app.locals.siteName,
 //           pageName: pageName,
 //           pageTitle: pageTitle,
-//           userFullName: req.session.user.name,
-//           userImage: req.session.user.image_url,
-//           userEmail: req.session.user.email,
+//           userFullName:  req.session.admin.name,
+//           userImage:  req.session.admin.image_url,
+//           userEmail:  req.session.admin.email,
 //           year: moment().format("YYYY"),
 //           requrl: req.app.locals.requrl,
 //           message: "",
@@ -785,17 +730,17 @@ exports.deleteData = async function (req, res, next) {
 //         });
 //       })
 //       .catch((error) => {
-//         console.error(error);
 //         res.status(500).json({ error: 'An error occurred while fetching cart details' });
 //       });
 //   })
 //   .catch((error) => {
-//     console.error(error);
 //     res.status(500).json({ error: 'An error occurred while fetching order details' });
 //   });
 
 exports.kitorderplaced = async (req, res) => {
   try {
+
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const order_id = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(order_id)) {
@@ -806,10 +751,6 @@ exports.kitorderplaced = async (req, res) => {
       .populate('buyer_id', 'name phone_no email')
       .populate('shipping_address_id')
       .populate('hub_address_id');
-
-      // console.log(orderDetails.hub_address_id.shiprocket_address);
-      // return;
-
     const productdetails = await Userproduct.findById(orderDetails.product_id);
 
     if (productdetails) {
@@ -862,11 +803,7 @@ exports.kitorderplaced = async (req, res) => {
         height: productdetails.height,
         weight: productdetails.weight,
       };
-
       const shiprocketResponse = await generateOrder(orderData);
-
-      console.log('JSON Response:', shiprocketResponse);
-
       if (shiprocketResponse) {
 
         const payment_status = '0';
@@ -893,19 +830,20 @@ exports.kitorderplaced = async (req, res) => {
       return res.status(404).json({ error: 'Order not found' });
     }
     else {
-      //res.redirect("/orderlist");
-      res.redirect(`/couriresserviceability/${order_id}`);
+      //res.redirect("/admin/orderlist");
+      res.redirect(`/admin/couriresserviceability/${order_id}`);
     }
 
 
   } catch (error) {
-    console.error('Error placing order:', error);
     res.status(500).json({ error: 'An error occurred while placing the order' });
   }
 };
 
 
 exports.checkCourierServiceability = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   var pageName = "Check Courier Serviceability";
   var pageTitle = req.app.locals.siteName + " - List " + pageName;
@@ -915,6 +853,7 @@ exports.checkCourierServiceability = async function (req, res, next) {
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -928,6 +867,7 @@ exports.checkCourierServiceability = async function (req, res, next) {
         status: "0",
         message: "Order not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -954,14 +894,15 @@ exports.checkCourierServiceability = async function (req, res, next) {
             siteName: req.app.locals.siteName,
             pageName: pageName,
             pageTitle: pageTitle,
-            userFullName: req.session.user.name,
-            userImage: req.session.user.image_url,
-            userEmail: req.session.user.email,
+            userFullName:  req.session.admin.name,
+            userImage:  req.session.admin.image_url,
+            userEmail:  req.session.admin.email,
             year: moment().format("YYYY"),
             requrl: req.app.locals.requrl,
             message: "",
             respdata: existingOrder,
-            error: shiprocketResponse.error
+            error: shiprocketResponse.error,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         }
 
@@ -971,35 +912,39 @@ exports.checkCourierServiceability = async function (req, res, next) {
           siteName: req.app.locals.siteName,
           pageName: pageName,
           pageTitle: pageTitle,
-          userFullName: req.session.user.name,
-          userImage: req.session.user.image_url,
-          userEmail: req.session.user.email,
+          userFullName:  req.session.admin.name,
+          userImage:  req.session.admin.image_url,
+          userEmail:  req.session.admin.email,
           year: moment().format("YYYY"),
           requrl: req.app.locals.requrl,
           message: "",
           respdata: existingOrder,
           shiprocketResponse: shiprocketResponse,
-          error: null
+          error: null,
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
       respdata: error,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
 
 
 exports.getAWBnoById = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -1015,45 +960,39 @@ exports.getAWBnoById = async function (req, res, next) {
         status: "0",
         message: "Order not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
     if (existingOrder) {
       const shipment_id = existingOrder.shiprocket_shipment_id;
-
-
       const shiprocketResponse = await generateAWBno(shipment_id,courier_id);
-
-      console.log(shiprocketResponse);
-
       if (shiprocketResponse) {
-
         existingOrder.pickup_awb = shiprocketResponse.response.data.awb_code;
         existingOrder.shiprocket_delivery_partner = shiprocketResponse.response.courier_company_id;
-
         await existingOrder.save();
-
-        res.redirect("/shippingkitlist");
+        res.redirect("/admin/shippingkitlist");
       }
-
-
     }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
       respdata: error,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
 
 exports.getGenerateLabelforkit = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -1066,6 +1005,7 @@ exports.getGenerateLabelforkit = async function (req, res, next) {
         status: "0",
         message: "Order not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -1083,62 +1023,60 @@ exports.getGenerateLabelforkit = async function (req, res, next) {
           file.close(() => {
             res.download(outputFilePath, 'label.pdf', (err) => {
               if (err) {
-                console.error('Error downloading the file:', err);
                 return res.status(500).json({
                   status: "0",
                   message: "Error downloading the file!",
                   respdata: err,
+                  isAdminLoggedIn:isAdminLoggedIn
                 });
               }
               // File downloaded and response sent successfully
               fs.unlink(outputFilePath, (unlinkErr) => {
                 if (unlinkErr) {
-                  console.error('Error deleting the downloaded file:', unlinkErr);
                 }
               });
             });
           });
         });
       });
-
       request.on('error', (error) => {
-        console.error('Error downloading the file:', error);
         return res.status(500).json({
           status: "0",
           message: "Error downloading the file!",
           respdata: error,
+          isAdminLoggedIn:isAdminLoggedIn
         });
       });
     } else {
-      console.error('shiprocketResponse');
-      console.error(shiprocketResponse);
-      //alert('something went wrong'+ shiprocketResponse.response);
-
       return res.status(404).json({
         status: "0",
         message: "Label URL not found!",
         respdata: shiprocketResponse,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   } catch (error) {
-    console.error(error);
     //alert('something went wrong');
     res.status(500).json({
       status: "0",
       message: "Error!",
       respdata: error,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
 
 
 exports.getGenerateInvoiceforkit = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -1151,6 +1089,7 @@ exports.getGenerateInvoiceforkit = async function (req, res, next) {
         status: "0",
         message: "Order not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -1162,6 +1101,7 @@ exports.getGenerateInvoiceforkit = async function (req, res, next) {
         status: "0",
         message: "Invoice not found!",
         respdata: shiprocketResponse,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -1175,17 +1115,16 @@ exports.getGenerateInvoiceforkit = async function (req, res, next) {
         file.close(() => {
           res.download(outputFilePath, 'invoice.pdf', (err) => {
             if (err) {
-              console.error('Error downloading the file:', err);
               return res.status(500).json({
                 status: "0",
                 message: "Error downloading the file!",
                 respdata: err,
+                isAdminLoggedIn:isAdminLoggedIn
               });
             }
             // File downloaded and response sent successfully
             fs.unlink(outputFilePath, (unlinkErr) => {
               if (unlinkErr) {
-                console.error('Error deleting the downloaded file:', unlinkErr);
               }
             });
           });
@@ -1194,31 +1133,34 @@ exports.getGenerateInvoiceforkit = async function (req, res, next) {
     });
 
     request.on('error', (error) => {
-      console.error('Error downloading the file:', error);
       return res.status(500).json({
         status: "0",
         message: "Error downloading the file!",
         respdata: error,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
       respdata: error,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
 
 
 exports.getShipmentPickup = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -1232,30 +1174,19 @@ exports.getShipmentPickup = async function (req, res, next) {
         status: "0",
         message: "Order not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
     if (existingOrder) {
       const shipment_id = existingOrder.shiprocket_shipment_id;
-
-
-      // if(date)
-      // {
-      //   const shiprocketResponse = await generateRequestShipmentPickup(shipment_id,date);
-
-      // }
-
       const shiprocketResponse = await generateRequestShipmentPickup(shipment_id);
-
-      console.log(shiprocketResponse);
-
       if (shiprocketResponse) {
         existingOrder.pickup_token_number = shiprocketResponse.response.pickup_token_number;
         existingOrder.pickup_dtime = shiprocketResponse.response.pickup_scheduled_date;
 
         await existingOrder.save();
       }
-
       // res.status(200).json({
       //   status: "1",
       //   message: "Order canceled successfully!",
@@ -1270,14 +1201,15 @@ exports.getShipmentPickup = async function (req, res, next) {
           siteName: req.app.locals.siteName,
           pageName: pageName,
           pageTitle: pageTitle,
-          userFullName: req.session.user.name,
-          userImage: req.session.user.image_url,
-          userEmail: req.session.user.email,
+          userFullName:  req.session.admin.name,
+          userImage:  req.session.admin.image_url,
+          userEmail:  req.session.admin.email,
           year: moment().format("YYYY"),
           requrl: req.app.locals.requrl,
           message: "",
           respdata: existingOrder,
-          error: shiprocketResponse.error
+          error: shiprocketResponse.error,
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
 
@@ -1287,29 +1219,32 @@ exports.getShipmentPickup = async function (req, res, next) {
         siteName: req.app.locals.siteName,
         pageName: pageName,
         pageTitle: pageTitle,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         year: moment().format("YYYY"),
         requrl: req.app.locals.requrl,
         message: "",
         respdata: existingOrder,
         shiprocketResponse: shiprocketResponse,
-        error: null
+        error: null,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
       respdata: error,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
 
 
 exports.getList = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   var pageName = "Schedule pickup";
   var pageTitle = req.app.locals.siteName + " - Schedule Your Pick Up " + pageName;
@@ -1319,16 +1254,13 @@ exports.getList = async function (req, res, next) {
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
   try {
     const orderId = req.params.id;
-
     const existingOrder = await Order.findById(orderId);
-
-    console.log(orderId);
-
     if (!existingOrder) {
       return res.render("pages/order/list", {
         status: "0",
@@ -1336,12 +1268,13 @@ exports.getList = async function (req, res, next) {
         siteName: req.app.locals.siteName,
         pageName: pageName,
         pageTitle: pageTitle,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         year: moment().format("YYYY"),
         requrl: req.app.locals.requrl,
         message: "not found",
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -1351,38 +1284,38 @@ exports.getList = async function (req, res, next) {
       const shippingaddress = await Hublist.findById(existingOrder.hub_address_id);
 
       const shipment_id = existingOrder.shiprocket_shipment_id;
-
-
-
       res.render("pages/order/schedule", {
         status: "1",
         message: "Order canceled successfully!",
         siteName: req.app.locals.siteName,
         pageName: pageName,
         pageTitle: pageTitle,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         year: moment().format("YYYY"),
         requrl: req.app.locals.requrl,
         message: "",
         respdata: existingOrder,
         billingaddress: billingaddress,
-        shippingaddress: shippingaddress
+        shippingaddress: shippingaddress,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
       respdata: error,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
 
 exports.huborderplaced = async (req, res) => {
   try {
+
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const orderid = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(orderid)) {
@@ -1401,7 +1334,6 @@ exports.huborderplaced = async (req, res) => {
     const order_id = order._id;
     const order_code = order.order_code;
     const buyer_id = order.user_id;
-    // const seller_id = order.seller_id;
     const product_id = order.product_id;
     const shipping_address_id = order.shipping_address_id;
     const total_price = order.total_price;
@@ -1517,34 +1449,23 @@ exports.huborderplaced = async (req, res) => {
         height: productdetails.height,
         weight: productdetails.weight,
       };
-
       const shiprocketResponse = await generateOrder(orderData);
-
-      console.log('JSON Response:', shiprocketResponse);
-
       if (shiprocketResponse) {
-
         const payment_status = '0';
-
         shiprocket_payment_status = payment_status;
         shiprocket_order_id = shiprocketResponse.order_id;
         shiprocket_shipment_id = shiprocketResponse.shipment_id;
         shiprocket_status_code = shiprocketResponse.status_code;
-
-
         orderDetails.shiprocket_payment_status = shiprocket_payment_status;
         orderDetails.shiprocket_order_id = shiprocket_order_id;
         orderDetails.shiprocket_shipment_id = shiprocket_shipment_id;
         orderDetails.shiprocket_status_code = shiprocket_status_code;
-
         await orderDetails.save();
-
         const updatedOrderTracking = await Ordertracking.findOneAndUpdate(
           { tracking_id: track_id },
           { $set: { status: 2 } },
           { new: true }
         );
-
       }
     }
     else {
@@ -1554,12 +1475,9 @@ exports.huborderplaced = async (req, res) => {
       return res.status(404).json({ error: 'Order not found' });
     }
     else {
-      res.redirect("/orderlist");
+      res.redirect("/admin/orderlist");
     }
-
-
   } catch (error) {
-    console.error('Error placing order:', error);
     res.status(500).json({ error: 'An error occurred while placing the order' });
   }
 };

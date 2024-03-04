@@ -53,7 +53,6 @@ function generateToken(email, password) {
         const token = responseBody.token;
         resolve(token);
       } else {
-        console.error('Error:', response.body);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -62,16 +61,12 @@ function generateToken(email, password) {
 
 async function generateSellerPickup(data) {
   try {
-    console.log("Calling generateToken");
     const token = await generateToken(email, shipPassword);
 
     if (!token) {
-      console.error('Token not available. Call generateToken first.');
+      //console.error('Token not available. Call generateToken first.');
       return Promise.reject('Token not available. Call generateToken first.');
     }
-
-    console.log('Token:', token);
-
     const options = {
       method: 'POST',
       url: baseUrl + '/settings/company/addpickup',
@@ -88,16 +83,13 @@ async function generateSellerPickup(data) {
           reject(error);
         } else if (response.statusCode === 200) {
           const responseBody = JSON.parse(body);
-          console.log('Response from Shiprocket:', responseBody);
           resolve(responseBody);
         } else {
-          console.error('Error in generateSellerPickup:', response.body);
           reject(new Error(`Error in generateSellerPickup: ${response.statusCode}`));
         }
       });
     });
   } catch (error) {
-    console.error('Error in generateSellerPickup:', error);
     return Promise.reject(error);
   }
 }
@@ -106,17 +98,17 @@ async function generateSellerPickup(data) {
 //methods
 exports.getData = async function (req, res, next) {
 
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Hublist";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-
   Hub.find().sort({ _id: -1 }).then((hub) => {
     res.render("pages/hublist/list", {
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       status: 0,
@@ -124,62 +116,55 @@ exports.getData = async function (req, res, next) {
       respdata: {
         list: hub,
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
   });
 };
 
 exports.addData = async function (req, res, next) {
 
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Hub List";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-
   res.render("pages/hublist/create", {
     status: 1,
     siteName: req.app.locals.siteName,
     pageName: pageName,
     pageTitle: pageTitle,
-    userFullName: req.session.user.name,
-    userImage: req.session.user.image_url,
-    userEmail: req.session.user.email,
+    userFullName:  req.session.admin.name,
+    userImage:  req.session.admin.image_url,
+    userEmail:  req.session.admin.email,
     year: moment().format("YYYY"),
     requrl: req.app.locals.requrl,
     message: "",
     respdata: {},
+    isAdminLoggedIn:isAdminLoggedIn
   });
  
 };
 
 exports.createData = async function (req, res, next) {
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Hub";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-
   try {
-    console.log(req.body);
-    const hub = await Hub.findOne({ hub_name : req.body.hub_name });
-
-    console.log('HUB');
-    console.log(hub);
-    
-    
-    
+    const hub = await Hub.findOne({ hub_name : req.body.hub_name }); 
     if (hub) {
       res.render("pages/hublist/create", {
         status: 0,
         siteName: req.app.locals.siteName,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         pageName: pageName,
         pageTitle: pageTitle,
         year: moment().format("YYYY"),
         message: "Already exists!",
         requrl: req.app.locals.requrl,
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     } else {
-      console.log('req.body:', req.body);
-      console.log(req.body.street_name);
-
       const newAddress = new Hub({
         name: req.body.name,
         phone_no: req.body.phone_no,
@@ -194,15 +179,10 @@ exports.createData = async function (req, res, next) {
         hub_name: req.body.hub_name,
         created_dtime: dateTime,
       });
-      
-
-      console.log(newAddress);
-
       const savedAddress = await newAddress.save();
 
       if(savedAddress)
       {
-        console.log(savedAddress.hub_name);
         const PickupData = {
           pickup_location: "BFS" + ' - ' + savedAddress.hub_name,
           name: "Pratiik Jalan",
@@ -215,12 +195,7 @@ exports.createData = async function (req, res, next) {
           country: "India",
           pin_code: savedAddress.pin_code
         };
-        console.log(PickupData);
-  
-        const shiprocketResponse = await generateSellerPickup(PickupData);
-  
-        console.log(shiprocketResponse);
-  
+        const shiprocketResponse = await generateSellerPickup(PickupData);  
         if (shiprocketResponse) {
           savedAddress.shiprocket_address = "BFS" + ' - ' + savedAddress.hub_name;
           savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
@@ -234,13 +209,14 @@ exports.createData = async function (req, res, next) {
         siteName: req.app.locals.siteName,
         pageName: pageName,
         pageTitle: pageTitle,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         year: moment().format("YYYY"),
         message: "Added!",
         requrl: req.app.locals.requrl,
         respdata: savedAddress,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   } catch (error) {
@@ -248,21 +224,22 @@ exports.createData = async function (req, res, next) {
       status: 0,
       pageName: pageName,
       siteName: req.app.locals.siteName,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       pageTitle: pageTitle,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       message: "Error!",
       respdata: error,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
 
 exports.updateStatusData = async function (req, res, next) {
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const hubId = req.params.id;
-
   Hub.findById(hubId)
     .then((hub) => {
       if (!hub) {
@@ -270,6 +247,7 @@ exports.updateStatusData = async function (req, res, next) {
           status: "0",
           message: "Size not found!",
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
 
@@ -284,74 +262,75 @@ exports.updateStatusData = async function (req, res, next) {
               status: "0",
               message: "Size status not updated!",
               respdata: {},
+              isAdminLoggedIn:isAdminLoggedIn
             });
           }
 
-          res.redirect("/hublist");
+          res.redirect("/admin/hublist");
         })
         .catch((error) => {
-          console.error(error);
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the size status.",
             respdata: {},
+            isAdminLoggedIn:isAdminLoggedIn
           });
         });
     })
     .catch((error) => {
-      console.error(error);
       return res.status(500).json({
         status: "0",
         message: "An error occurred while finding the size.",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
 };
 
 
 exports.editData = async function (req, res, next) {
-  
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Hub";
   var pageTitle = req.app.locals.siteName + " - Edit " + pageName;
-
   const hub_id = mongoose.Types.ObjectId(req.params.id);
-
   Hub.findOne({ _id: hub_id }).then((hub) => {
-    console.log(hub);
     res.render("pages/hublist/edit", {
       status: 1,
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       message: "",
       respdata: {
         hub : hub,
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
   });
 };
 
 exports.updateData = async function (req, res, next) {
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
-
   Hub.findById(req.body.id).then(async (product) => {
     if (!product) {
       res.status(404).json({
         status: "0",
         message: "Not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     } else {
       var updData = {
@@ -370,14 +349,14 @@ exports.updateData = async function (req, res, next) {
 
       await Userproduct.findOneAndUpdate({ _id: req.body.product_id }, { $set: updData }, { upsert: true });
 
-      res.redirect("/productlist");
+      res.redirect("/admin/productlist");
     }
   }).catch((err) => {
-    console.error(err);
     res.status(500).json({
       status: "0",
       message: "An error occurred while updating the product.",
       respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
     });
   });
 };

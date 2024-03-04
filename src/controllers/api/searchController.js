@@ -237,7 +237,6 @@ exports.searchData = async function (req, res, next) {
 
       res.status(200).json({ respdata: respDataFinal });
     } catch (error) {
-      console.error("Error finding categories:", error);
       res.status(500).json({
         status: "0",
         message: "An error occurred while searching for categories",
@@ -279,7 +278,6 @@ exports.searchData = async function (req, res, next) {
 
       res.status(200).json({ respdata: respDataFinal });
     } catch (error) {
-      console.error("Error finding brands:", error);
       res.status(500).json({
         status: "0",
         message: "An error occurred while searching for brands",
@@ -342,7 +340,6 @@ exports.searchData = async function (req, res, next) {
 
       res.status(200).json({ respdata: respDataFinal });
     } catch (error) {
-      console.error("Error finding products:", error);
       res.status(500).json({
         status: "0",
         message: "An error occurred while searching for products",
@@ -381,7 +378,6 @@ exports.getProductListByValue = async function (reqBody, res) {
       respdata: userProducts,
     });
   } catch (error) {
-    console.error("Error fetching Userproducts:", error);
     res.status(500).json({
       status: "0",
       message: "Error fetching Userproducts",
@@ -401,7 +397,6 @@ exports.filterData = async function (req, res, next) {
 
     const types = type.split(',');
     var ids = (typeof id !== "undefined") ? (id.length > 1) ? id.split(',') : id : "";
-    console.log(ids);
     // const max = 5000;
     // const min = 1000;
 
@@ -442,10 +437,9 @@ exports.filterData = async function (req, res, next) {
           return res.status(400).json({ status: '0', message: 'Invalid type' });
       }
     }
-    console.log(filterQuery);
+
     const products = await Userproduct.find(filterQuery);
 
-    //console.log(products);
 
     if (!products || products.length === 0) {
       return res.status(200).json({
@@ -464,13 +458,9 @@ exports.filterData = async function (req, res, next) {
 
     for (const product of products) {
       let offerPrice = parseInt(product.offer_price);
-      // console.log("offerprice");
-      // console.log(offerPrice,maxVal);
       if (max > 0 && min > 0) {
         if (offerPrice <= maxVal && offerPrice >= minVal) {
 
-          // console.log(minVal);
-          // console.log(maxVal);
           const productImage = await Productimage.findOne({ product_id: product._id });
 
           var productWithImage = {
@@ -507,7 +497,6 @@ exports.filterData = async function (req, res, next) {
     });
 
   } catch (error) {
-    console.error('Error filtering products:', error);
     return res.status(500).json({
       status: '0',
       message: 'An error occurred while filtering products',
@@ -529,7 +518,6 @@ exports.getBestDealList = async function (req, res, next) {
     res.status(200).json({ status: "1", best_deal_list: deals });
   } catch (error) {
     // Handle errors
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Internal server error",
@@ -564,7 +552,6 @@ exports.filterByOfferPrice = async function (req, res, next) {
     });
 
 
-    console.log(filteredProducts);
     // const filteredProducts = allProducts.filter(product => {
     //   const offerPrice = parseFloat(product.offer_price.replace(/,/g, ''));
     //   return offerPrice <= sanitizedMaxPrice;
@@ -627,7 +614,6 @@ exports.filterByOfferPrice = async function (req, res, next) {
     });
 
   } catch (error) {
-    console.error('Error filtering products by offer price:', error);
     return res.status(500).json({
       status: '0',
       message: 'An error occurred while filtering products by offer price',
@@ -638,3 +624,63 @@ exports.filterByOfferPrice = async function (req, res, next) {
 
 
 
+
+exports.searchByKeyword = async function (req, res, next) {
+  try {
+    let reqBody = req.body;
+    let searchBy = reqBody.searchBy;
+    let allProductName = await Userproduct.find({
+      name: { $regex: new RegExp(`${searchBy}`, 'i') },
+      approval_status: 1,
+      flag: 0
+    }).limit(10);
+    
+    let allBrandName = await Brand.find({ name: { $regex: new RegExp(`${searchBy}`, 'i') } }).limit(10);
+    let allData = [];
+    let siteUrl = process.env.SITE_URL;
+    //if(allProductName.length >= 5) {
+      let i = 0;
+      for(let element of allProductName) {
+        if(i < 5) {
+          let name = element.name;
+          let link = "/productdeatils/" + element._id.toString();
+          let newElement = {
+            name: name,
+            link: link,
+            siteUrl: siteUrl
+          };
+          allData.push(newElement);
+          i++;
+        }
+      }
+    //}
+    for(let element of allBrandName) {
+      if(allData.length < 10) {
+        let name = element.name;
+        let link = "/websubcategoriesproducts/"+element._id.toString();
+        let newElement = {
+          name: name,
+          link: link
+        };
+        allData.push(newElement);
+      } else {
+        break;
+      }
+    }
+    res.status(200).json({
+      status: "1",
+      message: "successfully search your result!",
+      siteUrl: process.env.SITE_URL,
+      respdata: {
+        allData: allData
+      },
+    });
+  } catch (error) {
+    //console.log(error);
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while searching the result.",
+      error: error.message,
+    });
+  }
+};

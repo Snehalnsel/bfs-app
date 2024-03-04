@@ -10,7 +10,17 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const nodemailer = require("nodemailer");
 var path = require("path");
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
 app.use("/public", express.static(path.join(__dirname, "public")));
+require('dotenv').config();
+const axios = require("axios")
+
+//Import Bids watcher Model
+const { getFirestore, Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
+const checkChangesInField = require("./src/models/fireDbServices/checkChangesInField");
+
+const Userproduct = require("./src/models/api/userproductModel");
 
 app.locals.siteName = "BFS - Bid For Sale";
 
@@ -35,7 +45,8 @@ const UserModel = require("./src/models/api/userModel");
 app.use(express.json());
 
 mongoose.set("strictQuery", true);
-mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true });
+//mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(dbURI);
 const db = mongoose.connection;
 mongoose.Promise = global.Promise;
 
@@ -51,8 +62,10 @@ db.once("open", () => {
 // app.set('views', path.join(__dirname, 'views'));
 app.set("view engine", "ejs");
 
+app.use(cookieParser());
 // adding Helmet to enhance your API's security
 // app.use(helmet());
+
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
@@ -109,13 +122,27 @@ app.use(cors());
 // adding morgan to log HTTP requests
 app.use(morgan("combined"));
 
-//routes
-var routes = require("./src/routes/routes.js");
-var web = require("./src/routes/web.js");
-var api = require("./src/routes/api.js");
+//Add session in app as it was in web.js -- edited by Palash
 
-app.use("/", web);
-app.use("/api", api);
+app.use(
+  session({
+    secret: "fd$e43W7ujyDFw(8@tF",
+    // store: redisStore,
+    saveUninitialized: true,
+    resave: true,
+  })
+);
+
+//routes
+const routes = require("./src/routes/routes.js");
+const web = require("./src/routes/web.js");
+const api = require("./src/routes/api.js");
+const adminRoute = require("./src/routes/adminRoute");
+
+
+app.use("/", api);
+app.use("/admin_2F19C0M", web);
+app.use("/admin",adminRoute);
 app.use("/routes", routes); //test
 
 // catch 404 and forward to error handler
@@ -170,7 +197,61 @@ const { userJoin, getCurrentUser, userLeave, getRoomUsers} = require("./src/mode
 const formatMessage = require("./src/utils/messages");
 const botName = "Bid Chatbot";
 
+//let changesInDb = checkChangesInField();
+
+const initializeApp = require("./src/DB/firebaseInitialize");
+const dbFdb = getFirestore();
+(async function () {
+  const bidsRef = await dbFdb.collection('bids');
+  const observer = bidsRef.onSnapshot(docSnapshot => {
+    docSnapshot.docChanges().forEach(async change => {
+      const changeDoc = change.doc.data();
+      let changeDocDetails = changeDoc.id.split("_");
+      // let chatBuyerId = changeDoc.buyerId;
+      // let chatSellerId = changeDoc.sellerId;
+      // let chatProductId = changeDoc.productId;
+      let chatPrice = changeDoc.currentOffer.price;
+      const queryData = {
+        bidId:changeDoc.id
+      };
+      let currUserDetails = "";
+      let sendFromUserId = changeDoc.currentOffer.userId;
+      if(changeDocDetails[1] != "undefined" && changeDocDetails[1] != "") {
+        currUserDetails = await UserModel.findOne({_id:sendFromUserId});
+      }
+      if (change.type === 'added') {
+        //console.log('New Doc: ', change.doc.data());
+      }
+      if (change.type === 'modified') {
+        io.to(changeDoc.id).emit("message", formatMessage(currUserDetails.name, chatPrice,sendFromUserId, changeDoc.id));
+        //console.log('Modified Doc: ', change.doc.data());
+      }
+      if (change.type === 'removed') {
+        //console.log('Removed Doc: ', change.doc.data());
+      }
+    });
+    // let allData = [];
+    // docSnapshot.forEach(function(doc) {
+    //   allData.push(doc.data());
+    // });
+    //console.log(allData);
+    //let newData = docSnapshot.data();
+    
+    //io.to("bid_65d32286b7cc28e479341711_65659ed980149f0cc691ccb1_1708421970111").emit("message",formatMessage("Antu Dhara",newData.currentOffer.price, "65d32286b7cc28e479341711", "bid_65d32286b7cc28e479341711_65659ed980149f0cc691ccb1_1708421970111"));
+    //return true;
+  }, err => {
+      //return false;
+      //console.log(`Encountered error: ${err}`);
+  });
+})();
+
 io.on("connection", (socket) => {
+  /*let reqData = {
+    userId: "65d32286b7cc28e479341711",
+    productId: "65659ed980149f0cc691ccb1",
+    sellerId: "654f368443db200178350161"
+  };
+  checkChangesInField(reqData);*/
   socket.on("joinRoom", async ({ username, currRoom }) => {
     let room = currRoom;
     const user = userJoin(socket.id, username, room);
@@ -204,33 +285,104 @@ io.on("connection", (socket) => {
     };
     let bidOldData = await getBidData(queryData);
     bidOldData = bidOldData[0];
-    let currIndex = parseInt(bidOldData.currentOffer.offerIndex) + 1;
-    const currDateTime = new Date();
-    let timeMiliSeccond = currDateTime.valueOf();
-    let currentOffer = {
-      bidId: bidId,
-      createdAt: timeMiliSeccond,
-      id:(username == bidOldData.buyerId) ? "offer_buyer_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond : "offer_seller_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond,
-      isFromBuyer:(username == bidOldData.buyerId) ? true: false,
-      offerIndex:currIndex,
-      price: (msg != "") ? msg : 0,
-      status: 0,
-      userId: queryData.userId,
-    };
-    let updateData = {
-      buyerId:queryData.userId,
+    let bidProductId = bidOldData.productId;
+    let bidProductDetails = await Userproduct.findOne({_id:bidProductId});
+    if(bidProductDetails.offer_price >= msg) {
+      let currIndex = parseInt(bidOldData.currentOffer.offerIndex) + 1;
+      const currDateTime = new Date();
+      let timeMiliSeccond = currDateTime.valueOf();
+      let currentOffer = {
+        bidId: bidId,
+        createdAt: timeMiliSeccond,
+        id:(username == bidOldData.buyerId) ? "offer_buyer_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond : "offer_seller_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond,
+        isFromBuyer:(username == bidOldData.buyerId) ? true: false,
+        offerIndex:currIndex,
+        price: (msg != "") ? msg : 0,
+        status: 0,
+        userId: queryData.userId,
+      };
+      let updateData = {
+        //buyerId:queryData.userId,
+        buyerId:(bidOldData.buyerId != "") ? bidOldData.buyerId : "",
+        id:bidId,
+        createdAt: timeMiliSeccond,
+        productId: (bidOldData.productId != "") ? bidOldData.productId : "",
+        withdrew: false,
+        acceptedByBuyer:false,
+        acceptedBySeller:false,
+        status:1,
+        currentOffer: currentOffer,
+        sellerId:(bidOldData.sellerId != "") ? bidOldData.sellerId : "",
+      }; 
+      await updateBidData(updateData,bidId);
+      await insertBidOfferData(currentOffer,currentOffer.id);
+      //let currUserDetails = await UserModel.findOne({_id:username});
+      //Below line has commented out due to a observer written on the above
+      //io.to(roomName).emit("message",formatMessage(currUserDetails.name, msg,username, roomName));
+    }
+  });
+  // Buyer Seller Acceptation
+  socket.on("acceptation", async ({username,roomName,}) => {
+    //Save the accpetence in db
+    let bidId = roomName;
+    let queryData = {
       id:bidId,
-      createdAt: timeMiliSeccond,
-      productId: (bidOldData.productId != "") ? bidOldData.productId : "",
-      withdrew: false,
-      status:1,
-      currentOffer: currentOffer,
-      sellerId:(bidOldData.sellerId != "") ? bidOldData.sellerId : "",
-    }; 
-    await updateBidData(updateData,bidId);
-    await insertBidOfferData(currentOffer,currentOffer.id);
-    let currUserDetails = await UserModel.findOne({_id:username});
-    io.to(roomName).emit("message", formatMessage(currUserDetails.name, msg, roomName));
+      userId:username
+    };
+    let bidOldData = await getBidData(queryData);
+    bidOldData = bidOldData[0];
+    let currIndex = parseInt(bidOldData.currentOffer.offerIndex) + 1;
+      const currDateTime = new Date();
+      let timeMiliSeccond = currDateTime.valueOf();
+      let currentOffer = {
+        bidId: bidId,
+        createdAt: timeMiliSeccond,
+        id:(username == bidOldData.buyerId) ? "offer_buyer_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond : "offer_seller_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond,
+        isFromBuyer:(username == bidOldData.buyerId) ? true: false,
+        offerIndex:currIndex,
+        price: " Has Accepted Your Offer!!",
+        status: 0,
+        userId: queryData.userId,
+      };
+      let updateData = {
+        //buyerId:queryData.userId,
+        buyerId:(bidOldData.buyerId != "") ? bidOldData.buyerId : "",
+        id:bidId,
+        createdAt: timeMiliSeccond,
+        productId: (bidOldData.productId != "") ? bidOldData.productId : "",
+        withdrew: false,
+        status:1,
+        acceptedByBuyer:(username == bidOldData.buyerId) ? true : false,
+        acceptedBySeller:(username == bidOldData.sellerId) ? true : false,
+        currentOffer: currentOffer,
+        sellerId:(bidOldData.sellerId != "") ? bidOldData.sellerId : "",
+      }; 
+      //Write code for both side acceptation
+      if(((bidOldData.acceptedByBuyer == true) && (updateData.acceptedBySeller == true)) || ((bidOldData.acceptedBySeller == true) && (updateData.acceptedByBuyer == true))) {
+        //Item added to the cart
+        /*axios({
+          method: 'post',
+          url: process.env.SITE_URL + "/api/add-to-cart",
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '
+          },
+          body: {
+            user_id: email,
+            product_id: password,
+            qty: 1,
+            status: 0,
+          }
+        })
+        .then((response) => {
+          //currentOffer.price = " Item added to the cart.";
+          //console.log(response);
+        });*/
+      }
+      await updateBidData(updateData,bidId);
+      await insertBidOfferData(currentOffer,currentOffer.id);
+      //let currUserDetails = await UserModel.findOne({_id:username});
+      //io.to(socket.id).emit("message", formatMessage(currUserDetails.name, " Has Accepted the latest bid",username, roomName));
   });
   //Get old messages form database
   socket.on("getOldMessages", async ({ roomName,username }) => {
@@ -242,7 +394,7 @@ io.on("connection", (socket) => {
     if(allData.length > 0 ) {
       for(let newElement of allData) {
         let currUserDetails = await UserModel.findOne({_id:newElement.userId});
-        io.to(socket.id).emit("message", formatMessage(currUserDetails.name, newElement.price, roomName));
+        io.to(socket.id).emit("message", formatMessage(currUserDetails.name, newElement.price,newElement.userId, roomName));
       }
     }
   });

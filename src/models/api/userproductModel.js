@@ -8,7 +8,6 @@ const model = mongoose.Schema({
   },
   description: {
     type: String,
-    required: true,
   },
   category_id: {
     type: mongoose.Schema.Types.ObjectId,
@@ -26,6 +25,10 @@ const model = mongoose.Schema({
   size_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'mt_sizes', 
+  },
+  gender_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'mt_gender', 
   },
   price: {
     type: String,

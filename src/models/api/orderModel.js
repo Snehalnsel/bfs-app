@@ -37,12 +37,20 @@ const model = mongoose.Schema({
     ref: 'hub_list', 
   },
   total_price: {
-    type: String,
+    type: Number,
     required: true,
+  },
+  pay_now: {
+    type: Number,
+    default: 0,
+  },
+  remaining_amount: {
+    type: Number,
+    default: 0,
   },
   payment_method: {
     type: Number,
-    enum: [0, 1],//1 for online 0 for COD
+    enum: [0, 1],
     default: 0,
     required: true,
   },
@@ -124,6 +132,26 @@ const model = mongoose.Schema({
     type: String,
   }, 
   delete_status:{
+    type: Number,
+    enum: [0,1],
+    default: 0,
+  },
+  delete_status:{
+    type: Number,
+    enum: [0,1],
+    default: 0,
+  },
+  delete_by:{
+    type: Number,
+    enum: [0,1,2,3],
+    default: 0,
+  },
+  is_deletedtime:{
+    type: Number,
+    enum: [0,1],
+    default: 0,
+  },
+  is_return:{
     type: Number,
     enum: [0,1],
     default: 0,

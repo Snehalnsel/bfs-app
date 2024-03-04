@@ -32,15 +32,15 @@ exports.getData = async function (req, res, next) {
   
     var pageName = "App Users";
     var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-  
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     Users.find().then((users) => {
       res.render("pages/app-users/list", {
         siteName: req.app.locals.siteName,
         pageName: pageName,
         pageTitle: pageTitle,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         year: moment().format("YYYY"),
         requrl: req.app.locals.requrl,
         status: 0,
@@ -48,30 +48,29 @@ exports.getData = async function (req, res, next) {
         respdata: {
           list: users,
         },
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
   };
 
 
   exports.addData = async function (req, res, next) {
-    
-  
     var pageName = "App Users";
     var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-  
-   
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     res.render("pages/app-users/create", {
       status: 1,
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       message: "",
       respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
     });
  
   };
@@ -80,21 +79,22 @@ exports.getData = async function (req, res, next) {
   exports.createData = async function (req, res, next) {
     var pageName = "App Users";
     var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-  
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.render("pages/app-users/create", {
         status: 0,
         siteName: req.app.locals.siteName,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         pageName: pageName,
         pageTitle: pageTitle,
         year: moment().format("YYYY"),
         message: "Validation error!",
         requrl: req.app.locals.requrl,
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   
@@ -103,15 +103,16 @@ exports.getData = async function (req, res, next) {
         res.render("pages/app-users/create", {
           status: 0,
           siteName: req.app.locals.siteName,
-          userFullName: req.session.user.name,
-          userImage: req.session.user.image_url,
-          userEmail: req.session.user.email,
+          userFullName:  req.session.admin.name,
+          userImage:  req.session.admin.image_url,
+          userEmail:  req.session.admin.email,
           pageName: pageName,
           pageTitle: pageTitle,
           year: moment().format("YYYY"),
           message: "Already exists!",
           requrl: req.app.locals.requrl,
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       } else {
         var image_url = req.app.locals.requrl + "/public/images/no-image.jpg";
@@ -137,29 +138,30 @@ exports.getData = async function (req, res, next) {
               siteName: req.app.locals.siteName,
               pageName: pageName,
               pageTitle: pageTitle,
-              userFullName: req.session.user.name,
-              userImage: req.session.user.image_url,
-              userEmail: req.session.user.email,
+              userFullName:  req.session.admin.name,
+              userImage:  req.session.admin.image_url,
+              userEmail:  req.session.admin.email,
               year: moment().format("YYYY"),
               message: "Added!",
               requrl: req.app.locals.requrl,
               respdata: users,
+              isAdminLoggedIn:isAdminLoggedIn
             });
           })
           .catch((error) => {
-            console.log(error);
             res.render("pages/app-users/create", {
               status: 0,
               pageName: pageName,
               siteName: req.app.locals.siteName,
-              userFullName: req.session.user.name,
-              userImage: req.session.user.image_url,
-              userEmail: req.session.user.email,
+              userFullName:  req.session.admin.name,
+              userImage:  req.session.admin.image_url,
+              userEmail:  req.session.admin.email,
               pageTitle: pageTitle,
               year: moment().format("YYYY"),
               requrl: req.app.locals.requrl,
               message: "Error!",
               respdata: error,
+              isAdminLoggedIn:isAdminLoggedIn
             });
           });
       }
@@ -171,7 +173,7 @@ exports.getData = async function (req, res, next) {
   
     var pageName = "App Users";
     var pageTitle = req.app.locals.siteName + " - Edit " + pageName;
-  
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const user_id = mongoose.Types.ObjectId(req.params.id);
   
     Users.findOne({ _id: user_id }).then((users) => {
@@ -180,13 +182,14 @@ exports.getData = async function (req, res, next) {
         siteName: req.app.locals.siteName,
         pageName: pageName,
         pageTitle: pageTitle,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         year: moment().format("YYYY"),
         requrl: req.app.locals.requrl,
         message: "",
         respdata: users,
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
   };
@@ -195,26 +198,22 @@ exports.getData = async function (req, res, next) {
   exports.updateData = async function (req, res, next) {
     try {
       const errors = validationResult(req);
+      let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
       if (!errors.isEmpty()) {
         return res.status(400).json({
           status: "0",
           message: "Validation error!",
           respdata: errors.array(),
+          isAdminLoggedIn:isAdminLoggedIn
         });
-      }
-  
-      console.log(req.body);
-      console.log(req.params.user_id);
-  
+      }  
       const user = await Users.findOne({ _id: req.params.user_id });
-  
-      console.log(user);
-  
       if (!user) {
         return res.status(404).json({
           status: "0",
           message: "Not found!",
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
   
@@ -241,6 +240,7 @@ exports.getData = async function (req, res, next) {
           status: "0",
           message: "Failed to update user!",
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
   
@@ -248,15 +248,16 @@ exports.getData = async function (req, res, next) {
         status: "1",
         message: "Successfully updated!",
         respdata: updatedUser,
+        isAdminLoggedIn:isAdminLoggedIn
       });
 
-      res.redirect("/app-users"); 
+      res.redirect("/admin/app-users"); 
     } catch (error) {
-      console.error(error);
       res.status(500).json({
         status: "0",
         message: "An error occurred while updating the user!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   };
@@ -264,11 +265,13 @@ exports.getData = async function (req, res, next) {
   exports.deleteData = async function (req, res, next) {
     try {
         const errors = validationResult(req);
+        let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
         if (!errors.isEmpty()) {
             return res.status(400).json({
                 status: "0",
                 message: "Validation error!",
                 respdata: errors.array(),
+                isAdminLoggedIn:isAdminLoggedIn
             });
         }
 
@@ -278,19 +281,21 @@ exports.getData = async function (req, res, next) {
                 status: "0",
                 message: "User not found!",
                 respdata: {},
+                isAdminLoggedIn:isAdminLoggedIn
             });
         }
 
         await Users.deleteOne({ _id: req.params.id }, { w: "majority", wtimeout: 100 });
 
         // Redirect after successful deletion
-        res.redirect("/app-users");
+        res.redirect("/admin/app-users");
     } catch (error) {
         // Handle any errors that occur during the deletion process
         return res.status(500).json({
             status: "0",
             message: "Error occurred while deleting the user!",
             respdata: error.message, // Include the error message for debugging purposes
+            isAdminLoggedIn:isAdminLoggedIn
         });
     }
 };

@@ -319,7 +319,7 @@ exports.getSubcatData = async function (req, res, next) {
       respdata: subcategories,
     });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     return res.status(500).json({
       status: "0",
       message: "An error occurred while fetching the data.",
@@ -348,7 +348,7 @@ exports.getCategoryWithParent = async function (req, res, next) {
       respdata: category,
     });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     return res.status(500).json({
       status: "0",
       message: "An error occurred while fetching the data.",
@@ -444,7 +444,7 @@ exports.getData = async function (req, res, next) {
       respdata: parentCategories,
     });
   } catch (error) {
-    console.error('Error fetching parent categories with parent details:', error);
+    //console.error('Error fetching parent categories with parent details:', error);
     return res.status(500).json({
       status: "0",
       message: "An error occurred while fetching parent categories with parent details.",
@@ -494,7 +494,7 @@ exports.getCategories = async function (req, res, next) {
       respdata: parentCategories,
     });
   } catch (error) {
-    console.error('Error fetching parent categories:', error);
+    //console.error('Error fetching parent categories:', error);
     return res.status(500).json({
       status: "0",
       message: "An error occurred while fetching parent categories.",
@@ -586,7 +586,7 @@ exports.getParentCategories = async function (req, res, next) {
       respdata: extractedCategories,
     });
   } catch (error) {
-    console.error('Error fetching unique parent details:', error);
+    //console.error('Error fetching unique parent details:', error);
     return res.status(500).json({
       status: "0",
       message: "An error occurred while fetching unique parent details.",
@@ -652,7 +652,7 @@ exports.getCategoriesWithMatchingParentId = async function (req, res, next) {
       respdata: categoriesWithMatchingParentId,
     });
   } catch (error) {
-    console.error('Error fetching categories with matching parent_id:', error);
+    //console.error('Error fetching categories with matching parent_id:', error);
     return res.status(500).json({
       status: '0',
       message: 'An error occurred while fetching categories with matching parent_id.',
@@ -667,6 +667,7 @@ exports.getCategoriesWithMatchingParentId = async function (req, res, next) {
 
 exports.getAllSubcategoriesWithProducts = async function (req, res, next) {
   try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const subcategoriesWithProducts = await Userproduct.aggregate([
       {
         $lookup: {
@@ -702,6 +703,9 @@ exports.getAllSubcategoriesWithProducts = async function (req, res, next) {
           product_ids: 1,
         },
       },
+      {
+        $sort: { name: 1 } // Sort by name in ascending order
+      }
     ]);
 
     if (!subcategoriesWithProducts || subcategoriesWithProducts.length === 0) {
@@ -730,6 +734,7 @@ exports.getAllSubcategoriesWithProducts = async function (req, res, next) {
         status: '1',
         message: 'Subcategories with associated products found!',
         respdata: subcategoriesWithProducts,
+        isLoggedIn: isLoggedIn,
     });
 
     // let response = () => {
@@ -743,7 +748,7 @@ exports.getAllSubcategoriesWithProducts = async function (req, res, next) {
 
     
   } catch (error) {
-    console.error('Error fetching subcategories with associated products:', error);
+    //console.error('Error fetching subcategories with associated products:', error);
     return res.status(500).json({
         status: '0',
         message: 'An error occurred while fetching subcategories with associated products.',

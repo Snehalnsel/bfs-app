@@ -21,6 +21,7 @@ var ObjectId = require("mongodb").ObjectId;
 const Wishlist = require('../../models/api/wishlistModel');
 const Userproduct = require("../../models/api/userproductModel");
 const Productimage = require("../../models/api/productimageModel");
+const insertNotification = require("../../models/api/insertNotification");
 const Users = require("../../models/api/userModel");
 
 exports.addToWishlist = async (req, res) => {
@@ -46,18 +47,21 @@ exports.addToWishlist = async (req, res) => {
     } else {
       const user = await Users.findOne({ _id: user_id });
       const product = await Userproduct.findOne({ _id: product_id }).populate('category_id', 'name');
-
-      console.log(product);
-
       const newFavList = new Wishlist({
         user_id,
         product_id,
         status,
         added_dtime: new Date(), 
       });
-
       const savedFavData = await newFavList.save();
-
+      const requestUrl = req.originalUrl || req.url;
+      // await insertNotification(
+      //   'Wishlist Notification', 
+      //   `Item ${product.name} added to wishlist by ${user.name}`, 
+      //   user_id, 
+      //   requestUrl, 
+      //   new Date()
+      // );
       return res.status(200).json({
         message: 'Item added to your wishlist successfully',
         wishlist: {
@@ -74,7 +78,6 @@ exports.addToWishlist = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error(error); 
     res.status(500).json({ error: 'An error occurred while adding to favlist' });
   }
 };
@@ -85,9 +88,6 @@ exports.getWishlistByUserId = async (req, res) => {
       .populate('user_id', 'name')
       .exec();
 
-      console.log(existingList);
-      console.log("--------");
-
     if (existingList.length === 0) {
       return res.status(200).json({
         message: 'Wishlist is empty',
@@ -96,7 +96,6 @@ exports.getWishlistByUserId = async (req, res) => {
     } else {
       const formattedList = await Promise.all(
         existingList.map(async (item) => {
-          console.log(item.product_id);
           const product = await Userproduct.findById(item.product_id).populate('category_id', 'name');
 
           if (product.length === 0) {
@@ -105,14 +104,8 @@ exports.getWishlistByUserId = async (req, res) => {
               existingList: [],
             });
           }  
-
-          console.log(product);
           
           const productImages = await Productimage.find({ product_id: item.product_id }).limit(1);
-
-          console.log("--------");
-          console.log(productImages);
-
 
           return {
             _id: item._id,
@@ -160,7 +153,6 @@ exports.getWishlistByUserId = async (req, res) => {
         });
       }
     } catch (error) {
-      console.error('Error while deleting product from cart:', error);
       res.status(500).json({
         error: 'An error occurred while deleting product from cart',
       });

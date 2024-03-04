@@ -26,6 +26,7 @@ const Productsize = require("../../models/api/catsizeModel");
 const Userproduct = require("../../models/api/userproductModel");
 const Productimage = require("../../models/api/productimageModel");
 const Productcondition = require("../../models/api/productconditionModel");
+const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 const multer = require("multer");
 const upload = multer({ dest: 'public/images/' }); 
 
@@ -54,7 +55,6 @@ exports.getSizeList = async function (req, res, next) {
 
     res.status(200).json({ status: "1", size_list: sizeInfo });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Internal server error",
@@ -78,7 +78,6 @@ exports.getSizeData = async function (req, res, next) {
 
     res.status(200).json({ status: "1", productSize: productsize });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Internal server error",
@@ -101,7 +100,6 @@ exports.getBrandData = async function (req, res, next) {
 
     res.status(200).json({ status: "1", productBrand: productbrand });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Internal server error",
@@ -148,9 +146,6 @@ exports.getBrandData = async function (req, res, next) {
 //     });
 
 //     const savedProductdata = await newProduct.save();
-
-//     console.log(savedProductdata);
-
 //     const requrl = url.format({
 //       protocol: req.protocol,
 //       host: req.get("host"),
@@ -184,7 +179,6 @@ exports.getBrandData = async function (req, res, next) {
 //     } 
  
 //    } catch (error) {
-//     console.error(error);
 //     res.status(500).json({
 //       status: "0",
 //       message: "Error!",
@@ -192,8 +186,6 @@ exports.getBrandData = async function (req, res, next) {
 //     });
 //   }
 // };
-
-
 
 exports.getProductconditionList = async function (req, res, next) {
   try {
@@ -206,10 +198,8 @@ exports.getProductconditionList = async function (req, res, next) {
         respdata: {},
       });
     }
-
     res.status(200).json({ status: "1", productConditions: productConditions });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Internal server error",
@@ -217,8 +207,6 @@ exports.getProductconditionList = async function (req, res, next) {
     });
   }
 };
-
-
 
 exports.addData = async function (req, res, next) {
   const errors = validationResult(req);
@@ -231,8 +219,6 @@ exports.addData = async function (req, res, next) {
   }
 
   try {
-
-    console.log(req.body);
     // const existingProduct = await Userproduct.findOne({ name: req.body.name });
 
     // if (existingProduct) {
@@ -297,22 +283,32 @@ exports.addData = async function (req, res, next) {
     });
 
     const savedProductdata = await newProduct.save();
-
-    console.log(savedProductdata);
-
     const requrl = url.format({
       protocol: req.protocol,
       host: req.get("host"),
     });
-
-    console.log(req.files);
     const imageUrls = [];
     if (req.files && req.files.length > 0) {
       const imageDetails = [];
 
       req.files.forEach(async (file) => {
-        const imageUrl = requrl + "/public/images/" + file.filename;
-        //const imageUrl = file.filename;
+        //const imageUrl = requrl + "/public/images/" + file.filename;
+        const imageUrl = file.filename;
+
+        if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){
+          await CompressImage("./public/images/"+image,"./public/compress_images/");
+        }
+        else
+        {
+          await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
+            if (err) {
+                console.log("Error Found:", err);
+            }
+            else {
+                console.log("File copied successfully!");
+            }
+          });
+        }
 
         const productimageDetail = new Productimage({
           product_id: savedProductdata._id,
@@ -335,7 +331,6 @@ exports.addData = async function (req, res, next) {
     }
 
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -378,10 +373,6 @@ exports.getProductData = async function (req, res, next) {
     .skip((page - 1) * limit)
     .limit(limit)
     .exec();
-
-    // console.log(userproducts);
-
-   
     if (!userproducts || userproducts.length === 0) {
       return res.status(404).json({
         status: "0",
@@ -394,9 +385,6 @@ exports.getProductData = async function (req, res, next) {
  
     for (const userproduct of userproducts) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
-
-      console.log(productImages);
-
       const formattedUserProduct = {
         _id: userproduct._id,
         name: userproduct.name,
@@ -425,14 +413,9 @@ exports.getProductData = async function (req, res, next) {
         __v: userproduct.__v,
         product_images: productImages, 
       };
-      
-    
       formattedUserProducts.push(formattedUserProduct);
     }
-
-    console.log(formattedUserProducts);
     const totalPages = Math.ceil(count / limit);
-
     if(formattedUserProducts)
     {
       res.status(200).json({
@@ -506,11 +489,7 @@ exports.getProductDataById = async function (req, res, next) {
         respdata: [],
       });
     }
-
     const formattedUserProducts = [];
-   
-    console.log(userproducts);
-
     for (const userproduct of userproducts) {
       
      
@@ -637,7 +616,7 @@ exports.getDetailsById = async function (req, res, next) {
       name: userproducts.name,
       description: userproducts.description,
       category_id: userproducts.category_id ? userproducts.category_id._id: '', 
-      category: userproducts.category_id ? userproducts.category : userproducts.category || '', 
+      category: userproducts.category_id ? userproducts.category_id.name : userproducts.category_id || '', 
       brand: userproducts.brand_id ? userproducts.brand_id.name : userproducts.brand || '',
       brand_id: userproducts.brand_id ? userproducts.brand_id._id : '',
       user_id: userproducts.user_id ? userproducts.user_id._id : '',
@@ -657,6 +636,7 @@ exports.getDetailsById = async function (req, res, next) {
       original_packaging: userproducts.original_packaging,
       approval_status: userproducts.approval_status,
       satus_name : productCondition ? productCondition.name : '',
+      satus : productCondition ? productCondition.name : '',
       added_dtime: userproducts.added_dtime,
       hitCount: userproducts.hitCount || 0, 
       __v: userproducts.__v,
@@ -670,7 +650,6 @@ exports.getDetailsById = async function (req, res, next) {
       respdata: formattedUserProduct,
     });
   } catch (error) {
-    console.error('Error while fetching product details:', error);
     return res.status(500).json({
       status: "0",
       message: "Server error!",
@@ -706,7 +685,6 @@ exports.getProduct = async function (req, res, next) {
       respdata: productDetails,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -727,11 +705,8 @@ exports.updateProduct = async function (req, res, next) {
   }
 
   try {
-    console.log(req.body);
     const productId = req.body.product_id;
-
     const existingProduct = await Userproduct.findById(productId);
-
     if (!existingProduct) {
       return res.status(404).json({
         status: "0",
@@ -821,7 +796,6 @@ exports.updateProduct = async function (req, res, next) {
       respdata: productDetails,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -856,7 +830,6 @@ exports.updateProductBidDetails = async (req, res) => {
       respdata: updatedUserProduct,
     });
   } catch (error) {
-    console.error(error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
@@ -885,7 +858,6 @@ exports.deleteProduct = async function (req, res, next) {
       respdata: {},
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",

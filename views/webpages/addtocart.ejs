@@ -1,24 +1,23 @@
 <%- include('../../public/assets/include/header'); %>
-
+<% if(respdata != ''){ %>  
 <section class="bids-wrapper">
-    <div class="container">     
-       <div class="bids-lists cart-wrapper">     
-       <div class="cart-list">
-           
-         <!--<form action="/api/checkout-web" method="POST">  -->
-         <form id="orderPlace"> 
-            <% console.log('ADD TO CART VIEW PAGE LIST'); console.log(respdata); %>
-            <input type="hidden" id="user_id" name="user_id" value="<%=user%>">
-             <input type="hidden" id="seller_id" name="seller_id" value="<%=respdata.seller_id%>">
-            <input type="hidden" id="cart_id" name="cart_id" value="<%=respdata.cart_id%>">
-            <input type="hidden" id="product_id" name="product_id" value="<%=respdata.product_id%>">
-            <input type="hidden" id="total_amt" name="total_amt" value="<%=respdata1%>">
-            <input type="hidden" id="gst" name="gst" value="28">
-            <input type="hidden" id="payment_method" name="payment_method" value="0">
-          <div class="bids-row cart-row">             
+    <div class="container"> 
+       <div class="bids-lists cart-wrapper">
+         <div class="cart-list">
+            <form id="orderPlace"> 
+               <input type="hidden" id="user_id" name="user_id" value="<%=user%>">
+               <input type="hidden" id="seller_id" name="seller_id" value="<%=respdata.seller_id%>">
+               <input type="hidden" id="cart_id" name="cart_id" value="<%=respdata.cart_id%>">
+               <input type="hidden" id="product_id" name="product_id" value="<%=respdata.product_id%>">
+               <input type="hidden" id="total_amt" name="total_amt" value="<%=respdata1%>">
+               <input type="hidden" id="gst" name="gst" value="28">
+               <input type="hidden" id="product_price" name="product_price" value="<%=respdata.product_price%>">
+               <input type="hidden" id="payment_method" name="payment_method" value="0">
+            </form> 
+            <div class="bids-row cart-row">             
              <div class="br-details">
                 <div class="bid-images">
-                    <img src="<%=respdata.images%>" alt="images" class="img-fluid"> 
+                  <img src="<%=websiteUrl %>/public/compress_images/<%=respdata.images%>" alt="images" class="img-fluid">
                 </div>
                 <div class="bid-info">
                    <div class="bd-title"><%=respdata.product_name%></div>
@@ -37,68 +36,12 @@
                 </div>
                 <div class="cart-action">
                    <div class="remove-cart">
-                      <a href="/api/delete-cart/<%=respdata._id%>"><i class="fa fa-times" aria-hidden="true"></i></a>
+                      <a href="/delete-cart/<%=respdata._id%>"><i class="fa fa-times" aria-hidden="true"></i></a>
                    </div>
                 </div>
              </div>
           </div>
- 
-          <!-- <div class="bids-row cart-row">             
-             <div class="br-details">
-                <div class="bid-images"><img src="assets/images/cart2.png" alt="images" class="img-fluid"></div>
-                <div class="bid-info">
-                   <div class="bd-title">Lorem ipsum dolor sit amet</div>
-                   <div class="bd-price">
-                      <span><i class="fa fa-inr" aria-hidden="true"></i></span>
-                      10,000
-                   </div>
-                   <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i> 110000</div>                
-                </div>
-             </div>
-            
-             <div class="br-results cart-right-box">
-                <div class="cart-price">
-                   <p>Final Bid Price</p>
-                   <div class="highlight-title "><span><i class="fa fa-inr" aria-hidden="true"></i></span>8,000</div>
-                </div>
-                <div class="cart-action">
-                   <div class="remove-cart">
-                      <a href="#"><i class="fa fa-times" aria-hidden="true"></i></a>
-                   </div>
-                </div>
-             </div>
-          </div>
- 
-          <div class="bids-row cart-row">             
-             <div class="br-details">
-                <div class="bid-images"><img src="assets/images/product4.jpg" alt="images" class="img-fluid"></div>
-                <div class="bid-info">
-                   <div class="bd-title">Lorem ipsum dolor sit amet</div>
-                   <div class="bd-price">
-                      <span><i class="fa fa-inr" aria-hidden="true"></i></span>
-                      10,000
-                   </div>
-                   <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i> 110000</div>                
-                </div>
-             </div>
-            
-             <div class="br-results cart-right-box">
-                <div class="cart-price">
-                   <p>Final Bid Price</p>
-                   <div class="highlight-title "><span><i class="fa fa-inr" aria-hidden="true"></i></span>8,000</div>
-                </div>
-                <div class="cart-action">
-                   <div class="remove-cart">
-                      <a href="#"><i class="fa fa-times" aria-hidden="true"></i></a>
-                   </div>
-                </div>
-             </div>
-          </div> -->
- 
-       </div> 
-
-
-      
+       </div>      
        <div class="cart-summery">
           <div class="summery-title">
              <h4>Price details</h4>
@@ -117,7 +60,7 @@
                      <tr>
                         
                        <td>GST<small>(18% Packing & Handling Charges)</small></td>
-                        <th><i class="fa fa-inr" aria-hidden="true"></i> <%=(respdata.product_price*28)/100;%></th> 
+                        <th><i class="fa fa-inr" aria-hidden="true"></i> <%=(respdata.product_price*18)/100;%></th> 
                      </tr>
                      <tr class="border-top total-table">
                        <td><strong>Total Amount</strong></td>
@@ -129,61 +72,73 @@
         
           <div class="summery-button">
           <!-- <a class="btn check-out">Place Order</a>-->
-          <input type="button" class="btn check-out" value="Place Order">
+          <input type="button" class="btn check-out" value="Proceed to Checkout">
          </div> 
           
 
-       </div> 
-          
-      </form>
- 
        </div>
- 
-        
-    </div>
- </section>
+      </div>        
+   </div>
+</section> 
+       <% } else { %>        
+         <section class="bids-wrapper empty-content ">
+            <div class="container">
+              <div class="ec-box">
+                 <h6>Your shopping cart is empty</h6>
+                 <p>Please browse products to add in your cart!</p>
+                 <a href="/webSubCategories" class="bc-btn">Continue Shopping</a>
+              </div> 
+            </div>
+           </section> 
+       <% } %>    
+    
 
 <%- include('../../public/assets/include/newsletter'); %>
 <%- include('../../public/assets/include/footer'); %>
 
 <script>
-$(document).on("click", ".check-out", function(e) {
-    e.preventDefault();
-    
-    let formData = {
-        cart_id: $('#cart_id').val(),
-        user_id: $('#user_id').val(),
-        product_id: $('#product_id').val(),
-        total_amt: $('#total_amt').val(),
-        gst: $('#gst').val(),
-        seller_id: $('#seller_id').val(),
-        payment_method: $('#payment_method').val()
-    };
+$(document).on("click", ".check-out", async function(e) {
+   
+    //e.preventDefault();
 
-console.log(formData);
-    $.ajax({
+    window.location.href = '/checkout-web';
+
+   //  let formData = {
+   //      cart_id: $('#cart_id').val(),       
+   //      seller_id: $('#seller_id').val(),
+   //      user_id: $('#user_id').val(),
+   //      product_id: $('#product_id').val(),
+   //      total_amt: $('#total_amt').val(),
+   //      gst: $('#gst').val(),
+   //      payment_method: $('#payment_method').val(),
+   //      product_price: $('#product_price').val()
+   //  };
+   //  let addToCartreCookieAccessToken = await getCookieFunc(accessTokenVar);
+   //  let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
+   //  await userReLogin(addToCartreCookieAccessToken, addToCartreCookieRefreshToken);
+
+   /* $.ajax({
         type: 'POST',
-        url: '/api/checkout-web', // URL to submit the form data to (process.php in this case)
+        url: '/checkout-web', // URL to submit the form data to (process.php in this case)
         data: { data: formData },
-        dataType: "json",
-        success: function(response) {
-           if(response.is_orderPlaced == 1)
-           {
-              Swal.fire({
-                 html: response.message,  
-                 confirmButtonText: "OK",
-                 customClass: { confirmButton: 'alert-box-button' }
-              });
-              setTimeout(() => {
-                 window.location.href = '/api/home';
-              }, 3000);
-           }
-        },
-        error: function(xhr, status, error) {
-            // Handle errors
-            console.error(xhr.responseText);
-        }
-    });
+        //dataType: "json",
+      //   success: function(response) {
+      //      if(response.is_orderPlaced == 1)
+      //      {
+      //         Swal.fire({
+      //            html: response.message,  
+      //            confirmButtonText: "OK",
+      //            customClass: { confirmButton: 'alert-box-button' }
+      //         });
+      //         setTimeout(() => {
+      //            window.location.href = '/home';
+      //         }, 5000);
+      //      }
+      //   },
+      //   error: function(xhr, status, error) {
+      //       // Handle errors
+      //   }
+    });*/
 });
 
 </script>

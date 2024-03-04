@@ -1,5 +1,5 @@
-<%- include('../../public/assets/include/header'); %>
-
+<%- await include('../../public/assets/include/header'); %>
+<!--<%-await helper.checkImageExist("image-1708429829497-616768594.jpg") %>-->
 <section class="dashboard-wrapper">
     <div class="dashboard-container">
        <div class="dashboard-sidbar">        
@@ -11,19 +11,20 @@
                <div class="sht-ui">Hello</div>
                
                <div class="user-name"><%=respdata.title%> <%=respdata.name%></div>
+               <div class="userimage-edit">
+                  <!--  <a href="javascript:void(0)" data-toggle="modal" data-target="#profile-change-modal"><i class="fa fa-pencil" aria-hidden="true"></i></a> -->
+                    <!--<label for="file"><i class="fa fa-pencil" aria-hidden="true"></i></label>-->
+                    <!--<input id="file" class="file-line" type="file" onchange="loadFile(event)">-->
+                    <label>
+                        <a href="javascript:void(0)" data-toggle="modal" data-target="#upload-profile-modal" class="edit_link">
+                         Edit
+                        </a>
+                    </label>
+                 </div>
             </div>
-   <!-- Profile Image Modal Start -->   
+            <!-- Profile Image Modal Start -->   
    
-            <div class="userimage-edit">
-              <!--  <a href="javascript:void(0)" data-toggle="modal" data-target="#profile-change-modal"><i class="fa fa-pencil" aria-hidden="true"></i></a> -->
-                <!--<label for="file"><i class="fa fa-pencil" aria-hidden="true"></i></label>-->
-                <!--<input id="file" class="file-line" type="file" onchange="loadFile(event)">-->
-                <label>
-                    <a href="javascript:void(0)" data-toggle="modal" data-target="#upload-profile-modal" class="edit_link">
-                        <i class="fa fa-pencil" aria-hidden="true"></i>
-                    </a>
-                </label>
-             </div>
+            
 
             <div class="modal theme_modal short-modal change-profile-update" id="upload-profile-modal">
                <div class="modal-dialog">
@@ -31,7 +32,7 @@
                   <div class="modal-content">
                      <div class="loginform-box short-box">
                         <h5 class="box-title">Change Profile Picture</h5>
-                        <form action="/api/change-profile-image-web" method="POST" enctype="multipart/form-data">
+                        <form action="/change-profile-image-web" method="POST" enctype="multipart/form-data">
                              <div class="inner-formbox">
                                 <div class="profile-chnage-box">
                                    <div class="user-icon">
@@ -53,25 +54,25 @@
          <div class="sidbar-box sidbar-nav">
             <ul class="nav d-flex flex-column mb-2 ">
                       <li class="nav-item">
-                        <a class="nav-link" href="/api/my-account"><i class="fa fa-user" aria-hidden="true"></i> <span>Profile</span></a>
+                        <a class="nav-link" href="/my-account"><i class="fa fa-user" aria-hidden="true"></i> <span>Profile</span></a>
                       </li>
                       <li class="nav-item">
-                        <a class="nav-link" href="/api/web-my-order"><i class="fa fa-list-ul" aria-hidden="true"></i> <span>My Orders</span></a>
-                      </li>
-        
-                      <li class="nav-item">
-                        <a class="nav-link" href="/api/my-post/<%=respdata.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Posts</span></a>
+                        <a class="nav-link" href="/web-my-order"><i class="fa fa-list-ul" aria-hidden="true"></i> <span>My Orders</span></a>
                       </li>
         
                       <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> <span>My Bids</span></a>
+                        <a class="nav-link" href="/my-post/<%=respdata.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Product</span></a>
+                      </li>
+        
+                      <li class="nav-item">
+                        <a class="nav-link" href="/bid-for-product"><i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> <span>My Bids</span></a>
                       </li>
                       
                     </ul>
                     <div class="bottom-link">
                      <ul class="nav d-flex flex-column mb-2 ">
-                        <!--<li><a class="nav-link" href="/api/sign-out"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li>-->
-                        <li><a class="nav-link" href="/api/sign-out"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li>
+                        <!--<li><a class="nav-link" href="/sign-out"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li>-->
+                        <li><a class="nav-link signout" id="signout" href="javascript:void(0)"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li>
                      </ul>
         
                        
@@ -83,7 +84,7 @@
           <div class="dashboard-infobox">
              <div class="dashboard-title-arrow mb-25">
                 <h4 class="di-title mr-25">Account Setting </h4>
-                <div class="edit-link"><a href="/api/edit-profile">Edit</a></div>
+                <div class="edit-link shortedit-btn"><a href="/edit-profile">Edit</a></div>
              </div>
              
              <div class="dsh-shortbox">
@@ -114,7 +115,7 @@
           <div class="dashboard-infobox mt-50">
              <div class="dashboard-title-arrow mb-25">
                 <h4 class="di-title mr-25">Address </h4>
-                <div class="edit-link"><a href="/api/add-address">Add Address</a></div>
+                <div class="edit-link shortedit-btn"><a href="/add-address">Add Address</a></div>
              </div>
              
  
@@ -122,26 +123,25 @@
                 <form >
                    
                    <div class="div-row">
-                     <% respdata1.forEach(function(item) { %>
-                        
+                     <% respdata1.forEach(function(item) { %>                        
                       <% if(item.address_name == 'Home' && item.default_status == '0') {%>
                       <div class="div-12">
-                         <label>Home: <div class="edit-link"><a href="/api/delete-address/<%=item._id%>">Delete Address</a></div></label>                        
-                         <textarea class="ds-form-control" value="" disabled><%=item.address1%>, <%=item.street_name%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>
+                         <div class="edit-link"><a href="/delete-address/<%=item._id%>"><i class="fa fa-trash-o" aria-hidden="true"></i></a></div>                      
+                         <textarea class="ds-form-control" value="" disabled>Home:<%=item.address1%>, <%=item.street_name%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>
                          <input type="hidden" name="address_home" value="">
                         </div>
                       <% } %>
                       <%if(item.address_name == 'Office' && item.default_status == '0') {%>
                         <div class="div-12">
-                           <label>Office:</label> <div class="edit-link"><a href="/api/delete-address/<%=item._id%>">Delete Address</a></div>                       
-                           <textarea class="ds-form-control" value="" disabled><%=item.address1%>, <%=item.street_name%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>
+                           <label></label> <div class="edit-link"><a href="/delete-address/<%=item._id%>"><i class="fa fa-trash-o" aria-hidden="true"></i></a></div>                       
+                           <textarea class="ds-form-control" value="" disabled>Office:<%=item.address1%>, <%=item.street_name%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>
                            <input type="hidden" name="address_office" value="">
                         </div>
                         <% } %>
                         <%if(item.address_name == 'Other' && item.default_status == '0'){%>
                            <div class="div-12">
-                              <label>Others:</label> <div class="edit-link"><a href="/api/delete-address/<%=item._id%>">Delete Address</a></div>                       
-                              <textarea class="ds-form-control" value="" disabled><%=item.address1%>, <%=item.street_name%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>
+                              <label></label> <div class="edit-link"><a href="/delete-address/<%=item._id%>"><i class="fa fa-trash-o" aria-hidden="true"></i></a></div>                       
+                              <textarea class="ds-form-control" value="" disabled>Others:<%=item.address1%>, <%=item.street_name%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>
                               <input type="hidden" name="address_others" value="">
                            </div>
                            <% } %>
@@ -154,31 +154,31 @@
              
           </div> 
  
-          <div class="dashboard-infobox mt-50">
+          <div class="dashboard-infobox mt-50" >
              <div class="dashboard-title-arrow mb-25">
-                <h4 class="di-title mr-25">Change Password</h4>              
+                <h4 class="di-title mr-25" id="changePasswordLink">Change Password <i class="fa fa-angle-down" style="font-size:24px"></i> </h4>              
              </div>
              
  
-             <div class="dsh-shortbox">
-                 <form>
+             <div class="dsh-shortbox" id="changePasswordForm" style="display: none;">
+                 <form id="resetpasswordfrom">
                    <div class="div-row">
                       <div class="div-12">
                          <label>Enter Old Password:</label>
-                         <input type="Password" name="" class="ds-form-control">
+                         <input type="Password" name="oldpassword" class="ds-form-control oldpassword">
                       </div>
  
                       <div class="div-12">
                          <label>Enter New Password:</label>
-                         <input type="Password" name="" class="ds-form-control">
+                         <input type="Password" name="newpassword" id="newpassword" class="ds-form-control newpassword">
                       </div>
  
                       <div class="div-12">
                          <label>Confirm New Password:</label>
-                         <input type="Password" name="" class="ds-form-control">
+                         <input type="Password" name="cnewpassword" id="cnewpassword" class="ds-form-control cnewpassword">
                       </div>
                       <div class="div-12">
-                         <input type="submit" name="" class="ds-form-control" value="Save">
+                         <input type="submit" name="resetpassord" class="ds-form-control" value="Save">
                       </div>
                    </div>
                 </form>
@@ -190,6 +190,7 @@
        </div>
     </div>
  </section>
-   <%- include('../../public/assets/include/newsletter'); %>
-      <%- include('../../public/assets/include/footer'); %>
+   <%- await include('../../public/assets/include/newsletter'); %>
+      <%- await include('../../public/assets/include/footer'); %>
 </body>
+<script src="/public/assets/js/myaccount.js"></script>

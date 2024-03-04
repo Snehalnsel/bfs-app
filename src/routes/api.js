@@ -31,20 +31,20 @@ const WebsiteController = require("../controllers/api/websiteController");
 const HubController = require("../controllers/api/hubController");
 const NotificationsController = require("../controllers/api/notificationsController");
 const ShippingkitController = require("../controllers/api/shippingkitController");
+const PaymentController = require("../controllers/api/paymentController");
 // const helper = require("../helpers/helper");
 //others
 const dateTime = moment().format("YYYY-MM-DD h:mm:ss");
 
 //apis
-
-router.get("/", function (req, res) {
+router.get("/",[],DashboardController.getData);
+/*router.get("/", function (req, res) {
   res.status(401).json({
     status: "0",
     message: "401 - Unauthorised!",
     respdata: {},
   });
-});
-
+});*/
 
 
 router.post(
@@ -83,7 +83,6 @@ router.post(
 //   ],
 //   UserController.getLogin
 // );
-
 
 router.post(
   "/login",
@@ -151,8 +150,6 @@ router.post(
   ],
   UserController.uploadImage
 );
-
-
 
 router.post(
   "/logout",
@@ -233,7 +230,6 @@ router.post(
 );
 
 //category
-
 router.get("/categories", CategoryController.getParentCategories);
 router.post("/subcategories", CategoryController.getCategoriesWithMatchingParentId);
 router.post("/subcategory", CategoryController.getAllSubcategoriesWithProducts);
@@ -263,7 +259,6 @@ router.post(
   CategoryController.getSubcatData
 );
 
-
 router.post(
   "/view-subcategory",
   [
@@ -287,6 +282,8 @@ const storage = multer.diskStorage({
 
 // const upload = multer({ storage: storage });
 const upload = multer({ storage: storage, limits: { files: 5 } });
+const firstSetUpload = multer({ storage: storage, limits: { files: 5 } }).array('firstSetFiles', 5);
+const secondSetUpload = multer({ storage: storage, limits: { files: 5 } }).array('secondSetFiles', 5);
 
 router.post(
   "/add-category",
@@ -317,7 +314,6 @@ router.post(
 );
 
 //sub category
-
 router.get("/sub-categories", SubCategoryController.getData);
 
 router.post(
@@ -328,7 +324,6 @@ router.post(
   ],
   SubCategoryController.viewData
 );
-
 
 router.post(
   "/get-sub-category",
@@ -342,16 +337,12 @@ router.post(
   SubCategoryController.getSubCatData
 );
 
-
-
-
 router.post(
   "/add-sub-category",
   auth.isAuthorized,
   upload.single('image'), 
   SubCategoryController.addData
 );
-
 
 router.post(
   "/edit-sub-category",
@@ -393,7 +384,6 @@ router.post(
   ],
   SubCategoryController.deleteData
 );
-
 
 router.post("/add-users", (req, res) => {
 
@@ -503,7 +493,6 @@ router.post(
   CartController.addToCart
 );
 
-
 router.post(
   "/cart-list",
   auth.isAuthorized,
@@ -516,7 +505,6 @@ router.post(
   ],
   CartController.getCartListByUserId
 );
-
 
 router.post(
   "/cart-productstatus",
@@ -531,7 +519,6 @@ router.post(
   CartController.getCartProductChange
 );
 
-
 router.post(
   "/remove-cart-product",
   auth.isAuthorized,
@@ -544,7 +531,6 @@ router.post(
   ],
   CartController.removeProductItem
 );
-
 
 router.post(
   "/delete-cart-product",
@@ -595,7 +581,6 @@ router.post(
   WishlistController.addToWishlist
 );
 
-
 router.post(
   "/wish-list",
   auth.isAuthorized,
@@ -608,7 +593,6 @@ router.post(
   ],
   WishlistController.getWishlistByUserId
 );
-
 
 router.post(
   "/delete-wishlist-product",
@@ -636,7 +620,6 @@ router.post(
   BrandController.addData
 );
 
-
 router.post(
   "/delete-brand",
   auth.isAuthorized,
@@ -652,8 +635,6 @@ router.post(
 
 const checkLogin = (req, res, next) => {
     
-    console.log('Check Login>>>>>>>>>>');
-    console.log(req.isAuthenticated());
   // Check if the user is authenticated/logged in
   if (req.isAuthenticated()) {
     // User is authenticated, proceed to the next middleware
@@ -853,6 +834,7 @@ router.get(
 );
 
 
+
 router.get(
   "/whats-hot",
   [],
@@ -943,20 +925,24 @@ router.post(
 
 router.post(
   "/cancel-order",
-  auth.isAuthorized, 
-  [
-    check("order_id", "This is a required field!").not().isEmpty(),
-  ],
   OrderController.cancelOrderById
 );
-
-
+router.post(
+  "/return-order", 
+  [],
+  OrderController.returnOrder
+);
+router.get(
+  "/cancelorderbybuyer/:order_id",
+  OrderController.cancelOrderByBuyer
+);
 router.post(
   "/orderlist",
   //auth.isAuthorized, 
   [],
   OrderController.getOrderListByUser
 );
+
 
 router.post(
   "/selllist",
@@ -985,7 +971,6 @@ router.post(
   [],
   OrderController.updateDeliveryaddressByOrderId
 );
-
 router.post(
   "/generate-awbno",
   auth.isAuthorized, 
@@ -1111,14 +1096,27 @@ router.post("/notificationslist", auth.isAuthorized, [],NotificationsController.
 router.post("/readnotification", auth.isAuthorized, [],NotificationsController.getNotificationById);
 router.post("/updatenotification", auth.isAuthorized, [],NotificationsController.updateNotificationById);
 router.post("/deletenotification", auth.isAuthorized, [],NotificationsController.deleteNotificationById);
-
-
+router.get("/webnotificationslist",[],NotificationsController.listofWebNotification);
+router.post("/markNotificationAsRead",[],NotificationsController.markNotificationAsRead);
 // generate 
 router.post("/get-shipmentkit", auth.isAuthorized,[],ShippingkitController.addShipmentData);
+
+router.get("/get-shipmentkitweb/:id",[],WebsiteController.addShipmentData);
 
 
 // WEBSITE API'S
 router.get("/home",[],DashboardController.getData);
+
+
+router.get(
+  "/top-categoriesweb",
+  [],
+  DashboardController.getTopCategoriesweb
+);
+
+router.get("/bestdeal",[],WebsiteController.getBestDealProductsweb);
+router.get("/whatshot",[],WebsiteController.getWhatsHotProductsweb);
+router.get("/justsold",[],WebsiteController.getJustSoldProductsweb);
 router.get("/productdeatils/:id",[],WebsiteController.productData);
 router.get("/privacy-policy",[],WebsiteController.privacypolicyData);
 router.get("/trems",[],WebsiteController.tremsandconditionData);
@@ -1140,11 +1138,9 @@ router.post(
       }
     ),
     check("confirmpassword", "This is a required field!").not().isEmpty().trim().escape(),
-    //check("fcm_token", "This is a required field!").not().isEmpty().trim().escape(),
   ],
   WebsiteController.signin
 );
-
 
 router.post("/userlogin",cors(),[check("email", "Email length should be 10 to 30 characters")
 .isEmail(),
@@ -1156,7 +1152,7 @@ max: 10,
   WebsiteController.getUserLogin
 );
 
-router.get("/sign-out",[],WebsiteController.signOut);
+router.post("/sign-out",[],WebsiteController.signOut);
 
 
 // // Web user Profile API's
@@ -1165,21 +1161,21 @@ router.get("/my-account",[],WebsiteController.myAccount);
 router.get("/edit-profile",[],WebsiteController.editProfile);
 router.get("/add-address",[],WebsiteController.addAddress);
 
-// // Product API's
-
+// Product API's
 router.get("/webSubCategories", WebsiteController.getParentCategories);
-
 router.get("/subcategory",CategoryController.getAllSubcategoriesWithProducts);
-
-
-
 // router.get("/websubcategories/:id",[],WebsiteController.getSubCategoriesWithMatchingParentId);
 
-router.get("/websubcategoriesproducts/:id",[],WebsiteController.getSubCategoriesProducts);
-router.get("/websubcategoriesproductswithsort/:id/:sortid",[],WebsiteController.getSubCategoriesProductswithSort);
+router.get("/websubcategoriesproducts/:id", cors(), (req, res) => {
+  const page = req.query.page;
+  WebsiteController.getSubCategoriesProducts(page, req, res);
+});
 
+router.get("/websubcategoriesproductswithsort/:id/:sortid", cors(), (req, res) => {
+  const page = req.query.page;
+  WebsiteController.getSubCategoriesProductswithSort(page, req, res);
+});
 // Profile Edit API's
-
 router.post("/useredit",
     [
       check("name", "This is a required field!").not().isEmpty().trim().escape(),
@@ -1189,6 +1185,8 @@ router.post("/useredit",
       .isLength({ min: 10, max: 30 }),
   ],WebsiteController.userUpdate
 );
+
+router.post("/user-new-checkout-address",[],WebsiteController.userNewCheckOutAddressAdd);
 
 router.post("/adduseraddress",[],WebsiteController.userAddressAdd);
 
@@ -1202,8 +1200,17 @@ router.post("/addnewpost",[], upload.array('image', 5),WebsiteController.addNewP
 
 router.get("/edit-mypost/:id",[],WebsiteController.editUserWisePost);
 
-// router.post("/updatepostdata",[],WebsiteController.updatePostData);
-
+router.post("/updatepostdata",[],upload.fields([{
+  name: 'img0', maxCount: 1
+}, {
+  name: 'img1', maxCount: 1
+},{
+  name: 'img2', maxCount: 1
+},{
+  name: 'img3', maxCount: 1
+},{
+  name: 'img4', maxCount: 1
+},]),WebsiteController.updatePostData);
 
 // Add To cart 
 router.post("/addtocart/:id",[],WebsiteController.addToCart);
@@ -1214,7 +1221,7 @@ router.get("/show-cart-details",[],WebsiteController.viewCartListByUserId);
 router.get("/delete-cart/:id",[],WebsiteController.deleteCart); //auth.isAuthorized
 
 // Wishlist Web Start
-router.get("/add-to-wishlist-web/:id",[],WebsiteController.addToWishlistWeb);
+router.post("/add-to-wishlist-web/:id",[],WebsiteController.addToWishlistWeb);
 
 router.get("/show-wishlist-details",[],WebsiteController.viewWishListByUserId);
 
@@ -1228,13 +1235,16 @@ router.get("/web-my-order",WebsiteController.myOrderWeb);
 
 router.get("/web-myorder-details/:id",WebsiteController.myOrderDetailsWeb);
 
-
 router.get("/bannerlist",[],DashboardController.bannerlist);
-
 
 router.post("/change-profile-image-web",[],upload.array('image', 1),WebsiteController.changeProfileImgWeb);
 
-router.post("/checkout-web",WebsiteController.checkoutWeb);
+router.get("/checkout-web",WebsiteController.checkoutWeb);
+
+router.post("/placed-order",WebsiteController.userPlacedOrder);
+
+
+
 //Routes Added By Palash
 
 router.get(
@@ -1252,4 +1262,93 @@ router.post(
   [],
   BidController.bidExistReccord
 );
+router.post(
+  "/search-by-keyword",
+  [],
+  SearchController.searchByKeyword
+);
+
+router.post("/ajax-userlogin",cors(),[check("email", "Email length should be 10 to 30 characters"),
+// .isEmail(),
+check("password", "Password length should be 8 to 10 characters").isLength({
+min: 8,
+max: 10,
+}),
+  ],
+  WebsiteController.ajaxGetUserLogin
+);
+
+
+router.post("/user-relogin",cors(),
+  WebsiteController.userRelogin
+);
+router.post("/user-filter",cors(),
+  WebsiteController.userFilter
+);
+router.get("/forgot-password",cors(),
+  WebsiteController.forgotPassword
+);
+router.post("/forgotpassword-sendotp",cors(),
+  WebsiteController.sendotp
+);
+router.post(
+  "/resetpassword",
+  [
+    check(
+      "old_password",
+      "Password length should be 8 to 10 characters!"
+    ).isLength({
+      min: 8,
+      max: 10,
+    }),
+    check(
+      "new_password",
+      "Password length should be 8 to 10 characters!"
+    ).isLength({
+      min: 8,
+      max: 10,
+    }),
+    check(
+      "repeat_password",
+      "Password length should be 8 to 10 characters!"
+    ).isLength({
+      min: 8,
+      max: 10,
+    }),
+  ],
+  WebsiteController.changePassword
+);
+
+router.get("/reason-list",cors(),
+  WebsiteController.reasonlistdata
+);
+
+router.get("/womengender-list",cors(),
+  WebsiteController.genderwomenlistdata
+);
+
+router.get("/mengender-list",cors(),
+  WebsiteController.gendermenlistdata
+);
+
+router.get("/kidgender-list",cors(),
+  WebsiteController.genderkidlistdata
+);
+
+router.get("/otherwise-list",cors(),
+  WebsiteController.otherlistdata
+);
+
+router.post("/payment",cors(),
+PaymentController.getData
+);
+
+router.post("/pay",cors(),
+PaymentController.getPaymentData
+);
+
+router.post("/payment-status",cors(),
+PaymentController.getData
+);
+
 module.exports = router;

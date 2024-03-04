@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const tokenSecret = "a2sd#Fs43d4G3524Kh";
+const tokenSecret = process.env.ACCESS_TOKEN_PRIVATE_KEY;
 const mongoose = require("mongoose");
 const db = mongoose.connection;
 const Users = require("../models/api/userModel");

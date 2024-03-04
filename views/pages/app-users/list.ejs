@@ -50,6 +50,7 @@
                                             <th>User Id</th>
                                             <th>Email</th>
                                             <th>Phone No.</th>
+                                            <th>Ip Address</th>
                                             <th>Created On</th>
                                             <!-- <th>Status</th> -->
                                             <th>Action</th>
@@ -64,13 +65,21 @@
                                                 <td><%= value.app_user_id %></td>
                                                 <td><%= value.email %></td>
                                                 <td><%= value.phone_no %></td>
+                                                <td>
+                                                    <% if (value.ip_address) { %>
+                                                      <%= value.ip_address %>
+                                                    <% } else { %>
+                                                      No IP address found yet
+                                                    <% } %>
+                                                  </td>
+                                                  
                                                 <td><%= value.created_dtime%></td>
                                                 <!-- <td>Active</th> -->
                                                 <td>
-                                                    <a href="/edit-app-users/<%= value._id %>" class="btn btn-info btn-circle btn-sm"  title="Edit">
+                                                    <a href="/admin/edit-app-users/<%= value._id %>" class="btn btn-info btn-circle btn-sm"  title="Edit">
                                                         <i class="fas fa-pencil-alt"></i>
                                                     </a>
-                                                    <a href="/delete-app-users/<%= value._id %>" class="btn btn-danger btn-circle btn-sm"  title="Delete">
+                                                    <a href="/admin/delete-app-users/<%= value._id %>" class="btn btn-danger btn-circle btn-sm"  title="Delete">
                                                         <i class="fas fa-trash"></i>
                                                     </a>
                                                 </td>

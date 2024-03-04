@@ -1,4 +1,4 @@
-<%- include('../../public/assets/include/header'); %>
+<%- await include('../../public/assets/include/header'); %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -8,23 +8,26 @@
 <section class="home-banner-slider">
     <!-- <div class="container"> -->
        <div class="slider banner-slider">
-          <div class="slider-item">
+         <% banner.forEach(function (item){ %>
+           <!-- // <img src="<%=item.image%>" /> -->
+            <div class="slider-item">
+               <img src="<%=item.image%>" alt="images" class="img-fluid">
+            </div>
+         <% }) %>
+          <!-- <div class="slider-item">
              <img src="/public/assets/images/banner1.jpg" alt="images" class="img-fluid">
-          </div>
-          <div class="slider-item">
-             <img src="/public/assets/images/banner1.jpg" alt="images" class="img-fluid">
-          </div>
+          </div> -->
        </div>
     <!-- </div> -->
  </section>
- <section class="product-wrapper pd-40" id="best-deals-section">
+ <section class="product-wrapper pd-40 pdt-80" id="best-deals-section">
    <div class="container">
       <div class="top-title">
          <div class="title-box">
             <h3>Best Deals</h3>
          </div>
          <div class="short-box">
-            <a href="javascript:void(0)">See All</a>
+            <a href="/bestdeal">See All</a>
          </div>
       </div>
       <div class="slider product_Slider product_Slider1" id="best-deals-slider">
@@ -34,27 +37,20 @@
    </div>
 </section>
 
-
-
-
-
-
-
-
- <section class="poster-wrapper">
+ <section class="poster-wrapper pd-40">
     <div class="container">
        <div class="row">
           <div class="col-md-6">
              <div class="poster-box">
                 <a href="javascript:void(0)">
-                <img src="/public/assets/images/poster1.jpg" alt="images" class="img-fluid">
+                <img src="/public/assets/images/rebannerseller.webp" alt="images" class="img-fluid">
                 </a>
              </div>
           </div>
           <div class="col-md-6">
              <div class="poster-box">
                 <a href="javascript:void(0)">
-                <img src="/public/assets/images/poster2.jpg" alt="images" class="img-fluid">
+                <img src="/public/assets/images/rebannerbuyer.webp" alt="images" class="img-fluid">
                 </a>
              </div>
           </div>
@@ -68,7 +64,7 @@
              <h3>What's Hot</h3>
           </div>
           <div class="short-box">
-             <a href="javascript:void(0)">See All</a>
+             <a href="/whatshot">See All</a>
           </div>
        </div>
        <div class="slider product_Slider product_Slider1" id="whats-hot-slider">
@@ -76,14 +72,14 @@
        </div>
     </div>
  </section>
- <section class="product-wrapper pd-40 " id="just-sold-section">
+ <section class="product-wrapper pd-40 pdb-80 " id="just-sold-section">
     <div class="container">
        <div class="top-title">
           <div class="title-box">
              <h3>Just Sold</h3>
           </div>
           <div class="short-box">
-             <a href="javascript:void(0)">See All</a>
+             <a href="/justsold">See All</a>
           </div>
        </div>
        <div class="slider product_Slider product_Slider1 " id="just-sold-slider">
@@ -99,7 +95,7 @@
                 <div class="side-icon"><img src="/public/assets/images/check-icon.png" alt="images"></div>
                 <div class="sidebox-info">
                    <h6>Internal quality check</h6>
-                   <p>Lorem Ipsum is simply dummy text</p>
+                   <p>Team BFS does initial quality checks before delivering</p>
                 </div>
              </div>
           </div>
@@ -107,8 +103,9 @@
              <div class="icon-sidebox">
                 <div class="side-icon"><img src="/public/assets/images/return-icon.png" alt="images"></div>
                 <div class="sidebox-info">
-                   <h6>Return within 24 hrs*</h6>
-                   <p>No questions asked returns refunds</p>
+                   <h6>Hassle Free Returns</h6>
+                   <p>No questions asked return within 24 hours*
+                  </p>
                 </div>
              </div>
           </div>
@@ -124,110 +121,30 @@
        </div>
     </div>
    </section>
-   <div class="modal theme_modal bid_modal show" id="bid_modal" aria-modal="true" role="dialog" style="padding-right: 17px; display: none;">
-      <div class="modal-dialog">
-         <button type="button" class="close" data-dismiss="modal">×</button>
-         <div class="modal-content login-box">
-            <div class="left-boxpart hide-mobile">
-               <div class="box-inner">
-                  <img src="/public/assets/images/white_logo.png" alt="image" class="lg-logo">
-                  <p>BFS ( Bid for Sale )</p>
-               </div>
-            </div>
-            <div class="right-formpart loginform-box">
-               <h5 class="box-title">Bid Amount</h5>
-               <div class="inner-formbox">
-                  <div class="tab-content">
-                     <div class="tab-pane active" id="login-password" role="tabpanel">
-                        <!--<form action="" method="POST">-->
-                           <div class="mb-3">   
-                              <input type="text" class="form-control" id="bid_amount" placeholder="Enter Amount" name="bid_amount" required="required">
-                           </div>
-                           <div class="button-row">
-                              <button type="submit" class="btn liginbtn bidNowAmountBtn">Submit</button>
-                           </div>
-                        <!--</form>-->
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </div>
-   </div>
-  <%- include('../../public/assets/include/newsletter'); %>
-  <%- include('../../public/assets/include/footer'); %>
+ <%- await include('../../public/assets/include/newsletter'); %>
+  <%- await include('../../public/assets/include/footer'); %>
 </body>
-<script>
-   let productId = "";
-   $(document).on("click",".bidNowAmountBtn",function() {
-      let bidAmount = $("#bid_amount").val();
-      if(productId !== "" && bidAmount != "") {
-         $.ajax({
-            url: '/api/bid-check-exist-reccord', // Request to bid for first time or update the bid amount
-            data: {productId:productId,bidAmount:bidAmount},
-            method: 'POST',
-            success: function(data) {
-               window.location.href = "/api/bid-for-product/"+data.bidId;
-               //console.log('Danger Alert');
-            },
-            error: function(err) {
-                  console.error('Error:', err);
-            } 
-        });
-      }
-   });
-   $(document).on("click",".bidButton",function() {
-      if(isLoggedIn != "") {
-         productId = $(this).siblings('a').data("id");
-         $('#bid_modal').modal('show'); 
-         //window.location.href = "/api/bid-for-product";
-      } else {
-         //$('.loginModal').trigger('click');
-         $('#login_modal').modal('show'); 
-      }
-   });
-
-   $(document).on("click",".buyButton",function() {
-      console.log("13872047");
-      if(isLoggedIn != "") {
-         productId = $(this).siblings('a').data("id");
-         $('#bid_modal').modal('show'); 
-         //window.location.href = "/api/bid-for-product";
-      } else {
-         //$('.loginModal').trigger('click');
-         $('#login_modal').modal('show'); 
-      }
-   });
-   
-</script>
 <script>
    async function fetchData() {
      try {
-       const response = await fetch('/api/app-home');
+       const response = await fetch('/app-home');
        const data = await response.json();
 
       isLoggedIn = data.isLoggedIn;
      // Best deal populate
        const bestDeals = data.respdata.best_deal;
-       //console.log(bestDeals);
        const bestDealsSlider = document.getElementById('best-deals-slider');
+       console.log(bestDealsSlider);
        populateSlider(bestDealsSlider, bestDeals);
 
         const whatshot = data.respdata.whats_hot;
-
         const whatshotSlider = document.getElementById('whats-hot-slider');
         populateSlider(whatshotSlider, whatshot);
-        
-        
-        // Just sold populate
+      
         const justsold = data.respdata.just_sold;
-        
         const justsoldSlider = document.getElementById('just-sold-slider');
         populateSlider(justsoldSlider, justsold);
         
-        
-        
-      
       $('.product_Slider1').removeClass("slick-initialized slick-slider");
       $('.product_Slider1').slick({
          dots: false,
@@ -255,30 +172,35 @@
          });
 
      } catch (error) {
-       console.error('Error fetching data:', error);
      }
    }
 
-   function populateSlider(sliderElement, data, isLoggedIn = "") {
-         data.forEach(item => {
+   async function populateSlider(sliderElement, data, isLoggedIn = "") {
+         data.forEach(async item => {
          const sliderItem = document.createElement('div');
          sliderItem.classList.add('slider-item');
+         let currImagesUrl = `/public/images/${item.image}`;
          let html = ``;
          html += `
          <div class="product-box">
             <div class="product-image">
-               <a href="<%= requrl %>/api/productdeatils/${item._id}"><img src="${item.image}" alt="images" class="img-fluid"></a>
+               <a href="/productdeatils/${item._id}">
+                  <img src="${webSiteUrl}/public/compress_images/${item.image}" alt="images" class="img-fluid">
+                  </a>
             </div>
             <div class="prd-short-info">
                <div class="prd-name"><a href="javascript:void(0)">${item.name}</a></div>
                <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>${item.offer_price}</div>
                <div class="rtl-price"><span>Est. Retail:</span>₹${item.price}</div>
             </div>
-            <div class="prd-button-group">
-               <a href="javascript:void(0)" class="prd-btn buy-btn buyButton" data-id="${item._id}" >Buy Now</a>`;
-            //if(isLoggedIn != "") {
-               html += `<a href="javascript:void(0)" class="prd-btn orng-btn bidButton">Bid Now</a>`;
-            //}
+            <div class="prd-button-group">`;
+            if(item.flag == 0) {
+               html += `<a href="javascript:void(0)" class="prd-btn buy-btn" data-id="${item._id}">Buy Now</a>`;
+               //if(isLoggedIn != "") {
+                  html += `<a href="javascript:void(0)" class="prd-btn orng-btn bidButton">Bid Now</a>`;
+               //}
+            }
+               
             html += `</div>
             <div class="prd-batch">${item.status}</div>
          </div>
@@ -289,48 +211,32 @@
 
    }
 
-   window.onload = fetchData;
+$(document).ready(async function(){
+   fetchData();
+});
+   //window.onload = fetchData;
    
-    $(document).ready(function(){
-        var id1 = $(this).data('id');
+  
+    $(document).ready(async function(){
+        var id1 = $('#userReloggedIn').val();
+
+        let cartListreCookieAccessToken = await getCookieFunc(accessTokenVar);
+        let cartListreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
+        await userReLogin(cartListreCookieAccessToken, cartListreCookieRefreshToken);
+        
         $.ajax({
-                 url: '/api/cart-list', // Route on the server to handle the request
+                 url: '/cart-list', 
                  data: {id1:id1},
                  method: 'POST',
                  success: function(data) 
                   {
-                      console.log('Danger Alert');
                   },
                  error: function(err) 
                   {
-                      console.error('Error:', err);
                   } 
         });
-        
-      
-        $(document).on('click', ".buy-btn", function(e){
+   });
 
-          var id = $(this).data('id');
-          console.log(id);
-          $.ajax({
-                 url: '/api/addtocart/'+id.trim(), // Route on the server to handle the request
-                 method: 'POST',
-                 success: function(data) 
-                  {
-                      if (data.is_added) {
-                          alert(data.message);
-                      } else {
-                          alert("Item Already Added to the cart.");
-                      }
-                  },
-                 error: function(err) 
-                  {
-                      console.error('Error:', err);
-                  } 
-              }); 
-          
-            });
-         });
-
+// <img src="${ (baseURL + '/public/compress_images/' + item.image) ? (baseURL + '/public/compress_images/' + item.image) : (baseURL + '/public/images/' + item.image) }" alt="images" class="img-fluid">
 
 </script>

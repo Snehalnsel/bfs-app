@@ -28,7 +28,7 @@ const Users = require("../../models/api/userModel");
 exports.getData = function (req, res, next) {
   var pageName = "Bid Management List";
   var pageTitle = req.app.locals.siteName + " - " + pageName;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   BidManagement.aggregate([
     {
       $lookup: {
@@ -94,17 +94,15 @@ exports.getData = function (req, res, next) {
     },
   ]).exec(function (error, bidList) {
     if (error) {
-      console.error(error);
       res.status(500).json({ error: 'An error occurred' });
     } else {
-      // console.log(bidList);
       res.render("pages/bid-management/list", {
         siteName: req.app.locals.siteName,
         pageName: pageName,
         pageTitle: pageTitle,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         year: moment().format("YYYY"),
         requrl: req.app.locals.requrl,
         status: 0,
@@ -112,6 +110,7 @@ exports.getData = function (req, res, next) {
         respdata: {
           list: bidList,
         },
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
   });
@@ -120,7 +119,7 @@ exports.getData = function (req, res, next) {
 exports.detailsData = function (req, res, next) {
   var pageName = "Bid Details";
   var pageTitle = req.app.locals.siteName + " - " + pageName;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const bidId = req.params.id;
 
   if (!mongoose.Types.ObjectId.isValid(bidId)) {
@@ -134,25 +133,21 @@ exports.detailsData = function (req, res, next) {
       if (!bidDetails) {
         return res.status(404).json({ error: 'Bid not found' });
       }
-      console.log(bidDetails);
       Userproduct.findOne({ _id: bidDetails.product_id })
         .then((productDetails) => {
           if (!productDetails) {
             return res.status(404).json({ error: 'Product not found' });
           }
-
-          console.log(productDetails);
           Productimage.findOne({ product_id: productDetails._id })
             .then((productImage) => {
-              console.log(productImage);
               res.render("pages/bid-management/edit", {
                 status: 1,
                 siteName: req.app.locals.siteName,
                 pageName: pageName,
                 pageTitle: pageTitle,
-                userFullName: req.session.user.name,
-                userImage: req.session.user.image_url,
-                userEmail: req.session.user.email,
+                userFullName:  req.session.admin.name,
+                userImage:  req.session.admin.image_url,
+                userEmail:  req.session.admin.email,
                 year: moment().format("YYYY"),
                 requrl:  req.app.locals.requrl,
                 message: "",
@@ -161,31 +156,31 @@ exports.detailsData = function (req, res, next) {
                   productDetails: productDetails,
                   productImage: productImage, 
                 },
+                isAdminLoggedIn:isAdminLoggedIn
               });
             })
             .catch((error) => {
-              console.error(error);
               res.status(500).json({ error: 'An error occurred while fetching the product image' });
             });
         })
-        .catch((error) => {
-          console.error(error);
+        .catch((error) => {;
           res.status(500).json({ error: 'An error occurred while fetching product details' });
         });
     })
     .catch((error) => {
-      console.error(error);
       res.status(500).json({ error: 'An error occurred while fetching bid details' });
     });
 };
 
 exports.updatedetailsData = async function (req, res, next) {
   const errors = validationResult(req);
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -197,6 +192,7 @@ exports.updatedetailsData = async function (req, res, next) {
         status: "0",
         message: "Bid not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -219,17 +215,18 @@ exports.updatedetailsData = async function (req, res, next) {
         status: "0",
         message: "Failed to update bid!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
     
-    res.redirect("/bid-listing");
+    res.redirect("/admin/bid-listing");
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while updating bid!",
       respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
@@ -237,11 +234,13 @@ exports.updatedetailsData = async function (req, res, next) {
 exports.deleteData = async function (req, res, next) {
   try {
     const errors = validationResult(req);
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     if (!errors.isEmpty()) {
       return res.status(400).json({
         status: "0",
         message: "Validation error!",
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -251,6 +250,7 @@ exports.deleteData = async function (req, res, next) {
         status: "0",
         message: "Not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -260,13 +260,14 @@ exports.deleteData = async function (req, res, next) {
     );
 
    
-    res.redirect("/bid-listing");
+    res.redirect("/admin/bid-listing");
   } catch (error) {
  
     return res.status(500).json({
       status: "0",
       message: "Error occurred while deleting the category!",
-      respdata: error.message, 
+      respdata: error.message,
+      isAdminLoggedIn:isAdminLoggedIn 
     });
   }
 };

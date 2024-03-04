@@ -1,0 +1,9 @@
+File from: [./public/images/1692213490863.png]
+
+File to: [./public/compress_images/1692213490863.png]
+
+Compression algorithm: [pngquant]
+
+Description: Error: Command failed: D:\Project\bfs-app\node_modules\pngquant-bin\vendor\pngquant.exe --quality=20-50 -o ./public/compress_images/1692213490863.png ./public/images/1692213490863.png
+  error: Not a PNG file (libpng failed)
+  error: cannot decode image public\images\1692213490863.png

@@ -1,4 +1,3 @@
-
 // Stick the header at top on scroll
   $(window).scroll(function(){
     if ($(window).scrollTop() >= 90) {
@@ -44,7 +43,7 @@ $(document).ready(function(){
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 5000,
+    autoplaySpeed: 3000,
     cssEase: 'linear'
   });
 
@@ -227,5 +226,6 @@ function topFunction() {
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
 }
+
 
 

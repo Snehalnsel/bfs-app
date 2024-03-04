@@ -1,0 +1,187 @@
+<%- include('../../public/assets/include/header'); %>
+<section class="inner-wrapper white-inner-wrapper">
+    <div class="container">
+       <div class="title-box">       
+             <h1>All Products</h1> 
+          <div class="breadcum-product">
+             <ul>
+                 
+                <li><a href="javascript:void(0)">Home</a></li>               
+                <li>All Products</li>
+             </ul>
+          </div>        
+         </div>
+         <div class="product-wrapper">    
+            <div class="short-sidebar">                   
+               <div class="filter-header">
+                  <div class="flt-title">All Filters</div>
+                  <div class="flt-clear"><a href="javascript:void(0)" onclick="clearAllAndReload()">Clear All</a></div>
+               </div>
+               <div class="accordion theme-accordion" id="theme-accordion">
+                  <div class="card">
+                     <div class="card-header">                           
+                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#card1" aria-expanded="false" aria-controls="card1">Brand</button>
+                     </div>
+                     <div id="card1" class="collapse" data-parent="#theme-accordion" style="">
+                        <div class="card-body">
+                           <div class="filter-list">
+                              <%if(brandList.length > 0) {%>
+                                 <ul class="list-group">
+                                    <% brandList.forEach(function(item) { %>
+                                       <li class="single-list">                  
+                                          <input type="checkbox" id="" class="chkfield filterByChecked searchByBrand" data-id="<%=item.name%>" value="">
+                                          <label class="label-check" for="incbox1"><%=item.name%></label>                  
+                                       </li>
+                                    <% }) %>                               
+                                 </ul>   
+                              <% } %>                         
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="card">
+                     <div class="card-header">                           
+                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#card2" aria-expanded="false" aria-controls="card2">Size</button>
+                     </div>
+                     <div id="card2" class="collapse" data-parent="#theme-accordion" style="">
+                        <div class="card-body">
+                           <div class="filter-list">
+                              <%if(sizeList.length > 0) {%>
+                                 <ul class="list-group">
+                                    <% sizeList.forEach(function(item) { %>
+                                       <li class="single-list">                  
+                                          <input type="checkbox" data-id="<%=item.name%>" class="chkfield filterByChecked searchBySize" value="">
+                                          <label class="label-check" for="incboxx1"><%=item.name%></label>                  
+                                       </li>
+                                    <% }) %>  
+                                 </ul>
+                              <% } %>                             
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="card">
+                     <div class="card-header">                           
+                        <button class="accordion-button collapsed" type="button" data-toggle="collapse" data-target="#card4" aria-expanded="false" aria-controls="card4">Condition</button>
+                     </div>
+
+                     <div id="card4" class="collapse" data-parent="#theme-accordion" style="">
+                        <div class="card-body">
+                           <div class="filter-list">
+                              
+                              <%if(conditionList.length > 0) {%>
+                                 <ul class="list-group">
+                                    <% conditionList.forEach(function(item) { %>
+                                       <li class="single-list">                  
+                                          <input type="checkbox" class="chkfield filterByChecked searchByCondition" data-id="<%=item._id%>" value="">
+                                          <label class="label-check" for="incboxx1"><%=item.name%></label>                  
+                                       </li>
+                                    <% }) %>  
+                                 </ul>
+                              <% } %>                    
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="card">
+                     <div class="card-header">                           
+                        <button class="accordion-button " type="button" data-toggle="collapse" data-target="#card3" aria-expanded="true" aria-controls="card2">Price Range</button>
+                     </div>
+
+                     <div id="card3" class="collapse " data-parent="#theme-accordion">
+                        <div class="card-body">
+                           <div class="filter-list">
+                              <ul class="list-group">
+                                 <li class="single-list">                  
+                                    <input type="checkbox" class="chkfield filterByChecked searchByPrice" data-id="0-1000" value="">
+                                    <label class="label-check" for="prc2">₹0 - ₹1,000</label>                  
+                                 </li>
+                                 <li class="single-list">                  
+                                    <input type="checkbox" class="chkfield filterByChecked searchByPrice" data-id="1000-5000" value="">
+                                    <label class="label-check" for="prc3">₹1,000 - ₹5,000</label>                  
+                                 </li>
+                                 <li class="single-list">                  
+                                    <input type="checkbox" class="chkfield filterByChecked searchByPrice" data-id="5000-10000" value="">
+                                    <label class="label-check" for="prc4">₹5,000 - ₹10,000</label>                  
+                                 </li>
+                                 <li class="single-list">                  
+                                    <input type="checkbox" class="chkfield filterByChecked searchByPrice" data-id="10000-20000" value="">
+                                    <label class="label-check" for="prc5">₹10,000 - ₹20,000</label>                  
+                                 </li>
+                                 <li class="single-list">                  
+                                    <input type="checkbox" class="chkfield filterByChecked searchByPrice" data-id="20000-50000" value="">
+                                    <label class="label-check" for="prc5">₹20,000 - ₹50,000</label>                  
+                                 </li>
+                                 <li class="single-list">                  
+                                    <input type="checkbox" class="chkfield filterByChecked searchByPrice" data-id="50000-100000" value="">
+                                    <label class="label-check" for="prc5">₹50,000 - ₹100,000</label>                  
+                                 </li>
+                                 <li class="single-list" >                  
+                                    <input type="checkbox" class="chkfield filterByChecked searchByPrice" data-id="100000-200000" value="">
+                                    <label class="label-check" for="prc5">₹100,000 - ₹200,000</label>                  
+                                 </li>
+                                 <li class="single-list">                  
+                                    <input type="checkbox" class="chkfield filterByChecked searchByPrice" data-id="200000-500000" value="">
+                                    <label class="label-check" for="prc5">₹200,000 - ₹500,000</label>                  
+                                 </li>
+                              </ul>                             
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>                             
+            </div>
+         
+            <!------------------------------------>
+            <div class="main_product-wrapper ">
+               <div class="top-title shorting-row">
+                  <div class="product-result d-flex aling-center">
+                    
+                        <h5>Showing <%= productCount ? productCount : 0 %> products</h5>
+
+
+                  </div>
+                  <div class="shorting-box">
+                     <div class="short-label">Sort by:</div>
+                     <div class="short-dropdown">
+                        <select class="form-control sortBy" id="sortBy" name="sortBy">
+                           <option>Choose</option>
+                           <option value="0">Low - High</option>
+                           <option value="1">High - Low</option>
+                           <!--<option>4</option>-->
+                           <!--<option>5</option>-->
+                        </select>
+                     </div>
+                  </div>
+               </div>
+               <div class="product-listrow column4-box sortdata" >
+                  <% if (respdata && respdata.length > 0) { %>
+                  <% respdata.forEach(function(item) { %>
+                    
+                  <div class="product-box">
+                    
+                    <div class="product-image">                       
+                            <a href="/productdeatils/<%=item._id%>"><img src="<%=item.image.image%>" alt="images" class="img-fluid"></a>
+                       
+                    </div>
+                    
+                    <div class="prd-short-info">
+                       <div class="prd-name"><a href="/productdeatils/<%=item._id%>"><%=item.name%></a></div>
+                       <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%=item.offer_price%></div>
+                       <div class="rtl-price"><span>Est. Retail:</span><%=item.price%></div>   
+                       <div class="prd-batch"><%=item.status%></div>              
+                    </div> 
+                 </div>
+                 
+                 <% }); %>
+                 <% } else { %>
+                    <p>No products found yet.</p>
+                  <% } %>
+               
+                </div>
+            </div>
+ </section>
+ <input type="hidden" name="product_category_id" id="product_category_id" value="<%=filter_basedon%>" />
+<%- include('../../public/assets/include/newsletter'); %>
+<%- include('../../public/assets/include/footer'); %>
+<script src="/public/assets/js/subcategory-product-list.js"></script>

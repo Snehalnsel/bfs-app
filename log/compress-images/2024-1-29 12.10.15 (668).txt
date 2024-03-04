@@ -1,0 +1,117 @@
+File from: [./public/images/1692236168372.png]
+
+File to: [./public/compress_images/1692236168372.png]
+
+Compression algorithm: [pngquant]
+
+Description: Error: Command failed: D:\Project\bfs-app\node_modules\pngquant-bin\vendor\pngquant.exe --quality=20-50 -o ./public/compress_images/1692236168372.png ./public/images/1692236168372.png
+  error: Not a PNG file (libpng failed)
+  error: cannot decode image public\images\1692236168372.png
+File from: [./public/images/1692190926839.png]
+
+File to: [./public/compress_images/1692190926839.png]
+
+Compression algorithm: [pngquant]
+
+Description: Error: Command failed: D:\Project\bfs-app\node_modules\pngquant-bin\vendor\pngquant.exe --quality=20-50 -o ./public/compress_images/1692190926839.png ./public/images/1692190926839.png
+  error: Not a PNG file (libpng failed)
+  error: cannot decode image public\images\1692190926839.png
+File from: [./public/images/1692236168372.png]
+
+File to: [./public/compress_images/1692236168372.png]
+
+Compression algorithm: [pngquant]
+
+Description: Error: Command failed: D:\Project\bfs-app\node_modules\pngquant-bin\vendor\pngquant.exe --quality=20-50 -o ./public/compress_images/1692236168372.png ./public/images/1692236168372.png
+  error: Not a PNG file (libpng failed)
+  error: cannot decode image public\images\1692236168372.png
+File from: [./public/images/1692189970934.png]
+
+File to: [./public/compress_images/1692189970934.png]
+
+Compression algorithm: [pngquant]
+
+Description: Error: Command failed: D:\Project\bfs-app\node_modules\pngquant-bin\vendor\pngquant.exe --quality=20-50 -o ./public/compress_images/1692189970934.png ./public/images/1692189970934.png
+  error: Not a PNG file (libpng failed)
+  error: cannot decode image public\images\1692189970934.png
+File from: [./public/images/1692213851465.png]
+
+File to: [./public/compress_images/1692213851465.png]
+
+Compression algorithm: [pngquant]
+
+Description: Error: Command failed: D:\Project\bfs-app\node_modules\pngquant-bin\vendor\pngquant.exe --quality=20-50 -o ./public/compress_images/1692213851465.png ./public/images/1692213851465.png
+  error: Not a PNG file (libpng failed)
+  error: cannot decode image public\images\1692213851465.png
+File from: [./public/images/1692237644133.png]
+
+File to: [./public/compress_images/1692237644133.png]
+
+Compression algorithm: [pngquant]
+
+Description: Error: Command failed: D:\Project\bfs-app\node_modules\pngquant-bin\vendor\pngquant.exe --quality=20-50 -o ./public/compress_images/1692237644133.png ./public/images/1692237644133.png
+  error: Not a PNG file (libpng failed)
+  error: cannot decode image public\images\1692237644133.png
+File from: [./public/images/1692236854646.png]
+
+File to: [./public/compress_images/1692236854646.png]
+
+Compression algorithm: [pngquant]
+
+Description: Error: Command failed: D:\Project\bfs-app\node_modules\pngquant-bin\vendor\pngquant.exe --quality=20-50 -o ./public/compress_images/1692236854646.png ./public/images/1692236854646.png
+  error: Not a PNG file (libpng failed)
+  error: cannot decode image public\images\1692236854646.png
+File from: [./public/images/1692189970934.png]
+
+File to: [./public/compress_images/1692189970934.png]
+
+Compression algorithm: [pngquant]
+
+Description: Error: Command failed: D:\Project\bfs-app\node_modules\pngquant-bin\vendor\pngquant.exe --quality=20-50 -o ./public/compress_images/1692189970934.png ./public/images/1692189970934.png
+  error: Not a PNG file (libpng failed)
+  error: cannot decode image public\images\1692189970934.png
+File from: [./public/images/1692213851465.png]
+
+File to: [./public/compress_images/1692213851465.png]
+
+Compression algorithm: [pngquant]
+
+Description: Error: Command failed: D:\Project\bfs-app\node_modules\pngquant-bin\vendor\pngquant.exe --quality=20-50 -o ./public/compress_images/1692213851465.png ./public/images/1692213851465.png
+  error: Not a PNG file (libpng failed)
+  error: cannot decode image public\images\1692213851465.png
+File from: [./public/images/1692237366636.png]
+
+File to: [./public/compress_images/1692237366636.png]
+
+Compression algorithm: [pngquant]
+
+Description: Error: Command failed: D:\Project\bfs-app\node_modules\pngquant-bin\vendor\pngquant.exe --quality=20-50 -o ./public/compress_images/1692237366636.png ./public/images/1692237366636.png
+  error: Not a PNG file (libpng failed)
+  error: cannot decode image public\images\1692237366636.png
+File from: [./public/images/1692214919532.png]
+
+File to: [./public/compress_images/1692214919532.png]
+
+Compression algorithm: [pngquant]
+
+Description: Error: Command failed: D:\Project\bfs-app\node_modules\pngquant-bin\vendor\pngquant.exe --quality=20-50 -o ./public/compress_images/1692214919532.png ./public/images/1692214919532.png
+  error: Not a PNG file (libpng failed)
+  error: cannot decode image public\images\1692214919532.png
+File from: [./public/images/1692190926839.png]
+
+File to: [./public/compress_images/1692190926839.png]
+
+Compression algorithm: [pngquant]
+
+Description: Error: Command failed: D:\Project\bfs-app\node_modules\pngquant-bin\vendor\pngquant.exe --quality=20-50 -o ./public/compress_images/1692190926839.png ./public/images/1692190926839.png
+  error: Not a PNG file (libpng failed)
+  error: cannot decode image public\images\1692190926839.png
+File from: [./public/images/1692237644133.png]
+
+File to: [./public/compress_images/1692237644133.png]
+
+Compression algorithm: [pngquant]
+
+Description: Error: Command failed: D:\Project\bfs-app\node_modules\pngquant-bin\vendor\pngquant.exe --quality=20-50 -o ./public/compress_images/1692237644133.png ./public/images/1692237644133.png
+  error: Not a PNG file (libpng failed)
+  error: cannot decode image public\images\1692237644133.png

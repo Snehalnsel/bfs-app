@@ -4413,6 +4413,10 @@ a#navbarDropdown {
     border-bottom: 1px solid #dddddd;
 }
 
+.bids-wrapper .bids-chatbox .bids-productbox .bib-box{
+
+}
+
 .bids-wrapper .bids-chatbox .chatbid-box .chat-title {
     font-size: 16px;
     text-align: left;
@@ -4435,8 +4439,8 @@ a#navbarDropdown {
 }
 
 .bids-wrapper .bids-chatbox .chat-messages{
-    height: calc(90vh - 180px);
-    max-height: calc(90vh - 180px);
+    height: calc(90vh - 162px);
+    max-height: calc(90vh - 162px);
 }
 .bids-wrapper .chat-input-holder{
     background: #f0f2f5;

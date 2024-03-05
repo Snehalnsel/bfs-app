@@ -3140,6 +3140,8 @@ button.message-send {
     flex-wrap: wrap;
     padding: 10px;
     align-items: flex-start;
+    border-radius: 6px;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
 }
 
 .bids-chatbox .bids-productbox .bid-images {
@@ -4413,10 +4415,6 @@ a#navbarDropdown {
     border-bottom: 1px solid #dddddd;
 }
 
-.bids-wrapper .bids-chatbox .bids-productbox .bib-box{
-
-}
-
 .bids-wrapper .bids-chatbox .chatbid-box .chat-title {
     font-size: 16px;
     text-align: left;
@@ -4449,4 +4447,46 @@ a#navbarDropdown {
     padding: 10px 15px;
     background: #f0f2f5;
     margin: 0;
+}
+.bids-wrapper .bids-chatbox .bids-productbox .bib-box .bs-group {
+    width: 100%;
+    padding: 15px;
+    margin: 0;
+    border: none;
+    outline: none;
+    text-decoration: none;
+    max-width: 100%;
+}
+
+.bids-wrapper .incoming-message {
+    border: none;
+    align-self: flex-start;
+    background: #ffffff;
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
+}
+.bids-wrapper .incoming-message:before {
+    border-color: rgba(255, 255, 255, 0);
+    border-right-color: #ececec;
+    bottom: 7px;
+    border-width: 12px;
+}
+.bids-wrapper .outgoing-message {
+    border: solid 1px #d4d7dc;
+    border-radius: 8px 8px 0px;
+    background-color: #f0f2f5;
+}
+.bids-wrapper .outgoing-message:after {
+    border-color: rgba(255, 255, 255, 0);
+    border-left-color: #f0f2f5;
+    bottom: 8px;
+    border-width: 11px;
+}
+.bids-wrapper .outgoing-message:before {
+    border-color: rgba(255, 255, 255, 0);
+    border-left-color: #d4d7dc;
+    bottom: 7px;
+    border-width: 12px;
+}
+.bids-wrapper .message-box label.bid-amount span {
+    padding-right: 3px;
 }

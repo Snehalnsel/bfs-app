@@ -1343,4 +1343,8 @@ router.get("/payment",cors(),
 PaymentController.getData
 );
 
+router.post("/payment-status",cors(),
+PaymentController.getStatus
+);
+
 module.exports = router;

@@ -2662,7 +2662,7 @@ exports.checkoutWeb = async function (req, res, next) {
           cart_id: existingCart._id,
           quantity: cartItem.qty,
           product_id: cartItem.product_id._id,
-          product_name: cartItem.product_id.name,
+          product_name: cartItem.product_id. name,
           product_price: product.offer_price,
           product_est_price: product.price,
           seller_id: product.user_id,
@@ -2672,7 +2672,6 @@ exports.checkoutWeb = async function (req, res, next) {
           added_dtime: cartItem.added_dtime,
           status: cartItem.status,
         };
-
         // const requestUrl =  req.headers.referer;
         const requestUrl = '/web-my-order';
 

@@ -157,8 +157,8 @@
                                  <p>Select Payments Method </p>
                                  <ul>
                                     <li><label class="form-check-label">
-                                          <input type="radio" class="form-check-input payment-method" name="paymentmethod"
-                                             value="Online">Pay Now
+                                          <input type="radio" class="form-check-input payment-method"
+                                             name="paymentmethod" value="Online">Pay Now
                                        </label>
                                     </li>
                                     <li>
@@ -275,15 +275,15 @@
             //    $(".check-out").css("pointer-events", "auto");
             // });
             function displayErrorMessage(message) {
-               console.log("kana"+message);
-               $("#error-message").html(message).addClass("error-msg"); 
+               console.log("kana" + message);
+               $("#error-message").html(message).addClass("error-msg");
             }
 
             $(document).on("click", ".check-out", async function (e) {
                e.preventDefault();
                $("#error-message").html("");
                let agreeCheckbox = $(".checkbox-input");
-   
+
                if (!agreeCheckbox.prop("checked")) {
                   displayErrorMessage("Please agree to the Terms & Conditions.");
                   return;
@@ -313,49 +313,66 @@
                   product_price: $('#product_price').val(),
                   addressBookId: $('#userAddressId').val()
                };
-
                if (selectedPaymentMethod == 0) {
                   formData.pay_now = $('#pay-now-row th').text().replace(/[^\d.-]/g, '').trim();
                   formData.remaining_amount = $('#remaining-amount-row th').text().replace(/[^\d.-]/g, '').trim();
                }
-
                let totalAmtText = $('#total-cod-amount-row th').text();
                let totalAmtValue = parseFloat(totalAmtText.replace('₹ ', ''));
                formData.total_amt = totalAmtValue;
 
                console.log(formData);
-              
 
                let addToCartreCookieAccessToken = await getCookieFunc(accessTokenVar);
                let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
                await userReLogin(addToCartreCookieAccessToken, addToCartreCookieRefreshToken);
-                  $.ajax({
-                     type: 'POST',
-                     url: '/placed-order',
-                     data: { data: formData },
-                     dataType: "json",
-                     success: function (response) {
-                        if (response.is_orderPlaced == 1) {
-                           Swal.fire({
-                              title: response.message,
-                              iconHtml: '<img src="' + src + '">',
-                              customClass: {
-                                 icon: 'alert-logo-item',
-                                 popup: "bid-alert-modal"
-                              },
-                              confirmButtonText: "OK",
-                           });
-                           setTimeout(() => {
-                              window.location.href = '/';
-                           }, 3000);
-                        } else {
-                           $(".check-out").css("pointer-events", "auto");
-                        }
-                     },
-                     error: function (xhr, status, error) {
-                        $(".check-out").css("pointer-events", "auto");
+
+             
+               location.href='/payment?data=' + JSON.stringify(formData);
+               $.ajax({
+                  type: 'POST',
+                  url: '/payment',
+                  data: formData, 
+                  dataType: "json",
+                  success: function (paymentResponse) {
+                     if (statusResponse.code === "PAYMENT_SUCCESS") 
+                     {
+                     //    $.ajax({
+                     //    type: 'POST',
+                     //    url: '/placed-order',
+                     //    data: { data: formData },
+                     //    dataType: "json",
+                     //    success: function (response) {
+                     //       if (response.is_orderPlaced == 1) {
+                     //          Swal.fire({
+                     //             title: response.message,
+                     //             iconHtml: '<img src="' + src + '">',
+                     //             customClass: {
+                     //                icon: 'alert-logo-item',
+                     //                popup: "bid-alert-modal"
+                     //             },
+                     //             confirmButtonText: "OK",
+                     //          });
+                     //          setTimeout(() => {
+                     //             window.location.href = '/';
+                     //          }, 3000);
+                     //       } else {
+                     //          $(".check-out").css("pointer-events", "auto");
+                     //       }
+                     //    },
+                     //    error: function (xhr, status, error) {
+                     //       $(".check-out").css("pointer-events", "auto");
+                     //    }
+                     // });
                      }
-                  });
+                     
+                  },
+                  error: function (xhr, status, error) {
+                     // Handle error if GET request to "/payment" fails
+                     console.error("Error fetching payment data:", error);
+                  }
+               });
+
             });
 
          </script>

@@ -4510,13 +4510,13 @@ a#navbarDropdown {
 }
 
 @media screen and (min-width: 768px) {
-    .product-wrapper .main_product-wrapper .filter-shorting {
+    .product-wrapper .main_product-wrapper .filter-shorting, .product-wrapper .main_product-wrapper .top-title{
         padding-right: 10px;
     }
-    .product-wrapper .main_product-wrapper .filter-shorting .product-result {
+    .product-wrapper .main_product-wrapper .filter-shorting .product-result, .product-wrapper .main_product-wrapper .top-title .product-result {
         margin-left: 1%;
     }
-    .product-wrapper .main_product-wrapper .filter-shorting .product-result {
+    .product-wrapper .main_product-wrapper .filter-shorting .product-result, .product-wrapper .main_product-wrapper .top-title .product-result {
         margin-right: 1%;
     }
 }

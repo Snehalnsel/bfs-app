@@ -26,6 +26,7 @@ var ObjectId = require("mongodb").ObjectId;
 const Appsettings = require("../../models/api/appSettingsModel");
 const Users = require("../../models/api/userModel");
 const Category = require("../../models/api/categoryModel");
+const DemoOrder = require("../../models/api/demoModel");
 const Userproduct = require("../../models/api/userproductModel");
 const Productimage = require("../../models/api/productimageModel");
 const Productcondition = require("../../models/api/productconditionModel");
@@ -48,7 +49,7 @@ const SALT_INDEX = 1;
 const SALT_KEY = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";
 const APP_BE_URL = "http://localhost:8000/";
 
-exports.getData = async function (req, res, next) {
+exports.getPaymentData = async function (req, res, next) {
   try {
     console.log(req.query);
     const amount = 1;

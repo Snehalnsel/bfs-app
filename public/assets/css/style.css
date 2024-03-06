@@ -4500,6 +4500,18 @@ a#navbarDropdown {
     padding-right: 3px;
 }
 
+.bids-wrapper .unread-notification {
+    background-color: #f7f7f7;
+    border: 1px solid #ccc !important;
+    margin: 10px 0 !important;
+    padding: 0 15px;
+    border-radius: 6px;
+}
+.bids-wrapper .wishlist-list {
+    width: 100%;
+    border-bottom: 1px solid #f1f1f1;
+}
+
 /*////*/
 
 #login-password .bidNowAmountBtn {

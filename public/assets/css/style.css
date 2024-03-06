@@ -2886,10 +2886,7 @@ section.home-banner-slider {
 
 /*////new-add////*/
 
-.bids-wrapper {
-    padding: 25px 0px 40px 0px;
-    background: #f1f3f6;
-}
+
 
 .bids-chatbox {
     display: flex;
@@ -4326,16 +4323,16 @@ a#navbarDropdown {
 
 /*/////My Bids/////*/
 
-.bids-wrapper{
+.dark-graybg{
     background: #989898;
 }
-.bids-wrapper .breadcum-product ul li a {
+.dark-graybg .breadcum-product ul li a {
     color: #ffffff;
 }
-.bids-wrapper .breadcum-product ul li{
+.dark-graybg .breadcum-product ul li{
     color: #ffffff;
 }
-.bids-wrapper .breadcum-product ul li{
+.dark-graybg .breadcum-product ul li{
     color: #ffffff;
 }
 

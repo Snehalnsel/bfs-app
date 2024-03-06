@@ -1583,8 +1583,8 @@
   
   .description-tab ul.nav.nav-tabs li a.active {
       color: #ffffff !important;
-      border: solid 1px #e2673d !important;
-      background: #e2673d;
+      border: solid 1px #000000 !important;
+      background: #000000;
   }
   .tab-content {
       padding: 15px 0px;
@@ -4405,10 +4405,6 @@ a#navbarDropdown {
     flex-wrap: wrap;
 }
 
-.bids-wrapper .bids-chatbox .bids-productbox .bib-box{
-
-}
-
 .bids-wrapper .bids-chatbox .buyer-heading {
     font-size: 16px;
     text-align: left;
@@ -4505,4 +4501,22 @@ a#navbarDropdown {
 }
 .bids-wrapper .message-box label.bid-amount span {
     padding-right: 3px;
+}
+
+/*////*/
+
+#login-password .bidNowAmountBtn {
+    width: 100%;
+}
+
+@media screen and (min-width: 768px) {
+    .product-wrapper .main_product-wrapper .filter-shorting {
+        padding-right: 10px;
+    }
+    .product-wrapper .main_product-wrapper .filter-shorting .product-result {
+        margin-left: 1%;
+    }
+    .product-wrapper .main_product-wrapper .filter-shorting .product-result {
+        margin-right: 1%;
+    }
 }

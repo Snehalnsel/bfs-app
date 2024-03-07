@@ -72,8 +72,8 @@ async function searchByFilter(priceList = '',pageId = '') {
                     let totalPages = obj.totalPages;
                     let currentPage = obj.currentPage;
                     let categoryId = productcategoryId;
-                    let webUrl = obj.webUrl;
-                    htmlContent = await makeHtml(obj, totalPages, currentPage, categoryId, webUrl, brandList, sizeList, conditionList, priceList,optionId);
+                    let websiteUrl = obj.websiteUrl;
+                    htmlContent = await makeHtml(obj, totalPages, currentPage, categoryId, websiteUrl, brandList, sizeList, conditionList, priceList,optionId);
                     // console.log(htmlContent)
                 } else {
                     htmlContent = '<p>No products found yet.</p>';
@@ -123,7 +123,8 @@ $(document).on('change', ".sortBy", function (e) {
             success: async function (data) {
                 let htmlContent = '';
                 if (data && data.respdata && data.respdata.length > 0) {
-                    htmlContent = await makeHtml(data);
+                    let websiteUrl = data.websiteUrl;
+                    htmlContent = await makeHtml(data,websiteUrl);
                 } else {
                     htmlContent = '<p>No products found yet.</p>';
                 }
@@ -145,14 +146,14 @@ $(document).on('click', ".ajax_pagination", function (e) {
     let priceList = min + '-' + max;
     searchByFilter(priceList,pageId)
 });
-async function makeHtml(data,totalPages, currentPage, categoryId, webUrl, brandList, sizeList, conditionList, priceList,optionId) {
+async function makeHtml(data,totalPages, currentPage, categoryId, websiteUrl, brandList, sizeList, conditionList, priceList,optionId) {
     let htmlContent = ``;
     data.respdata.forEach(function (item) {
         htmlContent += `
             <div class="product-box">
                 <div class="product-image">
                     <a href="/productdeatils/${item._id}">
-                        <img src="${item.product_images[0].image}" alt="images" class="img-fluid">
+                        <img src="${websiteUrl}/public/compress_images/${item.product_images[0].image}" alt="images" class="img-fluid">
                     </a>
                 </div>
                 <div class="prd-short-info">

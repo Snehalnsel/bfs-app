@@ -747,13 +747,13 @@ exports.downloadProductExcel = async function (req, res, next) {
           }
           const rowData = [
             product.name,
-            product.category && product.category.length > 0 && product.category[0].name || '', // Check if category exists and has a name property
-            product.brand && product.brand.length > 0 && product.brand[0].name || '', // Check if brand exists and has a name property
-            product.size && product.size.length > 0 && product.size[0].name || '', // Check if size exists and has a name property
-            product.user && product.user.length > 0 && product.user[0].name || '', // Check if user exists and has a name property
-            product.productCondition && product.productCondition.length > 0 && product.productCondition[0].name || '', // Check if productCondition exists and has a name property
-            product.price || '', // Assuming price exists directly on the product document
-            product.offer_price || '', // Assuming offer_price exists directly on the product document
+            product.category && product.category.length > 0 && product.category[0].name || '', 
+            product.brand && product.brand.length > 0 && product.brand[0].name || '', 
+            product.size && product.size.length > 0 && product.size[0].name || '', 
+            product.user && product.user.length > 0 && product.user[0].name || '', 
+            product.productCondition && product.productCondition.length > 0 && product.productCondition[0].name || '', 
+            product.price || '',
+            product.offer_price || '', 
             approvalStatus
           ];
           worksheet.addRow(rowData);

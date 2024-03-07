@@ -1339,9 +1339,9 @@ router.get("/otherwise-list",cors(),
   WebsiteController.otherlistdata
 );
 
-router.post("/payment",cors(),
-PaymentController.getData
-);
+// router.post("/payment",cors(),
+// PaymentController.getData
+// );
 
 router.post("/pay",cors(),
 PaymentController.getPaymentData

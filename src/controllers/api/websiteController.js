@@ -974,6 +974,7 @@ exports.userFilter = async function (req, res, next) {
       currentPage: page,
       pageSize: pageSize,
       webUrl: 'user-filter',
+      websiteUrl: process.env.SITE_URL,
       totalProduct: totalProduct
     });
   } else {

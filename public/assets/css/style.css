@@ -118,7 +118,7 @@
     outline: none;
     text-decoration: none;  
     height: 40px;
-    width: 400px;
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -4512,10 +4512,19 @@ a#navbarDropdown {
     border-bottom: 1px solid #f1f1f1;
 }
 
+.policy_box .col-md-4 {
+    display: flex;
+    align-items: center;
+}
+
 /*////*/
 
 #login-password .bidNowAmountBtn {
     width: 100%;
+}
+
+section.poster-wrapper {
+    background: #eeeeee;
 }
 
 @media screen and (min-width: 768px) {

@@ -319,7 +319,7 @@
                }
                let totalAmtText = $('#total-cod-amount-row th').text();
                let totalAmtValue = parseFloat(totalAmtText.replace('₹ ', ''));
-               formData.total_amt = totalAmtValue;
+               formData.total_amt = "670.00";
 
                console.log(formData);
 
@@ -327,80 +327,25 @@
                let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
                await userReLogin(addToCartreCookieAccessToken, addToCartreCookieRefreshToken);
 
-             
-                location.href='/payment?data=' + JSON.stringify(formData);
-               // $.ajax({
-               //    type: 'POST',
-               //    url: '/payment',
-               //    data: formData, 
-               //    dataType: "json",
-               //    success: function (paymentResponse) {
-               //       if (statusResponse.code === "PAYMENT_SUCCESS") 
-               //       {
-                        // $.ajax({
-                        // type: 'POST',
-                        // url: '/placed-order',
-                        // data: { data: formData },
-                        // dataType: "json",
-                        // success: function (response) {
-                        //    if (response.is_orderPlaced == 1) {
-                        //       Swal.fire({
-                        //          title: response.message,
-                        //          iconHtml: '<img src="' + src + '">',
-                        //          customClass: {
-                        //             icon: 'alert-logo-item',
-                        //             popup: "bid-alert-modal"
-                        //          },
-                        //          confirmButtonText: "OK",
-                        //       });
-                        //       setTimeout(() => {
-                        //          window.location.href = '/';
-                        //       }, 3000);
-                        //    } else {
-                        //       $(".check-out").css("pointer-events", "auto");
-                        //    }
-                        // },
-                        // error: function (xhr, status, error) {
-                        //    $(".check-out").css("pointer-events", "auto");
-                        // }
-                     //});
-                   //  }
-                     
-            //       },
-            //       error: function (xhr, status, error) {
-            //          // Handle error if GET request to "/payment" fails
-            //          console.error("Error fetching payment data:", error);
-            //       }
-            //    });
 
-            // });
-                  // $.ajax({
-                  //    type: 'POST',
-                  //    url: '/placed-order',
-                  //    data: { data: formData },
-                  //    dataType: "json",
-                  //    success: function (response) {
-                  //       if (response.is_orderPlaced == 1) {
-                  //          Swal.fire({
-                  //             title: response.message,
-                  //             iconHtml: '<img src="' + src + '">',
-                  //             customClass: {
-                  //                icon: 'alert-logo-item',
-                  //                popup: "bid-alert-modal"
-                  //             },
-                  //             confirmButtonText: "OK",
-                  //          });
-                  //          setTimeout(() => {
-                  //             window.location.href = '/';
-                  //          }, 3000);
-                  //       } else {
-                  //          $(".check-out").css("pointer-events", "auto");
-                  //       }
-                  //    },
-                  //    error: function (xhr, status, error) {
-                  //       $(".check-out").css("pointer-events", "auto");
-                  //    }
-                  // });
+               //  location.href='/pay';
+               $.ajax({
+                  type: 'POST',
+                  url: '/demoplacedorder',
+                  data: { data: formData },
+                  dataType: "json",
+                  success: function (response) {
+                     if (response.is_orderPlaced == 1) {
+                        console.log(response.order._id);
+                        const tempOrderId = response.order._id;
+                        window.location.href = '/pay?temp=' + tempOrderId; 
+                     }
+                  },
+                  error: function (xhr, status, error) {
+                     $(".check-out").css("pointer-events", "auto");
+                  }
+               });
+
             });
 
          </script>

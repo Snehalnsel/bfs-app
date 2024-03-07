@@ -47,8 +47,9 @@ const ReturnOrder = require("../../models/api/returnorderModel");
 const Reasonlist = require("../../models/api/reasonlistModel");
 const Iptrnsaction = require("../../models/api/ipTransactionModel");
 const insertNotification = require("../../models/api/insertNotification");
-//const smtpUser = "welcome@bidforsale.com";
-const smtpUser = "hello@bidforsale.com";
+const Demoorder = require("../../models/api/demoorderModel");
+const smtpUser = "welcome@bidforsale.com";
+//const smtpUser = "hello@bidforsale.com";
 const nodemailer = require("nodemailer");
 const app = express();
 const generateTokens = require("../../utils/generateTokens");
@@ -68,25 +69,25 @@ const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 const { log, Console } = require("console");
 const { create } = require('xmlbuilder2');
 
-const transporter = nodemailer.createTransport({
-  port: 465,
-  host: "mail.bidforsale.com",
-  auth: {
-    user: smtpUser,
-    pass: "aI)q#z@xJQ+u",
-  },
-  secure: true,
-});
-
 // const transporter = nodemailer.createTransport({
-//     port: 465,
-//     host: "mail.bidforsale.com",
-//     auth: {
-//       user: smtpUser,
-//       pass: "A6K9JAQD%m!s",
-//     },
-//     secure: true,
+//   port: 465,
+//   host: "mail.bidforsale.com",
+//   auth: {
+//     user: smtpUser,
+//     pass: "aI)q#z@xJQ+u",
+//   },
+//   secure: true,
 // });
+
+const transporter = nodemailer.createTransport({
+    port: 465,
+    host: "mail.bidforsale.com",
+    auth: {
+      user: smtpUser,
+      pass: "A6K9JAQD%m!s",
+    },
+    secure: true,
+});
 function randNumber(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
@@ -1144,6 +1145,7 @@ exports.myAccount = async function (req, res, next) {
         respdata: req.session.user,
         respdata1: address,
         isLoggedIn: isLoggedIn,
+        websiteUrl: process.env.SITE_URL,
       }, {async: true});
       res.send(html);
 
@@ -1204,6 +1206,31 @@ exports.addAddress = async function (req, res, next) {
       respdata: add,
       respdata1: userData,
       isLoggedIn: isLoggedIn,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the Edit Profile.",
+      error: error.message,
+    });
+  }
+};
+
+
+exports.thankyoupage = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    var userData = req.session.user;
+    const message = req.query.message;
+
+    console.log(message);
+
+    res.render("webpages/message", {
+      title: "Edit Address",
+      message: "Welcome to the Edit Profile page!",
+      respdata1: userData,
+      isLoggedIn: isLoggedIn,
+      message:message
     });
   } catch (error) {
     res.status(500).json({
@@ -3261,6 +3288,66 @@ exports.userPlacedOrder = async function (req, res) {
       });
     }
   } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+exports.demoorder = async function (req, res) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    let formData = req.body.data; // assuming formData is correctly populated
+    let user_id = formData.user_id;
+    let seller_id = formData.seller_id;
+    let cart_id = formData.cart_id;
+    let product_id = formData.product_id;
+    let total_price = formData.total_amt;
+    let payment_method = formData.payment_method;
+    let gst = formData.gst;
+    let order_status = '0';
+    let delivery_charges = '0';
+    let discount = '0';
+    let pickup_status = '0';
+    let delivery_status = '0';
+    let shipping_address_id = formData.addressBookId;
+    let pay_now = formData.pay_now || null;
+    let remaining_amount = formData.remaining_amount || null;
+
+    // Check if billing address exists
+    const billingaddress = await addressBook.findOne({ user_id: seller_id });
+    if (!billingaddress) {
+      return res.status(404).json({ message: 'Seller address not found' });
+    }
+
+    const billing_address_id = billingaddress._id;
+
+    const order = new Demoorder({
+      user_id,
+      cart_id,
+      seller_id,
+      product_id,
+      billing_address_id,
+      shipping_address_id,
+      total_price,
+      payment_method,
+      order_status,
+      pay_now,
+      remaining_amount,
+      status: 1,
+      added_dtime: new Date().toISOString(),
+    });
+
+    const savedOrder = await order.save();
+
+    if (savedOrder) {
+      res.status(200).json({
+        status: "1",
+        is_orderPlaced: 1,
+        message: 'Order placed successfully',
+        order: savedOrder
+      });
+    }
+  } catch (error) {
+    console.error(error); // Log the error for debugging
     return res.status(500).json({ message: 'Internal server error' });
   }
 };

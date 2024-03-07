@@ -1243,7 +1243,12 @@ router.get("/checkout-web",WebsiteController.checkoutWeb);
 
 router.post("/placed-order",WebsiteController.userPlacedOrder);
 
+// router.get("/message",WebsiteController.thankyoupage);
 
+router.get('/message', (req, res) => {
+  //const { message } = req.query;
+  WebsiteController.thankyoupage(req, res);
+});
 
 //Routes Added By Palash
 
@@ -1339,19 +1344,23 @@ router.get("/otherwise-list",cors(),
   WebsiteController.otherlistdata
 );
 
-// router.post("/payment",cors(),
+// router.get("/payment",cors(),
 // PaymentController.getData
 // );
 
-router.post("/pay",cors(),
+router.get("/pay",cors(),
 PaymentController.getPaymentData
 );
 
-router.post("/payment-status",cors(),
-PaymentController.getData
+// router.post("/demo-order",cors(),
+// PaymentController.demoorder
+// );
+
+router.post("/demoplacedorder",
+  WebsiteController.demoorder
 );
 
-router.post("/payment-status",cors(),
+router.get("/payment-status",
 PaymentController.getStatus
 );
 

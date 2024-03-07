@@ -153,7 +153,11 @@ async function makeHtml(data,totalPages, currentPage, categoryId, websiteUrl, br
             <div class="product-box">
                 <div class="product-image">
                     <a href="/productdeatils/${item._id}">
-                        <img src="${websiteUrl}/public/compress_images/${item.product_images[0].image}" alt="images" class="img-fluid">
+                    <img src="${item.product_images && item.product_images.length > 0 && item.product_images[0].image ? 
+                        `${websiteUrl}/public/compress_images/${item.product_images[0].image}` : 
+                        `${websiteUrl}/public/images/no-product.webp`}" 
+               alt="images" class="img-fluid">
+          
                     </a>
                 </div>
                 <div class="prd-short-info">

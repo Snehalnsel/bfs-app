@@ -311,6 +311,7 @@ exports.bidListProduct = async (req, res, next) => {
       title: "chat for bids",
       userId:queryData.userId,
       siteUrl: process.env.SITE_URL,
+      websiteUrl: process.env.SITE_URL,
       buyerData:buyerData,
       sellerData:sellerData,
       requrl: req.app.locals.requrl,

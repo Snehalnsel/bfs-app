@@ -24,7 +24,7 @@
                         <% for(let i=0; i<buyerData.length; i++) {%> 
                            <%if(buyerData[i].product_details.length > 0) {%>                                                   
                               <div class="br-details clickOnProduct" id="<%=buyerData[i].id %>">
-                                 <div class="bid-images"><img src="<%=buyerData[i].product_image %>" alt="images" class="img-fluid"></div>
+                                 <div class="bid-images"><img src="<%=websiteUrl %>/public/compress_images/<%=buyerData[i].product_image %>" alt="images" class="img-fluid"></div>
                                  <div class="bid-info">
                                     <div class="bd-title"><%=buyerData[i].product_details.name %></div>
                                     <div class="bd-price">
@@ -52,7 +52,7 @@
                      <% if(sellerData.length > 0) {%>                          
                         <% for(let i=0; i<sellerData.length; i++) {%>                             
                            <div class="br-details clickOnProduct" id="<%=sellerData[i].id %>">
-                              <div class="bid-images"><img src="<%=sellerData[i].product_image %>" alt="images" class="img-fluid"></div>
+                              <div class="bid-images"><img src="<%=websiteUrl %>/public/compress_images/<%=sellerData[i].product_image %>" alt="images" class="img-fluid"></div>
                               <div class="bid-info">
                                  <div class="bd-title"><%=sellerData[i].product_details.name %></div>
                                  <div class="bd-price">

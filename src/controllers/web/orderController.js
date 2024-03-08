@@ -5,7 +5,10 @@ const mongoose = require("mongoose");
 const db = mongoose.connection;
 const https = require("https");
 const path = require("path");
+const PDFDocument = require('pdfkit');
+const pdf = require('html-pdf');
 const fs = require("fs");
+const ejs = require('ejs');
 const mime = require("mime");
 const nodemailer = require('nodemailer');
 const request = require('request');
@@ -2101,4 +2104,368 @@ exports.downloadOrderExcel = function (req, res, next) {
       }
     }
   });
+};
+
+
+// exports.downloadOrderPDF = function (req, res, next) {
+//   var pageName = "Order List";
+//   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+//   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+
+//   const orderId = req.params.id; 
+
+//   Order.aggregate([
+//     {
+//       $match: {
+//         _id: mongoose.Types.ObjectId(orderId) 
+//       }
+//     },
+//     {
+//       $lookup: {
+//         from: 'users',
+//         localField: 'user_id',
+//         foreignField: '_id',
+//         as: 'user',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'users',
+//         localField: 'seller_id',
+//         foreignField: '_id',
+//         as: 'seller',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'addressbook_lists',
+//         localField: 'billing_address_id',
+//         foreignField: '_id',
+//         as: 'billing_address',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'addressbook_lists',
+//         localField: 'shipping_address_id',
+//         foreignField: '_id',
+//         as: 'shipping_address',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'mt_userproducts',
+//         localField: 'product_id',
+//         foreignField: '_id',
+//         as: 'product',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'order_trackings',
+//         localField: '_id',
+//         foreignField: 'order_id',
+//         as: 'trackingDetails',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'mt_tracks',
+//         localField: 'trackingDetails.tracking_id',
+//         foreignField: '_id',
+//         as: 'trackDetails',
+//       },
+//     },
+//     {
+//       $sort: {
+//         added_dtime: -1
+//       }
+//     }
+//   ]).exec(async function (error, orderList) {
+//     if (error) {
+//       res.status(500).json({ error: 'An error occurred' });
+//     } else {
+//       try {
+//         const doc = new PDFDocument();
+//         res.setHeader('Content-Type', 'application/pdf');
+//         res.setHeader('Content-Disposition', 'attachment; filename=order_list.pdf');
+//         doc.pipe(res);
+//         doc.fontSize(16).text('Order Details', { align: 'center' });
+//         doc.moveDown();
+
+//         orderList.forEach(order => {
+//           doc.text(`Order Code: ${order.order_code}`);
+//           doc.text(`User: ${order.user && order.user.length > 0 && order.user[0].name || ''}`);
+//           doc.text(`Seller: ${order.seller && order.seller.length > 0 && order.seller[0].name || ''}`);
+//           doc.text(`Billing Address: ${getFormattedAddress(order.billing_address)}`);
+//           doc.text(`Shipping Address: ${getFormattedAddress(order.shipping_address)}`);
+//           doc.text(`Product Name: ${order.product && order.product.length > 0 && order.product[0].name || ''}`);
+//           doc.text(`Total Price: ${order.total_price}`);
+//           doc.text(`ShippingKit Status: ${order.trackDetails[0] && order.trackDetails[0].shippingkit_status === 0 ? 'ShippingKit Ordered' : 'Not Ordered'}`);
+//           doc.text(`Status: ${order.bid_status === 0 ? 'Buy Now' : 'Won Bid'}`);
+//           doc.text(`Payment Method: ${order.payment_method === 0 ? 'COD' : 'Online'}`);
+//           doc.text(`Order Date: ${order.added_dtime}`);
+//           doc.moveDown();
+//         });
+       
+//         doc.end();
+//       } catch (err) {
+//         console.error('Error generating PDF:', err);
+//         res.status(500).json({ error: 'An error occurred while generating PDF' });
+//       }
+//     }
+//   });
+// };
+
+
+exports.downloadOrderPDF = function (req, res, next) {
+  var pageName = "Order List";
+  var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+
+  const orderId = req.params.id; 
+
+  Order.aggregate([
+    {
+      $match: {
+        _id: mongoose.Types.ObjectId(orderId) 
+      }
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user_id',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'seller_id',
+        foreignField: '_id',
+        as: 'seller',
+      },
+    },
+    {
+      $lookup: {
+        from: 'addressbook_lists',
+        localField: 'billing_address_id',
+        foreignField: '_id',
+        as: 'billing_address',
+      },
+    },
+    {
+      $lookup: {
+        from: 'addressbook_lists',
+        localField: 'shipping_address_id',
+        foreignField: '_id',
+        as: 'shipping_address',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_userproducts',
+        localField: 'product_id',
+        foreignField: '_id',
+        as: 'product',
+      },
+    },
+    {
+      $lookup: {
+        from: 'order_trackings',
+        localField: '_id',
+        foreignField: 'order_id',
+        as: 'trackingDetails',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_tracks',
+        localField: 'trackingDetails.tracking_id',
+        foreignField: '_id',
+        as: 'trackDetails',
+      },
+    },
+    {
+      $sort: {
+        added_dtime: -1
+      }
+    }
+  ]).exec(async function (error, orderList) {
+    if (error) {
+      res.status(500).json({ error: 'An error occurred' });
+    } else {
+      try {
+
+        const loginHtmlPath = 'views/webpages/demoinvoice.html';
+        const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
+
+        // Replace dynamic content in the HTML template
+        const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
+    
+        // PDF options
+        const options = { format: 'Letter' };
+    
+        // Convert HTML to PDF
+          pdf.create(renderedHtml, options).toStream((err, stream) => {
+          if (err) return res.status(500).send('An error occurred while generating PDF');
+    
+          // Set headers for file download
+          res.setHeader('Content-Type', 'application/pdf');
+          res.setHeader('Content-Disposition', 'attachment; filename=Invoice.pdf');
+    
+          // Pipe the stream to the response
+          stream.pipe(res);
+      });
+      } catch (err) {
+        console.error('Error generating PDF:', err);
+        res.status(500).json({ error: 'An error occurred while generating PDF' });
+      }
+    }
+  });
+};
+
+function getFormattedAddress(addressList) {
+  if (addressList && addressList.length > 0) {
+    const address = addressList[0];
+    return `${address.street_name}, ${address.address1}, ${address.landmark}, ${address.city_name}, ${address.state_name}`;
+  }
+  return '';
+}
+
+exports.downloadOrderPDF = async function (req, res, next) {
+  var pageName = "Order List";
+  var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+
+  const orderId = req.params.id; 
+
+  Order.aggregate([
+    {
+      $match: {
+        _id: mongoose.Types.ObjectId(orderId) 
+      }
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user_id',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'seller_id',
+        foreignField: '_id',
+        as: 'seller',
+      },
+    },
+    {
+      $lookup: {
+        from: 'addressbook_lists',
+        localField: 'billing_address_id',
+        foreignField: '_id',
+        as: 'billing_address',
+      },
+    },
+    {
+      $lookup: {
+        from: 'addressbook_lists',
+        localField: 'shipping_address_id',
+        foreignField: '_id',
+        as: 'shipping_address',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_userproducts',
+        localField: 'product_id',
+        foreignField: '_id',
+        as: 'product',
+      },
+    },
+    {
+      $lookup: {
+        from: 'order_trackings',
+        localField: '_id',
+        foreignField: 'order_id',
+        as: 'trackingDetails',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_tracks',
+        localField: 'trackingDetails.tracking_id',
+        foreignField: '_id',
+        as: 'trackDetails',
+      },
+    },
+    {
+      $sort: {
+        added_dtime: -1
+      }
+    }
+  ]).exec(async function (error, orderList) {
+    if (error) {
+      res.status(500).json({ error: 'An error occurred' });
+    } else {
+  try {
+    const loginHtmlPath = 'views/webpages/demoinvoice.html';
+    const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
+
+    // Replace dynamic content in the HTML template
+    const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
+
+    // PDF options
+    const options = { format: 'Letter' };
+
+    // Convert HTML to PDF
+    pdf.create(renderedHtml, options).toStream(async (err, stream) => {
+      if (err) {
+        console.error('Error generating PDF:', err);
+        return res.status(500).send('An error occurred while generating PDF');
+      }
+
+      // Create a transporter using your email configuration
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'your.email@gmail.com', // Your email address
+          pass: 'your-email-password', // Your email password or app-specific password
+        },
+      });
+
+      // Email details
+      const mailOptions = {
+        from: 'your.email@gmail.com', // Sender's email address
+        to: 'recipient@example.com', // Recipient's email address
+        subject: 'Order Invoice', // Email subject
+        text: 'Attached is the order invoice.', // Email body
+        attachments: [
+          {
+            filename: 'order_invoice.pdf',
+            content: stream,
+            encoding: 'base64',
+          },
+        ],
+      };
+
+      // Send email
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error('Error sending email:', error);
+          return res.status(500).send('An error occurred while sending the email');
+        }
+
+        console.log('Email sent:', info.response);
+        res.status(200).send('PDF sent via email successfully!');
+      });
+    });
+  } catch (err) {
+    console.error('Error generating PDF:', err);
+    res.status(500).json({ error: 'An error occurred while generating PDF' });
+  }
 };

@@ -4538,3 +4538,7 @@ section.poster-wrapper {
         margin-right: 1%;
     }
 }
+
+.upload-post  .alt_image {
+    height: 100%;
+}

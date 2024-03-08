@@ -4533,6 +4533,10 @@ section.poster-wrapper {
     background: #eeeeee;
 }
 
+.account-setting-blk .edit-link.shortedit-btn{
+    
+}
+
 @media screen and (min-width: 768px) {
     .product-wrapper .main_product-wrapper .filter-shorting, .product-wrapper .main_product-wrapper .top-title{
         padding-right: 10px;

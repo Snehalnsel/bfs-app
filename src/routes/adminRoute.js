@@ -520,6 +520,6 @@ router.get("/iplist", cors(), IpaddressController.getList);
 router.get("/download-product-excel", cors(), ProductController.downloadProductExcel);
 router.get("/download-order-excel", cors(), OrderController.downloadOrderExcel);
 router.get("/download-orderpdf/:id", cors(), OrderController.downloadOrderPDF);
-// router.get("/send-order-email/:id", cors(), OrderController.sent);
+router.get("/send-order-email/:id", cors(), OrderController.sentOrderPDF);
 
 module.exports = router;

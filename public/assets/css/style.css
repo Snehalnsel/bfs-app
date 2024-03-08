@@ -4517,6 +4517,12 @@ a#navbarDropdown {
     align-items: center;
 }
 
+.switch .tg-slider.round {
+    border-radius: 34px;
+    width: 62px;
+}
+
+
 /*////*/
 
 #login-password .bidNowAmountBtn {

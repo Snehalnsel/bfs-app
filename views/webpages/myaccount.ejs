@@ -5,7 +5,8 @@
        <div class="dashboard-sidbar">        
          <div class="sidbar-box user-profile">
             <div class="user-icon">
-               <img src="<%=respdata.image%>" alt="user-image">
+               <img src="<%= respdata.image && respdata.image !== 'na' ? respdata.image : websiteUrl + '/public/compress_images/nouser.png' %>" alt="user-image">
+
             </div>
             <div class="user-info">
                <div class="sht-ui">Hello</div>
@@ -36,7 +37,7 @@
                              <div class="inner-formbox">
                                 <div class="profile-chnage-box">
                                    <div class="user-icon">
-                                      <img src="<%=respdata.image%>" alt="user-image" id="output">                            
+                                      <img src="<%= respdata.image && respdata.image !== 'na' ? respdata.image : websiteUrl + '/public/compress_images/nouser.png' %>" alt="user-image" id="output">                      
                                    </div>
                                    <input id="file" class="" name="image" type="file"/>
                                    <input id="user_id" class="" name="user_id" type="hidden" value="<%=respdata.userId%>"/>
@@ -85,7 +86,7 @@
         
          </div>         
        </div>
-       <div class="dashboard-content">
+       <div class="dashboard-content account-setting-blk">
           <div class="dashboard-infobox">
              <div class="dashboard-title-arrow mb-25">
                 <h4 class="di-title mr-25">Account Setting </h4>

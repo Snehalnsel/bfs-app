@@ -1,0 +1,113 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TAX INVOICE</title>
+</head>
+<body>
+
+  <h1>TAX INVOICE</h1>
+
+  <table>
+    <tr>
+      <th>Sold By</th>
+      <th>Billing Address</th>
+    </tr>
+    <tr>
+      <td><%= order.user && order.user.length > 0 && order.user[0].name || '' %></td>
+      <td>
+        <%= order.billing_address[0].street_name %>, <%= order.billing_address[0].address1 %>, <%= order.billing_address[0].landmark %>,
+        <%= order.billing_address[0].city_name %>, <%= order.billing_address[0].state_name %>
+      </td>
+    </tr>
+    <!-- Add more rows as needed for additional data -->
+  </table>
+
+  <table>
+    <tr>
+      <th>Shipping Address</th>
+    </tr>
+    <tr>
+        <td>
+            BFS Retail Services Private Limited												
+            "ALTITUDE THE BUSINES PARK" 												
+            2 OC Ganguly Sarani 10th, L.R.Sarani, 												
+            Kolkata, West Bengal, India,700020												
+            Cin U46103WB2023PTC264898												
+          </td>
+    </tr>
+  </table>
+
+  <table>
+    <tr>
+      <th>Order No.</th>
+      <th>Invoice No.</th>
+    </tr>
+    <tr>
+      <td><%= order.order_code %></td>
+      <td>BB/000001/03-24</td>
+    </tr>
+    <tr>
+      <th>Order Date</th>
+      <th>Invoice Date:</th>
+    </tr>
+    <tr>
+      <td><%= order.added_dtime %></td>
+      <td>Invoice Date</td> 
+    </tr>
+    <!-- Add more rows as needed for additional data -->
+  </table>
+
+  <table border="1">
+    <tr>
+      <th>SL NO.</th>
+      <th>Name</th>
+      <th>HSN</th>
+      <th>Unit Price</th>
+      <th>Qty</th>
+      <th>Net Amount</th>
+      <th>Tax Rate</th>
+      <th>Tax Type</th>
+      <th>Tax Amount</th>
+      <th>Total Amount (Rs.)</th>
+    </tr>
+      <tr>
+        <% order.product.forEach(product => { %>
+        <td><%= product.sno %></td>
+        <td><%= product.name %></td>
+        <td><%= product.hsn %></td>
+        <td><%= order.total_price %></td>
+        <td>1</td>
+        <td></td>
+        <td</td>
+        <td></td>
+        <td></td>
+        <td><%= order.total_price %></td>
+        <% }); %>
+      </tr>
+  </table>
+
+
+  <table>
+    <tr>
+      <td></td>
+      <td><%= order.user && order.user.length > 0 && order.user[0].name || '' %></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Authorised Signatory</td>
+    </tr>
+  </table>
+
+  <table>
+    <tr>
+      <td>Payment Transaction ID</td>
+      <td>Date & Time</td>
+      <td>Invoice Value</td>
+      <td>Mode Of Payment</td>
+    </tr>
+  </table>
+
+</body>
+</html>

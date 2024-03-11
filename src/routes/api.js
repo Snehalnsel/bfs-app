@@ -1243,7 +1243,12 @@ router.get("/checkout-web",WebsiteController.checkoutWeb);
 
 router.post("/placed-order",WebsiteController.userPlacedOrder);
 
+// router.get("/message",WebsiteController.thankyoupage);
 
+router.get('/message', (req, res) => {
+  //const { message } = req.query;
+  WebsiteController.thankyoupage(req, res);
+});
 
 //Routes Added By Palash
 
@@ -1339,32 +1344,24 @@ router.get("/otherwise-list",cors(),
   WebsiteController.otherlistdata
 );
 
-// router.post("/payment",cors(),
+// router.get("/payment",cors(),
 // PaymentController.getData
 // );
 
-router.get("/payment", cors(), (req, res) => {
-  // Extracting data from the query parameter
-  const dataParam = req.query.data;
-
-  try {
-    // Parsing the JSON data
-    const formData = JSON.parse(dataParam);
-
-    // Call the PaymentController.getData method with the parsed data
-    PaymentController.getData(req, res, formData);
-  } catch (error) {
-    // Handle JSON parsing error
-    res.status(400).json({ error: 'Invalid JSON data' });
-  }
-});
-
-router.post("/pay",cors(),
+router.get("/pay",cors(),
 PaymentController.getPaymentData
 );
 
-router.post("/payment-status",cors(),
-PaymentController.getData
+// router.post("/demo-order",cors(),
+// PaymentController.demoorder
+// );
+
+router.post("/demoplacedorder",
+  WebsiteController.demoorder
+);
+
+router.get("/payment-status",
+PaymentController.getStatus
 );
 
 module.exports = router;

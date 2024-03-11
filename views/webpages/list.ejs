@@ -44,7 +44,7 @@
          <div class="col-md-12">
             <div class="poster-box">
                <a href="javascript:void(0)">
-               <img src="/public/assets/images/seller-buyer-process.webp" alt="images" class="img-fluid">
+               <img src="https://bidforsale.com:3000/public/assets/images/seller-buyer-process.webp" alt="images" class="img-fluid">
                </a>
             </div>
          </div>
@@ -196,7 +196,7 @@
          <div class="product-box">
             <div class="product-image">
                <a href="/productdeatils/${item._id}">
-                  <img src="${webSiteUrl}/public/compress_images/${item.image}" alt="images" class="img-fluid">
+                  <img src="${item.image ? `${webSiteUrl}/public/compress_images/${item.image}` : `${webSiteUrl}/public/images/no-product.webp`}" alt="images" class="img-fluid">
                   </a>
             </div>
             <div class="prd-short-info">

@@ -106,7 +106,11 @@
                                                             <td>
                                                                 <% if (value.order_code) { %>
                                                                     <a href="/admin/shipmentdetails/<%= value._id %>" target="_blank"><%= value.order_code %></a>
-                                                                   <a href="/admin/download-orderpdf/<%= value._id %>"><button id="downloadPdfBtn" class="btn btn-primary">Download Pdf</button></a> 
+                                                                    <a href="/admin/download-orderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download PDF</button></a>
+                                                                    <button id="showOptionsBtn" class="btn btn-primary">Show Options</button>
+                                                                    <div id="optionsContainer" style="display: none;">                                                                      <button id="emailOption" class="btn btn-secondary" onclick="sendViaEmail('<%= value._id %>')">Send via Email</button>
+                                                                      <button id="whatsappOption" class="btn btn-secondary" onclick="sendViaWhatsApp('<%= value._id %>')">Send via WhatsApp</button>
+                                                                    </div>
                                                                 <% } else { %>
                                                                     <span style="color: red;">No Order Code is Found</span>
                                                                 <% } %>
@@ -406,3 +410,19 @@
       $('#productNameInput').val(searchValue);
     }
   </script>
+  <script>
+    document.getElementById('showOptionsBtn').addEventListener('click', function () {
+      var optionsContainer = document.getElementById('optionsContainer');
+      optionsContainer.style.display = optionsContainer.style.display === 'none' ? 'block' : 'none';
+    });
+  
+    function sendViaEmail(orderId) {
+      console.log('Sending via Email for order ID:', orderId);
+      window.location.href = '/admin/send-order-email/' + orderId;
+    }
+  
+    function sendViaWhatsApp(orderId) {
+      console.log('Sending via WhatsApp for order ID:', orderId);
+    }
+  </script>
+  

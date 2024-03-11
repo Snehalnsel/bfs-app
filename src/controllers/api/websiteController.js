@@ -2711,7 +2711,7 @@ exports.checkoutWeb = async function (req, res, next) {
           new Date()
         );
         const product_price = finalData.product_price;
-        const gst = (product_price * 18) / 100;
+        const gst = (product_price * 28) / 100;
         const finalPrice = parseInt(product_price) + 250 + parseInt(gst);
         res.render("webpages/mycheckoutweb", {
           title: "Check Out Page",
@@ -2722,6 +2722,7 @@ exports.checkoutWeb = async function (req, res, next) {
           product_price: product_price,
           finalPrice: finalPrice,
           gst: gst,
+          product_id: finalData.product_id,
           isLoggedIn: isLoggedIn,
           user: req.session.user,
           addressUserList: addressUserList,

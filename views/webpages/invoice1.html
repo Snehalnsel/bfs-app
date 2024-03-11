@@ -1,0 +1,303 @@
+<!doctype html>
+<html>
+   <head>
+      <meta charset="utf-8">
+      <title>TAX INVOICE</title>
+   </head>
+   <body>
+   <div style="width:100%; max-width:1000px; margin: 0 auto; ">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+         <tbody>
+            <tr>
+               <td>
+                  <table width="100%" border="0" cellspacing="0" cellpadding="3" style="font-family:'Arial', Gadget, sans-serif; font-size:15px; line-height:18px; margin-bottom: 25px;">
+                     <tbody>
+                        <tr>
+                           <td style="text-transform: uppercase; text-align: center; border: solid 1px #000;">
+                              <h1 style="font-size:18px;">TAX INVOICE</h1>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+                  <table width="100%" border="0" cellspacing="0" cellpadding="3" style="font-family:'Arial', Gadget, sans-serif; font-size:15px; line-height:24px;">
+                     <tbody>
+                        <tr>
+                           <td style="width: 50%; border-left: solid 1px #000; border-top: solid 1px #000;">
+                              <strong>Sold By</strong><br>
+                              <strong><%= order.seller && order.seller.length > 0 && order.seller[0].name || '' %></strong><br>
+                              <%= order.billing_address[0].street_name %>, <%= order.billing_address[0].address1 %>,<br>
+                               <%= order.billing_address[0].landmark %>,<br>
+                              <%= order.billing_address[0].city_name %>, <%= order.billing_address[0].state_name %><br>
+                              Pan: BHVPA9269J<br>
+                              Contact No.: <br>
+                              E-Mail ID: <%= order.seller && order.seller.length > 0 && order.seller[0].email || '' %> <br>
+                           </td>
+                           <td style="width: 50%; border-top: solid 1px #000; border-right: solid 1px #000;"><strong>Billing Address</strong><br>
+                              BFS Retail Services Private Limited<br>
+                              <strong>"ALTITUDE THE BUSINES PARK" </strong><br>
+                              2 OC Ganguly Sarani 10th, L.R.Sarani, <br>
+                              Kolkata, West Bengal, India,700020<br>
+                              Cin U46103WB2023PTC264898<br>
+                              Pan AALCB9231G<br>
+                              Gstin 19AALCB9231G1ZG<br>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td style="width: 50%; border-left: solid 1px #000;">&nbsp;</td>
+                           <td style="width: 50%; border-right: solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td style="width: 50%; border-left: solid 1px #000;">
+                              &nbsp;
+                           </td>
+                           <td style="width: 50%; border-right: solid 1px #000;"><strong>Shipping Address</strong><br>
+                              BFS Retail Services Private Limited<br>
+                              <strong>"ALTITUDE THE BUSINES PARK" </strong><br>
+                              2 OC Ganguly Sarani 10th, L.R.Sarani, <br>
+                              Kolkata, West Bengal, India,700020<br>
+                              Cin U46103WB2023PTC264898<br>
+                           </td>
+                        </tr>
+                        <tr style="margin-top: 30px;">
+                           <td style="width: 50%; border-left: solid 1px #000;">
+                              <h1 style="font-size:16px;">Order No. </h1>
+                              <h1 style="font-size:16px;">Order Date </h1>
+                           </td>
+                           <td style="width: 50%; border-right: solid 1px #000;">
+                              <h1 style="font-size:16px;"><%= order.order_code %></h1>
+                              <h1 style="font-size:16px;"><%= order.added_dtime %></h1>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </td>
+            </tr>
+            <tr>
+               <td>
+                  <table width="100%" border="0" cellspacing="0" cellpadding="3" style="text-align: center; border-left:solid 1px #000; border-top:solid 1px #000; font-family:'Arial', Gadget, sans-serif; font-size:15px; line-height:18px;">
+                     <tbody>
+                        <tr>
+                           <td style="width: 9%; border-right:solid 1px #000; border-bottom:solid 1px #000;"><strong>SL NO.</strong></td>
+                           <td style="width: 18%; border-right:solid 1px #000; border-bottom:solid 1px #000;"><strong>DESCRIPTION</strong></td>
+                           <td style="width: 9%; border-right:solid 1px #000; border-bottom:solid 1px #000;"><strong>HSN</strong></td>
+                           <td style="width: 9%; border-right:solid 1px #000; border-bottom:solid 1px #000;"><strong>Unit Price </strong></td>
+                           <td style="width: 9%; border-right:solid 1px #000; border-bottom:solid 1px #000;"><strong>Qty</strong></td>
+                           <td style="width: 9%; border-right:solid 1px #000; border-bottom:solid 1px #000;"><strong>Net Amount</strong></td>
+                           <td style="width: 9%; border-right:solid 1px #000; border-bottom:solid 1px #000;"><strong>Tax Rate</strong></td>
+                           <td style="width: 9%; border-right:solid 1px #000; border-bottom:solid 1px #000;"><strong>Tax Type</strong></td>
+                           <td style="width: 9%; border-right:solid 1px #000; border-bottom:solid 1px #000;"><strong>Tax Amount</strong></td>
+                           <td style="width: 10%; border-right:solid 1px #000; border-bottom:solid 1px #000;"><strong>Total Amount (Rs.)</strong></td>
+                        </tr>
+                       <tr>
+                           <td style="border-right:solid 1px #000;">1</td>
+                           <% order.product.forEach(product => { %>
+                           <td style="border-right:solid 1px #000;">
+                              <h1 style="text-align: left; font-size:16px;"><%= product.name %></h1>
+                           </td>
+                           <% }); %>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+
+                           <td style="border-right:solid 1px #000;">
+                              <h1 style="text-align: right; font-size:16px;"><%= order.total_price %></h1>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td align="right" style="border-right:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td align="right" style="border-right:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td align="right" style="border-right:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td align="right" style="border-right:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td align="right" style="border-right:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td align="right" style="border-right:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td align="right" style="border-right:solid 1px #000;">
+                              <h1 style="text-align: right; font-size:16px;"><%= order.total_price %></h1>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
+                           <td align="right" style="border-right:solid 1px #000; border-bottom: 1px solid #000;">
+                              <h1 style="text-align: right; font-size:16px;">0.00</h1>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td colspan="2" style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">
+                              <h1 style="text-align: right; font-size:16px;">Total</h1>
+                           </td>
+                           <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">
+                              <h1 style="text-align: right; font-size:16px;"><%= order.total_price %></h1>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td colspan="10" style="text-align: left; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong>Rupees</strong> </td>
+                        </tr>
+                        <tr>
+                           <td colspan="10" style="text-align: left; border-right:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td colspan="10" style="text-align: left; border-right:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td colspan="10" style="text-align: left; border-right:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td colspan="10" style="text-align: left; border-right:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td colspan="10" style="text-align: left; border-right:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td colspan="10" style="text-align: left; border-right:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td colspan="10" style="text-align: left; border-right:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td colspan="10" style="text-align: left; border-right:solid 1px #000;"><strong><%= order.seller && order.seller.length > 0 && order.seller[0].name || '' %></strong> </td>
+                        </tr>
+                        <tr>
+                           <td colspan="10" style="text-align: left; border-right:solid 1px #000; border-bottom:solid 1px #000;"><strong>Authorised Signatory</strong> </td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </td>
+            </tr>
+            <tr>
+               <td>
+                  <table width="100%" border="0" cellspacing="0" cellpadding="4" style="font-family:'Arial', Gadget, sans-serif; font-size:15px; line-height:18px; margin-top: 25px;">
+                     <tbody>
+                        <tr>
+                           <td colspan="4" style="border-right:solid 1px #000; border-left:solid 1px #000; border-top: 1px solid #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td colspan="4" style="border-right:solid 1px #000; border-left:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td colspan="4" style="border-right:solid 1px #000; border-left:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td colspan="4" style="border-right:solid 1px #000; border-left:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td colspan="4" style="border-right:solid 1px #000; border-left:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td colspan="4" style="border-right:solid 1px #000; border-left:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td colspan="4" style="border-right:solid 1px #000; border-left:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td colspan="4" style="border-right:solid 1px #000; border-left:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td style="border-left:solid 1px #000; border-bottom: 1px solid #000;"><strong>Payment Transaction ID</strong> </td>
+                           <td style="border-bottom: 1px solid #000;"><strong>Date & Time</strong> </td>
+                           <td style="border-bottom: 1px solid #000;"><strong>Invoice Value	</strong> </td>
+                           <td style="text-transform: uppercase; text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                              <strong>Mode Of Payment</strong> 
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </td>
+            </tr>
+         </tbody>
+      </table>
+	  </div>
+   </body>
+</html>

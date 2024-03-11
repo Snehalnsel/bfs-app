@@ -186,9 +186,10 @@
                         <tr>
                            <td>Packing & Handling Charges</td>
                            <th><i class="fa fa-inr" aria-hidden="true"></i> 250</th>
+                           <td><button onclick="checkShippingAmount(<%= product_id %>)">Check Shipping Amount</button></td>
                         </tr>
                         <tr>
-                           <td>GST<small>(18% Packing & Handling Charges)</small></td>
+                           <td>GST<small>(14% SGST & 14% CGST)</small></td>
                            <th><i class="fa fa-inr" aria-hidden="true"></i>
                               <%=gst%>
                            </th>
@@ -221,6 +222,32 @@
 
    <%- include('../../public/assets/include/newsletter'); %>
       <%- include('../../public/assets/include/footer'); %>
+      <script>
+         function checkShippingAmount(product_id) {
+           // Add your logic to check the expected shipping amount here
+           // Assuming product_id is a parameter passed to the function
+       
+           fetch("/getshipmentvalue", {
+             method: "POST",
+             headers: {
+               "Content-Type": "application/json",
+             },
+             body: JSON.stringify({ product_id: product_id }),
+           })
+             .then(response => response.json())
+             .then(data => {
+               // Handle the response from the server
+               console.log("Response from server:", data);
+               // You can update the UI or perform additional actions based on the server's response
+             })
+             .catch(error => {
+               console.error("Error:", error);
+               // Handle errors if any
+             });
+         }
+       </script>
+       
+       
 
          <script>
             $(document).ready(function () {
@@ -319,7 +346,7 @@
                }
                let totalAmtText = $('#total-cod-amount-row th').text();
                let totalAmtValue = parseFloat(totalAmtText.replace('₹ ', ''));
-               formData.total_amt = "670.00";
+               formData.total_amt = totalAmtValue;
 
                console.log(formData);
 
@@ -336,7 +363,7 @@
                   dataType: "json",
                   success: function (response) {
                      if (response.is_orderPlaced == 1) {
-                        console.log(response.order._id);
+                       // console.log(response.order._id);
                         const tempOrderId = response.order._id;
                         window.location.href = '/pay?temp=' + tempOrderId; 
                      }

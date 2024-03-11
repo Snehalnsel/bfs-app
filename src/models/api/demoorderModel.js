@@ -62,6 +62,9 @@ const model = mongoose.Schema({
   checkstatus_response: {
     type: Object,
   },
+  merchant_transactionid: {
+    type: String,
+  },
   checkstatus_status: {
     type: String,
   },

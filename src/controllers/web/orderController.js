@@ -5,7 +5,6 @@ const mongoose = require("mongoose");
 const db = mongoose.connection;
 const https = require("https");
 const path = require("path");
-const PDFDocument = require('pdfkit');
 const pdf = require('html-pdf');
 const fs = require("fs");
 const ejs = require('ejs');
@@ -425,6 +424,72 @@ exports.getOrderList = function (page, searchType, searchValue, req, res, next) 
 };
 
 
+// exports.getOrderDetails = function (req, res, next) {
+
+//   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+//   var pageName = "Order Details";
+//   var pageTitle = req.app.locals.siteName + " - " + pageName;
+//   const orderId = req.params.id;
+
+//   if (!mongoose.Types.ObjectId.isValid(orderId)) {
+//     return res.status(400).json({ error: 'Invalid order ID' });
+//   }
+
+//   Order.findOne({ _id: orderId })
+//     .populate('user_id', 'name phone_no email')
+//     .populate('seller_id', 'name phone_no email')
+//     .populate('billing_address_id')
+//     .populate('shipping_address_id')
+//     .populate('hub_address_id')
+//     .then(async (orderDetails) => {
+//       if (!orderDetails) {
+//         return res.status(404).json({ error: 'Order not found' });
+//       }
+
+//       const billingAddress = await AddressBook.find({ user_id: orderDetails.seller_id });
+//       const shippingAddress = await AddressBook.find({ user_id: orderDetails.user_id });
+
+//       const hubdata = await Hublist.find({ flag: 1 });
+
+//       const shiprocketResponse = await generateCouriresList();
+
+//       const cartId = orderDetails.cart_id;
+
+//       CartDetail.find({ cart_id: cartId })
+//         .populate('product_id', 'name')
+//         .then((cartDetails) => {
+//           res.render("pages/order/details", {
+//             status: 1,
+//             siteName: req.app.locals.siteName,
+//             pageName: pageName,
+//             pageTitle: pageTitle,
+//             userFullName: req.session.admin.name,
+//             userImage: req.session.admin.image_url,
+//             userEmail: req.session.admin.email,
+//             year: moment().format("YYYY"),
+//             requrl: req.app.locals.requrl,
+//             message: "",
+//             respdata: {
+//               orderDetails: orderDetails,
+//               cartDetails: cartDetails[0],
+//               billingAddress: billingAddress,
+//               shippingAddress: shippingAddress,
+//               hublist: hubdata,
+//               shiprocketResponse: shiprocketResponse
+//             },
+//             isAdminLoggedIn: isAdminLoggedIn
+//           });
+//         })
+//         .catch((error) => {
+//           res.status(500).json({ error: 'An error occurred while fetching cart details' });
+//         });
+//     })
+//     .catch((error) => {
+//       res.status(500).json({ error: 'An error occurred while fetching order details' });
+//     });
+
+// };
+
 exports.getOrderDetails = function (req, res, next) {
 
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
@@ -454,42 +519,33 @@ exports.getOrderDetails = function (req, res, next) {
 
       const shiprocketResponse = await generateCouriresList();
 
-      const cartId = orderDetails.cart_id;
+      res.render("pages/order/details", {
+        status: 1,
+        siteName: req.app.locals.siteName,
+        pageName: pageName,
+        pageTitle: pageTitle,
+        userFullName: req.session.admin.name,
+        userImage: req.session.admin.image_url,
+        userEmail: req.session.admin.email,
+        year: moment().format("YYYY"),
+        requrl: req.app.locals.requrl,
+        message: "",
+        respdata: {
+          orderDetails: orderDetails,
+          billingAddress: billingAddress,
+          shippingAddress: shippingAddress,
+          hublist: hubdata,
+          shiprocketResponse: shiprocketResponse
+        },
+        isAdminLoggedIn: isAdminLoggedIn
+      });
 
-      CartDetail.find({ cart_id: cartId })
-        .populate('product_id', 'name')
-        .then((cartDetails) => {
-          res.render("pages/order/details", {
-            status: 1,
-            siteName: req.app.locals.siteName,
-            pageName: pageName,
-            pageTitle: pageTitle,
-            userFullName: req.session.admin.name,
-            userImage: req.session.admin.image_url,
-            userEmail: req.session.admin.email,
-            year: moment().format("YYYY"),
-            requrl: req.app.locals.requrl,
-            message: "",
-            respdata: {
-              orderDetails: orderDetails,
-              cartDetails: cartDetails[0],
-              billingAddress: billingAddress,
-              shippingAddress: shippingAddress,
-              hublist: hubdata,
-              shiprocketResponse: shiprocketResponse
-            },
-            isAdminLoggedIn: isAdminLoggedIn
-          });
-        })
-        .catch((error) => {
-          res.status(500).json({ error: 'An error occurred while fetching cart details' });
-        });
     })
     .catch((error) => {
       res.status(500).json({ error: 'An error occurred while fetching order details' });
     });
-
 };
+
 
 async function generateLabel(shipment_id) {
   token = await generateToken(email, shipPassword);
@@ -2295,7 +2351,8 @@ exports.downloadOrderPDF = function (req, res, next) {
     } else {
       try {
 
-        const loginHtmlPath = 'views/webpages/demoinvoice.html';
+        // const loginHtmlPath = 'views/webpages/demoinvoice.html';
+        const loginHtmlPath = 'views/webpages/invoice1.html';
         const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
 
         // Replace dynamic content in the HTML template
@@ -2313,6 +2370,103 @@ exports.downloadOrderPDF = function (req, res, next) {
           res.setHeader('Content-Disposition', 'attachment; filename=Invoice.pdf');
 
           // Pipe the stream to the response
+          stream.pipe(res);
+        });
+      } catch (err) {
+        console.error('Error generating PDF:', err);
+        res.status(500).json({ error: 'An error occurred while generating PDF' });
+      }
+    }
+  });
+};
+
+exports.downloadOrdesecondrPDF = function (req, res, next) {
+  var pageName = "Order List";
+  var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+
+  const orderId = req.params.id;
+
+  Order.aggregate([
+    {
+      $match: {
+        _id: mongoose.Types.ObjectId(orderId)
+      }
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user_id',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'seller_id',
+        foreignField: '_id',
+        as: 'seller',
+      },
+    },
+    {
+      $lookup: {
+        from: 'addressbook_lists',
+        localField: 'billing_address_id',
+        foreignField: '_id',
+        as: 'billing_address',
+      },
+    },
+    {
+      $lookup: {
+        from: 'addressbook_lists',
+        localField: 'shipping_address_id',
+        foreignField: '_id',
+        as: 'shipping_address',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_userproducts',
+        localField: 'product_id',
+        foreignField: '_id',
+        as: 'product',
+      },
+    },
+    {
+      $lookup: {
+        from: 'order_trackings',
+        localField: '_id',
+        foreignField: 'order_id',
+        as: 'trackingDetails',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_tracks',
+        localField: 'trackingDetails.tracking_id',
+        foreignField: '_id',
+        as: 'trackDetails',
+      },
+    },
+    {
+      $sort: {
+        added_dtime: -1
+      }
+    }
+  ]).exec(async function (error, orderList) {
+    if (error) {
+      res.status(500).json({ error: 'An error occurred' });
+    } else {
+      try {
+        const loginHtmlPath = 'views/webpages/invoice2.html';
+        const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
+        const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
+        const options = { format: 'Letter' };
+        pdf.create(renderedHtml, options).toStream((err, stream) => {
+          if (err) return res.status(500).send('An error occurred while generating PDF');
+          res.setHeader('Content-Type', 'application/pdf');
+          res.setHeader('Content-Disposition', 'attachment; filename=InvoiceBFStoBuyer.pdf');
           stream.pipe(res);
         });
       } catch (err) {
@@ -2410,7 +2564,8 @@ exports.sentOrderPDF = async function (req, res, next) {
       res.status(500).json({ error: 'An error occurred' });
     } else {
       try {
-        const loginHtmlPath = 'views/webpages/demoinvoice.html';
+        // const loginHtmlPath = 'views/webpages/demoinvoice.html';
+        const loginHtmlPath = 'views/webpages/invoice1.html';
         const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
 
         const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });

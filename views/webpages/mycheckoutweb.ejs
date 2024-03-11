@@ -329,16 +329,16 @@
                let addToCartreCookieAccessToken = await getCookieFunc(accessTokenVar);
                let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
                await userReLogin(addToCartreCookieAccessToken, addToCartreCookieRefreshToken);
-
-               $.ajax({
-                  type: 'POST',
-                  url: '/pay',
-                  data: formData, 
-                  dataType: "json",
-                  success: function (paymentResponse) {
-                     if (statusResponse.code === "PAYMENT_SUCCESS") 
-                     {
-                        console.log("success");
+               location.href='/payment?data=' + JSON.stringify(formData);
+               // $.ajax({
+               //    type: 'POST',
+               //    url: '/pay',
+               //    data: formData, 
+               //    dataType: "json",
+               //    success: function (paymentResponse) {
+               //       if (statusResponse.code === "PAYMENT_SUCCESS") 
+               //       {
+               //          console.log("success");
                      //    $.ajax({
                      //    type: 'POST',
                      //    url: '/placed-order',
@@ -366,16 +366,16 @@
                      //       $(".check-out").css("pointer-events", "auto");
                      //    }
                      // });
-                     }
+                     //}
                      
-                  },
-                  error: function (xhr, status, error) {
-                     // Handle error if GET request to "/payment" fails
-                     console.error("Error fetching payment data:", error);
-                  }
-               });
+            //       },
+            //       error: function (xhr, status, error) {
+            //          // Handle error if GET request to "/payment" fails
+            //          console.error("Error fetching payment data:", error);
+            //       }
+            //    });
 
-            });
+             });
                   // $.ajax({
                   //    type: 'POST',
                   //    url: '/placed-order',
@@ -402,7 +402,7 @@
                   //    error: function (xhr, status, error) {
                   //       $(".check-out").css("pointer-events", "auto");
                   //    }
-                  // });
+                  //  });
             //});
 
          </script>

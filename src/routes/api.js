@@ -1339,9 +1339,25 @@ router.get("/otherwise-list",cors(),
   WebsiteController.otherlistdata
 );
 
-router.post("/payment",cors(),
-PaymentController.getData
-);
+// router.post("/payment",cors(),
+// PaymentController.getData
+// );
+
+router.get("/payment", cors(), (req, res) => {
+  // Extracting data from the query parameter
+  const dataParam = req.query.data;
+
+  try {
+    // Parsing the JSON data
+    const formData = JSON.parse(dataParam);
+
+    // Call the PaymentController.getData method with the parsed data
+    PaymentController.getData(req, res, formData);
+  } catch (error) {
+    // Handle JSON parsing error
+    res.status(400).json({ error: 'Invalid JSON data' });
+  }
+});
 
 router.post("/pay",cors(),
 PaymentController.getPaymentData

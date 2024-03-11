@@ -519,5 +519,6 @@ router.get("/iplist", cors(), IpaddressController.getList);
 //download product excel
 router.get("/download-product-excel", cors(), ProductController.downloadProductExcel);
 router.get("/download-order-excel", cors(), OrderController.downloadOrderExcel);
+router.get("/download-orderpdf/:id", cors(), OrderController.downloadOrderPDF);
 
 module.exports = router;

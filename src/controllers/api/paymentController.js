@@ -167,6 +167,8 @@ exports.getStatus = async function (req, res, next) {
 
         // Continue with creating the new Order
         const now = new Date();
+        const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0'); // Adding 1 because months are zero-based
+        const currentYear = now.getFullYear().toString();
         const currentHour = now.getHours().toString().padStart(2, '0');
         const currentMinute = now.getMinutes().toString().padStart(2, '0');
         const currentSecond = now.getSeconds().toString().padStart(2, '0');
@@ -177,8 +179,14 @@ exports.getStatus = async function (req, res, next) {
         let pickup_status = '0';
         let delivery_status = '0';
         let gst ='0';
-
-        const orderCode = `BFSORD${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
+          
+        const lastOrderNumber = getLastOrderNumber();
+        const lastIncrementingPart = lastOrderNumber ? parseInt(lastOrderNumber.split('-')[1]) : 0;
+        const nextIncrementingPart = lastIncrementingPart + 1;
+        const paddedNextIncrementingPart = nextIncrementingPart.toString().padStart(4, '0');
+        const orderCode = `BFSORD${currentMonth}${currentYear}-${paddedNextIncrementingPart}`;
+        console.log(orderCode);
+        //const orderCode = `BFSORD${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
         const order = new Order({
           order_code: orderCode,
           user_id: temporder.user_id,
@@ -223,6 +231,17 @@ exports.getStatus = async function (req, res, next) {
     });
   }
 };
+
+
+async function getLastOrderNumber() {
+  try {
+    const lastOrder = await Order.findOne().sort({ _id: -1 }); 
+    return lastOrder ? lastOrder.order_code: 0;
+  } catch (error) {
+    console.error('Error fetching last order number:', error);
+    return 0;
+  }
+}
 
 
 

@@ -1344,10 +1344,6 @@ router.get("/otherwise-list",cors(),
   WebsiteController.otherlistdata
 );
 
-// router.get("/payment",cors(),
-// PaymentController.getData
-// );
-
 router.get("/pay",cors(),
 PaymentController.getPaymentData
 );

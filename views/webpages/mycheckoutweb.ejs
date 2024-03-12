@@ -185,8 +185,20 @@
                         </tr>
                         <tr>
                            <td>Packing & Handling Charges</td>
-                           <th><i class="fa fa-inr" aria-hidden="true"></i> 250</th>
-                           <td><button onclick="checkShippingAmount(<%= product_id %>)">Check Shipping Amount</button></td>
+                           <th id="packingHandlingCharge"><i class="fa fa-inr" aria-hidden="true"></i></th>
+                        </tr>
+                        <tr>
+                           <input value="<%=product_id%>" type="hidden" id="productid">
+                           <td colspan="2" class="tp-no-gaptd"><button onclick="checkShippingAmount()"
+                                 class="check-link">Check Shipping Amount</button></td>
+                        </tr>
+                        <tr id="cash-handle-charge">
+                           <td>cash hand charge(5% of product value) </td>
+                           <th><i class="fa fa-inr" aria-hidden="true"></i> 200</th>
+                        </tr>
+                        <tr>
+                           <td>taxable value (S&H + CH)</td>
+                           <th id="taxvalue"><i class="fa fa-inr" aria-hidden="true"></i> </th>
                         </tr>
                         <tr>
                            <td>GST<small>(14% SGST & 14% CGST)</small></td>
@@ -198,6 +210,11 @@
                            <td><strong>Total Amount</strong></td>
                            <th><i class="fa fa-inr" aria-hidden="true"></i>
                               <%=finalPrice%>
+                           </th>
+                        </tr>
+                        <tr class="border-top total-table pmnt-hidebox" id="advance-amount">
+                           <td><strong>Advance Amount</strong></td>
+                           <th><i class="fa fa-inr" aria-hidden="true"></i>
                            </th>
                         </tr>
                         <tr>
@@ -222,33 +239,30 @@
 
    <%- include('../../public/assets/include/newsletter'); %>
       <%- include('../../public/assets/include/footer'); %>
-      <script>
-         function checkShippingAmount(product_id) {
-           // Add your logic to check the expected shipping amount here
-           // Assuming product_id is a parameter passed to the function
-       
-           fetch("/getshipmentvalue", {
-             method: "POST",
-             headers: {
-               "Content-Type": "application/json",
-             },
-             body: JSON.stringify({ product_id: product_id }),
-           })
-             .then(response => response.json())
-             .then(data => {
-               // Handle the response from the server
-               console.log("Response from server:", data);
-               // You can update the UI or perform additional actions based on the server's response
-             })
-             .catch(error => {
-               console.error("Error:", error);
-               // Handle errors if any
-             });
-         }
-       </script>
-       
-       
+         <script>
+            function checkShippingAmount() {
+               var productid = $('#productid').val();
+               console.log(productid);
 
+               $.ajax({
+                  url: "/getshipmentvalue",
+                  type: "POST",
+                  data: { productid: productid },
+                  success: function (data) {
+                     console.log("Response from server:", data);
+                     console.log("Respdata:", data.respdata);
+
+                     var newCharge = data.respdata;
+                     $('#packingHandlingCharge').html('<i class="fa fa-inr" aria-hidden="true"></i> ' + newCharge);
+                  },
+
+                  error: function (error) {
+                     console.error("Error:", error);
+                  }
+               });
+            }
+
+         </script>
          <script>
             $(document).ready(function () {
                $('.pmnt-hidebox').hide();
@@ -260,17 +274,33 @@
                      var productPrice = parseFloat('<%= product_price %>');
                      var payNowAmount = productPrice * 0.10;
                      $('#pay-now-row th').text('₹ ' + payNowAmount.toFixed(2));
+                     var cashHandlecharges = productPrice * 0.05;
+                     $('#cash-handle-charge th').text('₹ ' + cashHandlecharges.toFixed(2));
+                     console.log(payNowAmount);
                      var remainingAmount = productPrice - payNowAmount;
 
                      $('#remaining-amount-row th').text('₹ ' + remainingAmount.toFixed(2));
 
+                     var packingHandlingChargeValue = $('#packingHandlingCharge').text().trim();
+                     console.log(packingHandlingChargeValue);
+                     var taxvalue = parseFloat(packingHandlingChargeValue) + parseFloat(cashHandlecharges);
+                     console.log(taxvalue);
+
+                     $('#taxvalue').html('<i class="fa fa-inr" aria-hidden="true"></i>' + taxvalue.toFixed(2));
                      var productPrice = parseFloat('<%= product_price %>');
                      var gst = parseFloat('<%= gst %>');
-                     var totalAmount = payNowAmount + 250 + gst;
+                     var totalAmount = parseFloat(productPrice) + gst + taxvalue;
+                     var totalAdvanceAmount = parseFloat(payNowAmount) + gst + taxvalue;
 
                      $('#total-cod-amount-row th').text('₹ ' + totalAmount.toFixed(2));
+                     $('#advance-amount th').text('₹ ' + totalAdvanceAmount.toFixed(2));
+
                   } else {
                      $('.pmnt-hidebox').hide();
+                     var packingHandlingChargeValue = $('#packingHandlingCharge').text().trim();
+                     var taxvalue = parseFloat(packingHandlingChargeValue);
+                     $('#taxvalue').html('<i class="fa fa-inr" aria-hidden="true"></i> ' + taxvalue);
+                     var totalAmount = payNowAmount + gst + taxvalue + packingHandlingChargeValue;
                      $('#total-cod-amount-row th').text('₹ ' + originalTotalAmount.toFixed(2));
                   }
                });
@@ -363,9 +393,9 @@
                   dataType: "json",
                   success: function (response) {
                      if (response.is_orderPlaced == 1) {
-                       // console.log(response.order._id);
+                        // console.log(response.order._id);
                         const tempOrderId = response.order._id;
-                        window.location.href = '/pay?temp=' + tempOrderId; 
+                        window.location.href = '/pay?temp=' + tempOrderId;
                      }
                   },
                   error: function (xhr, status, error) {

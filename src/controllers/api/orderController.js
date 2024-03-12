@@ -1475,22 +1475,51 @@ exports.returnOrder = async function (req, res) {
   try{
       let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
 
+      console.log("body",req.body);
+     
       const delivery_postcode = 700020;
       const product_id = req.body.productid;
 
       const productdeatils = await Userproduct.findById(product_id);
+      console.log("product ID",product_id);
+      console.log("product details ",productdeatils);
       const weight = productdeatils.weight;
-      const details = await Users.findById(productdeatils.user_id);
-      const billingaddress = await AddressBook.findOne({ user_id: details.user_id });
+      // const details = await Users.findById(productdeatils.user_id);
+      const billingaddress = await AddressBook.findOne({ user_id: productdeatils.user_id });
     
+      console.log("billingaddress",billingaddress);
       const pickup_postcode = billingaddress.pin_code;
       
       const cod = "1";
 
+      console.log("pickup_postcode",pickup_postcode);
+      console.log("delivery_postcode ",delivery_postcode);
+      console.log("weight",weight);
+      console.log("cod ",cod);
+
+
       const shiprocketResponse = await generateCouriresServiceability(pickup_postcode, delivery_postcode, cod, weight);
 
       console.log(shiprocketResponse);
-      return;
+      console.log("couries list",shiprocketResponse.data.available_courier_companies);
+      const courierList = shiprocketResponse.data.available_courier_companies;
+      const minFreightCourier = courierList.reduce((minCourier, currentCourier) => {
+        const minFreight = minCourier ? minCourier.freight_charge : Infinity;
+        const currentFreight = currentCourier.freight_charge;
+      
+        return currentFreight < minFreight ? currentCourier : minCourier;
+      }, null);
+      
+      console.log("Courier with minimum freight charge:", minFreightCourier.freight_charge);
+
+      return res.json({
+        status: 'success',
+        message: 'getting feight charges',
+        respdata: minFreightCourier.freight_charge,
+        websiteUrl: process.env.SITE_URL,
+      });
+      
+      // return res.status(200).json({ minFreightCharge });
   } catch (error) {
    return res.status(500).json({ message: 'Internal server error' });
  }

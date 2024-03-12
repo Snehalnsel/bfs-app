@@ -4565,3 +4565,12 @@ section.poster-wrapper {
 .upload-post  .alt_image {
     height: 100%;
 }
+
+button.check-link {
+    background: none;
+    color: #e3683d;
+    font-size: 12px;
+}
+td.tp-no-gaptd {
+    padding-top: 0px !important;
+}

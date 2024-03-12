@@ -54,6 +54,7 @@ exports.getPaymentData = async function (req, res, next) {
   try {
 
     const tempOrderId = req.query.temp;
+    console.log("demo order id before payment",tempOrderId);
     const temporder = await Demoorder.findById(tempOrderId);
     const amount = temporder.total_price;
     let userId = temporder.user_id;
@@ -63,7 +64,7 @@ exports.getPaymentData = async function (req, res, next) {
       merchantTransactionId: merchantTransactionId,
       merchantUserId: userId,
       amount: amount * 100,
-      redirectUrl: `${APP_BE_URL}/payment-status?temp=${tempOrderId}&merchantTransactionId=${merchantTransactionId}`,
+      redirectUrl: `${APP_BE_URL}/payment-status?temp=${tempOrderId}`,
       redirectMode: "REDIRECT",
       mobileNumber: "9999999999",
       paymentInstrument: {
@@ -92,6 +93,7 @@ exports.getPaymentData = async function (req, res, next) {
       .then(async function (response) {
 
         const updateData = {
+          merchant_transactionid:merchantTransactionId,
           pay_response: response.data,
         };
 
@@ -120,103 +122,100 @@ exports.getPaymentData = async function (req, res, next) {
 
 exports.getStatus = async function (req, res, next) {
   try {
-    const merchantTransactionId  = req.query.merchantTransactionId;
-    const tempId  = req.query.temp;
+    const tempId = req.query.temp;
+    console.log("demo order id", tempId);
+
+    const temporder = await Demoorder.findById(tempId);
+    console.log("demo order details", temporder);
+
+    const merchantTransactionId = temporder.merchant_transactionid;
+
     if (merchantTransactionId) {
-      let statusUrl =
-        `${PHONE_PE_HOST_URL}/pg/v1/status/${MERCHANT_ID}/` +
+      let statusUrl = `${PHONE_PE_HOST_URL}/pg/v1/status/${MERCHANT_ID}/` +
         merchantTransactionId;
 
-      let string =
-        `/pg/v1/status/${MERCHANT_ID}/` +
+      let string = `/pg/v1/status/${MERCHANT_ID}/` +
         merchantTransactionId +
         SALT_KEY;
       let sha256_val = sha256(string);
       let xVerifyChecksum = sha256_val + "###" + SALT_INDEX;
 
-      axios
-        .get(statusUrl, {
+      try {
+        const response = await axios.get(statusUrl, {
           headers: {
             "Content-Type": "application/json",
             "X-VERIFY": xVerifyChecksum,
             "X-MERCHANT-ID": merchantTransactionId,
             accept: "application/json",
           },
-        })
-        .then(async function (response) {
-  
-
-          const updateData = {
-            checkstatus_response: response.data,
-            checkstatus_status: response.data.code === "PAYMENT_SUCCESS" ? "success" : "failure",
-          };
-
-          await Demoorder.findOneAndUpdate(
-            { _id: tempId },
-            { $set: updateData },
-            { new: true }
-          );
-
-          console.log("after paymentr", response.data.success);
-        
-          if (response.data.success) {
- 
-            console.log("vvjhyv");
-            let gst = req.body.data.gst;
-            let order_status = '0';
-            let delivery_charges = '0';
-            let discount = '0';
-            let pickup_status = '0';
-            let delivery_status = '0';
-          
-            const temporder = await Demoorder.findById(tempId);
-
-            const now = new Date();
-            const currentHour = now.getHours().toString().padStart(2, '0');
-            const currentMinute = now.getMinutes().toString().padStart(2, '0');
-            const currentSecond = now.getSeconds().toString().padStart(2, '0');
-            const currentMillisecond = now.getMilliseconds().toString().padStart(3, '0');
-
-            const orderCode = `BFSORD${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
-            const order = new Order({
-              order_code: orderCode,
-              user_id: temporder.user_id,
-              cart_id: temporder.cart_id,
-              seller_id: temporder.seller_id,
-              product_id: temporder.product_id,
-              billing_address_id: temporder.billing_address_id,
-              shipping_address_id: temporder.shipping_address_id,
-              total_price: temporder.total_price,
-              payment_method: temporder.payment_method,
-              order_status: order_status,
-              gst: gst,
-              delivery_charges: delivery_charges,
-              discount: discount,
-              pickup_status: pickup_status,
-              delivery_status: delivery_status,
-              pay_now: temporder.pay_now || '', 
-              remaining_amount: temporder.remaining_amount || '',
-              added_dtime: new Date().toISOString(),
-            });
-
-            const savedOrder = await order.save();
-            if(savedOrder){
-              res.redirect('/message?message=success');
-            }
-            
-          } else if(response.code != "PAYMENT_SUCCESS"){
-            const message = response.data.message;
-            res.redirect(`/message?message=${message}`);
-
-          }
-        })
-        .catch(function (error) {
-          res.send(error);
         });
+
+        const updateData = {
+          checkstatus_response: response.data,
+          checkstatus_status: response.data.code === "PAYMENT_SUCCESS" ? "success" : "failure",
+        };
+
+        console.log("Updating Demoorder with response data:", response.data);
+
+        const updatedOrder = await Demoorder.findOneAndUpdate(
+          { _id: tempId },
+          { $set: updateData },
+          { new: true }
+        );
+
+        console.log('Updated Demoorder:', updatedOrder);
+
+        // Continue with creating the new Order
+        const now = new Date();
+        const currentHour = now.getHours().toString().padStart(2, '0');
+        const currentMinute = now.getMinutes().toString().padStart(2, '0');
+        const currentSecond = now.getSeconds().toString().padStart(2, '0');
+        const currentMillisecond = now.getMilliseconds().toString().padStart(3, '0');
+        let order_status = '0';
+        let delivery_charges = '0';
+        let discount = '0';
+        let pickup_status = '0';
+        let delivery_status = '0';
+        let gst ='0';
+
+        const orderCode = `BFSORD${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
+        const order = new Order({
+          order_code: orderCode,
+          user_id: temporder.user_id,
+          cart_id: temporder.cart_id,
+          seller_id: temporder.seller_id,
+          product_id: temporder.product_id,
+          billing_address_id: temporder.billing_address_id,
+          shipping_address_id: temporder.shipping_address_id,
+          total_price: temporder.total_price,
+          payment_method: temporder.payment_method,
+          order_status: order_status,
+          gst: gst || '',
+          delivery_charges: delivery_charges,
+          discount: discount,
+          pickup_status: pickup_status,
+          delivery_status: delivery_status,
+          pay_now: temporder.pay_now || '', 
+          remaining_amount: temporder.remaining_amount || '',
+          added_dtime: new Date().toISOString(),
+        });
+
+        const savedOrder = await order.save();
+        console.log('Order saved successfully:', savedOrder);
+        res.redirect('/message?message=success');
+      } catch (error) {
+        console.error('Error in axios request:', error);
+        res.status(500).json({
+          status: '0',
+          message: 'Error in axios request.',
+          error: error.message,
+        });
+      }
     } else {
       res.send("Sorry!! Error");
     }
   } catch (error) {
+    console.error('Error in getStatus function:', error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the dashboard.",
@@ -224,6 +223,8 @@ exports.getStatus = async function (req, res, next) {
     });
   }
 };
+
+
 
 // exports.getData = async function (req, res, next) {
 //   try {

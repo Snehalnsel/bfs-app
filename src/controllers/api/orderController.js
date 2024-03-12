@@ -97,6 +97,38 @@ function generateToken(email, password) {
   });
 }
 
+
+async function generateCouriresServiceability(pickup_postcode, delivery_postcode, cod, weight) {
+  token = await generateToken(email, shipPassword);
+  if (!token) {
+    return Promise.reject('Token not available. Call generateToken first.');
+  }
+
+  const options = {
+    method: 'GET',
+    url: `${baseUrl}/courier/serviceability/?pickup_postcode=${pickup_postcode}&delivery_postcode=${delivery_postcode}&cod=${cod}&weight=${weight}`,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  };
+  return new Promise((resolve, reject) => {
+    request(options, function (error, response, body) {
+      if (error) {
+        reject(error);
+      } else if (response.statusCode === 200) {
+        const responseBody = JSON.parse(body);
+        const token = responseBody;
+        resolve(token);
+      } else {
+        reject(new Error(`Error: ${response.statusCode}`));
+      }
+    });
+  });
+
+
+}
+
 async function generateOrder(data) {
    token = await generateToken(email,shipPassword);
   if (!token) {
@@ -1013,12 +1045,8 @@ exports.getOrderDetails = async (req, res) => {
     const orderTrackStatusOne = await Ordertracking.find({ order_id, status: 1 });
 
     let shiprocketResponse = [];
-
-
     let shiprocketResponselabel = [];
-
     let shiprocketResponseinvoice = [];
-
     let shiprocketResponsefortracking = [];
 
     if (orderTrackStatusOne && orderTrackStatusOne.length > 0)  {
@@ -1437,6 +1465,32 @@ exports.returnOrder = async function (req, res) {
         isLoggedIn: isLoggedIn,
       });
      }
+  } catch (error) {
+   return res.status(500).json({ message: 'Internal server error' });
+ }
+ };
+
+ exports.shipmentvalue = async function (req, res) {
+
+  try{
+      let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+
+      const delivery_postcode = 700020;
+      const product_id = req.body.productid;
+
+      const productdeatils = await Userproduct.findById(product_id);
+      const weight = productdeatils.weight;
+      const details = await Users.findById(productdeatils.user_id);
+      const billingaddress = await AddressBook.findOne({ user_id: details.user_id });
+    
+      const pickup_postcode = billingaddress.pin_code;
+      
+      const cod = "1";
+
+      const shiprocketResponse = await generateCouriresServiceability(pickup_postcode, delivery_postcode, cod, weight);
+
+      console.log(shiprocketResponse);
+      return;
   } catch (error) {
    return res.status(500).json({ message: 'Internal server error' });
  }

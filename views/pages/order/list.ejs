@@ -65,6 +65,7 @@
                                   </div>
                                 </form>
                               </div>
+                              
                             <button id="downloadExcelBtn" class="btn btn-primary">Download Excel</button>
                             <!-- DataTales Example -->
                             <div class="card shadow mb-4">
@@ -105,7 +106,8 @@
                                                             <td>
                                                                 <% if (value.order_code) { %>
                                                                     <a href="/admin/shipmentdetails/<%= value._id %>" target="_blank"><%= value.order_code %></a>
-                                                                    <a href="/admin/download-orderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download PDF</button></a>
+                                                                    <a href="/admin/download-orderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download PDF</button></a><br>
+                                                                    <a href="/admin/download-orderbfspdf/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download Second PDF</button></a><br>
                                                                     <button id="showOptionsBtn" class="btn btn-primary">Show Options</button>
                                                                     <div id="optionsContainer" style="display: none;">                                                                      <button id="emailOption" class="btn btn-secondary" onclick="sendViaEmail('<%= value._id %>')">Send via Email</button>
                                                                       <button id="whatsappOption" class="btn btn-secondary" onclick="sendViaWhatsApp('<%= value._id %>')">Send via WhatsApp</button>

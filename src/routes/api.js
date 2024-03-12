@@ -1352,9 +1352,9 @@ router.get("/pay",cors(),
 PaymentController.getPaymentData
 );
 
-// router.post("/demo-order",cors(),
-// PaymentController.demoorder
-// );
+router.post("/getshipmentvalue",cors(),
+OrderController.shipmentvalue
+);
 
 router.post("/demoplacedorder",
   WebsiteController.demoorder

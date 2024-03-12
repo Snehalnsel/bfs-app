@@ -4517,6 +4517,12 @@ a#navbarDropdown {
     align-items: center;
 }
 
+.switch .tg-slider.round {
+    border-radius: 34px;
+    width: 62px;
+}
+
+
 /*////*/
 
 #login-password .bidNowAmountBtn {
@@ -4525,6 +4531,23 @@ a#navbarDropdown {
 
 section.poster-wrapper {
     background: #eeeeee;
+}
+
+.account-setting-blk .edit-link.shortedit-btn{
+    margin-right: 15px;
+}
+.account-setting-blk .dsh-shortbox .div-12 {
+    position: relative;
+}
+.account-setting-blk .dsh-shortbox .div-12 .edit-link {
+    position: absolute;
+    bottom: 30px;
+    right: 0;
+}
+.account-setting-blk .dsh-shortbox .div-12 .edit-link a{
+    border: none !important;
+    outline: none;
+    cursor: pointer;
 }
 
 @media screen and (min-width: 768px) {

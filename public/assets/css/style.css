@@ -425,12 +425,14 @@
   }
   
   .product-image {
-      height: 320px;
+      height: auto;
       display: flex;
       align-items: center;
       justify-content: center;
       background: #eee;
       margin-bottom: 10px;
+      aspect-ratio: 9 / 12.2;
+      overflow: hidden;
   }
   .product-image a {
     height: 100%;
@@ -441,9 +443,9 @@
 }
   
   .product-image img {
-    max-width: 90%;
+    max-width: 100%;
     margin: 0 auto;
-    max-height: 85% !important;
+    height: auto;
 }
   
 .prd-batch {
@@ -454,7 +456,7 @@
     position: absolute;
     top: 10px;
     left: 10px;
-    padding: 3px 6px;
+    padding: 3px 6px 1px 6px;
     font-size: 9px;
     border: solid 1px #565656;
 }
@@ -2231,7 +2233,7 @@
   }
   
   .inner-postbox .product-image img {
-      max-height: 90%;
+      max-height: auto;
   }
   .psi-left {
       text-align: left;

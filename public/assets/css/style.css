@@ -4244,7 +4244,7 @@ a#navbarDropdown {
     text-decoration: underline;
     font-weight: 400;
 }
-
+/*
 .shortedit-btn a {
     padding: 5px 10px;
     border: solid 1px #ddd;
@@ -4253,7 +4253,34 @@ a#navbarDropdown {
     color: #505050;
     font-weight: 400;
     font-size: 13px;
+}*/
+
+.shortedit-btn a {
+    color: #4a4a4a;
+    padding: 7px 20px;
+    border: solid 1px #565656;
+    border-radius: 5px;
+    font-size: 14px;
+    line-height: normal;
+    text-transform: none;
+    text-decoration: none;
+    font-weight: 500;
+    margin: 0 2px;
+    background: transparent;
+    transition: 0.5s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
+.shortedit-btn a:hover{
+    background: #000;
+    transition: 0.5s;
+    color: #bdbdbd !important;
+    border: solid 1px #000;
+}
+
+
 .divseparetor {
     margin-bottom: 15px;
 }

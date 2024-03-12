@@ -264,9 +264,13 @@
   }
   
   .top-title {
-      display: flex;
-      justify-content: space-between;
-          align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .related-products .top-title{
+    padding-bottom: 15px;
   }
 
   #just-sold-section .top-title {

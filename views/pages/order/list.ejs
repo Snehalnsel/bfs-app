@@ -414,12 +414,9 @@
       var optionsContainer = document.getElementById('optionsContainer');
       optionsContainer.style.display = optionsContainer.style.display === 'none' ? 'block' : 'none';
     });
-  
     function sendViaEmail(orderId) {
-      console.log('Sending via Email for order ID:', orderId);
       window.location.href = '/admin/send-order-email/' + orderId;
     }
-  
     function sendViaWhatsApp(orderId) {
       console.log('Sending via WhatsApp for order ID:', orderId);
     }

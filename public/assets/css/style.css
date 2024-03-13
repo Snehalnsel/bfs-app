@@ -4555,6 +4555,11 @@ a#navbarDropdown {
     border-radius: 34px;
     width: 62px;
 }
+.edit-link2 {
+    position: absolute;
+    bottom: 50px;
+    right: 0;
+}
 
 
 /*////*/

@@ -1190,6 +1190,9 @@ router.post("/user-new-checkout-address",[],WebsiteController.userNewCheckOutAdd
 
 router.post("/adduseraddress",[],WebsiteController.userAddressAdd);
 
+router.get("/edituseraddress/:id",[],WebsiteController.getAddressdetails);
+router.post("/updateuseraddress",[],WebsiteController.updateuserAddressAdd);
+
 router.get("/delete-address/:id",[],WebsiteController.deleteUserAddress);
 
 router.get("/my-post/:id",[],WebsiteController.userWisePost);

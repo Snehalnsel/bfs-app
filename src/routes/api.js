@@ -1183,7 +1183,7 @@ router.post("/useredit",
       check("email", "Email length should be 10 to 30 characters!")
       .isEmail()
       .isLength({ min: 10, max: 30 }),
-  ],WebsiteController.userUpdate
+  ],upload.array('image', 1),WebsiteController.userUpdate
 );
 
 router.post("/user-new-checkout-address",[],WebsiteController.userNewCheckOutAddressAdd);

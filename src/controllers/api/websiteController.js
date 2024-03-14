@@ -27,6 +27,7 @@ var ObjectId = require("mongodb").ObjectId;
 const url = require("url");
 var ObjectId = require("mongodb").ObjectId;
 const Appsettings = require("../../models/api/appSettingsModel");
+const Bankdetails = require("../../models/api/bankdetailsModel");
 const Users = require("../../models/api/userModel");
 const Userproduct = require("../../models/api/userproductModel");
 const Productimage = require("../../models/api/productimageModel");
@@ -1616,6 +1617,23 @@ exports.userUpdate = async function (req, res, next) {
         respdata: {},
       });
     }
+    const imgData = req.files;
+
+    const bankDetails = new Bankdetails({
+      user_id: user._id,
+      accountnumber: req.body.accountnumber,
+      bankname: req.body.bankname,
+      ifsccode: req.body.ifsccode,
+      accounttype: req.body.accounttype,
+      upiid: req.body.upiid,
+      upiid_scaner: imgData || '', //Bankdetails
+      default_status: 1, 
+      created_dtime: new Date().toISOString(), 
+    });
+
+    
+    const savedBankDetails = await bankDetails.save();
+
     req.session.user.name = updatedUser.name;
     req.session.user.email = updatedUser.email;
     req.session.user.phone_no = updatedUser.phone_no;

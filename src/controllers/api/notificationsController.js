@@ -175,14 +175,7 @@ exports.listofWebNotification = async function (req, res, next) {
 
     const notifications = await Notifications.find({ userId }).sort({ added_dtime: -1 ,is_read: 0 ,status : 0});
     const notificationCount = await Notifications.countDocuments({ userId, is_read: 0 ,status : 0});
-    // if (!notifications || notifications.length === 0) {
-    //   return res.status(404).json({
-    //     status: "0",
-    //     message: "Notifications not found",
-    //     respdata: {},
-    //   });
-    // }
-    res.render("webpages/notificationlist",
+      res.render("webpages/notificationlist",
       {
         title: "Users Notificartion List",
         message: "Users Data of the Notifications!",
@@ -191,7 +184,6 @@ exports.listofWebNotification = async function (req, res, next) {
         websiteUrl: process.env.SITE_URL,
         isLoggedIn: isLoggedIn,
       });
-    //res.status(200).json({ status: "1", notification_data: notifications });
   } catch (error) {
     //console.error(error);
     res.status(500).json({

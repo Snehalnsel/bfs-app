@@ -5,7 +5,7 @@
        <div class="dashboard-sidbar">
          <div class="sidbar-box user-profile">
             <div class="user-icon">
-               <img src="<%=respdata.image%>" alt="user-image">
+               <img src="<%= respdata && respdata.image ? respdata.image : '/default-image.jpg' %>" alt="user-image">
             </div>
             <div class="user-info">
                <div class="sht-ui">Hello</div>
@@ -80,7 +80,7 @@
              
              
              <div class="dsh-shortbox">
-                <form action="/useredit" method="post">
+                <form action="/useredit" method="post" enctype="multipart/form-data">
                    <div class="div-row">
                       <div class="div-12">
                          <label>Name:</label>
@@ -97,6 +97,51 @@
                          <label>Phone Number:</label>
                          <input type="type" name="phone_no" class="ds-form-control" value="<%=respdata.phone_no%>" placeholder="Phone Number">
                       </div>
+                  
+                     <div class="dashboard-infobox mt-50" >
+                        <div class="dashboard-title-arrow mb-25">
+                           <h4 class="di-title mr-25" id="changePasswordLink">Bank Deatils<i class="fa fa-angle-down" style="font-size:24px"></i> </h4>              
+                        </div>
+                        
+            
+                        <div class="dsh-shortbox" id="changePasswordForm" style="display: none;">
+                            <form id="resetpasswordfrom">
+                              <div class="div-row">
+                                 <div class="div-6">
+                                    <label>Enter BANK Name</label>
+                                    <input type="text" name="bankname" class="ds-form-control oldpassword">
+                                 </div>
+            
+                                 <div class="div-6">
+                                    <label>Enter Account Name:</label>
+                                    <input type="text" name="accountname" id="accountname" class="ds-form-control account number">
+                                 </div>
+            
+                                 <div class="div-6">
+                                    <label>IFSC CODE:</label>
+                                    <input type="text" name="ifsccode" id="ifsccode" class="ds-form-control cnewpassword">
+                                 </div>
+
+                                 <div class="div-6">
+                                    <label>Account Type:</label>
+                                    <input type="text" name="accounttype" id="accounttype" class="ds-form-control cnewpassword">
+                                 </div>
+
+                                 <div class="div-6">
+                                    <label>UPI ID:</label>
+                                    <input type="text" name="upiid" id="upiid" class="ds-form-control cnewpassword">
+                                 </div>
+
+                                 <div class="div-6">
+                                    <label>UPI ID SCANER:</label>
+                                    <input type="file" name="image" id="upiscaner" />
+                                 </div>
+                              </div>
+                           </form>
+                           
+                        </div>
+                        
+                     </div> 
                       <div class="div-12">
                          <input type="submit" name="" class="ds-form-control" value="Save">
                       </div>
@@ -110,5 +155,6 @@
        </div>
     </div>
  </section>
+ <%- include('../../public/assets/include/newsletter'); %>
       <%- include('../../public/assets/include/footer'); %>
 </body>

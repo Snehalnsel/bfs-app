@@ -4613,3 +4613,8 @@ button.check-link {
 td.tp-no-gaptd {
     padding-top: 0px !important;
 }
+
+
+.dblock-box {
+    display: block !important;
+}

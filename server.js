@@ -41,6 +41,8 @@ const updateBidOfferData = require("./src/models/fireDbServices/updateBidOfferDa
 const getBidData = require("./src/models/fireDbServices/getBidData");
 
 const UserModel = require("./src/models/api/userModel");
+const Cart = require('./src/models/api/cartModel');
+const CartDetail = require('./src/models/api/cartdetailsModel');
 
 app.use(express.json());
 
@@ -195,6 +197,7 @@ global.io = require('socket.io')(serv,{
 //Socket 
 const { userJoin, getCurrentUser, userLeave, getRoomUsers} = require("./src/models/socket/socketUser");
 const formatMessage = require("./src/utils/messages");
+const acceptFormatMessage = require("./src/utils/accept_messages");
 const botName = "Bid Chatbot";
 
 //let changesInDb = checkChangesInField();
@@ -221,6 +224,12 @@ const dbFdb = getFirestore();
       }
       if (change.type === 'added') {
         //console.log('New Doc: ', change.doc.data());
+        if(typeof changeDoc.currentOffer.sellerMessage != "undefined" && typeof changeDoc.currentOffer.buyerMessage != "undefined" && typeof changeDoc.currentOffer.sellerMessage != "" && typeof changeDoc.currentOffer.buyerMessage != "") {
+          io.to(changeDoc.id).emit("accept_message", acceptFormatMessage(changeDoc.buyerId, changeDoc.currentOffer.buyerMessage,changeDoc.sellerId,changeDoc.currentOffer.sellerMessage, changeDoc.id));
+          //io.to(changeDoc.id).emit("accept_message", acceptFormatMessage(currUserDetails.name, chatPrice,sendFromUserId, changeDoc.id));
+        } else {
+          io.to(changeDoc.id).emit("message", formatMessage(currUserDetails.name, chatPrice,sendFromUserId, changeDoc.id));
+        }
       }
       if (change.type === 'modified') {
         io.to(changeDoc.id).emit("message", formatMessage(currUserDetails.name, chatPrice,sendFromUserId, changeDoc.id));
@@ -340,9 +349,11 @@ io.on("connection", (socket) => {
         id:(username == bidOldData.buyerId) ? "offer_buyer_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond : "offer_seller_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond,
         isFromBuyer:(username == bidOldData.buyerId) ? true: false,
         offerIndex:currIndex,
-        price: " Has Accepted Your Offer!!",
+        price: bidOldData.currentOffer.price,
         status: 0,
         userId: queryData.userId,
+        sellerMessage: (username == bidOldData.sellerId) ? " Have Accepted Buyer Offer.": "Buyer Has Accepted Your Offer.",
+        buyerMessage: (username == bidOldData.buyerId) ? " Have Accepted Seller Offer.": " Seller Has Accpeted Your Offer."
       };
       let updateData = {
         //buyerId:queryData.userId,
@@ -353,36 +364,51 @@ io.on("connection", (socket) => {
         withdrew: false,
         status:1,
         acceptedByBuyer:(username == bidOldData.buyerId) ? true : false,
-        acceptedBySeller:(username == bidOldData.sellerId) ? true : false,
+        acceptedBySeller:true,
+        //acceptedBySeller:(username == bidOldData.sellerId) ? true : false,
         currentOffer: currentOffer,
         sellerId:(bidOldData.sellerId != "") ? bidOldData.sellerId : "",
       }; 
       //Write code for both side acceptation
-      if(((bidOldData.acceptedByBuyer == true) && (updateData.acceptedBySeller == true)) || ((bidOldData.acceptedBySeller == true) && (updateData.acceptedByBuyer == true))) {
+      //if(((bidOldData.acceptedByBuyer == true) && (updateData.acceptedBySeller == true)) || ((bidOldData.acceptedBySeller == true) && (updateData.acceptedByBuyer == true))) {
         //Item added to the cart
-        /*axios({
-          method: 'post',
-          url: process.env.SITE_URL + "/api/add-to-cart",
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer '
-          },
-          body: {
-            user_id: email,
-            product_id: password,
-            qty: 1,
-            status: 0,
+        var userData = bidOldData.buyerId;
+        var qty = '1';
+        const product_id = bidOldData.productId;
+        const user_id = bidOldData.buyerId;
+        const existingCart = await Cart.findOne({ user_id: user_id, status: 0 });
+        if (existingCart) {
+          const existingCartItem = await CartDetail.findOne({
+            cart_id: existingCart._id
+          });
+
+          if (existingCartItem) {
+            existingCartItem.product_id = product_id;
+            existingCartItem.qty = parseInt(qty);
+            await existingCartItem.save();
+          } else {
+
+            const cartDetail = new CartDetail({
+              cart_id: existingCart._id,
+              product_id,
+              qty,
+              check_status: 0,
+              status: 0,
+              added_dtime: dateTime,
+            });
+            await cartDetail.save();
           }
-        })
-        .then((response) => {
-          //currentOffer.price = " Item added to the cart.";
-          //console.log(response);
-        });*/
-      }
-      await updateBidData(updateData,bidId);
-      await insertBidOfferData(currentOffer,currentOffer.id);
-      //let currUserDetails = await UserModel.findOne({_id:username});
-      //io.to(socket.id).emit("message", formatMessage(currUserDetails.name, " Has Accepted the latest bid",username, roomName));
+        }
+      //}
+        await updateBidData(updateData,bidId);
+        await insertBidOfferData(currentOffer,currentOffer.id);
+        currentOffer.buyerMessage = "Item Added to your Cart!";
+        currentOffer.sellerMessage = "Item Added to buyer Cart!";
+        await updateBidData(updateData,bidId);
+        await insertBidOfferData(currentOffer,currentOffer.id);
+        //let currUserDetails = await UserModel.findOne({_id:username});
+        //io.to(socket.id).emit("message", formatMessage(currUserDetails.name, " Has Accepted the latest bid",username, roomName));
+      //}
   });
   //Get old messages form database
   socket.on("getOldMessages", async ({ roomName,username }) => {
@@ -391,10 +417,21 @@ io.on("connection", (socket) => {
       bidId:roomName
     };
     let allData = await getAllOfferHistory(queryData);
+    let bidId = roomName;
+    let queryData1 = {
+      id:bidId,
+      userId:username
+    };
+    let bidOldData = await getBidData(queryData1);
+    bidOldData = bidOldData[0];
     if(allData.length > 0 ) {
       for(let newElement of allData) {
         let currUserDetails = await UserModel.findOne({_id:newElement.userId});
-        io.to(socket.id).emit("message", formatMessage(currUserDetails.name, newElement.price,newElement.userId, roomName));
+        if(typeof newElement.sellerMessage != "undefined" && typeof newElement.buyerMessage != "undefined" && typeof newElement.sellerMessage != "" && typeof newElement.buyerMessage != "") {
+          io.to(socket.id).emit("accept_message", acceptFormatMessage(bidOldData.buyerId, bidOldData.currentOffer.buyerMessage,bidOldData.sellerId,bidOldData.currentOffer.sellerMessage, roomName));
+        }else {
+          io.to(socket.id).emit("message", formatMessage(currUserDetails.name, newElement.price,newElement.userId, roomName));
+        }
       }
     }
   });

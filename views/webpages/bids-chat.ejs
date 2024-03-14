@@ -264,15 +264,21 @@
             div2.classList.add("incoming-message");
             p.innerText = message.text2;
          }*/
-         if(message.isFormBuyer && message.name1 == username) {
-            div2.classList.add("outgoing-message");
-            p.innerText = message.text1;
-            div2.innerText = "You";
-         } else {
-            if(message.name1 == username) {
-               div2.innerText = "Seller";
+         if(message.name1 == username) {
+            if(message.isFormBuyer) {
+               div2.classList.add("outgoing-message");
+               p.innerText = message.text1;
+               div2.innerText = "You";
+            } else {
                div2.classList.add("incoming-message");
                p.innerText = message.text1;
+               div2.innerText = "Seller";
+            }
+         } else {
+            if(!message.isFormBuyer) {
+               div2.innerText = "You";
+               div2.classList.add("outgoing-message");
+               p.innerText = message.text2;
             } else {
                div2.innerText = "Buyer";
                div2.classList.add("incoming-message");

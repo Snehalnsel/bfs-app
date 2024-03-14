@@ -234,7 +234,12 @@ const dbFdb = getFirestore();
         }
       }
       if (change.type === 'modified') {
-        io.to(changeDoc.id).emit("message", formatMessage(currUserDetails.name, chatPrice,sendFromUserId,changeDoc.buyerId, changeDoc.id));
+        if(typeof changeDoc.currentOffer.sellerMessage != "undefined" && typeof changeDoc.currentOffer.buyerMessage != "undefined" && changeDoc.currentOffer.sellerMessage != "" && changeDoc.currentOffer.buyerMessage != "") {
+          io.to(changeDoc.id).emit("accept_message", acceptFormatMessage(changeDoc.buyerId, changeDoc.currentOffer.buyerMessage,changeDoc.sellerId,changeDoc.currentOffer.sellerMessage,changeDoc.currentOffer.isFromBuyer, changeDoc.id));
+          //io.to(changeDoc.id).emit("accept_message", acceptFormatMessage(currUserDetails.name, chatPrice,sendFromUserId, changeDoc.id));
+        } else {
+          io.to(changeDoc.id).emit("message", formatMessage(currUserDetails.name, chatPrice,sendFromUserId,changeDoc.buyerId, changeDoc.id));
+        }
         //console.log('Modified Doc: ', change.doc.data());
       }
       if (change.type === 'removed') {
@@ -356,8 +361,8 @@ io.on("connection", (socket) => {
         price: bidOldData.currentOffer.price,
         status: 0,
         userId: queryData.userId,
-        sellerMessage: (username == bidOldData.sellerId) ? " Have Accepted Buyer Offer.": "Buyer Has Accepted Your Offer.",
-        buyerMessage: (username == bidOldData.buyerId) ? " Have Accepted Seller Offer.": " Seller Has Accpeted Your Offer."
+        sellerMessage: (username == bidOldData.sellerId) ? " Have Accepted Buyer's Offer.": "Buyer Has Accepted Your Offer.",
+        buyerMessage: (username == bidOldData.buyerId) ? " Have Accepted Seller's Offer.": " Has Accpeted Your Offer."
       };
       let updateData = {
         //buyerId:queryData.userId,
@@ -377,10 +382,12 @@ io.on("connection", (socket) => {
         //Item added to the cart
         let user_id = bidOldData.buyerId;
         let product_id = bidOldData.productId;
+        let finalBidPrice = bidOldData.currentOffer.price;
         let qty = 1;
         const newCart = new Cart({
           user_id,
           status: 0,
+          finalBidPrice:finalBidPrice,
           added_dtime: dateTime,
         });
         const savedCart = await newCart.save();
@@ -388,13 +395,14 @@ io.on("connection", (socket) => {
           cart_id: savedCart._id,
           product_id,
           qty,
+          finalBidPrice,
           check_status: 0,
           status: 0,
           added_dtime: dateTime,
         });
         const savedata = await cartDetail.save();
-        currentOffer.buyerMessage = "Item Added to your Cart!";
-        currentOffer.sellerMessage = "Item Added to buyer's Cart!";
+        currentOffer.buyerMessage = "Item Added to Your Cart!";
+        currentOffer.sellerMessage = "Item Added to Buyer's Cart!";
         await updateBidData(updateData,bidId);
         await insertBidOfferData(currentOffer,currentOffer.id);
       } else {
@@ -424,7 +432,7 @@ io.on("connection", (socket) => {
       for(let newElement of allData) {
         let currUserDetails = await UserModel.findOne({_id:newElement.userId});
         if(typeof newElement.sellerMessage != "undefined" && typeof newElement.buyerMessage != "undefined" && newElement.sellerMessage != "" && newElement.buyerMessage != "") {
-          io.to(socket.id).emit("accept_message", acceptFormatMessage(bidOldData.buyerId, bidOldData.currentOffer.buyerMessage,bidOldData.sellerId,bidOldData.currentOffer.sellerMessage,bidOldData.currentOffer.isFromBuyer, roomName));
+          io.to(socket.id).emit("accept_message", acceptFormatMessage(bidOldData.buyerId, newElement.buyerMessage,bidOldData.sellerId,newElement.sellerMessage,newElement.isFromBuyer, roomName));
         }else {
           io.to(socket.id).emit("message", formatMessage(currUserDetails.name, newElement.price,newElement.userId,bidOldData.buyerId, roomName));
         }

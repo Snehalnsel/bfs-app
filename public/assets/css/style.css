@@ -4558,9 +4558,12 @@ a#navbarDropdown {
 .edit-link2 {
     position: absolute;
     bottom: 50px;
-    right: 0;
+    right: 18px;
+    color: #000;
 }
-
+.edit-link2 i{
+    color: #000;
+}
 
 /*////*/
 

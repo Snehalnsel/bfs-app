@@ -255,7 +255,7 @@
          const div2 = document.createElement('div');
          div2.classList.add('message-box');
          const p = document.createElement('p');
-         if(message.name1 == username) {
+         /*if(message.name1 == username) {
             div2.classList.add("outgoing-message");
             div2.innerText = "You";
             p.innerText = message.text1;
@@ -263,6 +263,21 @@
             div2.innerText = "Seller";
             div2.classList.add("incoming-message");
             p.innerText = message.text2;
+         }*/
+         if(message.isFormBuyer && message.name1 == username) {
+            div2.classList.add("outgoing-message");
+            p.innerText = message.text1;
+            div2.innerText = "You";
+         } else {
+            if(message.name1 == username) {
+               div2.innerText = "Seller";
+               div2.classList.add("incoming-message");
+               p.innerText = message.text1;
+            } else {
+               div2.innerText = "Buyer";
+               div2.classList.add("incoming-message");
+               p.innerText = message.text2;
+            }
          }
          //div2.innerText = message.name;
          const i = document.createElement('i');
@@ -293,8 +308,13 @@
             div2.classList.add("outgoing-message");
             div2.innerText = "You";
          } else {
-            div2.innerText = "Other";
-            div2.classList.add("incoming-message");
+            if(message.buyerId == username) {
+               div2.innerText = "Seller";
+               div2.classList.add("incoming-message");
+            } else {
+               div2.innerText = "Buyer";
+               div2.classList.add("incoming-message");
+            }
          }
          const i = document.createElement('i');
          i.classList.add('fa');

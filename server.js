@@ -232,7 +232,7 @@ const dbFdb = getFirestore();
         }
       }
       if (change.type === 'modified') {
-        io.to(changeDoc.id).emit("message", formatMessage(currUserDetails.name, chatPrice,sendFromUserId, changeDoc.id));
+        io.to(changeDoc.id).emit("message", formatMessage(currUserDetails.name, chatPrice,sendFromUserId,changeDoc.buyerId, changeDoc.id));
         //console.log('Modified Doc: ', change.doc.data());
       }
       if (change.type === 'removed') {

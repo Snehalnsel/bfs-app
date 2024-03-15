@@ -1176,14 +1176,7 @@ router.get("/websubcategoriesproductswithsort/:id/:sortid", cors(), (req, res) =
   WebsiteController.getSubCategoriesProductswithSort(page, req, res);
 });
 // Profile Edit API's
-router.post("/useredit",
-    [
-      check("name", "This is a required field!").not().isEmpty().trim().escape(),
-      check("phone_no", "This is a required field!").not().isEmpty().trim().escape(),
-      check("email", "Email length should be 10 to 30 characters!")
-      .isEmail()
-      .isLength({ min: 10, max: 30 }),
-  ],upload.array('image', 1),WebsiteController.userUpdate
+router.post("/useredit",upload.array('image', 1),WebsiteController.userUpdate
 );
 
 router.post("/user-new-checkout-address",[],WebsiteController.userNewCheckOutAddressAdd);
@@ -1362,5 +1355,9 @@ router.post("/demoplacedorder",
 router.get("/payment-status",
 PaymentController.getStatus
 );
+
+// router.get("/whatsapp",
+// WebsiteController.whatsappintegration
+// );
 
 module.exports = router;

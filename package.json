@@ -48,6 +48,7 @@
     "pngquant-bin": "^6.0.1",
     "redis": "^4.3.0",
     "request": "^2.88.2",
+    "request-promise-native": "^1.0.9",
     "select2": "^4.1.0-rc.0",
     "sha256": "^0.2.0",
     "socket.io": "^4.7.2",

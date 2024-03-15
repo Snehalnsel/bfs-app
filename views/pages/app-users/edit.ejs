@@ -53,6 +53,36 @@
                                     <input type="text" class="form-control form-control-user" id="phone_no" name="phone_no" placeholder="Phone Number" value="<%-respdata.phone_no%>" required>
                                 </div>
                             </div>
+
+                            <div class="form-group row">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <h6>Bank Details</h6>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <input type="text" class="form-control form-control-user" id="bankname" name="bankname" placeholder="Bank Number" value="<%-bankDetails.bankname%>" required>
+                                </div>
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <input type="text" class="form-control form-control-user" id="ifsccode" name="ifsccode" placeholder="Phone Number" value="<%-bankDetails.ifsccode%>" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <input type="text" class="form-control form-control-user" id="accountnumber" name="accountnumber" placeholder="Phone Number" value="<%-bankDetails.accountnumber%>" required>
+                                </div>
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <input type="text" class="form-control form-control-user" id="accounttype" name="accounttype" placeholder="Phone Number" value="<%-bankDetails.accounttype%>" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <input type="text" class="form-control form-control-user" id="upiid" name="upiid" placeholder="Phone Number" value="<%-bankDetails.upiid%>">
+                                </div>
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <input type="text" class="form-control form-control-user" id="upiid_scaner" name="upiid_scaner" placeholder="Phone Number" value="<%-bankDetails.upiid_scaner%>" >
+                                </div>
+                            </div>
                                 <input type="submit" class="btn btn-primary btn-user btn-block" id="btn_profile" name="btn_profile" value="Submit">
                             </form>
                             <hr>

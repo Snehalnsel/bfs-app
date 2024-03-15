@@ -12,6 +12,7 @@ const crypto = require('crypto');
 const path = require("path");
 const ejs = require('ejs');
 const helper = require("../../helpers/helper");
+const rp = require('request-promise-native');
 const fs = require("fs");
 const mime = require("mime");
 const cors = require('cors');
@@ -69,6 +70,10 @@ const ApiCallHistory = require("../../models/thirdPartyApi/ApiCallHistory");
 const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 const { log, Console } = require("console");
 const { create } = require('xmlbuilder2');
+// const INSTANCE_URL = 'https://api.maytapi.com/api';
+// const PHONE_ID = '18710';
+// const PRODUCT_ID = 'b119f3b5-819b-46e0-ae30-0d1cf1dd8cc8';
+// const API_TOKEN = 'c1af8dac-f1fd-4757-8536-c1731ed63eda';
 
 // const transporter = nodemailer.createTransport({
 //   port: 465,
@@ -645,28 +650,11 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
                 else console.log(info);
               });
 
-              //html:
-              // "Hey " +
-              // user.name +
-              // ", <br> <p>Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items </p>",
-              // const msg = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
-
-              // const whatsappMessage = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
-              // const userPhoneNo = "+917044289770";
-
-              // twilioClient.messages.create({
-              //   body: whatsappMessage,
-              //   // From: 'whatsapp:+12565734549',
-              //   // to: 'whatsapp:+918116730275'
-              //   from: 'whatsapp:+14155238886',
-              //   to: 'whatsapp:+917044289770'
-              // })
-              //   .then((message) => {
-              //     console.log(`WhatsApp message sent with SID: ${message.sid}`);
-              //   })
-              //   .catch((error) => {
-              //     console.error(`Error sending WhatsApp message: ${error.message}`);
-              //   });
+              const message = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
+              const to_number = "91" + user.phone_no;
+              console.log(44444);
+              let response = await send_message({ type: 'text', message, to_number });
+              console.log(response);
               const userToken = {
                 userId: user._id,
                 email: user.email,
@@ -1019,9 +1007,6 @@ exports.getUserLogin = async function (req, res, next) {
             respdata: error,
           });
         } else if (match) {
-          // user.deviceid = deviceid;
-          // user.devicename = devicename;
-          // user.fcm_token = fcm_token;
           user.save(async (err) => {
             if (err) {
               res.status(400).json({
@@ -1044,20 +1029,11 @@ exports.getUserLogin = async function (req, res, next) {
                 if (err) console.log(err);
                 else console.log(info);
               });
-              // const msg = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
-              const whatsappMessage = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
-              const userPhoneNo = "+917044289770";
-              twilioClient.messages.create({
-                body: whatsappMessage,
-                // From: 'whatsapp:+12565734549',
-                // to: 'whatsapp:+918116730275'
-                from: 'whatsapp:+14155238886',
-                to: 'whatsapp:+917044289770'
-              })
-                .then((message) => {
-                })
-                .catch((error) => {
-                });
+              const message = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
+              const to_number = "91" + user.phone_no;
+             console.log(44444);
+              let response = await send_message({ type: 'text', message, to_number });
+              console.log(response);
               const userToken = {
                 userId: user._id,
                 email: user.email,
@@ -1084,7 +1060,6 @@ exports.getUserLogin = async function (req, res, next) {
                 name: user.name,
                 age: user.age,
                 image: user.image,
-                //usertoken:user.token,
                 phone_no: user.phone_no,
                 weight: user.weight,
                 height: user.height,
@@ -1617,8 +1592,9 @@ exports.userUpdate = async function (req, res, next) {
         respdata: {},
       });
     }
-    const imgData = req.files;
-
+    // const imgData = req.files;
+    const uploadedFile = req.files[0];
+    const imagePath = uploadedFile.path; // Path to the upload
     const bankDetails = new Bankdetails({
       user_id: user._id,
       accountnumber: req.body.accountnumber,
@@ -1626,14 +1602,11 @@ exports.userUpdate = async function (req, res, next) {
       ifsccode: req.body.ifsccode,
       accounttype: req.body.accounttype,
       upiid: req.body.upiid,
-      upiid_scaner: imgData || '', //Bankdetails
+      upiid_scaner: imagePath || '', 
       default_status: 1, 
       created_dtime: new Date().toISOString(), 
-    });
-
-    
+    });    
     const savedBankDetails = await bankDetails.save();
-
     req.session.user.name = updatedUser.name;
     req.session.user.email = updatedUser.email;
     req.session.user.phone_no = updatedUser.phone_no;
@@ -3980,3 +3953,40 @@ exports.otherlistdata = async function (req, res, next) {
     });
   }
 };
+
+// exports.whatsappintegration = async function (req, res, next) {
+//   try {
+//     const to_number = '917044289770'; 
+//     const message = 'Hi, I am interested in your product.';
+// 	  let response = await send_message({ type: 'text', message, to_number });
+
+//     res.json({
+//       status: '1',
+//       message: 'Message sent successfully.',
+//       respdata: response,
+//     });
+//   } catch (error) {
+//     console.error(error); 
+//     res.status(500).json({
+//       status: '0',
+//       message: 'An error occurred while fetching categories by gender_id.',
+//       error: error.message,
+//     });
+//   }
+// };
+
+async function send_message(body) {
+	console.log(`Request Boduuy:${JSON.stringify(body)}`);
+	let url = process.env.WP_SMS_API_URL+"/"+process.env.WP_SMS_PRODUCT_ID+"/"+process.env.WP_SMS_PHONE_ID+"/"+"sendMessage";
+	let response = await rp(url, {
+		method: 'post',
+		json: true,
+		body,
+		headers: {
+			'Content-Type': 'application/json',
+			'x-maytapi-key': process.env.WP_SMS_API_TOKEN,
+		},
+	});
+	console.log(`Response: ${JSON.stringify(response)}`);
+	return response;
+}

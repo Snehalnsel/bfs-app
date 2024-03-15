@@ -8,6 +8,7 @@ const path = require("path");
 const fs = require("fs");
 const mime = require("mime");
 const Users = require("../../models/api/userModel");
+const Bankdetails = require("../../models/api/bankdetailsModel");
 // const helper = require("../helpers/helper");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -176,44 +177,155 @@ exports.getData = async function (req, res, next) {
     let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const user_id = mongoose.Types.ObjectId(req.params.id);
   
-    Users.findOne({ _id: user_id }).then((users) => {
-      res.render("pages/app-users/edit", {
-        status: 1,
-        siteName: req.app.locals.siteName,
-        pageName: pageName,
-        pageTitle: pageTitle,
-        userFullName:  req.session.admin.name,
-        userImage:  req.session.admin.image_url,
-        userEmail:  req.session.admin.email,
-        year: moment().format("YYYY"),
-        requrl: req.app.locals.requrl,
-        message: "",
-        respdata: users,
-        isAdminLoggedIn:isAdminLoggedIn
-      });
-    });
+    // Users.findOne({ _id: user_id }).then((users) => {
+    //   res.render("pages/app-users/edit", {
+    //     status: 1,
+    //     siteName: req.app.locals.siteName,
+    //     pageName: pageName,
+    //     pageTitle: pageTitle,
+    //     userFullName:  req.session.admin.name,
+    //     userImage:  req.session.admin.image_url,
+    //     userEmail:  req.session.admin.email,
+    //     year: moment().format("YYYY"),
+    //     requrl: req.app.locals.requrl,
+    //     message: "",
+    //     respdata: users,
+    //     isAdminLoggedIn:isAdminLoggedIn
+    //   });
+    // });
+    const user = await Users.findOne({ _id: user_id });
+    const bankDetails = await Bankdetails.findOne({ user_id: user_id });
+
+
+  console.log("user",user);
+  console.log("user",bankDetails);
+
+ 
+  res.render("pages/app-users/edit", {
+    status: 1,
+    siteName: req.app.locals.siteName,
+    pageName: pageName,
+    pageTitle: pageTitle,
+    userFullName:  req.session.admin.name,
+    userImage:  req.session.admin.image_url,
+    userEmail:  req.session.admin.email,
+    year: moment().format("YYYY"),
+    requrl: req.app.locals.requrl,
+    message: "",
+    respdata: user,
+    bankDetails: bankDetails,
+    isAdminLoggedIn: isAdminLoggedIn
+  });
   };
 
 
+  // exports.updateData = async function (req, res, next) {
+  //   try {
+  //     const errors = validationResult(req);
+  //     let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+  //     if (!errors.isEmpty()) {
+  //       return res.status(400).json({
+  //         status: "0",
+  //         message: "Validation error!",
+  //         respdata: errors.array(),
+  //         isAdminLoggedIn:isAdminLoggedIn
+  //       });
+  //     }  
+  //     const user = await Users.findOne({ _id: req.params.user_id });
+  //     if (!user) {
+  //       return res.status(404).json({
+  //         status: "0",
+  //         message: "Not found!",
+  //         respdata: {},
+  //         isAdminLoggedIn:isAdminLoggedIn
+  //       });
+  //     }
+  
+  //     const requrl = req.app.locals.requrl;
+  //     const image_url = requrl + "/public/images/no-image.jpg";
+  
+  //     const updData = {
+  //       name: req.body.name,
+  //       title: req.body.title,
+  //       email: req.body.email,
+  //       phone_no: req.body.phone_no,
+  //       image: image_url,
+  //       created_dtime: dateTime,
+  //     };
+  
+  //     const updatedUser = await Users.findOneAndUpdate(
+  //       { _id: req.body.userId },
+  //       { $set: updData },
+  //       { upsert: true, new: true } 
+  //     );
+
+      
+  //     const updBankData = {
+  //       user_id: req.body.userId,
+  //       accountnumber: req.body.accountnumber,
+  //       bankname: req.body.bankname,
+  //       ifsccode: req.body.ifsccode,
+  //       accounttype: req.body.accounttype,
+  //       upiid: req.body.upiid,
+  //       upiid_scaner: imagePath || '', 
+  //       default_status: 1, 
+  //       created_dtime: new Date().toISOString(), 
+  //     };
+  
+  //     const updatedBankDeatils = await Bankdetails.findOneAndUpdate(
+  //       {user_id: req.body.userId },
+  //       { $set: updBankData },
+  //       { upsert: true, new: true } 
+  //     );
+
+  //     // if (!updatedUser) {
+  //     //   return res.status(500).json({
+  //     //     status: "0",
+  //     //     message: "Failed to update user!",
+  //     //     respdata: {},
+  //     //     isAdminLoggedIn:isAdminLoggedIn
+  //     //   });
+  //     // }
+  
+  //     res.status(200).json({
+  //       status: "1",
+  //       message: "Successfully updated!",
+  //       respdata: updatedUser,
+  //       isAdminLoggedIn:isAdminLoggedIn
+  //     });
+
+  //     res.redirect("/admin/app-users"); 
+  //   } catch (error) {
+  //     res.status(500).json({
+  //       status: "0",
+  //       message: "An error occurred while updating the user!",
+  //       respdata: {},
+  //       isAdminLoggedIn:isAdminLoggedIn
+  //     });
+  //   }
+  // };
+
   exports.updateData = async function (req, res, next) {
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     try {
+
       const errors = validationResult(req);
-      let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
       if (!errors.isEmpty()) {
         return res.status(400).json({
           status: "0",
           message: "Validation error!",
           respdata: errors.array(),
-          isAdminLoggedIn:isAdminLoggedIn
+          isAdminLoggedIn: isAdminLoggedIn,
         });
-      }  
+      }
+  
       const user = await Users.findOne({ _id: req.params.user_id });
       if (!user) {
         return res.status(404).json({
           status: "0",
           message: "Not found!",
           respdata: {},
-          isAdminLoggedIn:isAdminLoggedIn
+          isAdminLoggedIn: isAdminLoggedIn,
         });
       }
   
@@ -232,35 +344,45 @@ exports.getData = async function (req, res, next) {
       const updatedUser = await Users.findOneAndUpdate(
         { _id: req.params.user_id },
         { $set: updData },
-        { upsert: true, new: true } // Use new: true to get the updated document
+        { upsert: true, new: true }
       );
   
-      if (!updatedUser) {
-        return res.status(500).json({
-          status: "0",
-          message: "Failed to update user!",
-          respdata: {},
-          isAdminLoggedIn:isAdminLoggedIn
-        });
-      }
+      const updBankData = {
+        user_id: req.params.user_id,
+        accountnumber: req.body.accountnumber,
+        bankname: req.body.bankname,
+        ifsccode: req.body.ifsccode,
+        accounttype: req.body.accounttype,
+        upiid: req.body.upiid,
+        upiid_scaner: imagePath || '',
+        default_status: 1,
+        created_dtime: new Date().toISOString(),
+      };
+  
+      const updatedBankDetails = await Bankdetails.findOneAndUpdate(
+        { user_id: req.params.user_id },
+        { $set: updBankData },
+        { upsert: true, new: true }
+      );
   
       res.status(200).json({
         status: "1",
         message: "Successfully updated!",
         respdata: updatedUser,
-        isAdminLoggedIn:isAdminLoggedIn
+        isAdminLoggedIn: isAdminLoggedIn,
       });
-
-      res.redirect("/admin/app-users"); 
+  
+      res.redirect("/admin/app-users");
     } catch (error) {
       res.status(500).json({
         status: "0",
         message: "An error occurred while updating the user!",
         respdata: {},
-        isAdminLoggedIn:isAdminLoggedIn
+        isAdminLoggedIn: isAdminLoggedIn,
       });
     }
   };
+  
   
   exports.deleteData = async function (req, res, next) {
     try {

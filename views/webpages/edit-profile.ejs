@@ -109,32 +109,32 @@
                               <div class="div-row">
                                  <div class="div-6">
                                     <label>Enter BANK Name</label>
-                                    <input type="text" name="bankname" class="ds-form-control">
+                                    <input type="text" name="bankname" class="ds-form-control" value="<%= bankDetails.bankname %>">
                                  </div>
             
                                  <div class="div-6">
                                     <label>Enter Account Name:</label>
-                                    <input type="text" name="accountname" id="accountname" class="ds-form-control account number">
+                                    <input type="text" name="accountname" id="accountname" class="ds-form-control account number" value="<%= bankDetails.accountnumber %>">
                                  </div>
             
                                  <div class="div-6">
                                     <label>IFSC CODE:</label>
-                                    <input type="text" name="ifsccode" id="ifsccode" class="ds-form-control cnewpassword">
+                                    <input type="text" name="ifsccode" id="ifsccode" class="ds-form-control" value="<%= bankDetails.ifsccode %>">
                                  </div>
 
                                  <div class="div-6">
                                     <label>Account Type:</label>
-                                    <input type="text" name="accounttype" id="accounttype" class="ds-form-control cnewpassword">
+                                    <input type="text" name="accounttype" id="accounttype" class="ds-form-control" value="<%= bankDetails.accounttype %>">
                                  </div>
 
                                  <div class="div-6">
                                     <label>UPI ID:</label>
-                                    <input type="text" name="upiid" id="upiid" class="ds-form-control cnewpassword">
+                                    <input type="text" name="upiid" id="upiid" class="ds-form-control" value="<%= bankDetails.upiid %>">
                                  </div>
 
                                  <div class="div-6">
                                     <label>UPI ID SCANER:</label>
-                                    <input type="file" name="image" id="upiscaner" />
+                                    <input type="file" name="image" id="upiscaner" value="<%= bankDetails.upiscaner %>"/>
                                  </div>
                               </div>
                            </form>

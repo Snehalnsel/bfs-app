@@ -280,7 +280,6 @@ const storage = multer.diskStorage({
   },
 });
 
-// const upload = multer({ storage: storage });
 const upload = multer({ storage: storage, limits: { files: 5 } });
 const firstSetUpload = multer({ storage: storage, limits: { files: 5 } }).array('firstSetFiles', 5);
 const secondSetUpload = multer({ storage: storage, limits: { files: 5 } }).array('secondSetFiles', 5);
@@ -931,6 +930,11 @@ router.post(
   "/return-order", 
   [],
   OrderController.returnOrder
+);
+router.post(
+  "/returnorder", 
+  [],
+  OrderController.returnOrderforapp
 );
 router.get(
   "/cancelorderbybuyer/:order_id",

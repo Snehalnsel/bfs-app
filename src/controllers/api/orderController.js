@@ -718,21 +718,57 @@ exports.checkout = async (req, res) => {
     {
       const user = await Users.findById(savedOrder.user_id);
 
+      const product = await Userproduct.findById(savedOrder.product_id);
+
+      const address = await AddressBook.findById(savedOrder.billing_address_id);
+
+      const billingaddress = address.street_name + ', ' + address.address1 + ', ' + address.landmark + ', ' + address.city_name + ', ' + address.state_name + ', ' + address.pin_code;
+
+      const loginHtmlPath = 'views/webpages/order-confirmed.html';
+      let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+
+      loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+      loginHtmlContent = loginHtmlContent.replace('{{ordernumber}}', orderCode);
+      loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
+      loginHtmlContent = loginHtmlContent.replace('{{productimages}}', orderCode);
+      loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
+      loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.price);
+      loginHtmlContent = loginHtmlContent.replace('{{shippingaddress}}', billingaddress);
+    
       const mailData = {
-        from: smtpUser,
+        from: "Bid For Sale! <" + smtpUser + ">",
         to: user.email,
-        subject: "BFS - Bid For Sale  - Order Placed Successfully",
-        text: "Server Email!",
-        html:
-          "Hey " +
-          user.name +
-          ", <br> <p>Congratulations your order is placed.please wait for some times and the delivery details you will show on the app.</p>",
+        subject: "Order Placed - Bid For Sale!",
+        name: "Bid For Sale!",
+        text: "order placed",
+        html: loginHtmlContent
       };
 
       transporter.sendMail(mailData, function (err, info) {
-        // if (err) console.log(err);
-        // else console.log(info);
+        if (err) console.log("err", err);
+        else console.log("info", info);
       });
+
+         //SEND SMS
+         let smsData = {
+          textId: "test",
+          toMobile: "91" +user.phone_no,
+          text: "Order placed successfully! Thank you for shopping with Bid For Sale. Your "+ product.name +" having Order ID "+ orderCode +"  is on its way to you. For any inquiries, feel free to reach out to us. Happy shopping!-BFS RETAIL SERVICES PRIVATE LIMITED",
+        };
+        let returnData;
+        returnData = await sendSms(smsData);
+
+        const historyData = new ApiCallHistory({
+          userId: user._id,
+          called_for: "Order Placed",
+          api_link: process.env.SITE_URL,
+          api_param: smsData,
+          api_response: returnData,
+          send_status: 'send',
+        });
+        await historyData.save();
+
+        //SEND SMS
 
       const updatedProduct = await Userproduct.findOneAndUpdate(
         { _id: product_id }, 
@@ -740,28 +776,29 @@ exports.checkout = async (req, res) => {
         { new: true }
       );
 
-    //   if(updatedProduct)
-    //   {
-    //     console.log(cart_id);
-    //     const cleanedCartId =  mongoose.Types.ObjectId(cart_id); // Removes leading/trailing spaces
-    //     const cartDetail = await CartDetail.findOne({ cart_id: cleanedCartId });
+      if(updatedProduct)
+      {
+        console.log(cart_id);
+        const cleanedCartId =  mongoose.Types.ObjectId(cart_id); // Removes leading/trailing spaces
+        const cartDetail = await CartDetail.findOne({ cart_id: cleanedCartId });
 
-    //     console.log(cartDetail);
+        console.log(cartDetail);
        
-    //     if (cartDetail) {
-    //       // The cartDetail exists, so it's safe to remove it
-    //       await cartDetail.remove();
-    //       // Continue with order placement logic
-    //     }
+        if (cartDetail) {
+          // The cartDetail exists, so it's safe to remove it
+          await cartDetail.remove();
+          // Continue with order placement logic
+        }
     
-    //     const cartDetailsCount = await CartDetail.countDocuments({ cart_id: savedOrder.cart_id });
+        const cartDetailsCount = await CartDetail.countDocuments({ cart_id: savedOrder.cart_id });
 
-    //     const existingCart = await Cart.findById(cart_id);
+        const existingCart = await Cart.findById(cart_id);
     
-    //     if (cartDetailsCount === 0) {
-    //       await existingCart.remove();
-    //     }
-    //   }    
+        if (cartDetailsCount === 0) {
+          await existingCart.remove();
+        }
+      } 
+      
           res.status(200).json({
               status: "1",
             message: 'Order placed successfully',
@@ -963,7 +1000,7 @@ exports.getOrderListByUser = async (req, res) => {
 
 exports.getOrdersBySeller = async (req, res) => {
   try {
-    //const { seller_id } = req.body;
+  
     let  seller_id  = typeof req.body.user_id != "undefined"  ? req.body.user_id : req.session.user.userId;
     const orders = await Order.find({ seller_id }).populate('seller_id', 'name').populate('user_id', 'name');
     if (!orders || orders.length === 0) {
@@ -1156,24 +1193,67 @@ exports.cancelOrderById = async function (req, res, next) {
     existingOrder.delete_by = deleteby;
     existingOrder.updated_dtime = new Date().toISOString();
     const canceledOrder = await existingOrder.save();
-
-    const requestUrl =  '/web-my-order';
-     
-    await insertNotification(
-       'Order Cancelled', 
-       `YOUR ORDER HAS BEEN CANCELED`, 
-       user_id, 
-       requestUrl, 
-       new Date()
-    );
-
     if (canceledOrder) {
-        return res.status(200).json({
-          status: "1",
-          message: "Order canceled successfully!",
-          respdata: canceledOrder,
-          is_cancelorder: true,
+
+      const requestUrl =  '/web-my-order';
+      
+      await insertNotification(
+        'Order Cancelled', 
+        `YOUR ORDER HAS BEEN CANCELED`, 
+        user_id, 
+        requestUrl, 
+        new Date()
+      );
+
+      const user = await Users.findById(user_id);
+      const product = await Userproduct.findById(canceledOrder.product_id);
+        //SEND SMS
+        let smsData = {
+          textId: "test",
+          toMobile: "91" +user.phone_no,
+          text: "Order cancellation request received. Your order having Order ID "+canceledOrder.order_code+" is being processed for cancellation. We'll update you shortly. Thank you for your patience.-BFS RETAIL SERVICES PRIVATE LIMITED",
+        };
+        let returnData;
+        returnData = await sendSms(smsData);
+        const historyData = new ApiCallHistory({
+          userId: user_id,
+          called_for: "cancel order",
+          api_link: process.env.SITE_URL,
+          api_param: smsData,
+          api_response: returnData,
+          send_status: 'send',
         });
+        await historyData.save();
+
+        const loginHtmlPath = 'views/webpages/order-cancel.html';
+        let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+
+        loginHtmlContent = loginHtmlContent.replace('{{ordercode}}', canceledOrder.order_code);
+        loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+        loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
+        loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
+        loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.price);      
+
+        const mailData = {
+          from: "Bid For Sale! <" + smtpUser + ">",
+          to: user.email,
+          subject: "Cancel Order- Bid For Sale!",
+          name: "Bid For Sale!",
+          text: "cancel order",
+          html: loginHtmlContent
+        };
+        
+        transporter.sendMail(mailData, function (err, info) {
+          if (err) console.log("err", err);
+          else console.log("info", info);
+        });
+
+          return res.status(200).json({
+            status: "1",
+            message: "Order canceled successfully!",
+            respdata: canceledOrder,
+            is_cancelorder: true,
+          });
       } else {
         return res.status(400).json({
           status: "0",
@@ -1424,6 +1504,84 @@ exports.updateDeliveryaddressByOrderId = async function (req, res, next) {
   }
 };
 
+exports.returnOrderforapp = async function (req, res) {
+
+  try{
+      let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+
+      const order_id = req.body.orderid;
+      const return_reason = req.body.reasonid;
+      const existingOrder = await Order.findById(order_id);
+      let status = 0;
+
+      if(!existingOrder)
+      {
+        return res.status(200).json({
+          message: 'Order not found',
+        });
+      }
+     const returnorder = new ReturnOrder({
+      order_id,
+      return_reason,
+      status,
+       added_dtime: new Date().toISOString(),
+     });
+     const savedOrder = await returnorder.save();
+ 
+     if (savedOrder) {
+       await Iptrnsaction.create({
+         user_id: req.session.user.userId, 
+         purpose: "Retuen Order Placement from Web",
+         ip_address: req.connection.remoteAddress, 
+         created_dtime: new Date(),
+       });
+       await Order.updateOne({ _id: order_id }, { is_return: 1 });
+
+       let smsData = {
+        textId: "test",
+        toMobile: "91" +user.phone_no,
+        text: "Return request for Order ID is "+existingOrder.order_code+" initiated with Bid For Sale. Our team will promptly review your request and provide further assistance. Thank you for choosing Bid For Sale, where your satisfaction is our priority.-BFS RETAIL SERVICES PRIVATE LIMITEDl",
+      };
+      let returnData;
+      returnData = await sendSms(smsData);
+      const historyData = new ApiCallHistory({
+        userId: user._id,
+        called_for: "return order",
+        api_link: process.env.SITE_URL,
+        api_param: smsData,
+        api_response: returnData,
+        send_status: 'send',
+      });
+      await historyData.save();
+
+      const user = await Users.findById(req.session.user.userId);
+       const loginHtmlPath = 'views/webpages/return-order.html';
+       const loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+
+       const mailData = {
+        from: "Bid For Sale! <" + smtpUser + ">",
+        to: user.email,
+        subject: "Return Order - Bid For Sale!",
+        name: "Bid For Sale!",
+        text: "return order",
+        html: loginHtmlContent
+      };
+
+      transporter.sendMail(mailData, function (err, info) {
+        if (err) console.log(err);
+        else console.log(info);
+      });
+
+       res.status(200).json({
+        status: "1",
+        message: "Order return successfully!"
+      });
+      
+     }
+  } catch (error) {
+   return res.status(500).json({ message: 'Internal server error' });
+ }
+ };
 
 exports.returnOrder = async function (req, res) {
 
@@ -1458,6 +1616,42 @@ exports.returnOrder = async function (req, res) {
        });
        await Order.updateOne({ _id: order_id }, { is_return: 1 });
       
+      const user = await Users.findById(req.session.user.userId);
+
+      let smsData = {
+        textId: "test",
+        toMobile: "91" +user.phone_no,
+        text: "Return request for Order ID is "+existingOrder.order_code+" initiated with Bid For Sale. Our team will promptly review your request and provide further assistance. Thank you for choosing Bid For Sale, where your satisfaction is our priority.-BFS RETAIL SERVICES PRIVATE LIMITEDl",
+      };
+      let returnData;
+      returnData = await sendSms(smsData);
+      const historyData = new ApiCallHistory({
+        userId: user._id,
+        called_for: "return order",
+        api_link: process.env.SITE_URL,
+        api_param: smsData,
+        api_response: returnData,
+        send_status: 'send',
+      });
+      await historyData.save();
+
+       
+       const loginHtmlPath = 'views/webpages/return-order.html';;
+       const loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+
+       const mailData = {
+        from: "Bid For Sale! <" + smtpUser + ">",
+        to: user.email,
+        subject: "Return Order-Bid For Sale!",
+        name: "Bid For Sale!",
+        text: "return order",
+        html: loginHtmlContent
+      };
+
+      transporter.sendMail(mailData, function (err, info) {
+        if (err) console.log(err);
+        else console.log(info);
+      });
        res.render("webpages/myorder", {
         title: "Wish List Page",
         message: "Welcome to the Wish List page!",

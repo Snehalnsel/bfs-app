@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html dir="ltr" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta name="x-apple-disable-message-reformatting">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="telephone=no" name="format-detection">
+    <title></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+
+<!-- Custom Font -->
+<style>
+    @font-face {
+        font-family: 'LiteraturnayaRegular';
+        src: url(font/Literaturnaya-Regular.ttf);
+        }
+</style>
+
+</head>
+
+<body style="margin: 0px; padding: 0px;">
+    <div dir="ltr" class="main-wrapper" style="margin: 0px auto; width: 600px; border-right: #E3683D solid 20px; border-left: #E3683D solid 20px;">
+        <div class="top-hero-section" style="text-align: center; padding-top: 50px;">
+            <img src="https://bidforsale.com:3000/public/images/logo-color.png" alt="Bid For Sale" width="120">
+        </div>
+
+
+        <div class="welcomesec" style="font-family: 'Poppins', sans-serif; text-align: center; padding: 30px 20px 0px 20px;">
+            <h3 style=" text-transform: uppercase; font-size: 2.3rem; color: #000; margin-bottom: 50px; font-family: 'LiteraturnayaRegular'; font-weight: 300; margin-top: 30px;
+            font-style: normal; letter-spacing: 3px;">ORDER CONFIRMATION</h3>
+
+            
+            <p style="font-size: 1.3rem; font-weight: 400; margin-top: 0px;">Dear <b>{{username}}</b>,</p>
+            <p style="font-size: 1.3rem; font-weight: 400; margin-top: 0px; line-height: 36px;">You have successfully<br>
+                added a luxury feather to your cap!</p>
+        </div>
+
+        <div class="pass-reset-link" style="font-family: 'Poppins', sans-serif; text-align: center; padding: 0 20px; margin-top: 30px; font-size: 32px; font-weight: 800;">
+            Order Number: {{ordernumber}}
+
+            
+        </div>
+
+
+        <div class="welcomesec" style="font-family: 'Poppins', sans-serif; text-align: center; padding: 0 40px; margin-top: 70px;">
+            <table style="width: 100%; border-collapse: collapse;  ">
+                <thead>
+                    <th colspan="4" style="text-align: left; border-bottom: solid 1px #a6a6a6; padding-bottom: 20px; font-size: 24px; font-weight: 500;">Items Ordered</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="4" style="height: 50px;"></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;  padding-bottom: 30px;"><img src="https://bidforsale.com:3000/public/images/{{productimages}}" width="100"></td>
+                        <td style="text-align: center;  padding-bottom: 30px; padding-left: 20px;">{{productname}}</td>
+                        <td style="padding-bottom: 30px; min-width: 150px">x 1</td>
+                        <td style="text-align: right; padding-bottom: 30px;">₹ {{productprice}}</td>
+                    </tr>
+                    <!-- <tr>
+                        <td style="text-align: left; width: 100px; padding-bottom: 30px;"><img src="https://bidforsale.com:3000/public/images/watch.png" width="100"></td>
+                        <td style="text-align: center; width: 150px; padding-bottom: 30px; padding-left: 20px;">EMPORIO ARMANI Wristwatch</td>
+                        <td style="padding-bottom: 30px; min-width: 150px">x 1</td>
+                        <td style="text-align: right; padding-bottom: 30px;">₹ xxxx</td>
+                    </tr> -->
+                </tbody>
+                <tfoot style="border-top: solid 1px #a6a6a6; border-bottom: solid 1px #a6a6a6;">
+                    <tr>
+                        <th colspan="2" style="text-align: left; padding-top: 20px; font-weight: 500;">Total</th>
+                        <th colspan="2" style="text-align: right; padding-top: 20px; font-size: 24px;">₹ {{totalprice}}</th>
+                    </tr>
+                    <tr>
+                        <th colspan="2" style="text-align: left; padding-top: 20px; padding-bottom: 30px; font-weight: 500;">Shipping Address:</th>
+                        <th colspan="2" style="text-align: right; padding-top: 20px; padding-bottom: 30px; font-weight: 500;">{{shippingaddress}}</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        
+
+        <div class="welcomesec" style="font-family: 'Poppins', sans-serif; text-align: center; padding: 0 20px; margin-top: 70px;">
+
+            <p style="font-size: 1.3rem; font-weight: 400; margin-top: 0px; line-height: 40px;"> We will notify you once your order is shipped.<br>
+                In the meantime, if you have any questions or<br>
+                need assistance, feel free to contact us at<br>
+ <b>[Contact Email]</b> , <b>[Contact Number]</b>
+ </p>
+
+ <p style="font-size: 1.3rem; font-weight: 400; margin-top: 0px; line-height: 40px;">Thank you for choosing sustainable luxury with BFS!
+</p>
+ 
+            <p style="font-size: 1.3rem; font-weight: 400; margin-top: 20px; line-height: 40px;">
+                Best regards,<br>
+                <b>Bid For Sale Team</b>
+            </p>
+
+        </div>
+       
+
+       
+        <div class="footer" style="font-family: 'Poppins', sans-serif; text-align: center; padding: 0 60px; margin-top: 50px; margin-bottom: 0;">
+            <table style="width: 100%; border-collapse: collapse;  ">
+                <tr>
+                    <td style="text-align: center; border: 1px solid #a6a6a6; border-left: 0; width: 50%; vertical-align: top; padding: 50px 0; ">
+                        <div style="font-size: 1rem; font-weight: 400; margin-top: 0px; ">Let’s hangout?<br>
+                            <div class="social" style="margin: 10px 0 0px;">
+                                <a href="#" style="margin-right: 10px; display: inline-block;"><img src="https://bidforsale.com:3000/public/images/facebook.png" width="45"></a>
+                                <a href="#" style="display: inline-block;"><img src="https://bidforsale.com:3000/public/images/insta.png" width="45"></a>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="text-align: center; vertical-align: top; padding: 50px 0; border: 1px solid #a6a6a6; border-right: 0;">
+                        <p style="font-size: 1rem; font-weight: 400; margin-top: 0px; line-height: 30px;">Changed your mind?<br>
+                            <a href="#" style="font-size: 1rem; font-weight: 800; text-decoration: none; color: #000;">Unsubscribe</a>
+                        </p>
+                    </td>
+                </tr>
+            </table>
+
+            <a href="#" title="Bid For Sale" style="margin: 0; padding: 0; display: block;"><img src="https://bidforsale.com:3000/public/images/logo2.png" width="100%" style="box-sizing: border-box; padding: 50px 70px 70px; margin-bottom: 0;" alt="Bid For Sale"></a>
+
+        </div>
+
+    </div>
+</body>
+
+</html>

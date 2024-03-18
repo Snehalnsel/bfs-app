@@ -195,11 +195,6 @@ exports.getData = async function (req, res, next) {
     // });
     const user = await Users.findOne({ _id: user_id });
     const bankDetails = await Bankdetails.findOne({ user_id: user_id });
-
-
-  console.log("user",user);
-  console.log("user",bankDetails);
-
  
   res.render("pages/app-users/edit", {
     status: 1,
@@ -309,6 +304,8 @@ exports.getData = async function (req, res, next) {
     let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     try {
 
+      console.log("body",req.body);
+      // return;
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -328,25 +325,33 @@ exports.getData = async function (req, res, next) {
           isAdminLoggedIn: isAdminLoggedIn,
         });
       }
-  
+      
       const requrl = req.app.locals.requrl;
       const image_url = requrl + "/public/images/no-image.jpg";
   
       const updData = {
         name: req.body.name,
-        title: req.body.title,
         email: req.body.email,
         phone_no: req.body.phone_no,
         image: image_url,
         created_dtime: dateTime,
       };
+
+      
   
       const updatedUser = await Users.findOneAndUpdate(
         { _id: req.params.user_id },
         { $set: updData },
         { upsert: true, new: true }
-      );
-  
+      ).then(async (result) => {
+        //console.log(result);
+      });
+
+      const uploadedFile = req.files[0];
+      const imagePath = uploadedFile.path; 
+
+      imagePath = imagePath ? imagePath: req.body.upiid_scaner;
+      
       const updBankData = {
         user_id: req.params.user_id,
         accountnumber: req.body.accountnumber,
@@ -359,16 +364,24 @@ exports.getData = async function (req, res, next) {
         created_dtime: new Date().toISOString(),
       };
   
+      console.log("bank", updBankData);
       const updatedBankDetails = await Bankdetails.findOneAndUpdate(
         { user_id: req.params.user_id },
         { $set: updBankData },
         { upsert: true, new: true }
-      );
+      ).then(async (result) => {
+        console.log("bank details",result);
+      }).catch((err) => {
+        console.log("bank details error",err);
+      });
+
+      // return;
   
       res.status(200).json({
         status: "1",
         message: "Successfully updated!",
         respdata: updatedUser,
+        bankdetails:updatedBankDetails,
         isAdminLoggedIn: isAdminLoggedIn,
       });
   

@@ -1216,6 +1216,36 @@ exports.addAddress = async function (req, res, next) {
   }
 };
 
+exports.addAddress = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    var userData = req.session.user;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        status: "0",
+        message: "Validation error!",
+        respdata: errors.array(),
+      });
+    }
+    const address = await addressBook.findOne({ user_id: userData.userId });
+    var add = address;
+    res.render("webpages/edit-address", {
+      title: "Edit Address",
+      message: "Welcome to the Edit Profile page!",
+      respdata: add,
+      respdata1: userData,
+      isLoggedIn: isLoggedIn,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the Edit Profile.",
+      error: error.message,
+    });
+  }
+};
+
 
 exports.thankyoupage = async function (req, res, next) {
   try {

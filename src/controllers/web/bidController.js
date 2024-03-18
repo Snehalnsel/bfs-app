@@ -1,27 +1,27 @@
 var express = require("express");
-var router = express.Router();
+//var router = express.Router();
 var moment = require("moment");
 const mongoose = require("mongoose");
-const db = mongoose.connection;
-const http = require("http");
-const path = require("path");
-const fs = require("fs");
-const mime = require("mime");
+//const db = mongoose.connection;
+//const http = require("http");
+//const path = require("path");
+//const fs = require("fs");
+//const mime = require("mime");
 // const helper = require("../helpers/helper");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const tokenSecret = "a2sd#Fs43d4G3524Kh";
-const rounds = 10;
-const dateTime = moment().format("YYYY-MM-DD h:mm:ss");
-const auth = require("../../middlewares/auth");
+//const bcrypt = require("bcrypt");
+//const jwt = require("jsonwebtoken");
+//const tokenSecret = "a2sd#Fs43d4G3524Kh";
+//const rounds = 10;
+//const dateTime = moment().format("YYYY-MM-DD h:mm:ss");
+//const auth = require("../../middlewares/auth");
 const { check, validationResult } = require("express-validator");
-var ObjectId = require("mongodb").ObjectId;
-const url = require("url");
-var ObjectId = require("mongodb").ObjectId;
+//var ObjectId = require("mongodb").ObjectId;
+//const url = require("url");
+//var ObjectId = require("mongodb").ObjectId;
 const BidManagement = require('../../models/api/bidModel');
 const Userproduct = require("../../models/api/userproductModel");
 const Productimage = require("../../models/api/productimageModel");
-const Users = require("../../models/api/userModel");
+//const Users = require("../../models/api/userModel");
 
 
 

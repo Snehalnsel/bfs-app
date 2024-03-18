@@ -8,7 +8,6 @@ const model = mongoose.Schema({
   },
   street_name: {
     type: String,
-    //required: true,
   },
   address1: {
     type: String,

@@ -1,169 +1,203 @@
 <%- include('../../public/assets/include/header'); %>
 
-<section class="dashboard-wrapper">
-    <div class="dashboard-container">
-       <div class="dashboard-sidbar">
-         <div class="sidbar-box user-profile">
-            <div class="user-icon">
-               <img src="<%=respdata1.image%>" alt="user-image">
-            </div>
-            <div class="user-info">
-               <div class="sht-ui">Hello</div>
-               <div class="user-name"><%=respdata1.title%> <%=respdata1.name%> </div>
-            </div>
-         
-            <div class="userimage-edit">
-                <label>
-                    <a href="javascript:void(0)" data-toggle="modal" data-target="#upload-profile-modal" class="edit_link">
-                        <i class="fa fa-pencil" aria-hidden="true"></i>
-                    </a>
-                </label>
-             </div>
+   <section class="dashboard-wrapper">
+      <div class="dashboard-container">
+         <div class="dashboard-sidbar">
+            <div class="sidbar-box user-profile">
+               <div class="user-icon">
+                  <img src="<%=respdata1.image%>" alt="user-image">
+               </div>
+               <div class="user-info">
+                  <div class="sht-ui">Hello</div>
+                  <div class="user-name">
+                     <%=respdata1.title%>
+                        <%=respdata1.name%>
+                  </div>
+               </div>
 
-            <div class="modal theme_modal short-modal change-profile-update" id="upload-profile-modal">
-               <div class="modal-dialog">
-                  <button type="button" class="close" data-dismiss="modal">&times;</button>
-                  <div class="modal-content">
-                     <div class="loginform-box short-box">
-                        <h5 class="box-title">Change Profile Picture</h5>
-                        <form action="/change-profile-image-web" method="POST" enctype="multipart/form-data">
-                             <div class="inner-formbox">
-                                <div class="profile-chnage-box">
-                                   <div class="user-icon">
-                                      <img src="<%=respdata1.image%>" alt="user-image" id="output">                            
-                                   </div>
-                                   <input id="file" class="" name="pro_img" type="file"/>
-                                   <input id="user_id" class="" name="user_id" type="hidden" value="<%=respdata1.userId%>"/>
-                                   <input class="update-btn" type="submit" value="Update Profile" />
-                                </div>
-                             </div>
-                        </form>
+               <div class="userimage-edit">
+                  <label>
+                     <a href="javascript:void(0)" data-toggle="modal" data-target="#upload-profile-modal"
+                        class="edit_link">
+                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                     </a>
+                  </label>
+               </div>
+
+               <div class="modal theme_modal short-modal change-profile-update" id="upload-profile-modal">
+                  <div class="modal-dialog">
+                     <button type="button" class="close" data-dismiss="modal">&times;</button>
+                     <div class="modal-content">
+                        <div class="loginform-box short-box">
+                           <h5 class="box-title">Change Profile Picture</h5>
+                           <form action="/change-profile-image-web" method="POST" enctype="multipart/form-data">
+                              <div class="inner-formbox">
+                                 <div class="profile-chnage-box">
+                                    <div class="user-icon">
+                                       <img src="<%=respdata1.image%>" alt="user-image" id="output">
+                                    </div>
+                                    <input id="file" class="" name="pro_img" type="file" />
+                                    <input id="user_id" class="" name="user_id" type="hidden"
+                                       value="<%=respdata1.userId%>" />
+                                    <input class="update-btn" type="submit" value="Update Profile" />
+                                 </div>
+                              </div>
+                           </form>
+                        </div>
                      </div>
                   </div>
                </div>
+
+
+
+
             </div>
-            
-            
-            
-            
+            <div class="sidbar-box sidbar-nav">
+               <ul class="nav d-flex flex-column mb-2 ">
+                  <li class="nav-item">
+                     <a class="nav-link" href="/my-account"><i class="fa fa-user" aria-hidden="true"></i>
+                        <span>Profile</span></a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link" href="/web-my-order"><i class="fa fa-list-ul" aria-hidden="true"></i> <span>My
+                           Orders</span></a>
+                  </li>
+
+                  <li class="nav-item">
+                     <a class="nav-link" href="/my-post/<%=respdata1.userId%>"><i class="fa fa-file-image-o"
+                           aria-hidden="true"></i> <span>My Posts</span></a>
+                  </li>
+
+                  <li class="nav-item">
+                     <a class="nav-link" href="/bid-for-product"><i class="fa fa-arrow-circle-o-right"
+                           aria-hidden="true"></i> <span>My Bids</span></a>
+                  </li>
+
+               </ul>
+               <div class="bottom-link">
+                  <ul class="nav d-flex flex-column mb-2 ">
+                     <li><a class="nav-link" href="/sign-out"><i class="fa fa-sign-out" aria-hidden="true"></i>
+                           <span>Sign Out</span></a></li>
+                  </ul>
+
+
+               </div>
+
+            </div>
          </div>
-         <div class="sidbar-box sidbar-nav">
-            <ul class="nav d-flex flex-column mb-2 ">
-                      <li class="nav-item">
-                        <a class="nav-link" href="/my-account"><i class="fa fa-user" aria-hidden="true"></i> <span>Profile</span></a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="/web-my-order"><i class="fa fa-list-ul" aria-hidden="true"></i> <span>My Orders</span></a>
-                      </li>
-        
-                      <li class="nav-item">
-                        <a class="nav-link" href="/my-post/<%=respdata1.userId%>"><i class="fa fa-file-image-o" aria-hidden="true"></i> <span>My Posts</span></a>
-                      </li>
-        
-                      <li class="nav-item">
-                        <a class="nav-link" href="/bid-for-product"><i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> <span>My Bids</span></a>
-                      </li>
-                      
-                    </ul>
-                    <div class="bottom-link">
-                     <ul class="nav d-flex flex-column mb-2 ">
-                        <li><a class="nav-link" href="/sign-out"><i class="fa fa-sign-out" aria-hidden="true"></i> <span>Sign Out</span></a></li>
-                     </ul>
-        
+         <div class="dashboard-content">
+            <div class="dashboard-infobox">
+               <div class="dashboard-title-arrow mb-25">
+                  <h4 class="di-title mr-25">Add Address </h4>
+                  <div class="edit-link"><a href="/my-account">Back </a></div>
+               </div>
+
+               <div class="dsh-shortbox">
+                  <form action="/updateuseraddress" method="post">
+                     <div class="div-row">
+                        <div class="div-12 mb-15">
+                           <label class="full-label">Address Type:</label>
+                           <div class="form-check-inline">
+                               <label class="form-check-label">
+                                   <input type="radio" class="form-check-input addr_type" id="add_type1" value="Home" name="addr_type">Home
+                               </label>
+                           </div>
+                           <div class="form-check-inline">
+                               <label class="form-check-label">
+                                   <input type="radio" class="form-check-input addr_type" id="add_type2" value="Office" name="addr_type">Office
+                               </label>
+                           </div>
+                           <div class="form-check-inline">
+                               <label class="form-check-label">
+                                   <input type="radio" class="form-check-input addr_type" id="add_type3" value="Other" name="addr_type">Other
+                               </label>
+                           </div>
+                       </div>
                        
-                    </div>
-        
-         </div>        
-       </div>
-       <div class="dashboard-content">
-          <div class="dashboard-infobox">
-             <div class="dashboard-title-arrow mb-25">
-                <h4 class="di-title mr-25">Add Address </h4>
-                <div class="edit-link"><a href="/my-account">Back </a></div>
-             </div>
- 
-             <div class="dsh-shortbox">
-                <form action="/adduseraddress" method="post">
-                   <div class="div-row">
-                      <div class="div-12 mb-15">
-                          <label class="full-label">Address Type:</label>
-                         <div class="form-check-inline">                           
-                              <label class="form-check-label">
-                                <input type="radio" class="form-check-input addr_type" id="add_type1" name="addr_type" >Home
-                              </label>
-                            </div>
+                        <input type="hidden" name="addrType" id="addrType">
 
-                            <div class="form-check-inline">
-                              <label class="form-check-label">
-                                <input type="radio" class="form-check-input addr_type" id="add_type2" name="addr_type">Office
-                              </label>
-                            </div>
- 
-                             <div class="form-check-inline">
-                              <label class="form-check-label">
-                                <input type="radio" class="form-check-input addr_type" id="add_type3" name="addr_type">Other
-                              </label>
-                            </div>
-                      </div>                      
-                      <input type="hidden" name="addrType" id="addrType">
-                      
-                      <div class="div-12">
-                         <label>Address 1:</label>                        
-                         <textarea class="ds-form-control" name="address1" placeholder="Enter Address" ></textarea>
-                          <input type="hidden" name="userId" class="ds-form-control" value="<%=respdata1.userId%>"> 
+                        <div class="div-12">
+                           <label>Address 1:</label>
+                           <textarea class="ds-form-control" name="address1"
+                              placeholder="Enter Address"><%=address.address1%></textarea>
+                           <input type="hidden" name="userId" class="ds-form-control" value="<%=respdata1.userId%>">
+                           <input type="hidden" name="addressid" class="ds-form-control" value="<%=address._id%>">
                         </div>
-                      
 
-                      
-                      <div class="div-12">
-                         <label>Address 2:</label>                        
-                         <textarea class="ds-form-control" name="address2" placeholder="Enter Address" ></textarea>
+                        <div class="div-12">
+                           <label>Address 2:</label>
+                           <textarea class="ds-form-control" name="address2"
+                              placeholder="Enter Address"><%=address.street_name%></textarea>
                         </div>
-                      
-                    
-                   
-                      <div class="div-6">
-                         <label>Landmark (Optional):</label>
-                         <input type="type" name="landmark" class="ds-form-control" value="" placeholder="Enter Landmark">
-                      </div>
-                     
-                      
-                     <div class="div-6">
-                         <label>City:</label>
-                         <input type="type" name="city_name" class="ds-form-control" placeholder="City" >
-                      </div>
- 
-                      <div class="div-6">
-                         <label>State:</label>
-                         <input type="type" name="state_name" class="ds-form-control" placeholder="State" >
-                      </div>
- 
-                      <div class="div-6">
-                         <label>Zip:</label>
-                         <input type="type" name="pin_code" class="ds-form-control" placeholder="Zip" >
-                      </div>
-                      <div class="div-12">
-                         <input type="submit" name="" class="ds-form-control" value="Save">
-                      </div>
-                   </div>
-                </form>
-                
-             </div>
-             
-          </div> 
- 
-       </div>
-    </div>
- </section>
+
+                        <div class="div-6">
+                           <label>Landmark (Optional):</label>
+                           <input type="type" name="landmark" class="ds-form-control" value="<%=address.landmark%>"
+                              placeholder="Enter Landmark">
+                        </div>
+
+                        <div class="div-6">
+                           <label>City:</label>
+                           <input type="type" name="city_name" class="ds-form-control" placeholder="City"
+                              value="<%=address.city_name%>">
+                        </div>
+
+                        <div class="div-6">
+                           <label>State:</label>
+                           <input type="type" name="state_name" class="ds-form-control" placeholder="State"
+                              value="<%=address.state_name%>">
+                        </div>
+
+                        <div class="div-6">
+                           <label>Zip:</label>
+                           <input type="type" name="pin_code" class="ds-form-control" placeholder="Zip"
+                              value="<%=address.pin_code%>">
+                        </div>
+                        <div class="div-12">
+                           <input type="submit" name="" class="ds-form-control" value="Update">
+                        </div>
+                     </div>
+                  </form>
+
+               </div>
+
+            </div>
+
+         </div>
+      </div>
+   </section>
    <%- include('../../public/assets/include/newsletter'); %>
       <%- include('../../public/assets/include/footer'); %>
-</body>
-<script>
-   $(document).on('change','.addr_type',function(){
-      if ($(this).is(":checked")) 
-      {
-         var txtVal = $.trim($(this).parent("label").text());
-      }
-      $('#addrType').val(txtVal);
-   });
-</script>
+         </body>
+         <script>
+            $(document).ready(function () {
+               // Get the value passed from the controller
+               var controllerValue = "<%= address.address_name %>";
+
+               // Iterate over each radio button
+               $('.addr_type').each(function () {
+
+                  if ($(this).val() === controllerValue) {
+                     $(this).prop('checked', true);
+                     $('#addrType').val(controllerValue);
+                  }
+               });
+
+               // Add change event listener to update the hidden input field
+               $('.addr_type').on('change', function () {
+                  if ($(this).is(":checked")) {
+                     var addrTypeName = $.trim($(this).parent("label").text());
+                     $('#addrType').val(addrTypeName);
+                  }
+               });
+            });
+         </script>
+
+         <script>
+            $(document).on('change', '.addr_type', function () {
+               if ($(this).is(":checked")) {
+                  var txtVal = $.trim($(this).parent("label").text());
+               }
+               $('#addrType').val(txtVal);
+            });
+         </script>

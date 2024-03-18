@@ -324,13 +324,6 @@
                $('.check-out').prop('disabled', false);
             });
 
-            // $(document).on('click', '.check-out', async function (e) {
-            //    e.preventDefault();
-            //    if (!$('.checkbox-input').is(':checked')) {
-            //       $(".check-out").css("pointer-events", "none");
-            //    }
-            //    $(".check-out").css("pointer-events", "auto");
-            // });
             function displayErrorMessage(message) {
                console.log("kana" + message);
                $("#error-message").html(message).addClass("error-msg");
@@ -383,9 +376,6 @@
                let addToCartreCookieAccessToken = await getCookieFunc(accessTokenVar);
                let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
                await userReLogin(addToCartreCookieAccessToken, addToCartreCookieRefreshToken);
-
-
-               //  location.href='/pay';
                $.ajax({
                   type: 'POST',
                   url: '/demoplacedorder',
@@ -393,7 +383,6 @@
                   dataType: "json",
                   success: function (response) {
                      if (response.is_orderPlaced == 1) {
-                        // console.log(response.order._id);
                         const tempOrderId = response.order._id;
                         window.location.href = '/pay?temp=' + tempOrderId;
                      }

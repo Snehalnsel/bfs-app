@@ -12,6 +12,7 @@ const crypto = require('crypto');
 const path = require("path");
 const ejs = require('ejs');
 const helper = require("../../helpers/helper");
+const rp = require('request-promise-native');
 const fs = require("fs");
 const mime = require("mime");
 const cors = require('cors');
@@ -27,6 +28,7 @@ var ObjectId = require("mongodb").ObjectId;
 const url = require("url");
 var ObjectId = require("mongodb").ObjectId;
 const Appsettings = require("../../models/api/appSettingsModel");
+const Bankdetails = require("../../models/api/bankdetailsModel");
 const Users = require("../../models/api/userModel");
 const Userproduct = require("../../models/api/userproductModel");
 const Productimage = require("../../models/api/productimageModel");
@@ -68,6 +70,10 @@ const ApiCallHistory = require("../../models/thirdPartyApi/ApiCallHistory");
 const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 const { log, Console } = require("console");
 const { create } = require('xmlbuilder2');
+// const INSTANCE_URL = 'https://api.maytapi.com/api';
+// const PHONE_ID = '18710';
+// const PRODUCT_ID = 'b119f3b5-819b-46e0-ae30-0d1cf1dd8cc8';
+// const API_TOKEN = 'c1af8dac-f1fd-4757-8536-c1731ed63eda';
 
 // const transporter = nodemailer.createTransport({
 //   port: 465,
@@ -80,13 +86,13 @@ const { create } = require('xmlbuilder2');
 // });
 
 const transporter = nodemailer.createTransport({
-    port: 465,
-    host: "mail.bidforsale.com",
-    auth: {
-      user: smtpUser,
-      pass: "A6K9JAQD%m!s",
-    },
-    secure: true,
+  port: 465,
+  host: "mail.bidforsale.com",
+  auth: {
+    user: smtpUser,
+    pass: "A6K9JAQD%m!s",
+  },
+  secure: true,
 });
 function randNumber(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
@@ -459,43 +465,56 @@ exports.signin = async function (req, res, next) {
             image: "na",
             ip_address: userIpAddress,
           });
+
           await newUser.save();
           const ipTransaction = new Iptrnsaction({
-            user_id: newUser._id, // Use newUser._id instead of user._id
+            user_id: newUser._id, 
             Purpose: "Web User Registration",
             ip_address: userIpAddress,
             created_dtime: dateTime,
           });
           await ipTransaction.save();
 
-          //SEND SMS
-          await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
-            if (err) {
-              // return {
-              //   status:false,
-              //   data:err
-              // };
-            }
-            //let obj = JSON.parse(data);
-            let randNumber = Math.floor((Math.random() * 1000000) + 1);
-            let smsData = {
-              textId: "test",
-              toMobile: "91" + req.body.phone_no,
-              text: "You have been tagged with an invoice " + randNumber + ". Please use OTP " + randNumber + " for approving the invoice. Do not share your OTP with anyone. RJSSLT",
-            };
-            let returnData;
-            returnData = await sendSms(smsData);
-            const historyData = new ApiCallHistory({
-              userId: mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"),
-              called_for: "sms",
-              api_link: process.env.SITE_URL,
-              api_param: smsData,
-              api_response: returnData,
-              send_status: 'send',
-            });
-            await historyData.save();
+          let smsData = {
+            textId: "test",
+            toMobile: "91" + newUser.phone_no,
+            text: "Welcome to Bid For Sale, "+newUser.name+"! Explore a world of luxury with access to top brands at exceptional value. Buy and sell pre-owned authentic luxury items globally, all while contributing to environmental conservation. Enjoy your journey with us!-BFS RETAIL SERVICES PRIVATE LIMITED",
+          };
+          let returnData;
+          returnData = await sendSms(smsData);
+          const historyData = new ApiCallHistory({
+            userId: newUser._id,
+            called_for: "register",
+            api_link: process.env.SITE_URL,
+            api_param: smsData,
+            api_response: returnData,
+            send_status: 'send',
           });
-          //SEND SMS
+          await historyData.save();
+
+          const loginHtmlPath = 'views/webpages/welcome.html';;
+          const loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+
+          loginHtmlContent = loginHtmlContent.replace('{{username}}', newUser.name);
+
+          const mailData = {
+            from: "Bid For Sale! <" + smtpUser + ">",
+            to: newUser.email,
+            subject: "Order Placed - Bid For Sale!",
+            name: "Bid For Sale!",
+            text: "order placed",
+            html: loginHtmlContent
+          };
+    
+          transporter.sendMail(mailData, function (err, info) {
+            if (err) console.log("err", err);
+            else console.log("info", info);
+          });
+    
+          const message = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
+          const to_number = "91" + newUser.phone_no;
+          let response = await send_message({ type: 'text', message, to_number });
+
           //SEND WHATSAPP
           const receiverMobileNo = "91" + req.body.phone_no;
           const root = create({ version: '1.0', encoding: "ISO-8859-1" })
@@ -619,7 +638,8 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
           // user.devicename = devicename;
           // user.fcm_token = fcm_token;
 
-          const loginHtmlPath = 'views/webpages/mailbody.html';
+          //const loginHtmlPath = 'views/webpages/mailbody.html';
+          const loginHtmlPath = 'views/webpages/welcome.html';;
           const loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
 
           user.save(async (err) => {
@@ -630,42 +650,42 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
                 respdata: err,
               });
             } else {
-              const mailData = {
-                from: "Bid For Sale! <" + smtpUser + ">",
-                to: user.email,
-                subject: "Welcome to Bid For Sale!",
-                name: "Bid For Sale!",
-                text: "welocome",
-                html: loginHtmlContent
-              };
-
-              transporter.sendMail(mailData, function (err, info) {
-                if (err) console.log(err);
-                else console.log(info);
-              });
-
-              //html:
-              // "Hey " +
-              // user.name +
-              // ", <br> <p>Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items </p>",
-              // const msg = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
-
-              // const whatsappMessage = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
-              // const userPhoneNo = "+917044289770";
-
-              // twilioClient.messages.create({
-              //   body: whatsappMessage,
-              //   // From: 'whatsapp:+12565734549',
-              //   // to: 'whatsapp:+918116730275'
-              //   from: 'whatsapp:+14155238886',
-              //   to: 'whatsapp:+917044289770'
-              // })
-              //   .then((message) => {
-              //     console.log(`WhatsApp message sent with SID: ${message.sid}`);
-              //   })
-              //   .catch((error) => {
-              //     console.error(`Error sending WhatsApp message: ${error.message}`);
-              //   });
+              // let smsData = {
+              //   textId: "test",
+              //   toMobile: "91" + user.phone_no,
+              //   text: "Welcome to Bid For Sale, "+user.name+"! Explore a world of luxury with access to top brands at exceptional value. Buy and sell pre-owned authentic luxury items globally, all while contributing to environmental conservation. Enjoy your journey with us!-BFS RETAIL SERVICES PRIVATE LIMITED",
+              // };
+              // let returnData;
+              // returnData = await sendSms(smsData);
+              // const historyData = new ApiCallHistory({
+              //   userId: mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"),
+              //   called_for: "register",
+              //   api_link: process.env.SITE_URL,
+              //   api_param: smsData,
+              //   api_response: returnData,
+              //   send_status: 'send',
+              // });
+              // await historyData.save();
+  
+              // const loginHtmlPath = 'views/webpages/welcome.html';;
+              // const loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+  
+              // loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+  
+              // const mailData = {
+              //   from: "Bid For Sale! <" + smtpUser + ">",
+              //   to: user.email,
+              //   subject: "Order Placed - Bid For Sale!",
+              //   name: "Bid For Sale!",
+              //   text: "order placed",
+              //   html: loginHtmlContent
+              // };
+        
+              // transporter.sendMail(mailData, function (err, info) {
+              //   if (err) console.log("err", err);
+              //   else console.log("info", info);
+              // });
+        
               const userToken = {
                 userId: user._id,
                 email: user.email,
@@ -1018,9 +1038,6 @@ exports.getUserLogin = async function (req, res, next) {
             respdata: error,
           });
         } else if (match) {
-          // user.deviceid = deviceid;
-          // user.devicename = devicename;
-          // user.fcm_token = fcm_token;
           user.save(async (err) => {
             if (err) {
               res.status(400).json({
@@ -1043,20 +1060,11 @@ exports.getUserLogin = async function (req, res, next) {
                 if (err) console.log(err);
                 else console.log(info);
               });
-              // const msg = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
-              const whatsappMessage = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
-              const userPhoneNo = "+917044289770";
-              twilioClient.messages.create({
-                body: whatsappMessage,
-                // From: 'whatsapp:+12565734549',
-                // to: 'whatsapp:+918116730275'
-                from: 'whatsapp:+14155238886',
-                to: 'whatsapp:+917044289770'
-              })
-                .then((message) => {
-                })
-                .catch((error) => {
-                });
+              const message = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
+              const to_number = "91" + user.phone_no;
+              console.log(44444);
+              let response = await send_message({ type: 'text', message, to_number });
+              console.log(response);
               const userToken = {
                 userId: user._id,
                 email: user.email,
@@ -1083,7 +1091,6 @@ exports.getUserLogin = async function (req, res, next) {
                 name: user.name,
                 age: user.age,
                 image: user.image,
-                //usertoken:user.token,
                 phone_no: user.phone_no,
                 weight: user.weight,
                 height: user.height,
@@ -1146,7 +1153,7 @@ exports.myAccount = async function (req, res, next) {
         respdata1: address,
         isLoggedIn: isLoggedIn,
         websiteUrl: process.env.SITE_URL,
-      }, {async: true});
+      }, { async: true });
       res.send(html);
 
       // res.render("webpages/myaccount", {
@@ -1171,10 +1178,13 @@ exports.editProfile = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
+    console.log(userData);
+    const bankDetails = await Bankdetails.findOne({ user_id: userData.userId });
     res.render("webpages/edit-profile", {
       title: "Edit profile",
       message: "Welcome to the Edit Profile page!",
       respdata: req.session.user,
+      bankDetails: bankDetails,
       isLoggedIn: isLoggedIn,
       userData: userData
     });
@@ -1260,7 +1270,7 @@ exports.thankyoupage = async function (req, res, next) {
       message: "Welcome to the Edit Profile page!",
       respdata1: userData,
       isLoggedIn: isLoggedIn,
-      message:message
+      message: message
     });
   } catch (error) {
     res.status(500).json({
@@ -1477,7 +1487,7 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
         approval_status: userproduct.approval_status,
         added_dtime: userproduct.added_dtime,
         __v: userproduct.__v,
-        product_images: (typeof productImages != "undefined") ? productImages: "",
+        product_images: (typeof productImages != "undefined") ? productImages : "",
         status_name: productCondition ? productCondition.name : '',
       };
       formattedUserProducts.push(formattedUserProduct);
@@ -1525,12 +1535,12 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
     const currentPage = data.currentPage;
     const categoryName = await Category.find({ _id: id }).populate('name');
     const userProducts = await Userproduct.find({
-        category_id: id,
-        approval_status: 1,
-        flag: 0,
-      })
-        .select('brand_id size_id status'); 
-    if(userProducts.length > 0) {
+      category_id: id,
+      approval_status: 1,
+      flag: 0,
+    })
+      .select('brand_id size_id status');
+    if (userProducts.length > 0) {
       result = await Userproduct.aggregate([
         {
           $match: {
@@ -1557,7 +1567,7 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
       // genderIds = userProducts.map(product => product.gender_id).filter(Boolean);
       // genderList = await Gender.find({ _id: { $in: genderIds } });
     }
-    
+
     res.render("webpages/subcategoryproduct", {
       title: "Product Sub Categories",
       message: "Welcome to the Product Sub Categories!",
@@ -1646,6 +1656,21 @@ exports.userUpdate = async function (req, res, next) {
         respdata: {},
       });
     }
+    // const imgData = req.files;
+    const uploadedFile = req.files[0];
+    const imagePath = uploadedFile.path;
+    const bankDetails = new Bankdetails({
+      user_id: user._id,
+      accountnumber: req.body.accountnumber,
+      bankname: req.body.bankname,
+      ifsccode: req.body.ifsccode,
+      accounttype: req.body.accounttype,
+      upiid: req.body.upiid,
+      upiid_scaner: imagePath || '',
+      default_status: 1,
+      created_dtime: new Date().toISOString(),
+    });
+    const savedBankDetails = await bankDetails.save();
     req.session.user.name = updatedUser.name;
     req.session.user.email = updatedUser.email;
     req.session.user.phone_no = updatedUser.phone_no;
@@ -1770,6 +1795,121 @@ exports.userAddressAdd = async function (req, res, next) {
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
       error: error.message,
+    });
+  }
+};
+
+
+exports.updateuserAddressAdd = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    addbook_id = req.body.addressid;
+    const updatedAddress = await addressBook.findOneAndUpdate(
+      { _id: addbook_id },
+      { $set: { default_status: 1 } },
+      { new: true }
+    );
+    const addr_name = req.body.addrType;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        status: "0",
+        message: "Validation error!",
+        respdata: errors.array(),
+      });
+    }
+    const newAddress = new addressBook({
+      user_id: req.body.userId,
+      street_name: req.body.address2,
+      address1: req.body.address1,
+      landmark: req.body.landmark,
+      city_name: req.body.city_name,
+      city_code: req.body.city_code,
+      state_name: req.body.state_name,
+      state_code: req.body.state_code,
+      pin_code: req.body.pin_code,
+      address_name: addr_name,
+      flag: req.body.flag,
+      created_dtime: dateTime,
+    });
+    const savedAddress = await newAddress.save();
+    const user = await Users.findById(newAddress.user_id);
+    const randomSuffix = Math.floor(Math.random() * 1000);
+    const pickupLocation = savedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;
+    const PickupData = {
+      pickup_location: pickupLocation,
+      name: user.name,
+      email: user.email,
+      phone: user.phone_no,
+      address: savedAddress.street_name + ',' + savedAddress.address1,
+      address_2: savedAddress.landmark,
+      city: savedAddress.city_name,
+      state: savedAddress.state_name,
+      country: "India",
+      pin_code: savedAddress.pin_code
+    };
+    const shiprocketResponse = await generateSellerPickup(PickupData);
+    if (shiprocketResponse) {
+      savedAddress.shiprocket_address = pickupLocation;
+      savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
+      await savedAddress.save();
+      res.redirect('/my-account');
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the Edit Profile.",
+      error: error.message,
+    });
+  }
+};
+
+exports.getAddressdetails = async function (req, res, next) {
+  //console.log('req.body:', req.body);
+  try {
+
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    var userData = req.session.user;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        status: "0",
+        message: "Validation error!",
+        respdata: errors.array(),
+      });
+    }
+
+    addbook_id = req.params.id;
+
+    const address = await addressBook.findById(addbook_id);
+
+    if (!address) {
+      return res.status(404).json({
+        status: "0",
+        message: "Address not found!",
+        respdata: {},
+      });
+    }
+
+    res.render("webpages/update-address", {
+      title: "My Account",
+      message: "Address fetched successfully!",
+      respdata: req.session.user,
+      respdata1: userData,
+      address: address,
+      isLoggedIn: isLoggedIn,
+    });
+
+    // res.status(200).json({
+    //   status: "1",
+    //   message: "Address fetched successfully!",
+    //   respdata: address,
+    // });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "Error!",
+      respdata: error.message,
     });
   }
 };
@@ -1949,20 +2089,19 @@ exports.addNewPost = async function (req, res, next) {
       const imageDetails = [];
       req.files.forEach(async (file) => {
         const imageUrl = file.filename;
-         let extension = path.extname(imageUrl);
-            if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){
-              await CompressImage("./public/images/"+imageUrl,"./public/compress_images/");
-            } else
-            {
-              await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
-                if (err) {
-                    console.log("Error Found:", err);
-                }
-                else {
-                    console.log("File copied successfully!");
-                }
-              });
+        let extension = path.extname(imageUrl);
+        if (typeof extension != "undefined" && extension != "webp" && extension != "WEBP") {
+          await CompressImage("./public/images/" + imageUrl, "./public/compress_images/");
+        } else {
+          await fs.copyFile("./public/images/" + imageUrl, "./public/compress_images/" + imageUrl, (err) => {
+            if (err) {
+              console.log("Error Found:", err);
             }
+            else {
+              console.log("File copied successfully!");
+            }
+          });
+        }
         const productimageDetail = new Productimage({
           product_id: savedProductdata._id,
           user_id: req.session.user.userId,
@@ -2114,19 +2253,19 @@ exports.updatePostData = async function (req, res, next) {
     //   }
     // }
 
-     const previousImages = await Productimage.find({ product_id: existingProduct._id });
-     //for (const image of previousImages) {
-      //  const imagePath = path.resolve(__dirname,'../../../public/compress_images/'+image.image);
-      //  const imagePathreal = path.resolve(__dirname,'../../../public/images/'+image.image);
-      //     if (fs.existsSync(imagePath)) {
-      //         fs.unlinkSync(imagePath);
-      //     }
-      //     if (fs.existsSync(imagePathreal)) {
-      //         fs.unlinkSync(imagePathreal);
-      //     }
-      //   await Productimage.findByIdAndDelete(image._id);
-      // }
- 
+    const previousImages = await Productimage.find({ product_id: existingProduct._id });
+    //for (const image of previousImages) {
+    //  const imagePath = path.resolve(__dirname,'../../../public/compress_images/'+image.image);
+    //  const imagePathreal = path.resolve(__dirname,'../../../public/images/'+image.image);
+    //     if (fs.existsSync(imagePath)) {
+    //         fs.unlinkSync(imagePath);
+    //     }
+    //     if (fs.existsSync(imagePathreal)) {
+    //         fs.unlinkSync(imagePathreal);
+    //     }
+    //   await Productimage.findByIdAndDelete(image._id);
+    // }
+
     if (req.files && Object.keys(req.files).length > 0) {
       const requrl = url.format({
         protocol: req.protocol,
@@ -2137,20 +2276,19 @@ exports.updatePostData = async function (req, res, next) {
         for (const file of files) {
           const imageUrl = file.filename;
           let extension = path.extname(imageUrl);
-             if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){
-               await CompressImage("./public/images/"+imageUrl,"./public/compress_images/");
-             }
-             else
-             {
-               await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
-                 if (err) {
-                     console.log("Error Found:", err);
-                 }
-                 else {
-                     console.log("File copied successfully!");
-                 }
-               });
-             }
+          if (typeof extension != "undefined" && extension != "webp" && extension != "WEBP") {
+            await CompressImage("./public/images/" + imageUrl, "./public/compress_images/");
+          }
+          else {
+            await fs.copyFile("./public/images/" + imageUrl, "./public/compress_images/" + imageUrl, (err) => {
+              if (err) {
+                console.log("Error Found:", err);
+              }
+              else {
+                console.log("File copied successfully!");
+              }
+            });
+          }
           const productImageDetail = new Productimage({
             product_id: existingProduct._id,
             category_id: existingProduct.category_id,
@@ -2642,19 +2780,18 @@ exports.changeProfileImgWeb = async function (req, res, next) {
         // const imageUrl = requrl + "/public/images/" + file.filename;
         const imageUrl = file.filename;
         let extension = path.extname(imageUrl);
-           if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){
-             await CompressImage("./public/images/"+imageUrl,"./public/compress_images/");
-           } else
-           {
-             await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
-               if (err) {
-                   console.log("Error Found:", err);
-               }
-               else {
-                   console.log("File copied successfully!");
-               }
-             });
-           }
+        if (typeof extension != "undefined" && extension != "webp" && extension != "WEBP") {
+          await CompressImage("./public/images/" + imageUrl, "./public/compress_images/");
+        } else {
+          await fs.copyFile("./public/images/" + imageUrl, "./public/compress_images/" + imageUrl, (err) => {
+            if (err) {
+              console.log("Error Found:", err);
+            }
+            else {
+              console.log("File copied successfully!");
+            }
+          });
+        }
         const updData = {
           image: imageUrl,
         };
@@ -2720,7 +2857,7 @@ exports.checkoutWeb = async function (req, res, next) {
           cart_id: existingCart._id,
           quantity: cartItem.qty,
           product_id: cartItem.product_id._id,
-          product_name: cartItem.product_id. name,
+          product_name: cartItem.product_id.name,
           product_price: product.offer_price,
           product_est_price: product.price,
           seller_id: product.user_id,
@@ -3326,7 +3463,7 @@ exports.userPlacedOrder = async function (req, res) {
 exports.demoorder = async function (req, res) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-    let formData = req.body.data; // assuming formData is correctly populated
+    let formData = req.body.data;
     let user_id = formData.user_id;
     let seller_id = formData.seller_id;
     let cart_id = formData.cart_id;
@@ -3343,7 +3480,6 @@ exports.demoorder = async function (req, res) {
     let pay_now = formData.pay_now || null;
     let remaining_amount = formData.remaining_amount || null;
 
-    // Check if billing address exists
     const billingaddress = await addressBook.findOne({ user_id: seller_id });
     if (!billingaddress) {
       return res.status(404).json({ message: 'Seller address not found' });
@@ -3378,7 +3514,7 @@ exports.demoorder = async function (req, res) {
       });
     }
   } catch (error) {
-    console.error(error); // Log the error for debugging
+    console.error(error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
@@ -3536,52 +3672,55 @@ exports.sendotp = async function (req, res, next) {
       });
     else if (!req.body.otp) {
       let randNumber = Math.floor((Math.random() * 1000000) + 1);
-      //SEND SMS
-      await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
-        if (err) {
-          // return {
-          //   status:false,
-          //   data:err
-          // };
-        }
-        //let obj = JSON.parse(data);
-        //let randNumber = Math.floor((Math.random() * 1000000) + 1);
-        let smsData = {
-          textId: "test",
-          toMobile: "91"+user.phone_no,
-          text: "You have been tagged with an invoice " + randNumber + ". Please use OTP " + randNumber + " for approving the invoice. Do not share your OTP with anyone. RJSSLT",
-        };
-        let returnData = "";
-        // returnData = await sendSms(smsData);
-        const historyData = new ApiCallHistory({
-          userId: mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"),
-          called_for: "sms",
-          api_link: process.env.SITE_URL,
-          api_param: smsData,
-          api_response: returnData,
-          send_status: 'send',
-        });
-        await historyData.save();
-      });
-      //SEND SMS
-      
 
+      //SEND SMS
+      let smsData = {
+        textId: "test",
+        toMobile: "91" + user.phone_no,
+        text: "Hello! Your OTP for password reset at Bid For Sale is:"+randNumber+". Please use this code to reset your password securely. If you didn't request this, kindly ignore this message. Thank you!-BFS RETAIL SERVICES PRIVATE LIMITED",
+      };
+      let returnData;
+      returnData = await sendSms(smsData);
+      
+      const historyData = new ApiCallHistory({
+        userId: user._id,
+        called_for: "forget password",
+        api_link: process.env.SITE_URL,
+        api_param: smsData,
+        api_response: returnData,
+        send_status: 'send',
+      });
+      await historyData.save();
+
+      const loginHtmlPath = 'views/webpages/otp-validation.html';
+      let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+
+      loginHtmlContent = loginHtmlContent.replace('{{otp}}', randNumber);
+      loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
       const mailData = {
         from: "Bid For Sale! <" + smtpUser + ">",
-        to: "sneha.lnsel@gmail.com",
-        //to: user.email,
-        subject: "BFS - Bids For Sale - Forgot password OTP",
-        text: "Server Email!",
-        html:
-          "Hey " +
-          user.name +
-          ", <br> <p> Please use this OTP : <b>" +
-          randNumber +
-          "</b> to reset your password! </p>",
+        to: user.email,
+        subject: "Welcome to Bid For Sale!",
+        name: "Bid For Sale!",
+        text: "welocome",
+        html: loginHtmlContent
       };
+      // const mailData = {
+      //   from: "Bid For Sale! <" + smtpUser + ">",
+      //   to: "sneha.lnsel@gmail.com",
+      //   //to: user.email,
+      //   subject: "BFS - Bids For Sale - Forgot password OTP",
+      //   text: "Server Email!",
+      //   html:
+      //     "Hey " +
+      //     user.name +
+      //     ", <br> <p> Please use this OTP : <b>" +
+      //     randNumber +
+      //     "</b> to reset your password! </p>",
+      // };
 
       transporter.sendMail(mailData, function (err, info) {
-        if (err) console.log("err",err);
+        if (err) console.log("err", err);
         else console.log("info", info);
       });
 
@@ -3718,7 +3857,43 @@ exports.changePassword = async function (req, res, next) {
                         throw err;
                       } else {
                         Users.findOne({ _id: req.body.user_id }).then(
-                          (user) => {
+                          async (user) => {
+
+                            let smsData = {
+                              textId: "test",
+                              toMobile: "91" +user.phone_no,
+                              text: "Password changed successfully! Your account at Bid For Sale is now updated. If you didn't make this change, please contact support immediately. Thank you!-BFS RETAIL SERVICES PRIVATE LIMITED",
+                            };
+                            let returnData;
+                            returnData = await sendSms(smsData);
+                            const historyData = new ApiCallHistory({
+                              userId: user._id,
+                              called_for: "reset password",
+                              api_link: process.env.SITE_URL,
+                              api_param: smsData,
+                              api_response: returnData,
+                              send_status: 'send',
+                            });
+                            await historyData.save();
+                    
+                            const loginHtmlPath = 'views/webpages/reset-password.html';
+                            let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+                            loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+                
+                            const mailData = {
+                              from: "Bid For Sale! <" + smtpUser + ">",
+                              to: user.email,
+                              subject: "Reset password successfully!",
+                              name: "Bid For Sale!",
+                              text: "reset password successfully!",
+                              html: loginHtmlContent
+                            };
+                            
+                            transporter.sendMail(mailData, function (err, info) {
+                              if (err) console.log("err", err);
+                              else console.log("info", info);
+                            });
+                    
                             res.status(200).json({
                               status: "1",
                               message: "Successfully updated!",
@@ -3775,11 +3950,11 @@ exports.reasonlistdata = async function (req, res, next) {
 
 exports.genderwomenlistdata = async function (req, res, next) {
   try {
-    const genderId = "65c5dd7c949c7a8b6173f1a9"; 
+    const genderId = "65c5dd7c949c7a8b6173f1a9";
     const userProducts = await Userproduct.find({
       approval_status: 1,
       flag: 0,
-      gender_id: genderId, 
+      gender_id: genderId,
     }).distinct('category_id');
 
     const categoryList = await Category.find({ _id: { $in: userProducts } });
@@ -3790,7 +3965,7 @@ exports.genderwomenlistdata = async function (req, res, next) {
       categories: categoryList,
     });
   } catch (error) {
-    console.error(error); 
+    console.error(error);
     res.status(500).json({
       status: '0',
       message: 'An error occurred while fetching categories by gender_id.',
@@ -3801,11 +3976,11 @@ exports.genderwomenlistdata = async function (req, res, next) {
 
 exports.gendermenlistdata = async function (req, res, next) {
   try {
-    const genderId = "65c5df544f66e281a6393737"; 
+    const genderId = "65c5df544f66e281a6393737";
     const userProducts = await Userproduct.find({
       approval_status: 1,
       flag: 0,
-      gender_id: genderId, 
+      gender_id: genderId,
     }).distinct('category_id');
 
     const categoryList = await Category.find({ _id: { $in: userProducts } });
@@ -3816,7 +3991,7 @@ exports.gendermenlistdata = async function (req, res, next) {
       categories: categoryList,
     });
   } catch (error) {
-    console.error(error); 
+    console.error(error);
     res.status(500).json({
       status: '0',
       message: 'An error occurred while fetching categories by gender_id.',
@@ -3828,11 +4003,11 @@ exports.gendermenlistdata = async function (req, res, next) {
 
 exports.genderkidlistdata = async function (req, res, next) {
   try {
-    const genderId = "65c5df684f66e281a639373a"; 
+    const genderId = "65c5df684f66e281a639373a";
     const userProducts = await Userproduct.find({
       approval_status: 1,
       flag: 0,
-      gender_id: genderId, 
+      gender_id: genderId,
     }).distinct('category_id');
 
     const categoryList = await Category.find({ _id: { $in: userProducts } });
@@ -3843,7 +4018,7 @@ exports.genderkidlistdata = async function (req, res, next) {
       categories: categoryList,
     });
   } catch (error) {
-    console.error(error); 
+    console.error(error);
     res.status(500).json({
       status: '0',
       message: 'An error occurred while fetching categories by gender_id.',
@@ -3854,11 +4029,11 @@ exports.genderkidlistdata = async function (req, res, next) {
 
 exports.otherlistdata = async function (req, res, next) {
   try {
-    const genderId = "65c5e0db8e59ce8c9788301c"; 
+    const genderId = "65c5e0db8e59ce8c9788301c";
     const userProducts = await Userproduct.find({
       approval_status: 1,
       flag: 0,
-      gender_id: genderId, 
+      gender_id: genderId,
     }).distinct('category_id');
 
     const categoryList = await Category.find({ _id: { $in: userProducts } });
@@ -3869,7 +4044,7 @@ exports.otherlistdata = async function (req, res, next) {
       categories: categoryList,
     });
   } catch (error) {
-    console.error(error); 
+    console.error(error);
     res.status(500).json({
       status: '0',
       message: 'An error occurred while fetching categories by gender_id.',
@@ -3877,3 +4052,40 @@ exports.otherlistdata = async function (req, res, next) {
     });
   }
 };
+
+// exports.whatsappintegration = async function (req, res, next) {
+//   try {
+//     const to_number = '917044289770'; 
+//     const message = 'Hi, I am interested in your product.';
+// 	  let response = await send_message({ type: 'text', message, to_number });
+
+//     res.json({
+//       status: '1',
+//       message: 'Message sent successfully.',
+//       respdata: response,
+//     });
+//   } catch (error) {
+//     console.error(error); 
+//     res.status(500).json({
+//       status: '0',
+//       message: 'An error occurred while fetching categories by gender_id.',
+//       error: error.message,
+//     });
+//   }
+// };
+
+async function send_message(body) {
+  console.log(`Request Boduuy:${JSON.stringify(body)}`);
+  let url = process.env.WP_SMS_API_URL + "/" + process.env.WP_SMS_PRODUCT_ID + "/" + process.env.WP_SMS_PHONE_ID + "/" + "sendMessage";
+  let response = await rp(url, {
+    method: 'post',
+    json: true,
+    body,
+    headers: {
+      'Content-Type': 'application/json',
+      'x-maytapi-key': process.env.WP_SMS_API_TOKEN,
+    },
+  });
+  console.log(`Response: ${JSON.stringify(response)}`);
+  return response;
+}

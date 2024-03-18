@@ -210,6 +210,8 @@ exports.bidExistReccord = async (req, res, next) => {
           price: (reqBody.bidAmount != "") ? reqBody.bidAmount : 0,
           status: 0,
           userId: queryData.userId,
+          sellerMessage:"",
+          buyerMessage:"",
         };
         let updateData = {
           buyerId:queryData.userId,
@@ -220,6 +222,8 @@ exports.bidExistReccord = async (req, res, next) => {
           status:1,
           currentOffer: currentOffer,
           sellerId:(productDetails.user_id.toString() != "") ? productDetails.user_id.toString() : "",
+          acceptedByBuyer: false,
+          acceptedBySeller:false,
         }; 
         await updateBidData(updateData,bidId);
         await insertBidOfferData(currentOffer,currentOffer.id);

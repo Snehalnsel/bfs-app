@@ -28,7 +28,8 @@ const url = require("url");
 const nodemailer = require("nodemailer");
 // const smtpUser = "snigdho.lnsel@gmail.com";onaonfajcxjjwoow
 // const smtpUser = "sneha.lnsel@gmail.com";
-const smtpUser = "hello@bidforsale.com";
+// const smtpUser = "hello@bidforsale.com";
+const smtpUser = "welcome@bidforsale.com";
 
 const accountSid = 'ACa1b71e8226f3a243196beeee233311a9';
 const authToken = 'ea9a24bf2a9ca43a95b991c9c471ba93';
@@ -50,14 +51,13 @@ const twilioClient = new twilio(accountSid, authToken);
 
 const transporter = nodemailer.createTransport({
   port: 465,
-  host: "bidforsale.com",
+  host: "mail.bidforsale.com",
   auth: {
     user: smtpUser,
-    pass: "India_2023",
+    pass: "A6K9JAQD%m!s",
   },
   secure: true,
 });
-
 
 
 function generateToken(user) {
@@ -149,7 +149,45 @@ exports.signUp = async function (req, res, next) {
 
           newUser
           .save()
-          .then((user) => {
+          .then(async (user) => {
+
+            let smsData = {
+              textId: "test",
+              toMobile: "91" + user.phone_no,
+              text: "Welcome to Bid For Sale, "+user.name+"! Explore a world of luxury with access to top brands at exceptional value. Buy and sell pre-owned authentic luxury items globally, all while contributing to environmental conservation. Enjoy your journey with us!-BFS RETAIL SERVICES PRIVATE LIMITED",
+            };
+            let returnData;
+            returnData = await sendSms(smsData);
+            const historyData = new ApiCallHistory({
+              userId: user._id,
+              called_for: "register",
+              api_link: process.env.SITE_URL,
+              api_param: smsData,
+              api_response: returnData,
+              send_status: 'send',
+            });
+            await historyData.save();
+
+            const loginHtmlPath = 'views/webpages/welcome.html';;
+            const loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+
+            loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+
+            const mailData = {
+              from: "Bid For Sale! <" + smtpUser + ">",
+              to: user.email,
+              subject: "Order Placed - Bid For Sale!",
+              name: "Bid For Sale!",
+              text: "order placed",
+              html: loginHtmlContent
+            };
+      
+            transporter.sendMail(mailData, function (err, info) {
+              if (err) console.log("err", err);
+              else console.log("info", info);
+            });
+      
+
             Iptrnsaction.create({
               user_id: user._id,
               Purpose: "Registration",
@@ -382,54 +420,6 @@ exports.getLogin = async function (req, res, next) {
                 respdata: err,
               });
             } else {
-              // const mailData = {
-              //   from: smtpUser,
-              //   to: user.email,
-              //   subject: "BFS - Bid For Sale  - Welcome Email",
-              //   text: "Server Email!",
-              //   html:
-              //     "Hey " +
-              //     user.name +
-              //     ", <br> <p>Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items </p>",
-              // };
-
-              const loginHtmlPath = 'views/webpages/mailbody.html';  
-              const loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
-
-              const mailData = {
-                from: "Bid For Sale! <"+smtpUser+">",
-                to: user.email,
-                subject: "Welcome to Bid For Sale!",
-                name:"Bid For Sale!",
-                text:"welocome",
-                html:loginHtmlContent
-              };
-
-
-              transporter.sendMail(mailData, function (err, info) {
-                if (err) console.log(err);
-                else console.log(info);
-              });
-
-             // const msg = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
-
-              const whatsappMessage = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
-              const userPhoneNo = "+917044289770";
-
-              twilioClient.messages.create({
-                body: whatsappMessage,
-                // From: 'whatsapp:+12565734549',
-                // to: 'whatsapp:+918116730275'
-                from: 'whatsapp:+14155238886',
-                to: 'whatsapp:+917044289770'
-              })
-              .then((message) => {
-                console.log(`WhatsApp message sent with SID: ${message.sid}`);
-              })
-              .catch((error) => {
-                console.error(`Error sending WhatsApp message: ${error.message}`);
-              });
-
               const userToken = {
                 userId: user._id,
                 email: user.email,
@@ -836,7 +826,42 @@ exports.resetPassword = async function (req, res, next) {
                   if (err) {
                     throw err;
                   } else {
-                    Users.findOne({ _id: req.body.user_id }).then((user) => {
+                    Users.findOne({ _id: req.body.user_id }).then(async (user) => {
+
+                      let smsData = {
+                        textId: "test",
+                        toMobile: "91" + user.phone_no,
+                        text: "Password changed successfully! Your account at Bid For Sale is now updated. If you didn't make this change, please contact support immediately. Thank you!-BFS RETAIL SERVICES PRIVATE LIMITED",
+                      };
+                      let returnData;
+                      returnData = await sendSms(smsData);
+                      const historyData = new ApiCallHistory({
+                        userId: user._id,
+                        called_for: "reset password",
+                        api_link: process.env.SITE_URL,
+                        api_param: smsData,
+                        api_response: returnData,
+                        send_status: 'send',
+                      });
+                      await historyData.save();
+              
+                      const loginHtmlPath = 'views/webpages/reset-password.html';
+                      let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+                      loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+          
+                      const mailData = {
+                        from: "Bid For Sale! <" + smtpUser + ">",
+                        to: user.email,
+                        subject: "Reset Passsword Successfully!",
+                        name: "Bid For Sale!",
+                        text: "reset password successfully!",
+                        html: loginHtmlContent
+                      };
+                      
+                      transporter.sendMail(mailData, function (err, info) {
+                        if (err) console.log("err", err);
+                        else console.log("info", info);
+                      });
                       res.status(200).json({
                         status: "1",
                         message: "Successfully updated!",

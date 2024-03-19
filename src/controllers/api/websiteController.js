@@ -3441,6 +3441,7 @@ exports.demoorder = async function (req, res) {
     let total_price = formData.total_amt;
     let payment_method = formData.payment_method;
     let gst = formData.gst;
+    let taxable_value = formData.taxable_value;
     let order_status = '0';
     let delivery_charges = '0';
     let discount = '0';
@@ -3475,6 +3476,8 @@ exports.demoorder = async function (req, res) {
       booking_amount,
       packing_handling_charge,
       status: 1,
+      gst,
+      taxable_value,
       added_dtime: new Date().toISOString(),
     });
 

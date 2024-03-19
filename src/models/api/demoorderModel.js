@@ -52,6 +52,14 @@ const model = mongoose.Schema({
     type: Number,
     default: 0,
   },
+  gst: {
+    type: Number,
+    required: true,
+  },
+  taxable_value: {
+    type: Number,
+    required: true,
+  },
   payment_method: {
     type: Number,
     enum: [0, 1],

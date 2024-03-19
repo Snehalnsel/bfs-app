@@ -284,7 +284,7 @@
                      var packingHandlingChargeValue = $('#packingHandlingCharge').text().trim();
                      console.log(packingHandlingChargeValue);
                      var taxvalue = parseFloat(packingHandlingChargeValue) + parseFloat(cashHandlecharges);
-                     console.log(taxvalue);
+                    
 
                      $('#taxvalue').html('<i class="fa fa-inr" aria-hidden="true"></i>' + taxvalue.toFixed(2));
                      var productPrice = parseFloat('<%= product_price %>');
@@ -368,6 +368,7 @@
                   formData.remaining_amount = $('#remaining-amount-row th').text().replace(/[^\d.-]/g, '').trim();
                   formData.booking_amount = parseFloat($('#advance-amount').text().replace(/[^\d.]/g, ''));
                }
+               formData.taxable_value = parseFloat($('#taxvalue').text().replace(/[^0-9.]/g, ''));
                formData.packing_handling_charge = parseFloat($('#packingHandlingCharge').text().replace(/[^0-9.]/g, ''));
 
                let totalAmtText = $('#total-cod-amount-row th').text();

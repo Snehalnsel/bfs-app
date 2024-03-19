@@ -73,6 +73,14 @@ const model = mongoose.Schema({
     required: true,
   },
   gst: {
+    type: Number,
+    required: true,
+  },
+  taxable_value: {
+    type: Number,
+    required: true,
+  },
+  taxable_value: {
     type: String,
     required: true,
   },

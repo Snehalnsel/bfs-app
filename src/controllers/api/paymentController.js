@@ -175,9 +175,7 @@ exports.getStatus = async function (req, res, next) {
         let delivery_charges = '0';
         let discount = '0';
         let pickup_status = '0';
-        let delivery_status = '0';
-        let gst ='0';
-          
+        let delivery_status = '0';          
         
         const lastOrderIndex = await getLastOrderIndex();
         const nextIncrementingPart = lastOrderIndex + 1;
@@ -197,7 +195,8 @@ exports.getStatus = async function (req, res, next) {
           packing_handling_charge : temporder.packing_handling_charge || 0, 
           payment_method: temporder.payment_method,
           order_status: order_status,
-          gst: gst || '',
+          gst: temporder.gst || '',
+          taxable_value : temporder.taxable_value || '',
           delivery_charges: delivery_charges,
           discount: discount,
           pickup_status: pickup_status,

@@ -26,6 +26,7 @@ const Productsize = require("../../models/api/catsizeModel");
 const Userproduct = require("../../models/api/userproductModel");
 const Productimage = require("../../models/api/productimageModel");
 const Productcondition = require("../../models/api/productconditionModel");
+const Gender = require("../../models/api/genderModel");
 const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 const multer = require("multer");
 const upload = multer({ dest: 'public/images/' }); 
@@ -108,6 +109,28 @@ exports.getBrandData = async function (req, res, next) {
   }
 };
 
+
+exports.getGenderdData = async function (req, res, next) {
+  try {
+    genderList = await Gender.find();
+
+    if (!genderList || genderList.length === 0) {
+      return res.status(404).json({
+        status: "0",
+        message: "Brands not found",
+        respdata: {},
+      });
+    }
+
+    res.status(200).json({ status: "1", genderList: genderList });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "Internal server error",
+      respdata: error,
+    });
+  }
+};
 
 // exports.addData = async function (req, res, next) {
 //   const errors = validationResult(req);

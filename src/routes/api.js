@@ -633,7 +633,6 @@ router.post(
 );
 
 const checkLogin = (req, res, next) => {
-    
   // Check if the user is authenticated/logged in
   if (req.isAuthenticated()) {
     // User is authenticated, proceed to the next middleware
@@ -687,6 +686,12 @@ router.post(
   "/brandlist",[],
   UserproductController.getBrandData
 );
+
+router.post(
+  "/genderlist",[],
+  UserproductController.getGenderdData
+);
+
 
 router.post(
   "/myproductlist",

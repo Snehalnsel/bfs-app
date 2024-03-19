@@ -3450,6 +3450,17 @@ exports.demoorder = async function (req, res) {
     
     let gst = product.offer_price * 0.28;
     let taxable_value = formData.taxable_value;
+
+    if (payment_method == 0)
+    {
+      booking_amount = pay_now + packing_handling_charge + taxable_value+ gst;
+      total_price = booking_amount + remaining_amount;
+    }
+    else
+    {
+      total_price = product.offer_price + gst + taxable_value ;
+    }
+
     let order_status = '0';
     let delivery_charges = '0';
     let discount = '0';

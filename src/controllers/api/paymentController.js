@@ -53,10 +53,12 @@ const APP_BE_URL = "https://localhost:3000";
 exports.getPaymentData = async function (req, res, next) {
   try {
 
+
     const tempOrderId = req.query.temp;
     console.log("demo order id before payment",tempOrderId);
     const temporder = await Demoorder.findById(tempOrderId);
-    const amount = temporder.total_price;
+    let amount = temporder.booking_amount !== 0 ? temporder.booking_amount : temporder.total_price;
+
     let userId = temporder.user_id;
     let merchantTransactionId = uniqid();
     let normalPayLoad = {
@@ -167,12 +169,8 @@ exports.getStatus = async function (req, res, next) {
 
         // Continue with creating the new Order
         const now = new Date();
-        const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0'); // Adding 1 because months are zero-based
+        const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0'); 
         const currentYear = now.getFullYear().toString();
-        const currentHour = now.getHours().toString().padStart(2, '0');
-        const currentMinute = now.getMinutes().toString().padStart(2, '0');
-        const currentSecond = now.getSeconds().toString().padStart(2, '0');
-        const currentMillisecond = now.getMilliseconds().toString().padStart(3, '0');
         let order_status = '0';
         let delivery_charges = '0';
         let discount = '0';
@@ -180,15 +178,14 @@ exports.getStatus = async function (req, res, next) {
         let delivery_status = '0';
         let gst ='0';
           
-        const lastOrderNumber = getLastOrderNumber();
-        const lastIncrementingPart = lastOrderNumber ? parseInt(lastOrderNumber.split('-')[1]) : 0;
-        const nextIncrementingPart = lastIncrementingPart + 1;
-        const paddedNextIncrementingPart = nextIncrementingPart.toString().padStart(4, '0');
-        const orderCode = `BFSORD${currentMonth}${currentYear}-${paddedNextIncrementingPart}`;
+        
+        const lastOrderIndex = await getLastOrderIndex();
+        const nextIncrementingPart = lastOrderIndex + 1;
+        const orderCode = `BFSORD${currentMonth}${currentYear}-${nextIncrementingPart}`;
         console.log(orderCode);
-        //const orderCode = `BFSORD${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
         const order = new Order({
           order_code: orderCode,
+          order_index: nextIncrementingPart,
           user_id: temporder.user_id,
           cart_id: temporder.cart_id,
           seller_id: temporder.seller_id,
@@ -196,6 +193,8 @@ exports.getStatus = async function (req, res, next) {
           billing_address_id: temporder.billing_address_id,
           shipping_address_id: temporder.shipping_address_id,
           total_price: temporder.total_price,
+          booking_amount : temporder.booking_amount || 0,
+          packing_handling_charge : temporder.packing_handling_charge || 0, 
           payment_method: temporder.payment_method,
           order_status: order_status,
           gst: gst || '',
@@ -244,6 +243,15 @@ async function getLastOrderNumber() {
 }
 
 
+async function getLastOrderIndex() {
+  try {
+    const result = await Order.findOne({}, {}, { sort: { order_index: -1 } });
+    return result ? result.order_index : '000';
+  } catch (error) {
+    console.error('Error fetching last order index:', error);
+    return 0; // Return 0 in case of an error
+  }
+}
 
 // exports.getData = async function (req, res, next) {
 //   try {

@@ -3448,7 +3448,10 @@ exports.demoorder = async function (req, res) {
     let delivery_status = '0';
     let shipping_address_id = formData.addressBookId;
     let pay_now = formData.pay_now || null;
+    let booking_amount = formData.booking_amount;
     let remaining_amount = formData.remaining_amount || null;
+    let packing_handling_charge = formData.packing_handling_charge|| null;
+
 
     const billingaddress = await addressBook.findOne({ user_id: seller_id });
     if (!billingaddress) {
@@ -3469,6 +3472,8 @@ exports.demoorder = async function (req, res) {
       order_status,
       pay_now,
       remaining_amount,
+      booking_amount,
+      packing_handling_charge,
       status: 1,
       added_dtime: new Date().toISOString(),
     });
@@ -3651,6 +3656,7 @@ exports.sendotp = async function (req, res, next) {
       };
       let returnData;
       returnData = await sendSms(smsData);
+      console.log("returnData",returnData);
       
       const historyData = new ApiCallHistory({
         userId: user._id,
@@ -3670,9 +3676,9 @@ exports.sendotp = async function (req, res, next) {
       const mailData = {
         from: "Bid For Sale! <" + smtpUser + ">",
         to: user.email,
-        subject: "Welcome to Bid For Sale!",
+        subject: "OTP For Forgot Password- Bid For Sale!",
         name: "Bid For Sale!",
-        text: "welocome",
+        text: "OTP",
         html: loginHtmlContent
       };
       // const mailData = {

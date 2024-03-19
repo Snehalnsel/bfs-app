@@ -366,7 +366,10 @@
                if (selectedPaymentMethod == 0) {
                   formData.pay_now = $('#pay-now-row th').text().replace(/[^\d.-]/g, '').trim();
                   formData.remaining_amount = $('#remaining-amount-row th').text().replace(/[^\d.-]/g, '').trim();
+                  formData.booking_amount = parseFloat($('#advance-amount').text().replace(/[^\d.]/g, ''));
                }
+               formData.packing_handling_charge = parseFloat($('#packingHandlingCharge').text().replace(/[^0-9.]/g, ''));
+
                let totalAmtText = $('#total-cod-amount-row th').text();
                let totalAmtValue = parseFloat(totalAmtText.replace('₹ ', ''));
                formData.total_amt = totalAmtValue;

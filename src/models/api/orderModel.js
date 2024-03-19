@@ -5,6 +5,10 @@ const model = mongoose.Schema({
     type: String,
     required: true,
   },
+  order_index:{
+    type: Number,
+    required: true,
+  },
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'users', 
@@ -45,6 +49,14 @@ const model = mongoose.Schema({
     default: 0,
   },
   remaining_amount: {
+    type: Number,
+    default: 0,
+  },
+  booking_amount: {
+    type: Number,
+    default: 0,
+  },
+  packing_handling_charge: {
     type: Number,
     default: 0,
   },

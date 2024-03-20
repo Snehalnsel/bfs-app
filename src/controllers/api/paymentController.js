@@ -176,6 +176,7 @@ exports.getStatus = async function (req, res, next) {
           checkstatus_response: response.data,
           //checkstatus_status: response.data.code === "PAYMENT_SUCCESS" ? "success" : "failure",
         };
+        console.log(response.data.code);
         if(typeof response.data.code != "undefined" && response.data.code == "PAYMENT_SUCCESS") {
           updateData.checkstatus_status = "success";
         } else {

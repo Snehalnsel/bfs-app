@@ -318,7 +318,7 @@ exports.getOrderList = function (req, res, next) {
           });
         })
         .catch((err) => {
-          res.status(500).json({ error: 'Error fetching product images' });
+          //res.status(500).json({ error: 'Error fetching product images' });
         });
     }
   });
@@ -1257,12 +1257,15 @@ exports.getAWBnoById = async function (req, res, next) {
 
     }
   } catch (error) {
-    res.status(500).json({
-      status: "0",
-      message: "Error!",
-      respdata: error,
-      isAdminLoggedIn: isAdminLoggedIn
+    return res.render("pages/error-msg", {
+      errorMsg:error
     });
+    // res.status(500).json({
+    //   status: "0",
+    //   message: "Error!",
+    //   respdata: error,
+    //   isAdminLoggedIn: isAdminLoggedIn
+    // });
   }
 };
 
@@ -1590,6 +1593,11 @@ exports.getCourierServiceability = async function (req, res, next) {
         //const weight = 0.05;
 
         const shiprocketResponse = await generateCouriresServiceability(pickup_postcode, delivery_postcode, cod, weight);
+        if(shiprocketResponse.status != 200) {
+          return res.render("pages/error-msg", {
+            errorMsg:shiprocketResponse.message
+          });
+        }
         if (shiprocketResponse.error) {
           return res.render("pages/order/serviceavabilitylist", {
             status: "0",
@@ -1680,12 +1688,31 @@ exports.getCourierServiceability = async function (req, res, next) {
       }
     }
   } catch (error) {
-    res.status(500).json({
+    //Added By Palash 20-03-2024
+    return res.render("pages/error-msg", {
+      errorMsg:error
+    });
+    /*res.render("pages/order/serviceavabilitylist", {
+      status: "0",
+      message: "Order canceled successfully!",
+      siteName: req.app.locals.siteName,
+      pageName: pageName,
+      pageTitle: pageTitle,
+      userFullName: req.session.admin.name,
+      userImage: req.session.admin.image_url,
+      userEmail: req.session.admin.email,
+      year: moment().format("YYYY"),
+      requrl: req.app.locals.requrl,
+      message: "",
+      respdata: [],
+      isAdminLoggedIn: isAdminLoggedIn
+    });*/
+    /*res.status(500).json({
       status: "0",
       message: "Error!",
       respdata: error,
       isAdminLoggedIn: isAdminLoggedIn
-    });
+    });*/
   }
 };
 

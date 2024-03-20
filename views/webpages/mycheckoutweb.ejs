@@ -221,7 +221,7 @@
                            <td colspan="2">
                               <label class="checkbox-label">
                                  <input type="checkbox" class="checkbox-input" value="">
-                                 <input typee="hidden" id="packingHandlingCharge-hidden">
+                                 <input type="hidden" id="packingHandlingCharge-hidden">
                                  <span>I agree with all <a href="#">Terms & condition</a></span>
                               </label>
                            </td>
@@ -243,21 +243,15 @@
          <script>
             function checkShippingAmount() {
                var productid = $('#productid').val();
-               console.log(productid);
-
                $.ajax({
                   url: "/getshipmentvalue",
                   type: "POST",
                   data: { productid: productid },
                   success: function (data) {
-                     console.log("Response from server:", data);
-                     console.log("Respdata:", data.respdata);
-
                      var newCharge = data.respdata;
                      $('#packingHandlingCharge').html('<i class="fa fa-inr" aria-hidden="true"></i> ' + newCharge);
                      $('#packingHandlingCharge-hidden').val(newCharge);
                   },
-
                   error: function (error) {
                      console.error("Error:", error);
                   }
@@ -278,12 +272,10 @@
                      $('#pay-now-row th').text('₹ ' + payNowAmount.toFixed(2));
                      var cashHandlecharges = productPrice * 0.05;
                      $('#cash-handle-charge th').text('₹ ' + cashHandlecharges.toFixed(2));
-                     console.log(payNowAmount);
                      var remainingAmount = productPrice - payNowAmount;
                      $('#remaining-amount-row th').text('₹ ' + remainingAmount.toFixed(2));
                      var packingHandlingChargeValue = $('#packingHandlingCharge').text().trim();
                      //var packingHandlingChargeValue = $('#packingHandlingCharge-hidden').val();
-                     console.log(packingHandlingChargeValue);
                      var taxvalue = parseFloat(packingHandlingChargeValue) + parseFloat(cashHandlecharges);
                     
 
@@ -326,7 +318,6 @@
             });
 
             function displayErrorMessage(message) {
-               console.log("kana" + message);
                $("#error-message").html(message).addClass("error-msg");
             }
 
@@ -387,15 +378,15 @@
                   url: '/demoplacedorder',
                   data: { data: formData },
                   dataType: "json",
-                  // success: function (response) {
-                  //    if (response.is_orderPlaced == 1) {
-                  //       const tempOrderId = response.order._id;
-                  //       window.location.href = '/pay?temp=' + tempOrderId;
-                  //    }
-                  // },
-                  // error: function (xhr, status, error) {
-                  //    $(".check-out").css("pointer-events", "auto");
-                  // }
+                  success: function (response) {
+                     if (response.is_orderPlaced == 1) {
+                        const tempOrderId = response.order._id;
+                        window.location.href = '/pay?temp=' + tempOrderId;
+                     }
+                  },
+                  error: function (xhr, status, error) {
+                     $(".check-out").css("pointer-events", "auto");
+                  }
                });
 
             });

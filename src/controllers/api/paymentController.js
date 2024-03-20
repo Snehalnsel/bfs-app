@@ -34,6 +34,7 @@ const Banner = require("../../models/api/bannerModel");
 const Demoorder = require("../../models/api/demoorderModel");
 const Order = require("../../models/api/orderModel");
 const Cart = require('../../models/api/cartModel');
+const CartDetail = require('../../models/api/cartdetailsModel');
 const Notifications = require("../../models/api/notificationModel");
 const sendSms = require("../../models/thirdPartyApi/sendSms");
 const sendWhatsapp = require("../../models/thirdPartyApi/sendWhatsapp");
@@ -52,12 +53,21 @@ const APP_BE_URL = process.env.SITE_URL;
 
 exports.getPaymentData = async function (req, res, next) {
   try {
-
-
     const tempOrderId = req.query.temp;
     console.log("demo order id before payment",tempOrderId);
     const temporder = await Demoorder.findById(tempOrderId);
-    let amount = temporder.booking_amount !== 0 ? temporder.booking_amount : temporder.total_price;
+   
+    let amount;
+    if(temporder.booking_amount == 0) {
+      amount= parseInt(temporder.total_price);
+    }
+    else
+    {
+      amount = parseInt(temporder.booking_amount);
+    }
+
+    console.log("amount",amount);
+   // amount = temporder.booking_amount !== 0 ? temporder.booking_amount : temporder.total_price;
 
     let userId = temporder.user_id;
     let merchantTransactionId = uniqid();
@@ -74,6 +84,7 @@ exports.getPaymentData = async function (req, res, next) {
       },
     };
 
+    console.log("normalPayLoad",normalPayLoad);
     let bufferObj = Buffer.from(JSON.stringify(normalPayLoad), "utf8");
     let base64EncodedPayload = bufferObj.toString("base64");
     let string = base64EncodedPayload + "/pg/v1/pay" + SALT_KEY;
@@ -218,6 +229,29 @@ exports.getStatus = async function (req, res, next) {
           });
 
           const savedOrder = await order.save();
+
+          if(savedOrder)
+          {
+            const updatedProduct = await Userproduct.findOneAndUpdate(
+              { _id: temporder.product_id }, 
+              { $set: { flag: 1 } }, 
+              { new: true }
+            );
+            if(updatedProduct)
+            {
+              const cleanedCartId =  mongoose.Types.ObjectId(temporder.cart_id); 
+              const cartDetail = await CartDetail.findOne({ cart_id: cleanedCartId });
+              console.log(cartDetail);
+              if (cartDetail) {
+                await cartDetail.remove();
+              }
+              const cartDetailsCount = await CartDetail.countDocuments({ cart_id: savedOrder.cart_id });
+              const existingCart = await Cart.findById(cart_id);
+              if (cartDetailsCount === 0) {
+                await existingCart.remove();
+              }
+            } 
+          }
           //console.log('Order saved successfully:', savedOrder);
           res.redirect('/message?message=success');
         } else {

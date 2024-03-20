@@ -1659,27 +1659,21 @@ exports.returnOrder = async function (req, res) {
       const product_id = req.body.productid;
 
       const productdeatils = await Userproduct.findById(product_id);
-      console.log("product ID",product_id);
-      console.log("product details ",productdeatils);
       const weight = productdeatils.weight;
       // const details = await Users.findById(productdeatils.user_id);
       const billingaddress = await AddressBook.findOne({ user_id: productdeatils.user_id });
-    
-      console.log("billingaddress",billingaddress);
       const pickup_postcode = billingaddress.pin_code;
-      
       const cod = "1";
-
-      console.log("pickup_postcode",pickup_postcode);
-      console.log("delivery_postcode ",delivery_postcode);
-      console.log("weight",weight);
-      console.log("cod ",cod);
+      // console.log("pickup_postcode",pickup_postcode);
+      // console.log("delivery_postcode ",delivery_postcode);
+      // console.log("weight",weight);
+      // console.log("cod ",cod);
 
 
       const shiprocketResponse = await generateCouriresServiceability(pickup_postcode, delivery_postcode, cod, weight);
 
-      console.log(shiprocketResponse);
-      console.log("couries list",shiprocketResponse.data.available_courier_companies);
+      //console.log(shiprocketResponse);
+      //console.log("couries list",shiprocketResponse.data.available_courier_companies);
       const courierList = shiprocketResponse.data.available_courier_companies;
       const minFreightCourier = courierList.reduce((minCourier, currentCourier) => {
         const minFreight = minCourier ? minCourier.freight_charge : Infinity;

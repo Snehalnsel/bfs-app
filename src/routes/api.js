@@ -681,46 +681,13 @@ router.post(
   UserproductController.getSizeData
 );
 
+router.post("/brandlist",[],UserproductController.getBrandData);
+router.post("/genderlist",[], UserproductController.getGenderdData);
+router.post("/myproductlist",[],UserproductController.getProductData);
+router.post("/productlistbyid",[],UserproductController.getProductDataById);
+router.post("/productdetailsbyid",[check("product_id", "This is a required field!").not().isEmpty().trim().escape(),],UserproductController.getDetailsById);
 
-router.post(
-  "/brandlist",[],
-  UserproductController.getBrandData
-);
-
-router.post(
-  "/genderlist",[],
-  UserproductController.getGenderdData
-);
-
-
-router.post(
-  "/myproductlist",
-  [],
-  UserproductController.getProductData
-);
-
-router.post(
-  "/productlistbyid",
-  [],
-  UserproductController.getProductDataById
-);
-
-router.post(
-  "/productdetailsbyid",
-  [
-    check("product_id", "This is a required field!").not().isEmpty().trim().escape(),
-  ],
-  UserproductController.getDetailsById
-);
-
-
-router.post(
-  "/fetch-product",
-  [
-    check("product_id", "This is a required field!").not().isEmpty().trim().escape(),
-  ],
-  UserproductController.getProduct
-);
+router.post("/fetch-product",[check("product_id", "This is a required field!").not().isEmpty().trim().escape(),],UserproductController.getProduct);
 
 router.post(
   "/update-product",

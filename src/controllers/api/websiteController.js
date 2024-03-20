@@ -3433,26 +3433,40 @@ exports.userPlacedOrder = async function (req, res) {
 exports.demoorder = async function (req, res) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    let pay_now,booking_amount,remaining_amount,packing_handling_charge;
     let formData = req.body.data;
     let user_id = formData.user_id;
     let seller_id = formData.seller_id;
     let cart_id = formData.cart_id;
     let product_id = formData.product_id;
-    let total_price = formData.total_amt;
     let payment_method = formData.payment_method;
-    let gst = formData.gst;
+    let product = Userproduct.findOne({ _id: product_id });
+    if (payment_method == 0)
+    {
+      pay_now = product.offer_price * 0.10;
+      remaining_amount = (product.offer_price)-booking_amount;
+      packing_handling_charge = product.offer_price * 0.05;
+    }
+    
+    let gst = product.offer_price * 0.28;
     let taxable_value = formData.taxable_value;
+
+    if (payment_method == 0)
+    {
+      booking_amount = pay_now + packing_handling_charge + taxable_value+ gst;
+      total_price = booking_amount + remaining_amount;
+    }
+    else
+    {
+      total_price = product.offer_price + gst + taxable_value ;
+    }
+
     let order_status = '0';
     let delivery_charges = '0';
     let discount = '0';
     let pickup_status = '0';
     let delivery_status = '0';
     let shipping_address_id = formData.addressBookId;
-    let pay_now = formData.pay_now || null;
-    let booking_amount = formData.booking_amount;
-    let remaining_amount = formData.remaining_amount || null;
-    let packing_handling_charge = formData.packing_handling_charge|| null;
-
 
     const billingaddress = await addressBook.findOne({ user_id: seller_id });
     if (!billingaddress) {

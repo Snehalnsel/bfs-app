@@ -3472,9 +3472,7 @@ exports.demoorder = async function (req, res) {
     if (!billingaddress) {
       return res.status(404).json({ message: 'Seller address not found' });
     }
-
     const billing_address_id = billingaddress._id;
-
     const order = new Demoorder({
       user_id,
       cart_id,

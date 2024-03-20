@@ -221,6 +221,7 @@
                            <td colspan="2">
                               <label class="checkbox-label">
                                  <input type="checkbox" class="checkbox-input" value="">
+                                 <input typee="hidden" id="packingHandlingCharge-hidden">
                                  <span>I agree with all <a href="#">Terms & condition</a></span>
                               </label>
                            </td>
@@ -254,6 +255,7 @@
 
                      var newCharge = data.respdata;
                      $('#packingHandlingCharge').html('<i class="fa fa-inr" aria-hidden="true"></i> ' + newCharge);
+                     $('#packingHandlingCharge-hidden').val(newCharge);
                   },
 
                   error: function (error) {
@@ -278,10 +280,9 @@
                      $('#cash-handle-charge th').text('₹ ' + cashHandlecharges.toFixed(2));
                      console.log(payNowAmount);
                      var remainingAmount = productPrice - payNowAmount;
-
                      $('#remaining-amount-row th').text('₹ ' + remainingAmount.toFixed(2));
-
                      var packingHandlingChargeValue = $('#packingHandlingCharge').text().trim();
+                     //var packingHandlingChargeValue = $('#packingHandlingCharge-hidden').val();
                      console.log(packingHandlingChargeValue);
                      var taxvalue = parseFloat(packingHandlingChargeValue) + parseFloat(cashHandlecharges);
                     
@@ -369,7 +370,8 @@
                   formData.booking_amount = parseFloat($('#advance-amount').text().replace(/[^\d.]/g, ''));
                }
                formData.taxable_value = parseFloat($('#taxvalue').text().replace(/[^0-9.]/g, ''));
-               formData.packing_handling_charge = parseFloat($('#packingHandlingCharge').text().replace(/[^0-9.]/g, ''));
+               //formData.packing_handling_charge = parseFloat($('#packingHandlingCharge').text().replace(/[^0-9.]/g, ''));
+               formData.packing_handling_charge =$('#packingHandlingCharge-hidden').val();
 
                let totalAmtText = $('#total-cod-amount-row th').text();
                let totalAmtValue = parseFloat(totalAmtText.replace('₹ ', ''));
@@ -385,15 +387,15 @@
                   url: '/demoplacedorder',
                   data: { data: formData },
                   dataType: "json",
-                  success: function (response) {
-                     if (response.is_orderPlaced == 1) {
-                        const tempOrderId = response.order._id;
-                        window.location.href = '/pay?temp=' + tempOrderId;
-                     }
-                  },
-                  error: function (xhr, status, error) {
-                     $(".check-out").css("pointer-events", "auto");
-                  }
+                  // success: function (response) {
+                  //    if (response.is_orderPlaced == 1) {
+                  //       const tempOrderId = response.order._id;
+                  //       window.location.href = '/pay?temp=' + tempOrderId;
+                  //    }
+                  // },
+                  // error: function (xhr, status, error) {
+                  //    $(".check-out").css("pointer-events", "auto");
+                  // }
                });
 
             });

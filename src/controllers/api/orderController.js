@@ -748,8 +748,6 @@ exports.checkout = async (req, res) => {
         if (err) console.log("err", err);
         else console.log("info", info);
       });
-
-         //SEND SMS
          let smsData = {
           textId: "test",
           toMobile: "91" +user.phone_no,
@@ -757,7 +755,6 @@ exports.checkout = async (req, res) => {
         };
         let returnData;
         returnData = await sendSms(smsData);
-
         const historyData = new ApiCallHistory({
           userId: user._id,
           called_for: "Order Placed",
@@ -767,44 +764,31 @@ exports.checkout = async (req, res) => {
           send_status: 'send',
         });
         await historyData.save();
-
-        //SEND SMS
-
       const updatedProduct = await Userproduct.findOneAndUpdate(
         { _id: product_id }, 
         { $set: { flag: 1 } }, 
         { new: true }
       );
-
       if(updatedProduct)
       {
         console.log(cart_id);
-        const cleanedCartId =  mongoose.Types.ObjectId(cart_id); // Removes leading/trailing spaces
+        const cleanedCartId =  mongoose.Types.ObjectId(cart_id); 
         const cartDetail = await CartDetail.findOne({ cart_id: cleanedCartId });
-
         console.log(cartDetail);
-       
         if (cartDetail) {
-          // The cartDetail exists, so it's safe to remove it
           await cartDetail.remove();
-          // Continue with order placement logic
         }
-    
         const cartDetailsCount = await CartDetail.countDocuments({ cart_id: savedOrder.cart_id });
-
         const existingCart = await Cart.findById(cart_id);
-    
         if (cartDetailsCount === 0) {
           await existingCart.remove();
         }
       } 
-      
           res.status(200).json({
               status: "1",
             message: 'Order placed successfully',
             order: savedOrder
-          });
-          
+          });    
     }
 
   } catch (error) {

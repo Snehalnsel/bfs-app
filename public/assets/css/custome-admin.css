@@ -159,5 +159,14 @@ tbody.category-listtable{
     margin-bottom: 10px;    
 }
 
+}
 
+.table-short-btn {
+    margin: 2px 0px;
+    font-size: 13px;
+    padding: 5px 10px;
+    width: 100%;
+    text-align: center;
+    font-weight: 500;
+    line-height: 20px;
 }

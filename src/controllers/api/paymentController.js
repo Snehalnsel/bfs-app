@@ -54,7 +54,6 @@ const APP_BE_URL = process.env.SITE_URL;
 exports.getPaymentData = async function (req, res, next) {
   try {
     const tempOrderId = req.query.temp;
-    console.log("demo order id before payment",tempOrderId);
     const temporder = await Demoorder.findById(tempOrderId);
    
     let amount;
@@ -66,7 +65,6 @@ exports.getPaymentData = async function (req, res, next) {
       amount = parseInt(temporder.booking_amount);
     }
 
-    console.log("amount",amount);
    // amount = temporder.booking_amount !== 0 ? temporder.booking_amount : temporder.total_price;
 
     let userId = temporder.user_id;
@@ -84,7 +82,6 @@ exports.getPaymentData = async function (req, res, next) {
       },
     };
 
-    console.log("normalPayLoad",normalPayLoad);
     let bufferObj = Buffer.from(JSON.stringify(normalPayLoad), "utf8");
     let base64EncodedPayload = bufferObj.toString("base64");
     let string = base64EncodedPayload + "/pg/v1/pay" + SALT_KEY;
@@ -202,7 +199,6 @@ exports.getStatus = async function (req, res, next) {
           const lastOrderIndex = await getLastOrderIndex();
           const nextIncrementingPart = lastOrderIndex + 1;
           const orderCode = `BFSORD${currentMonth}${currentYear}-${nextIncrementingPart}`;
-          console.log(orderCode);
           const order = new Order({
             order_code: orderCode,
             order_index: nextIncrementingPart,
@@ -241,18 +237,16 @@ exports.getStatus = async function (req, res, next) {
             {
               const cleanedCartId =  mongoose.Types.ObjectId(temporder.cart_id); 
               const cartDetail = await CartDetail.findOne({ cart_id: cleanedCartId });
-              console.log(cartDetail);
               if (cartDetail) {
                 await cartDetail.remove();
               }
               const cartDetailsCount = await CartDetail.countDocuments({ cart_id: savedOrder.cart_id });
-              const existingCart = await Cart.findById(cart_id);
+              const existingCart = await Cart.findById(temporder.cart_id);
               if (cartDetailsCount === 0) {
                 await existingCart.remove();
               }
             } 
           }
-          //console.log('Order saved successfully:', savedOrder);
           res.redirect('/message?message=success');
         } else {
           res.redirect('/message?message=failure');
@@ -284,7 +278,6 @@ async function getLastOrderNumber() {
     const lastOrder = await Order.findOne().sort({ _id: -1 }); 
     return lastOrder ? lastOrder.order_code: 0;
   } catch (error) {
-    console.error('Error fetching last order number:', error);
     return 0;
   }
 }
@@ -295,14 +288,12 @@ async function getLastOrderIndex() {
     const result = await Order.findOne({}, {}, { sort: { order_index: -1 } });
     return result ? result.order_index : '000';
   } catch (error) {
-    console.error('Error fetching last order index:', error);
     return 0; // Return 0 in case of an error
   }
 }
 
 // exports.getData = async function (req, res, next) {
 //   try {
-//     //console.log('hello',req.session.user);return false;
 //     //return;
 
 //     const amount = 1;
@@ -328,7 +319,6 @@ async function getLastOrderIndex() {
 //         type: "PAY_PAGE",
 //       },
 //     };
-//     //console.log("normalPayLoad",normalPayLoad);
 //     let bufferObj = Buffer.from(JSON.stringify(normalPayLoad), "utf8");
 //     let base64EncodedPayload = bufferObj.toString("base64");
 //     let string = base64EncodedPayload + "/pg/v1/pay" + SALT_KEY;
@@ -348,8 +338,6 @@ async function getLastOrderIndex() {
 //         }
 //       )
 //       .then(function (response) {
-//         console.log("response->", response.data);
-//         console.log("response instrument->", response.data.data.instrumentResponse.redirectInfo);
       
        
 //         const newOrder = new DemoOrder({
@@ -364,13 +352,11 @@ async function getLastOrderIndex() {
       
 //         newOrder.save()
 //           .then(savedOrder => {
-//             console.log("Order saved successfully:", savedOrder);
             
 //             const redirectWithTransactionId = `${APP_BE_URL}/payment-status?merchantTransactionId=${merchantTransactionId}`;
 //             res.redirect(redirectWithTransactionId);
 //           })
 //           .catch(saveError => {
-//             console.error("Error saving order:", saveError);
 //             res.status(500).json({
 //               status: "0",
 //               message: "An error occurred while saving the order.",

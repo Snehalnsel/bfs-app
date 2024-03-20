@@ -189,7 +189,7 @@
                         </tr>
                         <tr>
                            <input value="<%=product_id%>" type="hidden" id="productid">
-                           <td colspan="2" class="tp-no-gaptd"><button onclick="checkShippingAmount()"
+                           <td colspan="2" class="tp-no-gaptd"><button id="shipMentAmountCal" onclick="checkShippingAmount()"
                                  class="check-link">Check Shipping Amount</button></td>
                         </tr>
                         <tr id="cash-handle-charge">
@@ -399,5 +399,7 @@
                });
 
             });
-
-         </script>
+$(document).ready(function(){
+   $("#shipMentAmountCal").trigger( "click" );
+})
+</script>

@@ -48,7 +48,7 @@ const MERCHANT_ID = "PGTESTPAYUAT";
 const PHONE_PE_HOST_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox";
 const SALT_INDEX = 1;
 const SALT_KEY = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";
-const APP_BE_URL = "https://localhost:3000";
+const APP_BE_URL = process.env.SITE_URL;
 
 exports.getPaymentData = async function (req, res, next) {
   try {
@@ -125,10 +125,8 @@ exports.getPaymentData = async function (req, res, next) {
 exports.getStatus = async function (req, res, next) {
   try {
     const tempId = req.query.temp;
-    console.log("demo order id", tempId);
 
     const temporder = await Demoorder.findById(tempId);
-    console.log("demo order details", temporder);
 
     const merchantTransactionId = temporder.merchant_transactionid;
 
@@ -150,78 +148,94 @@ exports.getStatus = async function (req, res, next) {
             "X-MERCHANT-ID": merchantTransactionId,
             accept: "application/json",
           },
+        }).then(async (res)=>{
+          if(typeof res.data.code != "undefined") {
+            return {
+              code:res.data.code,
+              data:res.data
+            };
+          } else {
+            return {
+              code:"failure",
+              data:res.data
+            };
+          }
         });
-
-        const updateData = {
+        let updateData = {
           checkstatus_response: response.data,
-          checkstatus_status: response.data.code === "PAYMENT_SUCCESS" ? "success" : "failure",
+          //checkstatus_status: response.data.code === "PAYMENT_SUCCESS" ? "success" : "failure",
         };
+        if(typeof response.data.code != "undefined" && response.data.code == "PAYMENT_SUCCESS") {
+          updateData.checkstatus_status = "success";
+        } else {
+          updateData.checkstatus_status = "failure";
+        }
 
-        console.log("Updating Demoorder with response data:", response.data);
-
-        const updatedOrder = await Demoorder.findOneAndUpdate(
+        await Demoorder.findOneAndUpdate(
           { _id: tempId },
           { $set: updateData },
           { new: true }
         );
 
-        console.log('Updated Demoorder:', updatedOrder);
+        if(updateData.checkstatus_status == "success") {
+          // Continue with creating the new Order
+          const now = new Date();
+          const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0'); 
+          const currentYear = now.getFullYear().toString();
+          let order_status = '0';
+          let delivery_charges = '0';
+          let discount = '0';
+          let pickup_status = '0';
+          let delivery_status = '0';          
+          
+          const lastOrderIndex = await getLastOrderIndex();
+          const nextIncrementingPart = lastOrderIndex + 1;
+          const orderCode = `BFSORD${currentMonth}${currentYear}-${nextIncrementingPart}`;
+          console.log(orderCode);
+          const order = new Order({
+            order_code: orderCode,
+            order_index: nextIncrementingPart,
+            user_id: temporder.user_id,
+            cart_id: temporder.cart_id,
+            seller_id: temporder.seller_id,
+            product_id: temporder.product_id,
+            billing_address_id: temporder.billing_address_id,
+            shipping_address_id: temporder.shipping_address_id,
+            total_price: temporder.total_price,
+            booking_amount : temporder.booking_amount || 0,
+            packing_handling_charge : temporder.packing_handling_charge || 0, 
+            payment_method: temporder.payment_method,
+            order_status: order_status,
+            gst: temporder.gst || '',
+            taxable_value : temporder.taxable_value || '',
+            delivery_charges: delivery_charges,
+            discount: discount,
+            pickup_status: pickup_status,
+            delivery_status: delivery_status,
+            pay_now: temporder.pay_now || '', 
+            remaining_amount: temporder.remaining_amount || '',
+            added_dtime: new Date().toISOString(),
+          });
 
-        // Continue with creating the new Order
-        const now = new Date();
-        const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0'); 
-        const currentYear = now.getFullYear().toString();
-        let order_status = '0';
-        let delivery_charges = '0';
-        let discount = '0';
-        let pickup_status = '0';
-        let delivery_status = '0';          
-        
-        const lastOrderIndex = await getLastOrderIndex();
-        const nextIncrementingPart = lastOrderIndex + 1;
-        const orderCode = `BFSORD${currentMonth}${currentYear}-${nextIncrementingPart}`;
-        console.log(orderCode);
-        const order = new Order({
-          order_code: orderCode,
-          order_index: nextIncrementingPart,
-          user_id: temporder.user_id,
-          cart_id: temporder.cart_id,
-          seller_id: temporder.seller_id,
-          product_id: temporder.product_id,
-          billing_address_id: temporder.billing_address_id,
-          shipping_address_id: temporder.shipping_address_id,
-          total_price: temporder.total_price,
-          booking_amount : temporder.booking_amount || 0,
-          packing_handling_charge : temporder.packing_handling_charge || 0, 
-          payment_method: temporder.payment_method,
-          order_status: order_status,
-          gst: temporder.gst || '',
-          taxable_value : temporder.taxable_value || '',
-          delivery_charges: delivery_charges,
-          discount: discount,
-          pickup_status: pickup_status,
-          delivery_status: delivery_status,
-          pay_now: temporder.pay_now || '', 
-          remaining_amount: temporder.remaining_amount || '',
-          added_dtime: new Date().toISOString(),
-        });
-
-        const savedOrder = await order.save();
-        console.log('Order saved successfully:', savedOrder);
-        res.redirect('/message?message=success');
+          const savedOrder = await order.save();
+          //console.log('Order saved successfully:', savedOrder);
+          res.redirect('/message?message=success');
+        } else {
+          res.redirect('/message?message=failure');
+        }
       } catch (error) {
-        console.error('Error in axios request:', error);
-        res.status(500).json({
+        res.redirect('/message?message=failure');
+        /*res.status(500).json({
           status: '0',
           message: 'Error in axios request.',
           error: error.message,
-        });
+        });*/
       }
     } else {
-      res.send("Sorry!! Error");
+      //res.send("Sorry!! Error");
+      res.redirect('/message?message=failure');
     }
   } catch (error) {
-    console.error('Error in getStatus function:', error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the dashboard.",

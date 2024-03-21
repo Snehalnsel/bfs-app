@@ -199,4 +199,6 @@
     </ul>
 
 </nav>
-<input type="hidden" name="adminReloggedIn" id="adminReloggedIn" value="<%=isAdminLoggedIn;%>" />
+<%if(typeof isAdminLoggedIn != "undefined") {%>
+    <input type="hidden" name="adminReloggedIn" id="adminReloggedIn" value="<%=isAdminLoggedIn;%>" />
+<% } %>

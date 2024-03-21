@@ -170,3 +170,13 @@ tbody.category-listtable{
     font-weight: 500;
     line-height: 20px;
 }
+
+.error-msg-content h4 {
+    color: red;
+    font-size: 24px;
+    font-weight: 600;
+    text-transform: capitalize;
+    line-height: 36px;
+    padding-top: 50px;
+    text-align: center;
+  }

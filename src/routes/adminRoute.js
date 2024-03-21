@@ -523,5 +523,6 @@ router.get("/download-orderpdf/:id", cors(), OrderController.downloadOrderPDF);
 router.get("/download-orderbfspdf/:id", cors(), OrderController.downloadOrdesecondrPDF);
 router.get("/download-orderbfspdf/:id", cors(), OrderController.downloadOrdesecondrPDF);
 router.get("/send-order-email/:id", cors(), OrderController.sentOrderPDF);
+router.get("/send-order-whatsapp/:id", cors(), OrderController.sentOrderPDFInWhatsapp);
 
 module.exports = router;

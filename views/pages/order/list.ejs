@@ -421,6 +421,7 @@
     }
     function sendViaWhatsApp(orderId) {
       console.log('Sending via WhatsApp for order ID:', orderId);
+      window.location.href = '/admin/send-order-whatsapp/' + orderId;
     }
   </script>
   

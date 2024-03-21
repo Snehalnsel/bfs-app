@@ -11,6 +11,7 @@ const ejs = require('ejs');
 const mime = require("mime");
 const PDFDocument = require('pdfkit');
 const nodemailer = require('nodemailer');
+const rp = require('request-promise-native');
 const request = require('request');
 const Category = require("../../models/api/categoryModel");
 const Brand = require("../../models/api/brandModel");
@@ -542,7 +543,7 @@ exports.getOrderDetails = function (req, res, next) {
 
     })
     .catch((error) => {
-      res.status(500).json({ error: 'An error occurred while fetching order details' });
+      res.status(500).json({ error: 'An error occurred while fetching order details',error1:error });
     });
 };
 
@@ -2636,3 +2637,127 @@ exports.sentOrderPDF = async function (req, res, next) {
     } 
   });
 };
+
+exports.sentOrderPDFInWhatsapp = async function (req, res, next) {
+  var pageName = "Order List";
+  var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+
+  const orderId = req.params.id;
+
+  Order.aggregate([
+    {
+      $match: {
+        _id: mongoose.Types.ObjectId(orderId)
+      }
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user_id',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'seller_id',
+        foreignField: '_id',
+        as: 'seller',
+      },
+    },
+    {
+      $lookup: {
+        from: 'addressbook_lists',
+        localField: 'billing_address_id',
+        foreignField: '_id',
+        as: 'billing_address',
+      },
+    },
+    {
+      $lookup: {
+        from: 'addressbook_lists',
+        localField: 'shipping_address_id',
+        foreignField: '_id',
+        as: 'shipping_address',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_userproducts',
+        localField: 'product_id',
+        foreignField: '_id',
+        as: 'product',
+      },
+    },
+    {
+      $lookup: {
+        from: 'order_trackings',
+        localField: '_id',
+        foreignField: 'order_id',
+        as: 'trackingDetails',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_tracks',
+        localField: 'trackingDetails.tracking_id',
+        foreignField: '_id',
+        as: 'trackDetails',
+      },
+    },
+    {
+      $sort: {
+        added_dtime: -1
+      }
+    }
+  ]).exec(async function (error, orderList) {
+    if (error) {
+      res.status(500).json({ error: 'An error occurred' });
+    } else {
+      try {
+        
+        const loginHtmlPath = 'views/webpages/invoice1.html';
+        const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
+
+        const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
+
+        const options = { format: 'Letter' };
+
+        pdf.create(renderedHtml, options).toStream(async (err, stream) => {
+          if (err) {
+            console.error('Error generating PDF:', err);
+            return res.status(500).send('An error occurred while generating PDF');
+          }
+          const order_invoice = stream; 
+          const to_number = "91" + orderList[0].user[0].phone_no; 
+
+          // let response = await send_message({ type: 'media', order_invoice, to_number });
+          let response = await send_message({ type: 'media', message: 'https://file-examples-com.github.io/uploads/2017/02/file-sample_100kB.doc',to_number:to_number }).then((res)=> {
+            console.log(res);
+          });
+        });
+      } catch (err) {
+        console.error('Error generat ing PDF:', err);
+        res.status(500).json({ error: 'An error occurred while generating PDF' });
+      }
+    } 
+  });
+};
+
+async function send_message(body) {
+  console.log(`Request Boduuy:${JSON.stringify(body)}`);
+  let url = process.env.WP_SMS_API_URL + "/" + process.env.WP_SMS_PRODUCT_ID + "/" + process.env.WP_SMS_PHONE_ID + "/" + "sendMessage";
+  let response = await rp(url, {
+    method: 'post',
+    json: true,
+    body,
+    headers: {
+      'Content-Type': 'application/json',
+      'x-maytapi-key': process.env.WP_SMS_API_TOKEN,
+    },
+  });
+  console.log(`Response: ${JSON.stringify(response)}`);
+  return response;
+}

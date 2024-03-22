@@ -335,7 +335,7 @@ exports.detailsData = async function (req, res, next) {
       userImage:  req.session.admin.image_url,
       userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
-      requrl: req.app.locals.requrl,
+      requrl: process.env.SITE_URL,
       message: "",
       respdata: productdetails,
       category: categoryList,
@@ -347,7 +347,7 @@ exports.detailsData = async function (req, res, next) {
       productImages: productImages,
       parentCategory: productdetails.hasOwnProperty("category_id") ? parentCategory : null,
       isAdminLoggedIn:isAdminLoggedIn,
-      requrl:requrl
+      //requrl:requrl
     });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred' });

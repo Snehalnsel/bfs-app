@@ -3264,6 +3264,7 @@ exports.getBestDealProductsweb = async function (req, res) {
         sizeList: sizeList,
         conditionList: conditionList,
         productCount: count,
+        websiteUrl:process.env.SITE_URL,
         isLoggedIn: isLoggedIn,
         filter_basedon: "bestDeal"
       });

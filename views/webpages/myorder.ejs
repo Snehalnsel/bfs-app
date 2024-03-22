@@ -114,9 +114,7 @@
             function populateBuyerHtml(data) {
 
                data.orders.forEach(item => {
-
-                  let currImagesUrl = `/public/images/${item.image}`;
-
+                  let currImagesUrl = `/public/images/${item.product.image}`;
                   var hTml = `<div class="cart-list wishlist-list" data-orderid="${item._id}" data-userby="3">
         <div class="bids-row wishlist-row " >
               <div class="br-details">
@@ -137,7 +135,7 @@
                 <div class="br-results two-rowbox ">                                            
                               <div class="cart-action d-flex">
                                  <div class=" rcicon-2 watch-cart">
-                                    <a href="/web-myorder-details/${item._id}" class="prd-btn wish-rem-button"
+                                    <a href="/web-myorder-details/${item._id}" class="prd-btn"
                                        data-id=""><i class="fa fa-eye" aria-hidden="true"></i></a>
                                  </div>`;
                   if (item.delete_status == 0 && item.is_return == 0 && item.is_deletedtime == 0) {
@@ -175,7 +173,7 @@
                   if (item.is_return == 1) {
                      hTml += `
                   <span style="color: green;">Return placed successfully</span>`;
-                  } else if (item.is_return == 0 ) {
+                  } else if (item.is_return == 0  ) {
                      hTml += `
                   <button class="prd-btn return-order" data-id="${item._id}">Return Order</button>`;
                   }

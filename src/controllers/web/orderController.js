@@ -1588,11 +1588,11 @@ exports.getCourierServiceability = async function (req, res, next) {
 
         const productdeatils = await Userproduct.findById(existingOrder.product_id);
 
-        //const height = productdeatils.height;
         const weight = productdeatils.weight;
-        //const weight = 0.05;
 
         const shiprocketResponse = await generateCouriresServiceability(pickup_postcode, delivery_postcode, cod, weight);
+
+        console.log("shiprocketResponse",shiprocketResponse);
         if(shiprocketResponse.status != 200) {
           return res.render("pages/error-msg", {
             errorMsg:shiprocketResponse.message

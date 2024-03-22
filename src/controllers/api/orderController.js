@@ -90,7 +90,6 @@ function generateToken(email, password) {
         const token = responseBody.token;
         resolve(token);
       } else {
-        //console.error('Error:', response.body);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -132,7 +131,6 @@ async function generateCouriresServiceability(pickup_postcode, delivery_postcode
 async function generateOrder(data) {
    token = await generateToken(email,shipPassword);
   if (!token) {
-    //console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -153,12 +151,9 @@ async function generateOrder(data) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        //console.log(responseBody);
-        //console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        //console.error('Errottr:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -171,7 +166,6 @@ async function generateOrder(data) {
 async function generateSellerPickup(data) {
   token = await generateToken(email,shipPassword);
  if (!token) {
-   //console.error('Token not available. Call generateToken first.');
    return Promise.reject('Token not available. Call generateToken first.');
  }
 
@@ -192,12 +186,9 @@ async function generateSellerPickup(data) {
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = JSON.parse(body);
-       //console.log(responseBody);
-       //console.log("hi");
        const token = responseBody;
        resolve(token);
      } else {
-       //console.error('Errottr:', response);
        reject(new Error(`Error: ${response.statusCode}`));
      }
    });
@@ -211,7 +202,6 @@ async function generateSellerPickup(data) {
 async function generateLabel(shipment_id) {
   token = await generateToken(email,shipPassword);
  if (!token) {
-   //console.error('Token not available. Call generateToken first.');
    return Promise.reject('Token not available. Call generateToken first.');
  }
 
@@ -230,20 +220,15 @@ async function generateLabel(shipment_id) {
   })
  };
 
- //console.log(options);
-
  return new Promise((resolve, reject) => {
    request(options, function (error, response, body) {
      if (error) {
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = JSON.parse(body);
-       //console.log(responseBody);
-       //console.log("hi");
        const token = responseBody;
        resolve(token);
      } else {
-       //console.error('Errottr:', response);
        reject(new Error(`Error: ${response.statusCode}`));
      }
    });
@@ -256,7 +241,6 @@ async function generateLabel(shipment_id) {
 async function generateInvoice(order_id) {
   token = await generateToken(email,shipPassword);
  if (!token) {
-   //console.error('Token not available. Call generateToken first.');
    return Promise.reject('Token not available. Call generateToken first.');
  }
 
@@ -275,20 +259,15 @@ async function generateInvoice(order_id) {
   })
  };
 
- //console.log(options);
-
  return new Promise((resolve, reject) => {
    request(options, function (error, response, body) {
      if (error) {
        reject(error);
      } else if (response.statusCode === 200) {
-       const responseBody = JSON.parse(body);
-       //console.log(responseBody);
-       //console.log("hi");
+       const responseBody = JSON.parse(body);;
        const token = responseBody;
        resolve(token);
      } else {
-       //console.error('Error:', response);
        reject(new Error(`Error: ${response.statusCode}`));
      }
    });
@@ -300,7 +279,6 @@ async function generateInvoice(order_id) {
 async function trackbyaorderid(order_id){
   token = await generateToken(email, shipPassword);
   if (!token) {
-    //console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -320,12 +298,9 @@ async function trackbyaorderid(order_id){
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        //console.log(responseBody);
-        //console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        //console.error('Error:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -336,7 +311,6 @@ async function trackbyaorderid(order_id){
 async function updateOrder(data) {
   token = await generateToken(email,shipPassword);
  if (!token) {
-   //console.error('Token not available. Call generateToken first.');
    return Promise.reject('Token not available. Call generateToken first.');
  }
 
@@ -357,12 +331,9 @@ async function updateOrder(data) {
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = JSON.parse(body);
-       //console.log(responseBody);
-       //console.log("hi");
        const token = responseBody;
        resolve(token);
      } else {
-       //console.error('Errottr:', response);
        reject(new Error(`Error: ${response.statusCode}`));
      }
    });
@@ -375,12 +346,8 @@ async function canceleOrder(order_id) {
 
   token = await generateToken(email,shipPassword);
  if (!token) {
-   //console.error('Token not available. Call generateToken first.');
    return Promise.reject('Token not available. Call generateToken first.');
  }
-
-//  console.log(order_id);
-//  return;
 
  const options = {
    method: 'POST',
@@ -402,12 +369,9 @@ async function canceleOrder(order_id) {
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = "Deleted successfully";
-       //console.log(responseBody);
-       //console.log("hi");
        const token = responseBody;
        resolve(token);
      } else {
-       //console.error('Errottr:', response);
        reject(new Error(`Error: ${response.statusCode}`));
      }
    });
@@ -421,7 +385,6 @@ async function updatePicupLocation(order_id,pickup_location) {
 
   token = await generateToken(email,shipPassword);
  if (!token) {
-   //console.error('Token not available. Call generateToken first.');
    return Promise.reject('Token not available. Call generateToken first.');
  }
 
@@ -448,12 +411,9 @@ const requestBodyString = JSON.stringify(requestBody);
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = "Pickup location Updated";
-       //console.log(responseBody);
-       //console.log("hi");
        const token = responseBody;
        resolve(token);
      } else {
-       //console.error('Errottr:', response);
        reject(new Error(`Error: ${response.statusCode}`));
      }
    });
@@ -466,7 +426,6 @@ async function updateDeliveryLocation(orderData) {
 
   token = await generateToken(email,shipPassword);
  if (!token) {
-   //console.error('Token not available. Call generateToken first.');
    return Promise.reject('Token not available. Call generateToken first.');
  }
 
@@ -745,8 +704,8 @@ exports.checkout = async (req, res) => {
       };
 
       transporter.sendMail(mailData, function (err, info) {
-        if (err) console.log("err", err);
-        else console.log("info", info);
+        // if (err) console.log("err", err);
+        // else console.log("info", info);
       });
          let smsData = {
           textId: "test",
@@ -771,10 +730,8 @@ exports.checkout = async (req, res) => {
       );
       if(updatedProduct)
       {
-        console.log(cart_id);
         const cleanedCartId =  mongoose.Types.ObjectId(cart_id); 
         const cartDetail = await CartDetail.findOne({ cart_id: cleanedCartId });
-        console.log(cartDetail);
         if (cartDetail) {
           await cartDetail.remove();
         }
@@ -792,7 +749,6 @@ exports.checkout = async (req, res) => {
     }
 
   } catch (error) {
-    //console.error('Error placing order:', error); 
     res.status(500).json({ error: 'An error occurred while placing the order' });
   }
 };
@@ -976,7 +932,6 @@ exports.getOrderListByUser = async (req, res) => {
       orders: ordersWithProductDetails,
     });
   } catch (error) {
-    console.log(error);
     return;
     res.status(500).json({ error: 'An error occurred while fetching orders' });
   }
@@ -1228,8 +1183,8 @@ exports.cancelOrderById = async function (req, res, next) {
         };
         
         transporter.sendMail(mailData, function (err, info) {
-          if (err) console.log("err", err);
-          else console.log("info", info);
+          // if (err) console.log("err", err);
+          // else console.log("info", info);
         });
 
           return res.status(200).json({
@@ -1552,8 +1507,8 @@ exports.returnOrderforapp = async function (req, res) {
       };
 
       transporter.sendMail(mailData, function (err, info) {
-        if (err) console.log(err);
-        else console.log(info);
+        // if (err) console.log(err);
+        // else console.log(info);
       });
 
        res.status(200).json({
@@ -1633,8 +1588,8 @@ exports.returnOrder = async function (req, res) {
       };
 
       transporter.sendMail(mailData, function (err, info) {
-        if (err) console.log(err);
-        else console.log(info);
+        // if (err) console.log(err);
+        // else console.log(info);
       });
        res.render("webpages/myorder", {
         title: "Wish List Page",
@@ -1652,9 +1607,6 @@ exports.returnOrder = async function (req, res) {
 
   try{
       let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-
-      console.log("body",req.body);
-     
       const delivery_postcode = 700020;
       const product_id = req.body.productid;
 
@@ -1664,16 +1616,8 @@ exports.returnOrder = async function (req, res) {
       const billingaddress = await AddressBook.findOne({ user_id: productdeatils.user_id });
       const pickup_postcode = billingaddress.pin_code;
       const cod = "1";
-      // console.log("pickup_postcode",pickup_postcode);
-      // console.log("delivery_postcode ",delivery_postcode);
-      // console.log("weight",weight);
-      // console.log("cod ",cod);
-
-
       const shiprocketResponse = await generateCouriresServiceability(pickup_postcode, delivery_postcode, cod, weight);
 
-      //console.log(shiprocketResponse);
-      //console.log("couries list",shiprocketResponse.data.available_courier_companies);
       const courierList = shiprocketResponse.data.available_courier_companies;
       const minFreightCourier = courierList.reduce((minCourier, currentCourier) => {
         const minFreight = minCourier ? minCourier.freight_charge : Infinity;
@@ -1682,8 +1626,6 @@ exports.returnOrder = async function (req, res) {
         return currentFreight < minFreight ? currentCourier : minCourier;
       }, null);
       
-      console.log("Courier with minimum freight charge:", minFreightCourier.freight_charge);
-
       return res.json({
         status: 'success',
         message: 'getting feight charges',
@@ -1691,7 +1633,6 @@ exports.returnOrder = async function (req, res) {
         websiteUrl: process.env.SITE_URL,
       });
       
-      // return res.status(200).json({ minFreightCharge });
   } catch (error) {
    return res.status(500).json({ message: 'Internal server error' });
  }
@@ -1759,12 +1700,7 @@ exports.returnOrder = async function (req, res) {
 //       };
 
 //       transporter.sendMail(mailData, function (err, info) {
-//         if (err) console.log(err);
-//         else console.log(info);
 //       });
-
-//       console.log(billingaddress);
-
 //       // const orderData = {
 //       //   order_id: orderIdAsString, 
 //       //   order_date: new Date().toISOString(), 
@@ -1866,9 +1802,6 @@ exports.returnOrder = async function (req, res) {
 //       };
 
 //           const shiprocketResponse = await generateOrder(orderData);
-
-//           console.log('JSON Response:', shiprocketResponse);
-
 //           if (shiprocketResponse) {
             
 //             const payment_status = '0';
@@ -1913,7 +1846,6 @@ exports.returnOrder = async function (req, res) {
 //     }
 
 //   } catch (error) {
-//     console.error('Error placing order:', error); 
 //     res.status(500).json({ error: 'An error occurred while placing the order' });
 //   }
 // };

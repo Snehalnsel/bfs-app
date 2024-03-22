@@ -521,7 +521,9 @@ router.get("/download-product-excel", cors(), ProductController.downloadProductE
 router.get("/download-order-excel", cors(), OrderController.downloadOrderExcel);
 router.get("/download-orderpdf/:id", cors(), OrderController.downloadOrderPDF);
 router.get("/download-orderbfspdf/:id", cors(), OrderController.downloadOrdesecondrPDF);
-router.get("/download-orderbfspdf/:id", cors(), OrderController.downloadOrdesecondrPDF);
+// router.get("/download-orderbfspdf/:id", cors(), OrderController.downloadOrdesecondrPDF);
+router.get("/download-returnorderpdf/:id", cors(), OrderController.returninvoicebb);
+router.get("/download-returnorderpdfseller/:id", cors(), OrderController.returninvoicesbr);
 router.get("/send-order-email/:id", cors(), OrderController.sentOrderPDF);
 router.get("/send-order-whatsapp/:id", cors(), OrderController.sentOrderPDFInWhatsapp);
 

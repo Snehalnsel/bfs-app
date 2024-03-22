@@ -140,7 +140,7 @@
                                     <a href="/web-myorder-details/${item._id}" class="prd-btn wish-rem-button"
                                        data-id=""><i class="fa fa-eye" aria-hidden="true"></i></a>
                                  </div>`;
-                  if (item.delete_status == 0 && item.is_return == 0) {
+                  if (item.delete_status == 0 && item.is_return == 0 && item.is_deletedtime == 0) {
                      hTml += `
                                        <div class="remove-cart">
                                           <a href="#" class="prd-btn remove-order"
@@ -175,7 +175,7 @@
                   if (item.is_return == 1) {
                      hTml += `
                   <span style="color: green;">Return placed successfully</span>`;
-                  } else {
+                  } else if (item.is_return == 0 ) {
                      hTml += `
                   <button class="prd-btn return-order" data-id="${item._id}">Return Order</button>`;
                   }

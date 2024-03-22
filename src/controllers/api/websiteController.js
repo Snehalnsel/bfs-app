@@ -151,7 +151,6 @@ function generateToken1(email, password) {
 async function generateSellerPickup(data) {
   token = await generateToken1(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
   const options = {
@@ -507,8 +506,8 @@ exports.signin = async function (req, res, next) {
           };
     
           transporter.sendMail(mailData, function (err, info) {
-            if (err) console.log("err", err);
-            else console.log("info", info);
+            // if (err) console.log("err", err);
+            // else console.log("info", info);
           });
     
           const message = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
@@ -1057,14 +1056,12 @@ exports.getUserLogin = async function (req, res, next) {
                   ", <br> <p>Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items </p>",
               };
               transporter.sendMail(mailData, function (err, info) {
-                if (err) console.log(err);
-                else console.log(info);
+                // if (err) console.log(err);
+                // else console.log(info);
               });
               const message = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
               const to_number = "91" + user.phone_no;
-              console.log(44444);
               let response = await send_message({ type: 'text', message, to_number });
-              console.log(response);
               const userToken = {
                 userId: user._id,
                 email: user.email,
@@ -1178,7 +1175,6 @@ exports.editProfile = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
-    console.log(userData);
     const bankDetails = await Bankdetails.findOne({ user_id: userData.userId });
     res.render("webpages/edit-profile", {
       title: "Edit profile",
@@ -1232,9 +1228,6 @@ exports.thankyoupage = async function (req, res, next) {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
     const message = req.query.message;
-
-    console.log(message);
-
     res.render("webpages/message", {
       title: "Edit Address",
       message: "Welcome to the Edit Profile page!",
@@ -1835,9 +1828,7 @@ exports.updateuserAddressAdd = async function (req, res, next) {
 };
 
 exports.getAddressdetails = async function (req, res, next) {
-  //console.log('req.body:', req.body);
   try {
-
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
     const errors = validationResult(req);
@@ -1848,11 +1839,8 @@ exports.getAddressdetails = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
-
     addbook_id = req.params.id;
-
     const address = await addressBook.findById(addbook_id);
-
     if (!address) {
       return res.status(404).json({
         status: "0",
@@ -1860,7 +1848,6 @@ exports.getAddressdetails = async function (req, res, next) {
         respdata: {},
       });
     }
-
     res.render("webpages/update-address", {
       title: "My Account",
       message: "Address fetched successfully!",
@@ -1869,7 +1856,6 @@ exports.getAddressdetails = async function (req, res, next) {
       address: address,
       isLoggedIn: isLoggedIn,
     });
-
     // res.status(200).json({
     //   status: "1",
     //   message: "Address fetched successfully!",
@@ -2065,10 +2051,8 @@ exports.addNewPost = async function (req, res, next) {
         } else {
           await fs.copyFile("./public/images/" + imageUrl, "./public/compress_images/" + imageUrl, (err) => {
             if (err) {
-              console.log("Error Found:", err);
             }
             else {
-              console.log("File copied successfully!");
             }
           });
         }
@@ -2252,10 +2236,8 @@ exports.updatePostData = async function (req, res, next) {
           else {
             await fs.copyFile("./public/images/" + imageUrl, "./public/compress_images/" + imageUrl, (err) => {
               if (err) {
-                console.log("Error Found:", err);
               }
-              else {
-                console.log("File copied successfully!");
+              else { 
               }
             });
           }
@@ -2370,7 +2352,6 @@ exports.addToWishlistWeb = async function (req, res, next) {
       });
     }
     else {
-      console.log("helllo");
       const user = await Users.findOne({ _id: user_id });
       const product = await Userproduct.findOne({ _id: product_id }).populate('category_id', 'name');
       const newFavList = new Wishlist({
@@ -2755,10 +2736,8 @@ exports.changeProfileImgWeb = async function (req, res, next) {
         } else {
           await fs.copyFile("./public/images/" + imageUrl, "./public/compress_images/" + imageUrl, (err) => {
             if (err) {
-              console.log("Error Found:", err);
             }
             else {
-              console.log("File copied successfully!");
             }
           });
         }
@@ -3384,8 +3363,8 @@ exports.userPlacedOrder = async function (req, res) {
           ", <br> <p>Congratulations your order is placed.please wait for some times and the delivery details you will show on the app.</p>",
       };
       transporter.sendMail(mailData, function (err, info) {
-        if (err) console.log(err);
-        else console.log(info);
+        // if (err) console.log(err);
+        // else console.log(info);
       });
       // const deleteCart;
       //Delete Cart while place order
@@ -3505,7 +3484,7 @@ exports.demoorder = async function (req, res) {
       });
     }
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
@@ -3672,7 +3651,6 @@ exports.sendotp = async function (req, res, next) {
       };
       let returnData;
       returnData = await sendSms(smsData);
-      console.log("returnData",returnData);
       
       const historyData = new ApiCallHistory({
         userId: user._id,
@@ -3712,8 +3690,8 @@ exports.sendotp = async function (req, res, next) {
       // };
 
       transporter.sendMail(mailData, function (err, info) {
-        if (err) console.log("err", err);
-        else console.log("info", info);
+        // if (err) console.log("err", err);
+        //else console.log("info", info);
       });
 
       var updData = {
@@ -3804,9 +3782,8 @@ exports.changePassword = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-  Users.findOne({ _id: userId }).then((user) => {
+  Users.findById({ _id: userId }).then((user) => {
     if (!user)
       res.status(200).json({
         status: "0",
@@ -3841,16 +3818,15 @@ exports.changePassword = async function (req, res, next) {
                     password: hash,
                   };
                   Users.findOneAndUpdate(
-                    { _id: req.body.user_id },
+                    { _id: userId },
                     { $set: updData },
                     { upsert: true },
                     function (err, doc) {
                       if (err) {
                         throw err;
                       } else {
-                        Users.findOne({ _id: req.body.user_id }).then(
+                        Users.findById({ _id: userId }).then(
                           async (user) => {
-
                             let smsData = {
                               textId: "test",
                               toMobile: "91" +user.phone_no,
@@ -3859,7 +3835,7 @@ exports.changePassword = async function (req, res, next) {
                             let returnData;
                             returnData = await sendSms(smsData);
                             const historyData = new ApiCallHistory({
-                              userId: user._id,
+                              userId: userId,
                               called_for: "reset password",
                               api_link: process.env.SITE_URL,
                               api_param: smsData,
@@ -3867,11 +3843,9 @@ exports.changePassword = async function (req, res, next) {
                               send_status: 'send',
                             });
                             await historyData.save();
-                    
                             const loginHtmlPath = 'views/webpages/reset-password.html';
                             let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
                             loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
-                
                             const mailData = {
                               from: "Bid For Sale! <" + smtpUser + ">",
                               to: user.email,
@@ -3880,12 +3854,10 @@ exports.changePassword = async function (req, res, next) {
                               text: "reset password successfully!",
                               html: loginHtmlContent
                             };
-                            
                             transporter.sendMail(mailData, function (err, info) {
-                              if (err) console.log("err", err);
-                              else console.log("info", info);
+                              // if (err) console.log("err", err);
+                              // else console.log("info", info);
                             });
-                    
                             res.status(200).json({
                               status: "1",
                               message: "Successfully updated!",
@@ -3932,7 +3904,6 @@ exports.reasonlistdata = async function (req, res, next) {
   }
   try {
     const reasons = await Reasonlist.find();
-    console.log(reasons)
     return res.json(reasons);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -3957,7 +3928,6 @@ exports.genderwomenlistdata = async function (req, res, next) {
       categories: categoryList,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: '0',
       message: 'An error occurred while fetching categories by gender_id.',
@@ -3983,7 +3953,6 @@ exports.gendermenlistdata = async function (req, res, next) {
       categories: categoryList,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: '0',
       message: 'An error occurred while fetching categories by gender_id.',
@@ -4010,7 +3979,6 @@ exports.genderkidlistdata = async function (req, res, next) {
       categories: categoryList,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: '0',
       message: 'An error occurred while fetching categories by gender_id.',
@@ -4036,7 +4004,6 @@ exports.otherlistdata = async function (req, res, next) {
       categories: categoryList,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: '0',
       message: 'An error occurred while fetching categories by gender_id.',
@@ -4067,7 +4034,6 @@ exports.otherlistdata = async function (req, res, next) {
 // };
 
 async function send_message(body) {
-  console.log(`Request Boduuy:${JSON.stringify(body)}`);
   let url = process.env.WP_SMS_API_URL + "/" + process.env.WP_SMS_PRODUCT_ID + "/" + process.env.WP_SMS_PHONE_ID + "/" + "sendMessage";
   let response = await rp(url, {
     method: 'post',
@@ -4078,6 +4044,5 @@ async function send_message(body) {
       'x-maytapi-key': process.env.WP_SMS_API_TOKEN,
     },
   });
-  console.log(`Response: ${JSON.stringify(response)}`);
   return response;
 }

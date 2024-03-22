@@ -106,8 +106,10 @@
                                                             <td>
                                                                 <% if (value.order_code) { %>
                                                                     <a href="/admin/shipmentdetails/<%= value._id %>" target="_blank"><%= value.order_code %></a>
-                                                                    <a href="/admin/download-orderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary table-short-btn">Download PDF</button></a><br>
-                                                                    <a href="/admin/download-orderbfspdf/<%= value._id %>" target="_blank"><button class="btn btn-primary table-short-btn">Download Second PDF</button></a><br>
+                                                                    <a href="/admin/download-orderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary table-short-btn">SBFSORD PDF</button></a><br>
+                                                                    <a href="/admin/download-orderbfspdf/<%= value._id %>" target="_blank"><button class="btn btn-primary table-short-btn">BFSBORD PDF</button></a><br>
+                                                                    <a href="/admin/download-returnorderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary table-short-btn">BBReturn PDF</button></a><br>
+                                                                    <a href="/admin/download-returnorderpdfseller/<%= value._id %>" target="_blank"><button class="btn btn-primary table-short-btn">BFSReturn PDF</button></a><br>
                                                                     <button id="showOptionsBtn" class="btn btn-primary table-short-btn">Show Options</button>
                                                                     <div id="optionsContainer" style="display: none;">                                                                      <button id="emailOption" class="btn btn-secondary" onclick="sendViaEmail('<%= value._id %>')">Send via Email</button>
                                                                       <button id="whatsappOption" class="btn btn-secondary" onclick="sendViaWhatsApp('<%= value._id %>')">Send via WhatsApp</button>

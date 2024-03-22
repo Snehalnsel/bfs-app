@@ -421,6 +421,7 @@ exports.registration = async function (req, res, next) {
 // };
 
 exports.signin = async function (req, res, next) {
+  let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || null;
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   const errors = validationResult(req);
 
@@ -442,7 +443,8 @@ exports.signin = async function (req, res, next) {
         });
       } else {
         const user = await Users.findOne({ email: req.body.email });
-        const userIpAddress = req.connection.remoteAddress;
+        const userIpAddress = ip;
+        //const userIpAddress = req.connection.remoteAddress;
 
         if (!user) {
           const newUser = Users({
@@ -493,7 +495,7 @@ exports.signin = async function (req, res, next) {
           await historyData.save();
 
           const loginHtmlPath = 'views/webpages/welcome.html';;
-          const loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+          let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
 
           loginHtmlContent = loginHtmlContent.replace('{{username}}', newUser.name);
 

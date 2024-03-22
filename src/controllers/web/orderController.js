@@ -1216,8 +1216,7 @@ exports.getAWBnoById = async function (req, res, next) {
       const shipment_id = existingOrder.shiprocket_shipment_id;
       const shiprocketResponse = await generateAWBno(shipment_id, courier_id);
       if (shiprocketResponse) {
-
-        if (shiprocketResponse.response.data.awb_code) {
+        if (typeof shiprocketResponse.response.data.awb_code != "undefined") {
           existingOrder.pickup_awb = shiprocketResponse.response.data.awb_code;
           existingOrder.shiprocket_delivery_partner = shiprocketResponse.response.data.courier_company_id;
           existingOrder.shiprocket_courier_name = shiprocketResponse.response.data.transporter_name;

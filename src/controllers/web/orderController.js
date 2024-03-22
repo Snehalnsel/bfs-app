@@ -319,6 +319,9 @@ exports.getOrderList = function (req, res, next) {
           });
         })
         .catch((err) => {
+          return res.render("pages/error-msg", {
+            errorMsg:"Error fetching product images"
+          });
           //res.status(500).json({ error: 'Error fetching product images' });
         });
     }
@@ -402,7 +405,10 @@ exports.getOrderList = function (page, searchType, searchValue, req, res, next) 
     { $limit: 20 }
   ]).exec(function (error, orderList) {
     if (error) {
-      return res.status(500).json({ error: 'An error occurred' });
+      return res.render("pages/error-msg", {
+        errorMsg:"An error occurred"
+      });
+      //return res.status(500).json({ error: 'An error occurred' });
     }
 
     res.render("pages/order/list", {
@@ -499,7 +505,10 @@ exports.getOrderDetails = function (req, res, next) {
   const orderId = req.params.id;
 
   if (!mongoose.Types.ObjectId.isValid(orderId)) {
-    return res.status(400).json({ error: 'Invalid order ID' });
+    return res.render("pages/error-msg", {
+      errorMsg:"Invalid order ID"
+    });
+    //return res.status(400).json({ error: 'Invalid order ID' });
   }
 
   Order.findOne({ _id: orderId })
@@ -510,7 +519,10 @@ exports.getOrderDetails = function (req, res, next) {
     .populate('hub_address_id')
     .then(async (orderDetails) => {
       if (!orderDetails) {
-        return res.status(404).json({ error: 'Order not found' });
+        return res.render("pages/error-msg", {
+          errorMsg:"Order not found"
+        });
+        //return res.status(404).json({ error: 'Order not found' });
       }
 
       const billingAddress = await AddressBook.find({ user_id: orderDetails.seller_id });
@@ -826,11 +838,14 @@ exports.updateData = async function (req, res, next) {
     }
   }).catch((err) => {
     ;
-    res.status(500).json({
+    /*res.status(500).json({
       status: "0",
       message: "An error occurred while updating the product.",
       respdata: {},
       isAdminLoggedIn: isAdminLoggedIn
+    });*/
+    return res.render("pages/error-msg", {
+      errorMsg:"An error occurred while updating the product"
     });
   });
 };
@@ -997,12 +1012,15 @@ exports.deleteData = async function (req, res, next) {
 
     res.redirect("/admin/orderlist");
   } catch (error) {
-    return res.status(500).json({
+    return res.render("pages/error-msg", {
+      errorMsg:"Error occurred while deleting the category!"
+    });
+    /*return res.status(500).json({
       status: "0",
       message: "Error occurred while deleting the category!",
       respdata: error.message,
       isAdminLoggedIn: isAdminLoggedIn
-    });
+    });*/
   }
 };
 
@@ -1179,7 +1197,10 @@ exports.orderplaced = async (req, res) => {
       res.redirect(`/admin/check-Couriresserviceability/${track_id}`);
     }
   } catch (error) {
-    res.status(500).json({ error: 'An error occurred while placing the order' });
+    return res.render("pages/error-msg", {
+      errorMsg:"An error occurred while placing the order!"
+    });
+    //res.status(500).json({ error: 'An error occurred while placing the order' });
   }
 };
 
@@ -1206,12 +1227,15 @@ exports.getAWBnoById = async function (req, res, next) {
 
 
     if (!existingOrder) {
-      return res.status(404).json({
+      return res.render("pages/error-msg", {
+        errorMsg:"Order not found!"
+      });
+      /*return res.status(404).json({
         status: "0",
         message: "Order not found!",
         respdata: {},
         isAdminLoggedIn: isAdminLoggedIn
-      });
+      });*/
     }
     if (existingOrder) {
       const shipment_id = existingOrder.shiprocket_shipment_id;
@@ -1324,12 +1348,15 @@ exports.getGenerateLabel = async function (req, res, next) {
     const existingOrder = await Track.findById(trackId);
 
     if (!existingOrder) {
-      return res.status(404).json({
+      return res.render("pages/error-msg", {
+        errorMsg:"Order not found!"
+      });
+      /*return res.status(404).json({
         status: "0",
         message: "Order not found!",
         respdata: {},
         isAdminLoggedIn: isAdminLoggedIn
-      });
+      });*/
     }
 
     const shipment_id = existingOrder.shiprocket_shipment_id;
@@ -1346,12 +1373,15 @@ exports.getGenerateLabel = async function (req, res, next) {
           file.close(() => {
             res.download(outputFilePath, 'label.pdf', (err) => {
               if (err) {
-                return res.status(500).json({
+                return res.render("pages/error-msg", {
+                  errorMsg:"Error downloading the file!"
+                });
+                /*return res.status(500).json({
                   status: "0",
                   message: "Error downloading the file!",
                   respdata: err,
                   isAdminLoggedIn: isAdminLoggedIn
-                });
+                });*/
               }
               // File downloaded and response sent successfully
               fs.unlink(outputFilePath, (unlinkErr) => {
@@ -1364,25 +1394,33 @@ exports.getGenerateLabel = async function (req, res, next) {
       });
 
       request.on('error', (error) => {
-        return res.status(500).json({
+        return res.render("pages/error-msg", {
+          errorMsg:"Error downloading the file!"
+        });
+        /*return res.status(500).json({
           status: "0",
           message: "Error downloading the file!",
           respdata: error,
           isAdminLoggedIn: isAdminLoggedIn
-        });
+        });*/
       });
     } else {
       //alert('something went wrong'+ shiprocketResponse.response);
-
-      return res.status(404).json({
+      return res.render("pages/error-msg", {
+        errorMsg:"Label URL not found!"
+      });
+      /*return res.status(404).json({
         status: "0",
         message: "Label URL not found!",
         respdata: shiprocketResponse,
         isAdminLoggedIn: isAdminLoggedIn
-      });
+      });*/
     }
   } catch (error) {
-    alert('something went wrong');
+    return res.render("pages/error-msg", {
+      errorMsg:"something went wrong!"
+    });
+    //alert('something went wrong');
     // res.status(500).json({
     //   status: "0",
     //   message: "Error!",
@@ -1410,24 +1448,30 @@ exports.getGenerateInvoice = async function (req, res, next) {
     const existingOrder = await Track.findById(trackId);
 
     if (!existingOrder) {
-      return res.status(404).json({
+      return res.render("pages/error-msg", {
+        errorMsg:"Order not found!"
+      });
+      /*return res.status(404).json({
         status: "0",
         message: "Order not found!",
         respdata: {},
         isAdminLoggedIn: isAdminLoggedIn
-      });
+      });*/
     }
 
     const order_id = existingOrder.shiprocket_order_id;
     const shiprocketResponse = await generateInvoice(order_id);
 
     if (!shiprocketResponse || !shiprocketResponse.invoice_url) {
-      return res.status(404).json({
+      return res.render("pages/error-msg", {
+        errorMsg:"Invoice not found!"
+      });
+      /*return res.status(404).json({
         status: "0",
         message: "Invoice not found!",
         respdata: shiprocketResponse,
         isAdminLoggedIn: isAdminLoggedIn
-      });
+      });*/
     }
 
     const invoiceUrl = shiprocketResponse.invoice_url;
@@ -1440,12 +1484,15 @@ exports.getGenerateInvoice = async function (req, res, next) {
         file.close(() => {
           res.download(outputFilePath, 'invoice.pdf', (err) => {
             if (err) {
-              return res.status(500).json({
+              return res.render("pages/error-msg", {
+                errorMsg:"Error downloading the file!"
+              });
+              /*return res.status(500).json({
                 status: "0",
                 message: "Error downloading the file!",
                 respdata: err,
                 isAdminLoggedIn: isAdminLoggedIn
-              });
+              });*/
             }
             fs.unlink(outputFilePath, (unlinkErr) => {
               if (unlinkErr) {
@@ -1457,20 +1504,26 @@ exports.getGenerateInvoice = async function (req, res, next) {
     });
 
     request.on('error', (error) => {
-      return res.status(500).json({
+      return res.render("pages/error-msg", {
+        errorMsg:"Error downloading the file!"
+      });
+      /*return res.status(500).json({
         status: "0",
         message: "Error downloading the file!",
         respdata: error,
         isAdminLoggedIn: isAdminLoggedIn
-      });
+      });*/
     });
   } catch (error) {
-    res.status(500).json({
+    return res.render("pages/error-msg", {
+      errorMsg:"Error!"
+    });
+    /*res.status(500).json({
       status: "0",
       message: "Error!",
       respdata: error,
       isAdminLoggedIn: isAdminLoggedIn
-    });
+    });*/
   }
 };
 
@@ -1553,12 +1606,15 @@ exports.getCourierServiceability = async function (req, res, next) {
   var pageTitle = req.app.locals.siteName + " - List " + pageName;
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    return res.render("pages/error-msg", {
+      errorMsg:"Validation error!"
+    });
+    /*return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
       isAdminLoggedIn: isAdminLoggedIn
-    });
+    });*/
   }
 
   try {
@@ -1566,12 +1622,15 @@ exports.getCourierServiceability = async function (req, res, next) {
 
     const existingOrder = await Track.findById(trackId);
     if (!existingOrder) {
-      return res.status(404).json({
+      return res.render("pages/error-msg", {
+        errorMsg:"Order not found!"
+      });
+      /*return res.status(404).json({
         status: "0",
         message: "Order not found!",
         respdata: {},
         isAdminLoggedIn: isAdminLoggedIn
-      });
+      });*/
     }
 
     if (existingOrder) {
@@ -1725,12 +1784,15 @@ exports.getList = async function (req, res, next) {
   var pageTitle = req.app.locals.siteName + " - Schedule Your Pick Up " + pageName;
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    return res.render("pages/error-msg", {
+      errorMsg:"Validation error!"
+    });
+    /*return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
       isAdminLoggedIn: isAdminLoggedIn
-    });
+    });*/
   }
 
   try {
@@ -1793,12 +1855,15 @@ exports.getShipmentPickup = async function (req, res, next) {
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    return res.render("pages/error-msg", {
+      errorMsg:"Validation error!"
+    });
+    /*return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
       isAdminLoggedIn: isAdminLoggedIn
-    });
+    });*/
   }
 
   try {
@@ -1806,12 +1871,15 @@ exports.getShipmentPickup = async function (req, res, next) {
 
     const existingOrder = await Track.findById(trackId);
     if (!existingOrder) {
-      return res.status(404).json({
+      return res.render("pages/error-msg", {
+        errorMsg:"Order not found!"
+      });
+      /*return res.status(404).json({
         status: "0",
         message: "Order not found!",
         respdata: {},
         isAdminLoggedIn: isAdminLoggedIn
-      });
+      });*/
     }
 
     if (existingOrder) {
@@ -2044,10 +2112,16 @@ exports.huborderplaced = async (req, res) => {
       }
     }
     else {
-      return res.status(404).json({ error: ' product Not found' });
+      return res.render("pages/error-msg", {
+        errorMsg:"product Not found!"
+      });
+      //return res.status(404).json({ error: ' product Not found' });
     }
     if (!orderDetails) {
-      return res.status(404).json({ error: 'Order not found' });
+      return res.render("pages/error-msg", {
+        errorMsg:"Order not found!"
+      });
+      //return res.status(404).json({ error: 'Order not found' });
     }
     else {
       res.redirect("/admin/orderlist");
@@ -2621,17 +2695,26 @@ exports.sentOrderPDF = async function (req, res, next) {
 
           transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-              console.error('Error sending email:', error);
-              return res.status(500).send('An error occurred while sending the email');
+              //console.error('Error sending email:', error);
+              return res.render("pages/error-msg", {
+                errorMsg:"An error occurred while sending the email!"
+              });
+              //return res.status(500).send('An error occurred while sending the email');
             }
 
-            console.log('Email sent:', info.response);
-            res.status(200).send('PDF sent via email successfully!');
+            //console.log('Email sent:', info.response);
+            //res.status(200).send('PDF sent via email successfully!');
+            return res.render("pages/error-msg", {
+              errorMsg:"PDF sent via email successfully!"
+            });
           });
         });
       } catch (err) {
-        console.error('Error generating PDF:', err);
-        res.status(500).json({ error: 'An error occurred while generating PDF' });
+        //console.error('Error generating PDF:', err);
+        return res.render("pages/error-msg", {
+          errorMsg:"An error occurred while generating PDF!"
+        });
+        //res.status(500).json({ error: 'An error occurred while generating PDF' });
       }
     } 
   });
@@ -2713,7 +2796,10 @@ exports.sentOrderPDFInWhatsapp = async function (req, res, next) {
     }
   ]).exec(async function (error, orderList) {
     if (error) {
-      res.status(500).json({ error: 'An error occurred' });
+      return res.render("pages/error-msg", {
+        errorMsg:"An error occurred!"
+      });
+      //res.status(500).json({ error: 'An error occurred' });
     } else {
       try {
         
@@ -2725,10 +2811,10 @@ exports.sentOrderPDFInWhatsapp = async function (req, res, next) {
         const options = { format: 'Letter' };
 
         pdf.create(renderedHtml, options).toStream(async (err, stream) => {
-          if (err) {
-            console.error('Error generating PDF:', err);
-            return res.status(500).send('An error occurred while generating PDF');
-          }
+          // if (err) {
+          //   console.error('Error generating PDF:', err);
+          //   return res.status(500).send('An error occurred while generating PDF');
+          // }
           const order_invoice = stream; 
           const to_number = "91" + orderList[0].user[0].phone_no; 
 
@@ -2738,8 +2824,11 @@ exports.sentOrderPDFInWhatsapp = async function (req, res, next) {
           });
         });
       } catch (err) {
-        console.error('Error generat ing PDF:', err);
-        res.status(500).json({ error: 'An error occurred while generating PDF' });
+        //console.error('Error generat ing PDF:', err);
+        return res.render("pages/error-msg", {
+          errorMsg:"An error occurred while generating PDF!"
+        });
+        //res.status(500).json({ error: 'An error occurred while generating PDF' });
       }
     } 
   });

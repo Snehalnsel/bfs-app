@@ -751,8 +751,9 @@ exports.updateData = async function (req, res, next) {
       const user_id = orderDetails.user_id;
       const seller_id = orderDetails.seller_id;
       const product_id = orderDetails.product_id;
-      const billing_address_id = orderDetails.billing_address_id;
-      const shipping_address_id = req.body.hub_address;
+      const seller_address_id = orderDetails.billing_address_id;
+      const buyer_address_id = orderDetails.shipping_address_id;
+      const hub_address_id = req.body.hub_address;
       const total_price = orderDetails.total_price;
       const payment_method = orderDetails.payment_method;
       const order_status = orderDetails.order_status;
@@ -776,8 +777,7 @@ exports.updateData = async function (req, res, next) {
       let trackInsertData = {
         track_code: transactionCode,
         product_id: product_id,
-        billing_address_id: billing_address_id,
-        hub_address_id: req.body.hub_address,
+        hub_address_id: hub_address_id,
         total_price: total_price,
         payment_method: payment_method,
         order_status: order_status,
@@ -789,14 +789,19 @@ exports.updateData = async function (req, res, next) {
       };
       if(req.body.flow_id == 0) {
         trackInsertData.seller_id = seller_id;
+        trackInsertData.seller_address_id = seller_address_id;
       } else if(req.body.flow_id == 1) {
         trackInsertData.buyer_id = user_id;
+        trackInsertData.buyer_address_id = buyer_address_id;
       } else if(req.body.flow_id == 2) {
         trackInsertData.buyer_id = user_id;
+        trackInsertData.buyer_address_id = buyer_address_id;
       } else if(req.body.flow_id == 3){
         trackInsertData.seller_id = seller_id;
+        trackInsertData.seller_address_id = seller_address_id;
       } else if(req.body.flow_id == 4){
         trackInsertData.seller_id = seller_id;
+        trackInsertData.seller_address_id = seller_address_id;
       }
       let track = new Track(trackInsertData);
       const savedTrack = await track.save();
@@ -1196,7 +1201,7 @@ exports.orderplaced = async (req, res) => {
 };
 
 
-exports.orderplaced = async (req, res) => {
+exports.returnorderplaced = async (req, res) => {
   try {
 
     let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
@@ -1206,7 +1211,7 @@ exports.orderplaced = async (req, res) => {
     }
 
     const orderDetails = await Track.findById({ _id: track_id })
-      .populate('seller_id', 'name phone_no email')
+      .populate('buyer_id', 'name phone_no email')
       .populate('billing_address_id')
       .populate('hub_address_id');
 

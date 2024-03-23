@@ -306,8 +306,11 @@
                                                                         class="btn btn-info btn-circle btn-sm" title="Edit">
                                                                         <i class="fas fa-pencil-alt"></i>
                                                                     </a>
-                                                                    <% if (value.returnorder) { %>
-                                                                    
+                                                                    <!-- <% if (value.returnorder) { %> -->
+                                                                        <a href="/admin/returnorder/<%= value._id %>" class="btn btn-warning" title="Order Placed">
+                                                                            Order Placed
+                                                                         </a>
+                                                                    <!-- <% } %> -->
                                                                 <% } %>
                                                             </td>
                                                             <td>

@@ -410,7 +410,7 @@ router.post("/update-orderdetails", cors(), [], OrderController.updateData);
 router.get("/shipmentdetails/:id", cors(), OrderController.getShipmentList);
 router.get("/delete-orderdetails/:id", cors(), OrderController.deleteData);
 router.get("/orderplace/:id", cors(), OrderController.orderplaced);
-router.get("/returnorder/:id", cors(), OrderController.orderplaced);
+router.get("/returnorder/:id", cors(), OrderController.returnorderplaced);
 // router.get("/generateawb/:id", cors(),OrderController.getAWBnoById);
 router.get("/generateawb/:id/:courier_company_id", cors(), OrderController.getAWBnoById);
 router.get("/generatelabel/:id", cors(), OrderController.getGenerateLabel);

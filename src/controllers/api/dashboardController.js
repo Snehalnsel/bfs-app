@@ -411,7 +411,7 @@ function extractFilename(url) {
   return null;
 }
 
-exports.getData = async function (req, res, next) {
+exports.getData = async function (req, res,deviceType) {
   try {
        //await copyImages();
     //const requrl = req.protocol + '://' + req.get('host');
@@ -486,6 +486,7 @@ exports.getData = async function (req, res, next) {
     //  await image.save();
     // }
    // return;
+
     const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : ""
     var cartCount = (userId != "") ? await Cart.countDocuments({ user_id: mongoose.Types.ObjectId(userId) }) : 0;
     const banner = await Banner.find({ status: 1 });
@@ -501,6 +502,7 @@ exports.getData = async function (req, res, next) {
       isLoggedIn: isLoggedIn,
     }, {async: true});
     res.send(html);
+  
     // res.render("webpages/list", {
     //   title: "Home Page",
     //   websiteUrl: process.env.SITE_URL,
@@ -519,6 +521,20 @@ exports.getData = async function (req, res, next) {
     });
   }
 };
+
+exports.getAppPromotionData = async function (req, res) {
+  try {
+    res.render("webpages/app-promotion", {
+      title: "My Post",
+      message: "Welcome to the My Post page!",
+      websiteUrl: process.env.SITE_URL,
+    });
+  } catch (error) {
+    //console.error('Error fetching top categories:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 exports.bannerlist = async function (req, res) {
   try {
     const banner = await Banner.find({ status: 1 });

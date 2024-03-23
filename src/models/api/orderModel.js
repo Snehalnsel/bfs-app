@@ -5,6 +5,10 @@ const model = mongoose.Schema({
     type: String,
     required: true,
   },
+  order_index:{
+    type: Number,
+    required: true,
+  },
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'users', 
@@ -48,6 +52,14 @@ const model = mongoose.Schema({
     type: Number,
     default: 0,
   },
+  booking_amount: {
+    type: Number,
+    default: 0,
+  },
+  packing_handling_charge: {
+    type: Number,
+    default: 0,
+  },
   payment_method: {
     type: Number,
     enum: [0, 1],
@@ -61,6 +73,14 @@ const model = mongoose.Schema({
     required: true,
   },
   gst: {
+    type: Number,
+    required: true,
+  },
+  taxable_value: {
+    type: Number,
+    required: true,
+  },
+  taxable_value: {
     type: String,
     required: true,
   },

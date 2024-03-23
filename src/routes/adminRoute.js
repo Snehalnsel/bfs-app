@@ -405,11 +405,12 @@ router.get("/orderlist", cors(), (req, res) => {
   const searchValue = req.query.searchValue;
   OrderController.getOrderList(page, searchType, searchValue, req, res);
 });
-router.get("/orderdetails/:id", cors(), OrderController.getOrderDetails);
+router.get("/orderdetails/:id/:flowid", cors(), OrderController.getOrderDetails);
 router.post("/update-orderdetails", cors(), [], OrderController.updateData);
 router.get("/shipmentdetails/:id", cors(), OrderController.getShipmentList);
 router.get("/delete-orderdetails/:id", cors(), OrderController.deleteData);
 router.get("/orderplace/:id", cors(), OrderController.orderplaced);
+router.get("/returnorder/:id", cors(), OrderController.returnorderplaced);
 // router.get("/generateawb/:id", cors(),OrderController.getAWBnoById);
 router.get("/generateawb/:id/:courier_company_id", cors(), OrderController.getAWBnoById);
 router.get("/generatelabel/:id", cors(), OrderController.getGenerateLabel);
@@ -521,6 +522,10 @@ router.get("/download-product-excel", cors(), ProductController.downloadProductE
 router.get("/download-order-excel", cors(), OrderController.downloadOrderExcel);
 router.get("/download-orderpdf/:id", cors(), OrderController.downloadOrderPDF);
 router.get("/download-orderbfspdf/:id", cors(), OrderController.downloadOrdesecondrPDF);
+// router.get("/download-orderbfspdf/:id", cors(), OrderController.downloadOrdesecondrPDF);
+router.get("/download-returnorderpdf/:id", cors(), OrderController.returninvoicebb);
+router.get("/download-returnorderpdfseller/:id", cors(), OrderController.returninvoicesbr);
 router.get("/send-order-email/:id", cors(), OrderController.sentOrderPDF);
+router.get("/send-order-whatsapp/:id", cors(), OrderController.sentOrderPDFInWhatsapp);
 
 module.exports = router;

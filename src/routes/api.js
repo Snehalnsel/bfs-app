@@ -37,7 +37,12 @@ const PaymentController = require("../controllers/api/paymentController");
 const dateTime = moment().format("YYYY-MM-DD h:mm:ss");
 
 //apis
-router.get("/",[],DashboardController.getData);
+// router.get("/",[],DashboardController.getData);
+router.get('/', (req, res) => {
+  const deviceType = req.query.deviceType; 
+  DashboardController.getData(req, res, deviceType);
+});
+router.get("/app-promotion",[],DashboardController.getAppPromotionData);
 /*router.get("/", function (req, res) {
   res.status(401).json({
     status: "0",
@@ -633,7 +638,6 @@ router.post(
 );
 
 const checkLogin = (req, res, next) => {
-    
   // Check if the user is authenticated/logged in
   if (req.isAuthenticated()) {
     // User is authenticated, proceed to the next middleware
@@ -682,40 +686,13 @@ router.post(
   UserproductController.getSizeData
 );
 
+router.post("/brandlist",[],UserproductController.getBrandData);
+router.post("/genderlist",[], UserproductController.getGenderdData);
+router.post("/myproductlist",[],UserproductController.getProductData);
+router.post("/productlistbyid",[],UserproductController.getProductDataById);
+router.post("/productdetailsbyid",[check("product_id", "This is a required field!").not().isEmpty().trim().escape(),],UserproductController.getDetailsById);
 
-router.post(
-  "/brandlist",[],
-  UserproductController.getBrandData
-);
-
-router.post(
-  "/myproductlist",
-  [],
-  UserproductController.getProductData
-);
-
-router.post(
-  "/productlistbyid",
-  [],
-  UserproductController.getProductDataById
-);
-
-router.post(
-  "/productdetailsbyid",
-  [
-    check("product_id", "This is a required field!").not().isEmpty().trim().escape(),
-  ],
-  UserproductController.getDetailsById
-);
-
-
-router.post(
-  "/fetch-product",
-  [
-    check("product_id", "This is a required field!").not().isEmpty().trim().escape(),
-  ],
-  UserproductController.getProduct
-);
+router.post("/fetch-product",[check("product_id", "This is a required field!").not().isEmpty().trim().escape(),],UserproductController.getProduct);
 
 router.post(
   "/update-product",

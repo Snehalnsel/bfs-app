@@ -34,6 +34,7 @@ const Banner = require("../../models/api/bannerModel");
 const Demoorder = require("../../models/api/demoorderModel");
 const Order = require("../../models/api/orderModel");
 const Cart = require('../../models/api/cartModel');
+const CartDetail = require('../../models/api/cartdetailsModel');
 const Notifications = require("../../models/api/notificationModel");
 const sendSms = require("../../models/thirdPartyApi/sendSms");
 const sendWhatsapp = require("../../models/thirdPartyApi/sendWhatsapp");
@@ -48,15 +49,24 @@ const MERCHANT_ID = "PGTESTPAYUAT";
 const PHONE_PE_HOST_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox";
 const SALT_INDEX = 1;
 const SALT_KEY = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";
-const APP_BE_URL = "https://localhost:3000";
+const APP_BE_URL = process.env.SITE_URL;
 
 exports.getPaymentData = async function (req, res, next) {
   try {
-
     const tempOrderId = req.query.temp;
-    console.log("demo order id before payment",tempOrderId);
     const temporder = await Demoorder.findById(tempOrderId);
-    const amount = temporder.total_price;
+   
+    let amount;
+    if(temporder.booking_amount == 0) {
+      amount= parseInt(temporder.total_price);
+    }
+    else
+    {
+      amount = parseInt(temporder.booking_amount);
+    }
+
+   // amount = temporder.booking_amount !== 0 ? temporder.booking_amount : temporder.total_price;
+
     let userId = temporder.user_id;
     let merchantTransactionId = uniqid();
     let normalPayLoad = {
@@ -123,10 +133,8 @@ exports.getPaymentData = async function (req, res, next) {
 exports.getStatus = async function (req, res, next) {
   try {
     const tempId = req.query.temp;
-    console.log("demo order id", tempId);
 
     const temporder = await Demoorder.findById(tempId);
-    console.log("demo order details", temporder);
 
     const merchantTransactionId = temporder.merchant_transactionid;
 
@@ -148,82 +156,114 @@ exports.getStatus = async function (req, res, next) {
             "X-MERCHANT-ID": merchantTransactionId,
             accept: "application/json",
           },
+        }).then(async (res)=>{
+          if(typeof res.data.code != "undefined") {
+            return {
+              code:res.data.code,
+              data:res.data
+            };
+          } else {
+            return {
+              code:"failure",
+              data:res.data
+            };
+          }
         });
-
-        const updateData = {
+        let updateData = {
           checkstatus_response: response.data,
-          checkstatus_status: response.data.code === "PAYMENT_SUCCESS" ? "success" : "failure",
+          //checkstatus_status: response.data.code === "PAYMENT_SUCCESS" ? "success" : "failure",
         };
+        if(typeof response.data.code != "undefined" && response.data.code == "PAYMENT_SUCCESS") {
+          updateData.checkstatus_status = "success";
+        } else {
+          updateData.checkstatus_status = "failure";
+        }
 
-        console.log("Updating Demoorder with response data:", response.data);
-
-        const updatedOrder = await Demoorder.findOneAndUpdate(
+        await Demoorder.findOneAndUpdate(
           { _id: tempId },
           { $set: updateData },
           { new: true }
         );
 
-        console.log('Updated Demoorder:', updatedOrder);
-
-        // Continue with creating the new Order
-        const now = new Date();
-        const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0'); // Adding 1 because months are zero-based
-        const currentYear = now.getFullYear().toString();
-        const currentHour = now.getHours().toString().padStart(2, '0');
-        const currentMinute = now.getMinutes().toString().padStart(2, '0');
-        const currentSecond = now.getSeconds().toString().padStart(2, '0');
-        const currentMillisecond = now.getMilliseconds().toString().padStart(3, '0');
-        let order_status = '0';
-        let delivery_charges = '0';
-        let discount = '0';
-        let pickup_status = '0';
-        let delivery_status = '0';
-        let gst ='0';
+        if(updateData.checkstatus_status == "success") {
+          // Continue with creating the new Order
+          const now = new Date();
+          const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0'); 
+          const currentYear = now.getFullYear().toString();
+          let order_status = '0';
+          let delivery_charges = '0';
+          let discount = '0';
+          let pickup_status = '0';
+          let delivery_status = '0';          
           
-        const lastOrderNumber = getLastOrderNumber();
-        const lastIncrementingPart = lastOrderNumber ? parseInt(lastOrderNumber.split('-')[1]) : 0;
-        const nextIncrementingPart = lastIncrementingPart + 1;
-        const paddedNextIncrementingPart = nextIncrementingPart.toString().padStart(4, '0');
-        const orderCode = `BFSORD${currentMonth}${currentYear}-${paddedNextIncrementingPart}`;
-        console.log(orderCode);
-        //const orderCode = `BFSORD${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
-        const order = new Order({
-          order_code: orderCode,
-          user_id: temporder.user_id,
-          cart_id: temporder.cart_id,
-          seller_id: temporder.seller_id,
-          product_id: temporder.product_id,
-          billing_address_id: temporder.billing_address_id,
-          shipping_address_id: temporder.shipping_address_id,
-          total_price: temporder.total_price,
-          payment_method: temporder.payment_method,
-          order_status: order_status,
-          gst: gst || '',
-          delivery_charges: delivery_charges,
-          discount: discount,
-          pickup_status: pickup_status,
-          delivery_status: delivery_status,
-          pay_now: temporder.pay_now || '', 
-          remaining_amount: temporder.remaining_amount || '',
-          added_dtime: new Date().toISOString(),
-        });
+          const lastOrderIndex = await getLastOrderIndex();
+          const nextIncrementingPart = lastOrderIndex + 1;
+          const orderCode = `BFSORD${currentMonth}${currentYear}-${nextIncrementingPart}`;
+          const order = new Order({
+            order_code: orderCode,
+            order_index: nextIncrementingPart,
+            user_id: temporder.user_id,
+            cart_id: temporder.cart_id,
+            seller_id: temporder.seller_id,
+            product_id: temporder.product_id,
+            billing_address_id: temporder.billing_address_id,
+            shipping_address_id: temporder.shipping_address_id,
+            total_price: temporder.total_price,
+            booking_amount : temporder.booking_amount || 0,
+            packing_handling_charge : temporder.packing_handling_charge || 0, 
+            payment_method: temporder.payment_method,
+            order_status: order_status,
+            gst: temporder.gst || '',
+            taxable_value : temporder.taxable_value || '',
+            delivery_charges: delivery_charges,
+            discount: discount,
+            pickup_status: pickup_status,
+            delivery_status: delivery_status,
+            pay_now: temporder.pay_now || '', 
+            remaining_amount: temporder.remaining_amount || '',
+            added_dtime: new Date().toISOString(),
+          });
 
-        const savedOrder = await order.save();
-        console.log('Order saved successfully:', savedOrder);
-        res.redirect('/message?message=success');
+          const savedOrder = await order.save();
+
+          if(savedOrder)
+          {
+            const updatedProduct = await Userproduct.findOneAndUpdate(
+              { _id: temporder.product_id }, 
+              { $set: { flag: 1 } }, 
+              { new: true }
+            );
+            if(updatedProduct)
+            {
+              const cleanedCartId =  mongoose.Types.ObjectId(temporder.cart_id); 
+              const cartDetail = await CartDetail.findOne({ cart_id: cleanedCartId });
+              if (cartDetail) {
+                await cartDetail.remove();
+              }
+              const cartDetailsCount = await CartDetail.countDocuments({ cart_id: savedOrder.cart_id });
+              const existingCart = await Cart.findById(temporder.cart_id);
+              if (cartDetailsCount === 0) {
+                await existingCart.remove();
+              }
+            } 
+          }
+          res.redirect('/message?message=success');
+        } else {
+          res.redirect('/message?message=failure');
+        }
       } catch (error) {
-        console.error('Error in axios request:', error);
-        res.status(500).json({
+        res.redirect('/message?message=failure');
+        /*res.status(500).json({
           status: '0',
           message: 'Error in axios request.',
           error: error.message,
-        });
+        });*/
       }
     } else {
-      res.send("Sorry!! Error");
+      //res.send("Sorry!! Error");
+      res.redirect('/message?message=failure');
     }
   } catch (error) {
-    console.error('Error in getStatus function:', error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the dashboard.",
@@ -238,16 +278,22 @@ async function getLastOrderNumber() {
     const lastOrder = await Order.findOne().sort({ _id: -1 }); 
     return lastOrder ? lastOrder.order_code: 0;
   } catch (error) {
-    console.error('Error fetching last order number:', error);
     return 0;
   }
 }
 
 
+async function getLastOrderIndex() {
+  try {
+    const result = await Order.findOne({}, {}, { sort: { order_index: -1 } });
+    return result ? result.order_index : '000';
+  } catch (error) {
+    return 0; // Return 0 in case of an error
+  }
+}
 
 // exports.getData = async function (req, res, next) {
 //   try {
-//     //console.log('hello',req.session.user);return false;
 //     //return;
 
 //     const amount = 1;
@@ -273,7 +319,6 @@ async function getLastOrderNumber() {
 //         type: "PAY_PAGE",
 //       },
 //     };
-//     //console.log("normalPayLoad",normalPayLoad);
 //     let bufferObj = Buffer.from(JSON.stringify(normalPayLoad), "utf8");
 //     let base64EncodedPayload = bufferObj.toString("base64");
 //     let string = base64EncodedPayload + "/pg/v1/pay" + SALT_KEY;
@@ -293,8 +338,6 @@ async function getLastOrderNumber() {
 //         }
 //       )
 //       .then(function (response) {
-//         console.log("response->", response.data);
-//         console.log("response instrument->", response.data.data.instrumentResponse.redirectInfo);
       
        
 //         const newOrder = new DemoOrder({
@@ -309,13 +352,11 @@ async function getLastOrderNumber() {
       
 //         newOrder.save()
 //           .then(savedOrder => {
-//             console.log("Order saved successfully:", savedOrder);
             
 //             const redirectWithTransactionId = `${APP_BE_URL}/payment-status?merchantTransactionId=${merchantTransactionId}`;
 //             res.redirect(redirectWithTransactionId);
 //           })
 //           .catch(saveError => {
-//             console.error("Error saving order:", saveError);
 //             res.status(500).json({
 //               status: "0",
 //               message: "An error occurred while saving the order.",

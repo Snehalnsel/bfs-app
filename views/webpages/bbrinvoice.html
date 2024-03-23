@@ -23,24 +23,22 @@
                      <tbody>
                         <tr>
                            <td style="width: 50%; border-left: solid 1px #000; border-top: solid 1px #000;">
-                              <strong>Sold By</strong><br>
-                              <strong>&nbsp;</strong><br>
-                              BFS Retail Services Private Limited<br>
-                              <strong>"ALTITUDE THE BUSINES PARK" </strong><br>
-                              2 OC Ganguly Sarani 10th, L.R.Sarani, <br>
-                              Kolkata, West Bengal, India,700020<br>
-                              Cin U46103WB2023PTC264898<br>
-                              Pan AALCB9231G<br>
-                              Gstin 19AALCB9231G1ZG<br>
+                              <strong>Return By</strong><br>
+                              <strong>Sweta Agarwal</strong><br>
+                              27/1/A, Harish Mukherjee Road <br>
+                              Bhawanipore Kolkata 700025<br>
+                              <strong>Pan: BHVPA9269J</strong><br>
+                              Contact No.:<br>
+                              E-mail Id: support@bfsretailservice.com<br>
                            </td>
                            <td style="width: 50%; border-top: solid 1px #000; border-right: solid 1px #000;"><strong>Billing Address</strong><br>
-                               <strong><%= order.user && order.user.length > 0 && order.user[0].name || '' %></strong><br>
-                               <%= order.shipping_address[0].street_name %>, <%= order.shipping_address[0].address1 %><br>
-                               <%= order.shipping_address[0].landmark %>,<br>
-                               <%= order.shipping_address[0].city_name %>, <%= order.shipping_address[0].state_name %><br>
-                              <strong>Pan: BHVPA9269J</strong><br>
-                              Contact No.: <br>
-                              E-Mail ID:  <%= order.user && order.user.length > 0 && order.user[0].email || '' %>  <br>
+                              <strong>BFS Retail Services Private Limited</strong><br>
+                              <strong>"ALTITUDE THE BUSINES PARK" </strong><br>
+                              2 OC Ganguly Sarani 10th, L.R.Sarani,<br>
+                             Kolkata, West Bengal, India,700020<br>
+                              Cin U46103WB2023PTC264898<br>
+                              Pan AALCB9231G<br>
+                              Gstin 19AALCB9231G1ZG
                            </td>
                         </tr>
                         <tr>
@@ -52,20 +50,21 @@
                               &nbsp;
                            </td>
                            <td style="width: 50%; border-right: solid 1px #000;"><strong>Shipping Address</strong><br>
-						    <strong> <%= order.user && order.user.length > 0 && order.user[0].name || '' %> </strong><br>
-                            <%= order.shipping_address[0].street_name %>, <%= order.shipping_address[0].address1 %><br>
-                            <%= order.shipping_address[0].landmark %>,<br>
-                            <%= order.shipping_address[0].city_name %>, <%= order.shipping_address[0].state_name %><br>
+                              <strong>BFS Retail Services Private Limited</strong><br>
+                              <strong>"ALTITUDE THE BUSINES PARK"</strong><br>
+                              2 O C Ganguly Sarani 10th, L.R.Sarani, <br>
+                              Kolkata, West Bengal, India,700020<br>
+                            Cin U46103WB2023PTC264898<br>
                            </td>
                         </tr>
                         <tr style="margin-top: 30px;">
                            <td style="width: 50%; border-left: solid 1px #000;">
-                              <h1 style="font-size:16px;">Order No:<%= order.order_code %> </h1>
-                              <h1 style="font-size:16px;">Order Date:<%= order.added_dtime %> </h1>
+                              <h1 style="font-size:16px;">Order No. </h1>
+                              <h1 style="font-size:16px;">Order Date </h1>
                            </td>
                            <td style="width: 50%; border-right: solid 1px #000;">
-                              <h1 style="font-size:16px;">Invoice No. BB/000001/03-24</h1>
-                              <!-- <h1 style="font-size:16px;">Invoice Date: </h1> -->
+                              <h1 style="font-size:16px;">Invoice No. BBR/000001/03-24</h1>
+                              <h1 style="font-size:16px;">Invoice Date: </h1>
                            </td>
                         </tr>
                      </tbody>
@@ -88,13 +87,11 @@
                            <td style="width: 9%; border-right:solid 1px #000; border-bottom:solid 1px #000;"><strong>Tax Amount</strong></td>
                            <td style="width: 10%; border-right:solid 1px #000; border-bottom:solid 1px #000;"><strong>Total Amount (Rs.)</strong></td>
                         </tr>
-                        <tr>
+                       <tr>
                            <td style="border-right:solid 1px #000;">1</td>
-                           <% order.product.forEach(product => { %>
-                            <td style="border-right:solid 1px #000;">
-                               <h1 style="text-align: left; font-size:16px;"><%= product.name %></h1>
-                            </td>
-                            <% }); %>
+                           <td style="border-right:solid 1px #000;">
+                              <h1 style="text-align: left; font-size:16px;">Gucci Bag</h1>
+                           </td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
@@ -104,12 +101,11 @@
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
 
                            <td align="right" style="border-right:solid 1px #000;">
-                            <%= order.total_price %>
+                             0.00
                            </td>
                         </tr>
                         <tr>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
-                           <td style="border-right:solid 1px #000;"><h1 style="text-align: left; font-size:16px;">Shipping & Handling Charges</h1></td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
@@ -117,19 +113,8 @@
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
-                           <td align="right" style="border-right:solid 1px #000;"><%= order.total_price %></td>
-                        </tr>
-                        <tr>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
-                           <td style="border-right:solid 1px #000;">Cash Handling Charges</td>
-                           <td style="border-right:solid 1px #000;">&nbsp;</td>
-                           <td style="border-right:solid 1px #000;">&nbsp;</td>
-                           <td style="border-right:solid 1px #000;">&nbsp;</td>
-                           <td style="border-right:solid 1px #000;">&nbsp;</td>
-                           <td style="border-right:solid 1px #000;">&nbsp;</td>
-                           <td style="border-right:solid 1px #000;">&nbsp;</td>
-                           <td style="border-right:solid 1px #000;">&nbsp;</td>
-                           <td align="right" style="border-right:solid 1px #000;"><%= order.total_price %></td>
+                           <td align="right" style="border-right:solid 1px #000;">&nbsp;</td>
                         </tr>
                         <tr>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
@@ -140,7 +125,19 @@
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
-                           <td style="border-right:solid 1px #000;"><%= order.total_price %></td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td align="right" style="border-right:solid 1px #000;">&nbsp;</td>
+                        </tr>
+                        <tr>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td align="right" style="border-right:solid 1px #000;">&nbsp;</td>
                         </tr>
                         <tr>
@@ -190,7 +187,7 @@
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td align="right" style="border-right:solid 1px #000;">
-                            <%= order.total_price %>
+                              0.00
                            </td>
                         </tr>
                         <tr>
@@ -204,7 +201,7 @@
                            <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
                            <td align="right" style="border-right:solid 1px #000; border-bottom: 1px solid #000;">
-                            <%= order.total_price %>
+                             0.00
                            </td>
                         </tr>
                         <tr>
@@ -219,7 +216,7 @@
                               <h1 style="text-align: right; font-size:16px;">Total</h1>
                            </td>
                            <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">
-                              <h1 style="text-align: right; font-size:16px;"><%= order.total_price %></h1>
+                              <h1 style="text-align: right; font-size:16px;">0.00</h1>
                            </td>
                         </tr>
                         <tr>
@@ -247,7 +244,7 @@
                            <td colspan="10" style="text-align: left; border-right:solid 1px #000;">&nbsp;</td>
                         </tr>
                         <tr>
-                           <td colspan="10" style="text-align: left; border-right:solid 1px #000;"><strong> <%= order.user && order.user.length > 0 && order.user[0].name || '' %> </strong> </td>
+                           <td colspan="10" style="text-align: left; border-right:solid 1px #000;"><strong>Sweta Agarwal</strong> </td>
                         </tr>
                         <tr>
                            <td colspan="10" style="text-align: left; border-right:solid 1px #000; border-bottom:solid 1px #000;"><strong>Authorised Signatory</strong> </td>
@@ -288,7 +285,7 @@
                            <td style="border-left:solid 1px #000; border-bottom: 1px solid #000;"><strong>Payment Transaction ID</strong> </td>
                            <td style="border-bottom: 1px solid #000;"><strong>Date & Time</strong> </td>
                            <td style="border-bottom: 1px solid #000;"><strong>Invoice Value	</strong> </td>
-                           <td style="text-transform: uppercase; text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+                           <td style="text-align: center; border-right: 1px solid #000; border-bottom: 1px solid #000;">
                               <strong>Mode Of Payment</strong> 
                            </td>
                         </tr>
@@ -298,6 +295,6 @@
             </tr>
          </tbody>
       </table>
-	   </div>
+	  </div>
    </body>
 </html>

@@ -11,6 +11,7 @@ const ejs = require('ejs');
 const mime = require("mime");
 const PDFDocument = require('pdfkit');
 const nodemailer = require('nodemailer');
+const rp = require('request-promise-native');
 const request = require('request');
 const Category = require("../../models/api/categoryModel");
 const Brand = require("../../models/api/brandModel");
@@ -188,141 +189,182 @@ async function generateOrder(data) {
 
 }
 
-exports.getOrderList = function (req, res, next) {
-  var pageName = "Order List";
-  var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-  Order.aggregate([
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'user_id',
-        foreignField: '_id',
-        as: 'user',
-      },
+async function generateReturnOrder(data) {
+  token = await generateToken(email, shipPassword);
+  if (!token) {
+    return Promise.reject('Token not available. Call generateToken first.');
+  }
+  const options = {
+    method: 'POST',
+    url: baseUrl + '/orders/create/return',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
     },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'seller_id',
-        foreignField: '_id',
-        as: 'seller',
-      },
-    },
-    {
-      $lookup: {
-        from: 'addressbook_lists',
-        localField: 'billing_address_id',
-        foreignField: '_id',
-        as: 'billing_address',
-      },
-    },
-    {
-      $lookup: {
-        from: 'addressbook_lists',
-        localField: 'shipping_address_id',
-        foreignField: '_id',
-        as: 'shipping_address',
-      },
-    },
-    {
-      $lookup: {
-        from: 'mt_userproducts',
-        localField: 'product_id',
-        foreignField: '_id',
-        as: 'product',
-      },
-    },
-    {
-      $lookup: {
-        from: 'order_trackings',
-        localField: '_id',
-        foreignField: 'order_id',
-        as: 'trackingDetails',
-      },
-    },
-    {
-      $lookup: {
-        from: 'mt_tracks',
-        localField: 'trackingDetails.tracking_id',
-        foreignField: '_id',
-        as: 'trackDetails',
-      },
-    },
-    {
-      $sort: {
-        added_dtime: -1
+    body: JSON.stringify(data)
+  };
+
+  return new Promise((resolve, reject) => {
+    request(options, function (error, response, body) {
+      if (error) {
+        reject(error);
+      } else if (response.statusCode === 200) {
+        const responseBody = JSON.parse(body);
+        const token = responseBody;
+        resolve(token);
+      } else {
+        reject(new Error(`Error: ${response.statusCode}`));
       }
-    }
-  ]).exec(function (error, orderList) {
-    if (error) {
-      res.status(500).json({ error: 'An error occurred' });
-    } else {
-      const shipmentPromises = [];
-      const imagePromises = [];
-
-      orderList.forEach(function (order) {
-        if (order.product && order.product.length > 0) {
-          const product_id = order.product[0]._id;
-          const imagePromise = Productimage.findOne({ product_id: product_id }).limit(1).exec();
-          imagePromises.push(imagePromise);
-        }
-
-        const shipmentPromise = Shippingkit.findOne({ order_id: order._id });
-        shipmentPromises.push(shipmentPromise);
-      });
-
-      orderList.forEach(function (order) {
-        const shipment = Shippingkit.findOne({ order_id: order._id });
-
-        if (shipment) {
-          order.shipment = shipment;
-        }
-      });
-
-
-      Promise.all(shipmentPromises)
-        .then((shipments) => {
-
-          orderList.forEach((order, index) => {
-            if (shipments[index]) {
-              order.shipment = shipments[index];
-            } else {
-              order.shipment = null;
-            }
-          });
-
-          return Promise.all(imagePromises);
-        })
-        .then((productImages) => {
-
-          orderList.forEach((order, index) => {
-            order.productImage = productImages[index];
-          });
-          console.log(orderList);
-          res.render("pages/order/list", {
-            siteName: req.app.locals.siteName,
-            pageName: pageName,
-            pageTitle: pageTitle,
-            userFullName: req.session.admin.name,
-            userImage: req.session.admin.image_url,
-            userEmail: req.session.admin.email,
-            year: moment().format("YYYY"),
-            requrl: req.app.locals.requrl,
-            status: 0,
-            message: "Found!",
-            respdata: {
-              list: orderList,
-            },
-            isAdminLoggedIn: isAdminLoggedIn
-          });
-        })
-        .catch((err) => {
-          res.status(500).json({ error: 'Error fetching product images' });
-        });
-    }
+    });
   });
-};
+
+
+}
+
+// exports.getOrderList = function (req, res, next) {
+//   var pageName = "Order List";
+//   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+//   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+//   Order.aggregate([
+//     {
+//       $lookup: {
+//         from: 'users',
+//         localField: 'user_id',
+//         foreignField: '_id',
+//         as: 'user',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'users',
+//         localField: 'seller_id',
+//         foreignField: '_id',
+//         as: 'seller',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'addressbook_lists',
+//         localField: 'billing_address_id',
+//         foreignField: '_id',
+//         as: 'billing_address',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'addressbook_lists',
+//         localField: 'shipping_address_id',
+//         foreignField: '_id',
+//         as: 'shipping_address',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'mt_userproducts',
+//         localField: 'product_id',
+//         foreignField: '_id',
+//         as: 'product',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'order_trackings',
+//         localField: '_id',
+//         foreignField: 'order_id',
+//         as: 'trackingDetails',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'mt_tracks',
+//         localField: 'trackingDetails.tracking_id',
+//         foreignField: '_id',
+//         as: 'trackDetails',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'mt_returnorders',
+//         localField: 'returnorder.order_id',
+//         foreignField: '_id',
+//         as: 'returnorder',
+//       },
+//     },
+//     {
+//       $sort: {
+//         added_dtime: -1
+//       }
+//     }
+//   ]).exec(function (error, orderList) {
+//     if (error) {
+//       res.status(500).json({ error: 'An error occurred' });
+//     } else {
+//       const shipmentPromises = [];
+//       const imagePromises = [];
+
+//       orderList.forEach(function (order) {
+//         if (order.product && order.product.length > 0) {
+//           const product_id = order.product[0]._id;
+//           const imagePromise = Productimage.findOne({ product_id: product_id }).limit(1).exec();
+//           imagePromises.push(imagePromise);
+//         }
+
+//         const shipmentPromise = Shippingkit.findOne({ order_id: order._id });
+//         shipmentPromises.push(shipmentPromise);
+//       });
+
+//       orderList.forEach(function (order) {
+//         const shipment = Shippingkit.findOne({ order_id: order._id });
+
+//         if (shipment) {
+//           order.shipment = shipment;
+//         }
+//       });
+//       Promise.all(shipmentPromises)
+//         .then((shipments) => {
+
+//           orderList.forEach((order, index) => {
+//             if (shipments[index]) {
+//               order.shipment = shipments[index];
+//             } else {
+//               order.shipment = null;
+//             }
+//           });
+
+//           return Promise.all(imagePromises);
+//         })
+//         .then((productImages) => {
+
+//           orderList.forEach((order, index) => {
+//             order.productImage = productImages[index];
+//           });
+//           console.log("orderlist",orderList);
+//           res.render("pages/order/list", {
+//             siteName: req.app.locals.siteName,
+//             pageName: pageName,
+//             pageTitle: pageTitle,
+//             userFullName: req.session.admin.name,
+//             userImage: req.session.admin.image_url,
+//             userEmail: req.session.admin.email,
+//             year: moment().format("YYYY"),
+//             requrl: req.app.locals.requrl,
+//             status: 0,
+//             message: "Found!",
+//             respdata: {
+//               list: orderList,
+//             },
+//             isAdminLoggedIn: isAdminLoggedIn
+//           });
+//         })
+//         .catch((err) => {
+//           return res.render("pages/error-msg", {
+//             errorMsg:"Error fetching product images"
+//           });
+//           //res.status(500).json({ error: 'Error fetching product images' });
+//         });
+//     }
+//   });
+// };
 
 exports.getOrderList = function (page, searchType, searchValue, req, res, next) {
   var pageName = "Order List";
@@ -393,6 +435,14 @@ exports.getOrderList = function (page, searchType, searchValue, req, res, next) 
       },
     },
     {
+            $lookup: {
+              from: 'mt_returnorders',
+              localField: 'returnorder.order_id',
+              foreignField: '_id',
+              as: 'returnorder',
+            },
+    },
+    {
       $sort: {
         added_dtime: -1
       }
@@ -401,7 +451,10 @@ exports.getOrderList = function (page, searchType, searchValue, req, res, next) 
     { $limit: 20 }
   ]).exec(function (error, orderList) {
     if (error) {
-      return res.status(500).json({ error: 'An error occurred' });
+      return res.render("pages/error-msg", {
+        errorMsg:"An error occurred"
+      });
+      //return res.status(500).json({ error: 'An error occurred' });
     }
 
     res.render("pages/order/list", {
@@ -424,71 +477,7 @@ exports.getOrderList = function (page, searchType, searchValue, req, res, next) 
 };
 
 
-// exports.getOrderDetails = function (req, res, next) {
 
-//   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-//   var pageName = "Order Details";
-//   var pageTitle = req.app.locals.siteName + " - " + pageName;
-//   const orderId = req.params.id;
-
-//   if (!mongoose.Types.ObjectId.isValid(orderId)) {
-//     return res.status(400).json({ error: 'Invalid order ID' });
-//   }
-
-//   Order.findOne({ _id: orderId })
-//     .populate('user_id', 'name phone_no email')
-//     .populate('seller_id', 'name phone_no email')
-//     .populate('billing_address_id')
-//     .populate('shipping_address_id')
-//     .populate('hub_address_id')
-//     .then(async (orderDetails) => {
-//       if (!orderDetails) {
-//         return res.status(404).json({ error: 'Order not found' });
-//       }
-
-//       const billingAddress = await AddressBook.find({ user_id: orderDetails.seller_id });
-//       const shippingAddress = await AddressBook.find({ user_id: orderDetails.user_id });
-
-//       const hubdata = await Hublist.find({ flag: 1 });
-
-//       const shiprocketResponse = await generateCouriresList();
-
-//       const cartId = orderDetails.cart_id;
-
-//       CartDetail.find({ cart_id: cartId })
-//         .populate('product_id', 'name')
-//         .then((cartDetails) => {
-//           res.render("pages/order/details", {
-//             status: 1,
-//             siteName: req.app.locals.siteName,
-//             pageName: pageName,
-//             pageTitle: pageTitle,
-//             userFullName: req.session.admin.name,
-//             userImage: req.session.admin.image_url,
-//             userEmail: req.session.admin.email,
-//             year: moment().format("YYYY"),
-//             requrl: req.app.locals.requrl,
-//             message: "",
-//             respdata: {
-//               orderDetails: orderDetails,
-//               cartDetails: cartDetails[0],
-//               billingAddress: billingAddress,
-//               shippingAddress: shippingAddress,
-//               hublist: hubdata,
-//               shiprocketResponse: shiprocketResponse
-//             },
-//             isAdminLoggedIn: isAdminLoggedIn
-//           });
-//         })
-//         .catch((error) => {
-//           res.status(500).json({ error: 'An error occurred while fetching cart details' });
-//         });
-//     })
-//     .catch((error) => {
-//       res.status(500).json({ error: 'An error occurred while fetching order details' });
-//     });
-
-// };
 
 exports.getOrderDetails = function (req, res, next) {
 
@@ -496,9 +485,13 @@ exports.getOrderDetails = function (req, res, next) {
   var pageName = "Order Details";
   var pageTitle = req.app.locals.siteName + " - " + pageName;
   const orderId = req.params.id;
+  const flowId = req.params.flowid;
 
   if (!mongoose.Types.ObjectId.isValid(orderId)) {
-    return res.status(400).json({ error: 'Invalid order ID' });
+    return res.render("pages/error-msg", {
+      errorMsg:"Invalid order ID"
+    });
+    //return res.status(400).json({ error: 'Invalid order ID' });
   }
 
   Order.findOne({ _id: orderId })
@@ -509,7 +502,10 @@ exports.getOrderDetails = function (req, res, next) {
     .populate('hub_address_id')
     .then(async (orderDetails) => {
       if (!orderDetails) {
-        return res.status(404).json({ error: 'Order not found' });
+        return res.render("pages/error-msg", {
+          errorMsg:"Order not found"
+        });
+        //return res.status(404).json({ error: 'Order not found' });
       }
 
       const billingAddress = await AddressBook.find({ user_id: orderDetails.seller_id });
@@ -535,14 +531,15 @@ exports.getOrderDetails = function (req, res, next) {
           billingAddress: billingAddress,
           shippingAddress: shippingAddress,
           hublist: hubdata,
-          shiprocketResponse: shiprocketResponse
+          shiprocketResponse: shiprocketResponse,
+          flowId :flowId
         },
         isAdminLoggedIn: isAdminLoggedIn
       });
 
     })
     .catch((error) => {
-      res.status(500).json({ error: 'An error occurred while fetching order details' });
+      res.status(500).json({ error: 'An error occurred while fetching order details',error1:error });
     });
 };
 
@@ -745,12 +742,6 @@ exports.updateData = async function (req, res, next) {
         isAdminLoggedIn: isAdminLoggedIn
       });
     } else {
-      // var updData = {
-      //   billing_address_id: req.body.seller_address,
-      //   shipping_address_id: req.body.buyer_address,
-      //   hub_address_id: req.body.hub_address,
-      //   // shiprocket_delivery_partner: req.body.user_courier,
-      // };
       const orderDetails = await Order.findById(req.body.order_id);
       if (!orderDetails) {
         return res.status(404).json({ message: 'Order not found' });
@@ -760,8 +751,9 @@ exports.updateData = async function (req, res, next) {
       const user_id = orderDetails.user_id;
       const seller_id = orderDetails.seller_id;
       const product_id = orderDetails.product_id;
-      const billing_address_id = orderDetails.billing_address_id;
-      const shipping_address_id = req.body.hub_address;
+      const seller_address_id = orderDetails.billing_address_id;
+      const buyer_address_id = orderDetails.shipping_address_id;
+      const hub_address_id = req.body.hub_address;
       const total_price = orderDetails.total_price;
       const payment_method = orderDetails.payment_method;
       const order_status = orderDetails.order_status;
@@ -780,23 +772,39 @@ exports.updateData = async function (req, res, next) {
 
       // Generate the unique code using the current time components
       const transactionCode = `BFSTRANS${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
-      const track = new Track({
+
+     
+      let trackInsertData = {
         track_code: transactionCode,
-        seller_id: seller_id,
         product_id: product_id,
-        billing_address_id: billing_address_id,
-        hub_address_id: req.body.hub_address,
+        hub_address_id: hub_address_id,
         total_price: total_price,
         payment_method: payment_method,
         order_status: order_status,
         gst: gst,
         delivery_charges: delivery_charges,
         discount: discount,
+        order_flow_status: req.body.flow_id,
         added_dtime: new Date().toISOString(),
-      });
-
+      };
+      if(req.body.flow_id == 0) {
+        trackInsertData.seller_id = seller_id;
+        trackInsertData.seller_address_id = seller_address_id;
+      } else if(req.body.flow_id == 1) {
+        trackInsertData.buyer_id = user_id;
+        trackInsertData.buyer_address_id = buyer_address_id;
+      } else if(req.body.flow_id == 2) {
+        trackInsertData.buyer_id = user_id;
+        trackInsertData.buyer_address_id = buyer_address_id;
+      } else if(req.body.flow_id == 3){
+        trackInsertData.seller_id = seller_id;
+        trackInsertData.seller_address_id = seller_address_id;
+      } else if(req.body.flow_id == 4){
+        trackInsertData.seller_id = seller_id;
+        trackInsertData.seller_address_id = seller_address_id;
+      }
+      let track = new Track(trackInsertData);
       const savedTrack = await track.save();
-
       if (savedTrack) {
         const track_id = savedTrack._id;
 
@@ -806,6 +814,7 @@ exports.updateData = async function (req, res, next) {
           order_code: order_code,
           track_code: transactionCode,
           type: 0,
+          status:req.body.flow_id,
           added_dtime: new Date().toISOString(),
         });
 
@@ -825,11 +834,14 @@ exports.updateData = async function (req, res, next) {
     }
   }).catch((err) => {
     ;
-    res.status(500).json({
+    /*res.status(500).json({
       status: "0",
       message: "An error occurred while updating the product.",
       respdata: {},
       isAdminLoggedIn: isAdminLoggedIn
+    });*/
+    return res.render("pages/error-msg", {
+      errorMsg:"An error occurred while updating the product"
     });
   });
 };
@@ -996,12 +1008,15 @@ exports.deleteData = async function (req, res, next) {
 
     res.redirect("/admin/orderlist");
   } catch (error) {
-    return res.status(500).json({
+    return res.render("pages/error-msg", {
+      errorMsg:"Error occurred while deleting the category!"
+    });
+    /*return res.status(500).json({
       status: "0",
       message: "Error occurred while deleting the category!",
       respdata: error.message,
       isAdminLoggedIn: isAdminLoggedIn
-    });
+    });*/
   }
 };
 
@@ -1178,10 +1193,120 @@ exports.orderplaced = async (req, res) => {
       res.redirect(`/admin/check-Couriresserviceability/${track_id}`);
     }
   } catch (error) {
-    res.status(500).json({ error: 'An error occurred while placing the order' });
+    return res.render("pages/error-msg", {
+      errorMsg:"An error occurred while placing the order!"
+    });
+    //res.status(500).json({ error: 'An error occurred while placing the order' });
   }
 };
 
+
+exports.returnorderplaced = async (req, res) => {
+  try {
+
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+    const track_id = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(track_id)) {
+      return res.status(400).json({ error: 'Invalid order ID' });
+    }
+
+    const orderDetails = await Track.findById({ _id: track_id })
+      .populate('buyer_id', 'name phone_no email')
+      .populate('billing_address_id')
+      .populate('hub_address_id');
+
+    const productdetails = await Userproduct.findById(orderDetails.product_id);
+
+    if (productdetails) {
+      const orderData = {
+        order_id: orderDetails.track_code,
+        order_date: new Date().toISOString(),
+        pickup_location: orderDetails.billing_address_id.shiprocket_address,
+        channel_id: "",
+        comment: "BFS - Bid For Sale",
+        billing_customer_name: orderDetails.seller_id.name,
+        billing_last_name: "",
+        billing_address: orderDetails.billing_address_id.street_name,
+        billing_address_2: orderDetails.billing_address_id.address1,
+        billing_city: orderDetails.billing_address_id.city_name,
+        billing_pincode: orderDetails.billing_address_id.pin_code,
+        billing_state: "West Benagal",
+        billing_country: "India",
+        billing_email: orderDetails.seller_id.email,
+        billing_phone: orderDetails.seller_id.phone_no,
+        shipping_is_billing: false,
+        shipping_customer_name: orderDetails.hub_address_id.name,
+        shipping_last_name: "",
+        shipping_address: orderDetails.hub_address_id.street_name,
+        shipping_address_2: orderDetails.hub_address_id.address1,
+        shipping_city: orderDetails.hub_address_id.city_name,
+        shipping_pincode: orderDetails.hub_address_id.pin_code,
+        shipping_country: "India",
+        shipping_state: "West Benagal",
+        shipping_email: orderDetails.hub_address_id.email,
+        shipping_phone: orderDetails.hub_address_id.phone_no,
+        order_items: [
+          {
+            name: productdetails.name,
+            sku: "chakra123",
+            units: 1,
+            selling_price: productdetails.offer_price,
+            discount: "",
+            tax: "",
+            hsn: 12345678
+          }
+        ],
+        payment_method: "COD",
+        shipping_charges: 0,
+        giftwrap_charges: 0,
+        transaction_charges: 0,
+        total_discount: 0,
+        sub_total: orderDetails.total_price,
+        length: productdetails.length,
+        breadth: productdetails.breath,
+        height: productdetails.height,
+        weight: productdetails.weight,
+      };
+      const shiprocketResponse = await generateOrder(orderData);
+      if (shiprocketResponse) {
+
+        const payment_status = '0';
+
+        shiprocket_payment_status = payment_status;
+        shiprocket_order_id = shiprocketResponse.order_id;
+        shiprocket_shipment_id = shiprocketResponse.shipment_id;
+        shiprocket_status_code = shiprocketResponse.status_code;
+
+
+        orderDetails.shiprocket_payment_status = shiprocket_payment_status;
+        orderDetails.shiprocket_order_id = shiprocket_order_id;
+        orderDetails.shiprocket_shipment_id = shiprocket_shipment_id;
+        orderDetails.shiprocket_status_code = shiprocket_status_code;
+
+        await orderDetails.save();
+
+      }
+    }
+    else {
+      return res.status(404).json({ error: ' product Not found' });
+    }
+    if (!orderDetails) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+    else {
+      const updatedOrderTracking = await Ordertracking.findOneAndUpdate(
+        { tracking_id: track_id },
+        { $set: { status: 1 } },
+        { new: true }
+      );
+      res.redirect(`/admin/check-Couriresserviceability/${track_id}`);
+    }
+  } catch (error) {
+    return res.render("pages/error-msg", {
+      errorMsg:"An error occurred while placing the order!"
+    });
+  }
+};
 
 exports.getAWBnoById = async function (req, res, next) {
 
@@ -1201,23 +1326,23 @@ exports.getAWBnoById = async function (req, res, next) {
     const courier_id = req.params.courier_company_id;
 
     const existingOrder = await Track.findById(trackId);
-
-
-
     if (!existingOrder) {
-      return res.status(404).json({
+      return res.render("pages/error-msg", {
+        errorMsg:"Order not found!"
+      });
+      /*return res.status(404).json({
         status: "0",
         message: "Order not found!",
         respdata: {},
         isAdminLoggedIn: isAdminLoggedIn
-      });
+      });*/
     }
     if (existingOrder) {
       const shipment_id = existingOrder.shiprocket_shipment_id;
+  
       const shiprocketResponse = await generateAWBno(shipment_id, courier_id);
-      if (shiprocketResponse) {
-
-        if (shiprocketResponse.response.data.awb_code) {
+      if (shiprocketResponse.awb_assign_status == 1) {
+        if (typeof shiprocketResponse.response.data.awb_code != "undefined") {
           existingOrder.pickup_awb = shiprocketResponse.response.data.awb_code;
           existingOrder.shiprocket_delivery_partner = shiprocketResponse.response.data.courier_company_id;
           existingOrder.shiprocket_courier_name = shiprocketResponse.response.data.transporter_name;
@@ -1244,25 +1369,32 @@ exports.getAWBnoById = async function (req, res, next) {
           }
           res.redirect("/admin/orderlist");
         }
-        else {
+        else if (shiprocketResponse.awb_assign_status == 0) {
           existingOrder.pickup_awb = "0";
           existingOrder.shiprocket_delivery_partner = "0";
           existingOrder.shiprocket_courier_name = "0";
           await existingOrder.save();
           res.redirect("/admin/orderlist");
         }
-
+      }
+      else if (shiprocketResponse.awb_assign_status == 0) {
+        return res.render("pages/error-msg", {
+          errorMsg:shiprocketResponse.response.data.awb_assign_error
+        });
       }
 
 
     }
   } catch (error) {
-    res.status(500).json({
-      status: "0",
-      message: "Error!",
-      respdata: error,
-      isAdminLoggedIn: isAdminLoggedIn
+    return res.render("pages/error-msg", {
+      errorMsg:error
     });
+    // res.status(500).json({
+    //   status: "0",
+    //   message: "Error!",
+    //   respdata: error,
+    //   isAdminLoggedIn: isAdminLoggedIn
+    // });
   }
 };
 
@@ -1288,7 +1420,6 @@ const sendEmailWithAttachment = async (receiverEmail, labelUrl, invoiceUrl) => {
   };
 
   transporter.sendMail(mailData, function (err, info) {
-    if (err) console.log(err);
   });
 
   try {
@@ -1321,12 +1452,15 @@ exports.getGenerateLabel = async function (req, res, next) {
     const existingOrder = await Track.findById(trackId);
 
     if (!existingOrder) {
-      return res.status(404).json({
+      return res.render("pages/error-msg", {
+        errorMsg:"Order not found!"
+      });
+      /*return res.status(404).json({
         status: "0",
         message: "Order not found!",
         respdata: {},
         isAdminLoggedIn: isAdminLoggedIn
-      });
+      });*/
     }
 
     const shipment_id = existingOrder.shiprocket_shipment_id;
@@ -1343,12 +1477,15 @@ exports.getGenerateLabel = async function (req, res, next) {
           file.close(() => {
             res.download(outputFilePath, 'label.pdf', (err) => {
               if (err) {
-                return res.status(500).json({
+                return res.render("pages/error-msg", {
+                  errorMsg:"Error downloading the file!"
+                });
+                /*return res.status(500).json({
                   status: "0",
                   message: "Error downloading the file!",
                   respdata: err,
                   isAdminLoggedIn: isAdminLoggedIn
-                });
+                });*/
               }
               // File downloaded and response sent successfully
               fs.unlink(outputFilePath, (unlinkErr) => {
@@ -1361,25 +1498,33 @@ exports.getGenerateLabel = async function (req, res, next) {
       });
 
       request.on('error', (error) => {
-        return res.status(500).json({
+        return res.render("pages/error-msg", {
+          errorMsg:"Error downloading the file!"
+        });
+        /*return res.status(500).json({
           status: "0",
           message: "Error downloading the file!",
           respdata: error,
           isAdminLoggedIn: isAdminLoggedIn
-        });
+        });*/
       });
     } else {
       //alert('something went wrong'+ shiprocketResponse.response);
-
-      return res.status(404).json({
+      return res.render("pages/error-msg", {
+        errorMsg:"Label URL not found!"
+      });
+      /*return res.status(404).json({
         status: "0",
         message: "Label URL not found!",
         respdata: shiprocketResponse,
         isAdminLoggedIn: isAdminLoggedIn
-      });
+      });*/
     }
   } catch (error) {
-    alert('something went wrong');
+    return res.render("pages/error-msg", {
+      errorMsg:"something went wrong!"
+    });
+    //alert('something went wrong');
     // res.status(500).json({
     //   status: "0",
     //   message: "Error!",
@@ -1407,24 +1552,30 @@ exports.getGenerateInvoice = async function (req, res, next) {
     const existingOrder = await Track.findById(trackId);
 
     if (!existingOrder) {
-      return res.status(404).json({
+      return res.render("pages/error-msg", {
+        errorMsg:"Order not found!"
+      });
+      /*return res.status(404).json({
         status: "0",
         message: "Order not found!",
         respdata: {},
         isAdminLoggedIn: isAdminLoggedIn
-      });
+      });*/
     }
 
     const order_id = existingOrder.shiprocket_order_id;
     const shiprocketResponse = await generateInvoice(order_id);
 
     if (!shiprocketResponse || !shiprocketResponse.invoice_url) {
-      return res.status(404).json({
+      return res.render("pages/error-msg", {
+        errorMsg:"Invoice not found!"
+      });
+      /*return res.status(404).json({
         status: "0",
         message: "Invoice not found!",
         respdata: shiprocketResponse,
         isAdminLoggedIn: isAdminLoggedIn
-      });
+      });*/
     }
 
     const invoiceUrl = shiprocketResponse.invoice_url;
@@ -1437,12 +1588,15 @@ exports.getGenerateInvoice = async function (req, res, next) {
         file.close(() => {
           res.download(outputFilePath, 'invoice.pdf', (err) => {
             if (err) {
-              return res.status(500).json({
+              return res.render("pages/error-msg", {
+                errorMsg:"Error downloading the file!"
+              });
+              /*return res.status(500).json({
                 status: "0",
                 message: "Error downloading the file!",
                 respdata: err,
                 isAdminLoggedIn: isAdminLoggedIn
-              });
+              });*/
             }
             fs.unlink(outputFilePath, (unlinkErr) => {
               if (unlinkErr) {
@@ -1454,20 +1608,26 @@ exports.getGenerateInvoice = async function (req, res, next) {
     });
 
     request.on('error', (error) => {
-      return res.status(500).json({
+      return res.render("pages/error-msg", {
+        errorMsg:"Error downloading the file!"
+      });
+      /*return res.status(500).json({
         status: "0",
         message: "Error downloading the file!",
         respdata: error,
         isAdminLoggedIn: isAdminLoggedIn
-      });
+      });*/
     });
   } catch (error) {
-    res.status(500).json({
+    return res.render("pages/error-msg", {
+      errorMsg:"Error!"
+    });
+    /*res.status(500).json({
       status: "0",
       message: "Error!",
       respdata: error,
       isAdminLoggedIn: isAdminLoggedIn
-    });
+    });*/
   }
 };
 
@@ -1550,12 +1710,15 @@ exports.getCourierServiceability = async function (req, res, next) {
   var pageTitle = req.app.locals.siteName + " - List " + pageName;
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    return res.render("pages/error-msg", {
+      errorMsg:"Validation error!"
+    });
+    /*return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
       isAdminLoggedIn: isAdminLoggedIn
-    });
+    });*/
   }
 
   try {
@@ -1563,12 +1726,15 @@ exports.getCourierServiceability = async function (req, res, next) {
 
     const existingOrder = await Track.findById(trackId);
     if (!existingOrder) {
-      return res.status(404).json({
+      return res.render("pages/error-msg", {
+        errorMsg:"Order not found!"
+      });
+      /*return res.status(404).json({
         status: "0",
         message: "Order not found!",
         respdata: {},
         isAdminLoggedIn: isAdminLoggedIn
-      });
+      });*/
     }
 
     if (existingOrder) {
@@ -1585,11 +1751,14 @@ exports.getCourierServiceability = async function (req, res, next) {
 
         const productdeatils = await Userproduct.findById(existingOrder.product_id);
 
-        //const height = productdeatils.height;
         const weight = productdeatils.weight;
-        //const weight = 0.05;
 
         const shiprocketResponse = await generateCouriresServiceability(pickup_postcode, delivery_postcode, cod, weight);
+        if(shiprocketResponse.status != 200) {
+          return res.render("pages/error-msg", {
+            errorMsg:shiprocketResponse.message
+          });
+        }
         if (shiprocketResponse.error) {
           return res.render("pages/order/serviceavabilitylist", {
             status: "0",
@@ -1680,12 +1849,31 @@ exports.getCourierServiceability = async function (req, res, next) {
       }
     }
   } catch (error) {
-    res.status(500).json({
+    //Added By Palash 20-03-2024
+    return res.render("pages/error-msg", {
+      errorMsg:error
+    });
+    /*res.render("pages/order/serviceavabilitylist", {
+      status: "0",
+      message: "Order canceled successfully!",
+      siteName: req.app.locals.siteName,
+      pageName: pageName,
+      pageTitle: pageTitle,
+      userFullName: req.session.admin.name,
+      userImage: req.session.admin.image_url,
+      userEmail: req.session.admin.email,
+      year: moment().format("YYYY"),
+      requrl: req.app.locals.requrl,
+      message: "",
+      respdata: [],
+      isAdminLoggedIn: isAdminLoggedIn
+    });*/
+    /*res.status(500).json({
       status: "0",
       message: "Error!",
       respdata: error,
       isAdminLoggedIn: isAdminLoggedIn
-    });
+    });*/
   }
 };
 
@@ -1698,12 +1886,15 @@ exports.getList = async function (req, res, next) {
   var pageTitle = req.app.locals.siteName + " - Schedule Your Pick Up " + pageName;
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    return res.render("pages/error-msg", {
+      errorMsg:"Validation error!"
+    });
+    /*return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
       isAdminLoggedIn: isAdminLoggedIn
-    });
+    });*/
   }
 
   try {
@@ -1766,12 +1957,15 @@ exports.getShipmentPickup = async function (req, res, next) {
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    return res.render("pages/error-msg", {
+      errorMsg:"Validation error!"
+    });
+    /*return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
       isAdminLoggedIn: isAdminLoggedIn
-    });
+    });*/
   }
 
   try {
@@ -1779,12 +1973,15 @@ exports.getShipmentPickup = async function (req, res, next) {
 
     const existingOrder = await Track.findById(trackId);
     if (!existingOrder) {
-      return res.status(404).json({
+      return res.render("pages/error-msg", {
+        errorMsg:"Order not found!"
+      });
+      /*return res.status(404).json({
         status: "0",
         message: "Order not found!",
         respdata: {},
         isAdminLoggedIn: isAdminLoggedIn
-      });
+      });*/
     }
 
     if (existingOrder) {
@@ -2017,10 +2214,16 @@ exports.huborderplaced = async (req, res) => {
       }
     }
     else {
-      return res.status(404).json({ error: ' product Not found' });
+      return res.render("pages/error-msg", {
+        errorMsg:"product Not found!"
+      });
+      //return res.status(404).json({ error: ' product Not found' });
     }
     if (!orderDetails) {
-      return res.status(404).json({ error: 'Order not found' });
+      return res.render("pages/error-msg", {
+        errorMsg:"Order not found!"
+      });
+      //return res.status(404).json({ error: 'Order not found' });
     }
     else {
       res.redirect("/admin/orderlist");
@@ -2152,7 +2355,6 @@ exports.downloadOrderExcel = function (req, res, next) {
         await workbook.xlsx.write(res);
         res.end();
       } catch (err) {
-        console.error('Error generating Excel file:', err);
         res.status(500).json({ error: 'An error occurred while generating Excel file' });
       }
     }
@@ -2263,7 +2465,6 @@ exports.downloadOrderExcel = function (req, res, next) {
 
 //         doc.end();
 //       } catch (err) {
-//         console.error('Error generating PDF:', err);
 //         res.status(500).json({ error: 'An error occurred while generating PDF' });
 //       }
 //     }
@@ -2373,7 +2574,6 @@ exports.downloadOrderPDF = function (req, res, next) {
           stream.pipe(res);
         });
       } catch (err) {
-        console.error('Error generating PDF:', err);
         res.status(500).json({ error: 'An error occurred while generating PDF' });
       }
     }
@@ -2470,12 +2670,205 @@ exports.downloadOrdesecondrPDF = function (req, res, next) {
           stream.pipe(res);
         });
       } catch (err) {
-        console.error('Error generating PDF:', err);
         res.status(500).json({ error: 'An error occurred while generating PDF' });
       }
     }
   });
 };
+
+
+exports.returninvoicebb = function (req, res, next) {
+  var pageName = "Order List";
+  var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+
+  const orderId = req.params.id;
+
+  Order.aggregate([
+    {
+      $match: {
+        _id: mongoose.Types.ObjectId(orderId)
+      }
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user_id',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'seller_id',
+        foreignField: '_id',
+        as: 'seller',
+      },
+    },
+    {
+      $lookup: {
+        from: 'addressbook_lists',
+        localField: 'billing_address_id',
+        foreignField: '_id',
+        as: 'billing_address',
+      },
+    },
+    {
+      $lookup: {
+        from: 'addressbook_lists',
+        localField: 'shipping_address_id',
+        foreignField: '_id',
+        as: 'shipping_address',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_userproducts',
+        localField: 'product_id',
+        foreignField: '_id',
+        as: 'product',
+      },
+    },
+    {
+      $lookup: {
+        from: 'order_trackings',
+        localField: '_id',
+        foreignField: 'order_id',
+        as: 'trackingDetails',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_tracks',
+        localField: 'trackingDetails.tracking_id',
+        foreignField: '_id',
+        as: 'trackDetails',
+      },
+    },
+    {
+      $sort: {
+        added_dtime: -1
+      }
+    }
+  ]).exec(async function (error, orderList) {
+    if (error) {
+      res.status(500).json({ error: 'An error occurred' });
+    } else {
+      try {
+        const loginHtmlPath = 'views/webpages/returnInvoiceBBR.html';
+        const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
+        const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
+        const options = { format: 'Letter' };
+        pdf.create(renderedHtml, options).toStream((err, stream) => {
+          if (err) return res.status(500).send('An error occurred while generating PDF');
+          res.setHeader('Content-Type', 'application/pdf');
+          res.setHeader('Content-Disposition', 'attachment; filename=InvoiceBFStoBuyer.pdf');
+          stream.pipe(res);
+        });
+      } catch (err) {
+        res.status(500).json({ error: 'An error occurred while generating PDF' });
+      }
+    }
+  });
+};
+
+exports.returninvoicesbr = function (req, res, next) {
+  var pageName = "Order List";
+  var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+
+  const orderId = req.params.id;
+
+  Order.aggregate([
+    {
+      $match: {
+        _id: mongoose.Types.ObjectId(orderId)
+      }
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user_id',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'seller_id',
+        foreignField: '_id',
+        as: 'seller',
+      },
+    },
+    {
+      $lookup: {
+        from: 'addressbook_lists',
+        localField: 'billing_address_id',
+        foreignField: '_id',
+        as: 'billing_address',
+      },
+    },
+    {
+      $lookup: {
+        from: 'addressbook_lists',
+        localField: 'shipping_address_id',
+        foreignField: '_id',
+        as: 'shipping_address',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_userproducts',
+        localField: 'product_id',
+        foreignField: '_id',
+        as: 'product',
+      },
+    },
+    {
+      $lookup: {
+        from: 'order_trackings',
+        localField: '_id',
+        foreignField: 'order_id',
+        as: 'trackingDetails',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_tracks',
+        localField: 'trackingDetails.tracking_id',
+        foreignField: '_id',
+        as: 'trackDetails',
+      },
+    },
+    {
+      $sort: {
+        added_dtime: -1
+      }
+    }
+  ]).exec(async function (error, orderList) {
+    if (error) {
+      res.status(500).json({ error: 'An error occurred' });
+    } else {
+      try {
+        const loginHtmlPath = 'views/webpages/returnInvoiceSBR.html';
+        const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
+        const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
+        const options = { format: 'Letter' };
+        pdf.create(renderedHtml, options).toStream((err, stream) => {
+          if (err) return res.status(500).send('An error occurred while generating PDF');
+          res.setHeader('Content-Type', 'application/pdf');
+          res.setHeader('Content-Disposition', 'attachment; filename=InvoiceBFStoBuyer.pdf');
+          stream.pipe(res);
+        });
+      } catch (err) {
+        res.status(500).json({ error: 'An error occurred while generating PDF' });
+      }
+    }
+  });
+};
+
 
 function getFormattedAddress(addressList) {
   if (addressList && addressList.length > 0) {
@@ -2574,7 +2967,6 @@ exports.sentOrderPDF = async function (req, res, next) {
 
         pdf.create(renderedHtml, options).toStream(async (err, stream) => {
           if (err) {
-            console.error('Error generating PDF:', err);
             return res.status(500).send('An error occurred while generating PDF');
           }
 
@@ -2594,18 +2986,148 @@ exports.sentOrderPDF = async function (req, res, next) {
 
           transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-              console.error('Error sending email:', error);
-              return res.status(500).send('An error occurred while sending the email');
-            }
-
-            console.log('Email sent:', info.response);
-            res.status(200).send('PDF sent via email successfully!');
+              return res.render("pages/error-msg", {
+                errorMsg:"An error occurred while sending the email!"
+              });
+              //return res.status(500).send('An error occurred while sending the email');
+            };
+            //res.status(200).send('PDF sent via email successfully!');
+            return res.render("pages/error-msg", {
+              errorMsg:"PDF sent via email successfully!"
+            });
           });
         });
       } catch (err) {
-        console.error('Error generating PDF:', err);
-        res.status(500).json({ error: 'An error occurred while generating PDF' });
+        return res.render("pages/error-msg", {
+          errorMsg:"An error occurred while generating PDF!"
+        });
+        //res.status(500).json({ error: 'An error occurred while generating PDF' });
       }
     } 
   });
 };
+
+exports.sentOrderPDFInWhatsapp = async function (req, res, next) {
+  var pageName = "Order List";
+  var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+
+  const orderId = req.params.id;
+
+  Order.aggregate([
+    {
+      $match: {
+        _id: mongoose.Types.ObjectId(orderId)
+      }
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user_id',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'seller_id',
+        foreignField: '_id',
+        as: 'seller',
+      },
+    },
+    {
+      $lookup: {
+        from: 'addressbook_lists',
+        localField: 'billing_address_id',
+        foreignField: '_id',
+        as: 'billing_address',
+      },
+    },
+    {
+      $lookup: {
+        from: 'addressbook_lists',
+        localField: 'shipping_address_id',
+        foreignField: '_id',
+        as: 'shipping_address',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_userproducts',
+        localField: 'product_id',
+        foreignField: '_id',
+        as: 'product',
+      },
+    },
+    {
+      $lookup: {
+        from: 'order_trackings',
+        localField: '_id',
+        foreignField: 'order_id',
+        as: 'trackingDetails',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_tracks',
+        localField: 'trackingDetails.tracking_id',
+        foreignField: '_id',
+        as: 'trackDetails',
+      },
+    },
+    {
+      $sort: {
+        added_dtime: -1
+      }
+    }
+  ]).exec(async function (error, orderList) {
+    if (error) {
+      return res.render("pages/error-msg", {
+        errorMsg:"An error occurred!"
+      });
+      //res.status(500).json({ error: 'An error occurred' });
+    } else {
+      try {
+        
+        const loginHtmlPath = 'views/webpages/invoice1.html';
+        const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
+
+        const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
+
+        const options = { format: 'Letter' };
+
+        pdf.create(renderedHtml, options).toStream(async (err, stream) => {
+          // if (err) {
+          //   return res.status(500).send('An error occurred while generating PDF');
+          // }
+          const order_invoice = stream; 
+          const to_number = "91" + orderList[0].user[0].phone_no; 
+
+          // let response = await send_message({ type: 'media', order_invoice, to_number });
+          let response = await send_message({ type: 'media', message: 'https://file-examples-com.github.io/uploads/2017/02/file-sample_100kB.doc',to_number:to_number }).then((res)=> {
+          });
+        });
+      } catch (err) {
+        return res.render("pages/error-msg", {
+          errorMsg:"An error occurred while generating PDF!"
+        });
+        //res.status(500).json({ error: 'An error occurred while generating PDF' });
+      }
+    } 
+  });
+};
+
+async function send_message(body) {
+  let url = process.env.WP_SMS_API_URL + "/" + process.env.WP_SMS_PRODUCT_ID + "/" + process.env.WP_SMS_PHONE_ID + "/" + "sendMessage";
+  let response = await rp(url, {
+    method: 'post',
+    json: true,
+    body,
+    headers: {
+      'Content-Type': 'application/json',
+      'x-maytapi-key': process.env.WP_SMS_API_TOKEN,
+    },
+  });
+  return response;
+}

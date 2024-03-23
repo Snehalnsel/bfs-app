@@ -124,6 +124,12 @@ const model = mongoose.Schema({
     enum: [0,1],
     default: 0,
   },
+  order_flow_status: {
+    type: Number,
+    enum: [0,1,2,3,4],//0 for SBFS 1 for BFSB 2 for BBFSR 3 for BFSSR 4 for BFSSRF
+    default: 0,
+    required: true,
+  },
   added_dtime: {
     type: String,
     required: true,

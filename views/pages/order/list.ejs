@@ -301,9 +301,18 @@
                                                                    <% } %>
                                                             </td> 
                                                             <td>
-                                                                
+                                                                <% if (value.returnorder) { %>
+                                                                    <a href="/admin/orderdetails/<%= value._id %>/2"
+                                                                        class="btn btn-info btn-circle btn-sm" title="Edit">
+                                                                        <i class="fas fa-pencil-alt"></i>
+                                                                    </a>
+                                                                    <% if (value.returnorder) { %>
+                                                                    
+                                                                <% } %>
                                                             </td>
-                                                            <td></td>
+                                                            <td>
+
+                                                            </td>
                                                         </tr>
                                                         <% }); %>
                                                             <% } %>

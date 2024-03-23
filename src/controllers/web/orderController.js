@@ -189,144 +189,182 @@ async function generateOrder(data) {
 
 }
 
-exports.getOrderList = function (req, res, next) {
-  var pageName = "Order List";
-  var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-  Order.aggregate([
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'user_id',
-        foreignField: '_id',
-        as: 'user',
-      },
+async function generateReturnOrder(data) {
+  token = await generateToken(email, shipPassword);
+  if (!token) {
+    return Promise.reject('Token not available. Call generateToken first.');
+  }
+  const options = {
+    method: 'POST',
+    url: baseUrl + '/orders/create/return',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
     },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'seller_id',
-        foreignField: '_id',
-        as: 'seller',
-      },
-    },
-    {
-      $lookup: {
-        from: 'addressbook_lists',
-        localField: 'billing_address_id',
-        foreignField: '_id',
-        as: 'billing_address',
-      },
-    },
-    {
-      $lookup: {
-        from: 'addressbook_lists',
-        localField: 'shipping_address_id',
-        foreignField: '_id',
-        as: 'shipping_address',
-      },
-    },
-    {
-      $lookup: {
-        from: 'mt_userproducts',
-        localField: 'product_id',
-        foreignField: '_id',
-        as: 'product',
-      },
-    },
-    {
-      $lookup: {
-        from: 'order_trackings',
-        localField: '_id',
-        foreignField: 'order_id',
-        as: 'trackingDetails',
-      },
-    },
-    {
-      $lookup: {
-        from: 'mt_tracks',
-        localField: 'trackingDetails.tracking_id',
-        foreignField: '_id',
-        as: 'trackDetails',
-      },
-    },
-    {
-      $sort: {
-        added_dtime: -1
+    body: JSON.stringify(data)
+  };
+
+  return new Promise((resolve, reject) => {
+    request(options, function (error, response, body) {
+      if (error) {
+        reject(error);
+      } else if (response.statusCode === 200) {
+        const responseBody = JSON.parse(body);
+        const token = responseBody;
+        resolve(token);
+      } else {
+        reject(new Error(`Error: ${response.statusCode}`));
       }
-    }
-  ]).exec(function (error, orderList) {
-    if (error) {
-      res.status(500).json({ error: 'An error occurred' });
-    } else {
-      const shipmentPromises = [];
-      const imagePromises = [];
-
-      orderList.forEach(function (order) {
-        if (order.product && order.product.length > 0) {
-          const product_id = order.product[0]._id;
-          const imagePromise = Productimage.findOne({ product_id: product_id }).limit(1).exec();
-          imagePromises.push(imagePromise);
-        }
-
-        const shipmentPromise = Shippingkit.findOne({ order_id: order._id });
-        shipmentPromises.push(shipmentPromise);
-      });
-
-      orderList.forEach(function (order) {
-        const shipment = Shippingkit.findOne({ order_id: order._id });
-
-        if (shipment) {
-          order.shipment = shipment;
-        }
-      });
-
-
-      Promise.all(shipmentPromises)
-        .then((shipments) => {
-
-          orderList.forEach((order, index) => {
-            if (shipments[index]) {
-              order.shipment = shipments[index];
-            } else {
-              order.shipment = null;
-            }
-          });
-
-          return Promise.all(imagePromises);
-        })
-        .then((productImages) => {
-
-          orderList.forEach((order, index) => {
-            order.productImage = productImages[index];
-          });
-          console.log(orderList);
-          res.render("pages/order/list", {
-            siteName: req.app.locals.siteName,
-            pageName: pageName,
-            pageTitle: pageTitle,
-            userFullName: req.session.admin.name,
-            userImage: req.session.admin.image_url,
-            userEmail: req.session.admin.email,
-            year: moment().format("YYYY"),
-            requrl: req.app.locals.requrl,
-            status: 0,
-            message: "Found!",
-            respdata: {
-              list: orderList,
-            },
-            isAdminLoggedIn: isAdminLoggedIn
-          });
-        })
-        .catch((err) => {
-          return res.render("pages/error-msg", {
-            errorMsg:"Error fetching product images"
-          });
-          //res.status(500).json({ error: 'Error fetching product images' });
-        });
-    }
+    });
   });
-};
+
+
+}
+
+// exports.getOrderList = function (req, res, next) {
+//   var pageName = "Order List";
+//   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+//   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+//   Order.aggregate([
+//     {
+//       $lookup: {
+//         from: 'users',
+//         localField: 'user_id',
+//         foreignField: '_id',
+//         as: 'user',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'users',
+//         localField: 'seller_id',
+//         foreignField: '_id',
+//         as: 'seller',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'addressbook_lists',
+//         localField: 'billing_address_id',
+//         foreignField: '_id',
+//         as: 'billing_address',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'addressbook_lists',
+//         localField: 'shipping_address_id',
+//         foreignField: '_id',
+//         as: 'shipping_address',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'mt_userproducts',
+//         localField: 'product_id',
+//         foreignField: '_id',
+//         as: 'product',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'order_trackings',
+//         localField: '_id',
+//         foreignField: 'order_id',
+//         as: 'trackingDetails',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'mt_tracks',
+//         localField: 'trackingDetails.tracking_id',
+//         foreignField: '_id',
+//         as: 'trackDetails',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'mt_returnorders',
+//         localField: 'returnorder.order_id',
+//         foreignField: '_id',
+//         as: 'returnorder',
+//       },
+//     },
+//     {
+//       $sort: {
+//         added_dtime: -1
+//       }
+//     }
+//   ]).exec(function (error, orderList) {
+//     if (error) {
+//       res.status(500).json({ error: 'An error occurred' });
+//     } else {
+//       const shipmentPromises = [];
+//       const imagePromises = [];
+
+//       orderList.forEach(function (order) {
+//         if (order.product && order.product.length > 0) {
+//           const product_id = order.product[0]._id;
+//           const imagePromise = Productimage.findOne({ product_id: product_id }).limit(1).exec();
+//           imagePromises.push(imagePromise);
+//         }
+
+//         const shipmentPromise = Shippingkit.findOne({ order_id: order._id });
+//         shipmentPromises.push(shipmentPromise);
+//       });
+
+//       orderList.forEach(function (order) {
+//         const shipment = Shippingkit.findOne({ order_id: order._id });
+
+//         if (shipment) {
+//           order.shipment = shipment;
+//         }
+//       });
+//       Promise.all(shipmentPromises)
+//         .then((shipments) => {
+
+//           orderList.forEach((order, index) => {
+//             if (shipments[index]) {
+//               order.shipment = shipments[index];
+//             } else {
+//               order.shipment = null;
+//             }
+//           });
+
+//           return Promise.all(imagePromises);
+//         })
+//         .then((productImages) => {
+
+//           orderList.forEach((order, index) => {
+//             order.productImage = productImages[index];
+//           });
+//           console.log("orderlist",orderList);
+//           res.render("pages/order/list", {
+//             siteName: req.app.locals.siteName,
+//             pageName: pageName,
+//             pageTitle: pageTitle,
+//             userFullName: req.session.admin.name,
+//             userImage: req.session.admin.image_url,
+//             userEmail: req.session.admin.email,
+//             year: moment().format("YYYY"),
+//             requrl: req.app.locals.requrl,
+//             status: 0,
+//             message: "Found!",
+//             respdata: {
+//               list: orderList,
+//             },
+//             isAdminLoggedIn: isAdminLoggedIn
+//           });
+//         })
+//         .catch((err) => {
+//           return res.render("pages/error-msg", {
+//             errorMsg:"Error fetching product images"
+//           });
+//           //res.status(500).json({ error: 'Error fetching product images' });
+//         });
+//     }
+//   });
+// };
 
 exports.getOrderList = function (page, searchType, searchValue, req, res, next) {
   var pageName = "Order List";
@@ -397,6 +435,14 @@ exports.getOrderList = function (page, searchType, searchValue, req, res, next) 
       },
     },
     {
+            $lookup: {
+              from: 'mt_returnorders',
+              localField: 'returnorder.order_id',
+              foreignField: '_id',
+              as: 'returnorder',
+            },
+    },
+    {
       $sort: {
         added_dtime: -1
       }
@@ -431,71 +477,7 @@ exports.getOrderList = function (page, searchType, searchValue, req, res, next) 
 };
 
 
-// exports.getOrderDetails = function (req, res, next) {
 
-//   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-//   var pageName = "Order Details";
-//   var pageTitle = req.app.locals.siteName + " - " + pageName;
-//   const orderId = req.params.id;
-
-//   if (!mongoose.Types.ObjectId.isValid(orderId)) {
-//     return res.status(400).json({ error: 'Invalid order ID' });
-//   }
-
-//   Order.findOne({ _id: orderId })
-//     .populate('user_id', 'name phone_no email')
-//     .populate('seller_id', 'name phone_no email')
-//     .populate('billing_address_id')
-//     .populate('shipping_address_id')
-//     .populate('hub_address_id')
-//     .then(async (orderDetails) => {
-//       if (!orderDetails) {
-//         return res.status(404).json({ error: 'Order not found' });
-//       }
-
-//       const billingAddress = await AddressBook.find({ user_id: orderDetails.seller_id });
-//       const shippingAddress = await AddressBook.find({ user_id: orderDetails.user_id });
-
-//       const hubdata = await Hublist.find({ flag: 1 });
-
-//       const shiprocketResponse = await generateCouriresList();
-
-//       const cartId = orderDetails.cart_id;
-
-//       CartDetail.find({ cart_id: cartId })
-//         .populate('product_id', 'name')
-//         .then((cartDetails) => {
-//           res.render("pages/order/details", {
-//             status: 1,
-//             siteName: req.app.locals.siteName,
-//             pageName: pageName,
-//             pageTitle: pageTitle,
-//             userFullName: req.session.admin.name,
-//             userImage: req.session.admin.image_url,
-//             userEmail: req.session.admin.email,
-//             year: moment().format("YYYY"),
-//             requrl: req.app.locals.requrl,
-//             message: "",
-//             respdata: {
-//               orderDetails: orderDetails,
-//               cartDetails: cartDetails[0],
-//               billingAddress: billingAddress,
-//               shippingAddress: shippingAddress,
-//               hublist: hubdata,
-//               shiprocketResponse: shiprocketResponse
-//             },
-//             isAdminLoggedIn: isAdminLoggedIn
-//           });
-//         })
-//         .catch((error) => {
-//           res.status(500).json({ error: 'An error occurred while fetching cart details' });
-//         });
-//     })
-//     .catch((error) => {
-//       res.status(500).json({ error: 'An error occurred while fetching order details' });
-//     });
-
-// };
 
 exports.getOrderDetails = function (req, res, next) {
 
@@ -503,6 +485,7 @@ exports.getOrderDetails = function (req, res, next) {
   var pageName = "Order Details";
   var pageTitle = req.app.locals.siteName + " - " + pageName;
   const orderId = req.params.id;
+  const flowId = req.params.flowid;
 
   if (!mongoose.Types.ObjectId.isValid(orderId)) {
     return res.render("pages/error-msg", {
@@ -548,7 +531,8 @@ exports.getOrderDetails = function (req, res, next) {
           billingAddress: billingAddress,
           shippingAddress: shippingAddress,
           hublist: hubdata,
-          shiprocketResponse: shiprocketResponse
+          shiprocketResponse: shiprocketResponse,
+          flowId :flowId
         },
         isAdminLoggedIn: isAdminLoggedIn
       });
@@ -758,12 +742,6 @@ exports.updateData = async function (req, res, next) {
         isAdminLoggedIn: isAdminLoggedIn
       });
     } else {
-      // var updData = {
-      //   billing_address_id: req.body.seller_address,
-      //   shipping_address_id: req.body.buyer_address,
-      //   hub_address_id: req.body.hub_address,
-      //   // shiprocket_delivery_partner: req.body.user_courier,
-      // };
       const orderDetails = await Order.findById(req.body.order_id);
       if (!orderDetails) {
         return res.status(404).json({ message: 'Order not found' });
@@ -793,9 +771,10 @@ exports.updateData = async function (req, res, next) {
 
       // Generate the unique code using the current time components
       const transactionCode = `BFSTRANS${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
-      const track = new Track({
+
+     
+      let trackInsertData = {
         track_code: transactionCode,
-        seller_id: seller_id,
         product_id: product_id,
         billing_address_id: billing_address_id,
         hub_address_id: req.body.hub_address,
@@ -805,11 +784,22 @@ exports.updateData = async function (req, res, next) {
         gst: gst,
         delivery_charges: delivery_charges,
         discount: discount,
+        order_flow_status: req.body.flow_id,
         added_dtime: new Date().toISOString(),
-      });
-
+      };
+      if(req.body.flow_id == 0) {
+        trackInsertData.seller_id = seller_id;
+      } else if(req.body.flow_id == 1) {
+        trackInsertData.buyer_id = user_id;
+      } else if(req.body.flow_id == 2) {
+        trackInsertData.buyer_id = user_id;
+      } else if(req.body.flow_id == 3){
+        trackInsertData.seller_id = seller_id;
+      } else if(req.body.flow_id == 4){
+        trackInsertData.seller_id = seller_id;
+      }
+      let track = new Track(trackInsertData);
       const savedTrack = await track.save();
-
       if (savedTrack) {
         const track_id = savedTrack._id;
 
@@ -819,6 +809,7 @@ exports.updateData = async function (req, res, next) {
           order_code: order_code,
           track_code: transactionCode,
           type: 0,
+          status:req.body.flow_id,
           added_dtime: new Date().toISOString(),
         });
 
@@ -1205,6 +1196,113 @@ exports.orderplaced = async (req, res) => {
 };
 
 
+exports.orderplaced = async (req, res) => {
+  try {
+
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+    const track_id = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(track_id)) {
+      return res.status(400).json({ error: 'Invalid order ID' });
+    }
+
+    const orderDetails = await Track.findById({ _id: track_id })
+      .populate('seller_id', 'name phone_no email')
+      .populate('billing_address_id')
+      .populate('hub_address_id');
+
+    const productdetails = await Userproduct.findById(orderDetails.product_id);
+
+    if (productdetails) {
+      const orderData = {
+        order_id: orderDetails.track_code,
+        order_date: new Date().toISOString(),
+        pickup_location: orderDetails.billing_address_id.shiprocket_address,
+        channel_id: "",
+        comment: "BFS - Bid For Sale",
+        billing_customer_name: orderDetails.seller_id.name,
+        billing_last_name: "",
+        billing_address: orderDetails.billing_address_id.street_name,
+        billing_address_2: orderDetails.billing_address_id.address1,
+        billing_city: orderDetails.billing_address_id.city_name,
+        billing_pincode: orderDetails.billing_address_id.pin_code,
+        billing_state: "West Benagal",
+        billing_country: "India",
+        billing_email: orderDetails.seller_id.email,
+        billing_phone: orderDetails.seller_id.phone_no,
+        shipping_is_billing: false,
+        shipping_customer_name: orderDetails.hub_address_id.name,
+        shipping_last_name: "",
+        shipping_address: orderDetails.hub_address_id.street_name,
+        shipping_address_2: orderDetails.hub_address_id.address1,
+        shipping_city: orderDetails.hub_address_id.city_name,
+        shipping_pincode: orderDetails.hub_address_id.pin_code,
+        shipping_country: "India",
+        shipping_state: "West Benagal",
+        shipping_email: orderDetails.hub_address_id.email,
+        shipping_phone: orderDetails.hub_address_id.phone_no,
+        order_items: [
+          {
+            name: productdetails.name,
+            sku: "chakra123",
+            units: 1,
+            selling_price: productdetails.offer_price,
+            discount: "",
+            tax: "",
+            hsn: 12345678
+          }
+        ],
+        payment_method: "COD",
+        shipping_charges: 0,
+        giftwrap_charges: 0,
+        transaction_charges: 0,
+        total_discount: 0,
+        sub_total: orderDetails.total_price,
+        length: productdetails.length,
+        breadth: productdetails.breath,
+        height: productdetails.height,
+        weight: productdetails.weight,
+      };
+      const shiprocketResponse = await generateOrder(orderData);
+      if (shiprocketResponse) {
+
+        const payment_status = '0';
+
+        shiprocket_payment_status = payment_status;
+        shiprocket_order_id = shiprocketResponse.order_id;
+        shiprocket_shipment_id = shiprocketResponse.shipment_id;
+        shiprocket_status_code = shiprocketResponse.status_code;
+
+
+        orderDetails.shiprocket_payment_status = shiprocket_payment_status;
+        orderDetails.shiprocket_order_id = shiprocket_order_id;
+        orderDetails.shiprocket_shipment_id = shiprocket_shipment_id;
+        orderDetails.shiprocket_status_code = shiprocket_status_code;
+
+        await orderDetails.save();
+
+      }
+    }
+    else {
+      return res.status(404).json({ error: ' product Not found' });
+    }
+    if (!orderDetails) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+    else {
+      const updatedOrderTracking = await Ordertracking.findOneAndUpdate(
+        { tracking_id: track_id },
+        { $set: { status: 1 } },
+        { new: true }
+      );
+      res.redirect(`/admin/check-Couriresserviceability/${track_id}`);
+    }
+  } catch (error) {
+    return res.render("pages/error-msg", {
+      errorMsg:"An error occurred while placing the order!"
+    });
+  }
+};
+
 exports.getAWBnoById = async function (req, res, next) {
 
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
@@ -1223,9 +1321,6 @@ exports.getAWBnoById = async function (req, res, next) {
     const courier_id = req.params.courier_company_id;
 
     const existingOrder = await Track.findById(trackId);
-
-
-
     if (!existingOrder) {
       return res.render("pages/error-msg", {
         errorMsg:"Order not found!"
@@ -1239,8 +1334,9 @@ exports.getAWBnoById = async function (req, res, next) {
     }
     if (existingOrder) {
       const shipment_id = existingOrder.shiprocket_shipment_id;
+  
       const shiprocketResponse = await generateAWBno(shipment_id, courier_id);
-      if (shiprocketResponse) {
+      if (shiprocketResponse.awb_assign_status == 1) {
         if (typeof shiprocketResponse.response.data.awb_code != "undefined") {
           existingOrder.pickup_awb = shiprocketResponse.response.data.awb_code;
           existingOrder.shiprocket_delivery_partner = shiprocketResponse.response.data.courier_company_id;
@@ -1268,14 +1364,18 @@ exports.getAWBnoById = async function (req, res, next) {
           }
           res.redirect("/admin/orderlist");
         }
-        else {
+        else if (shiprocketResponse.awb_assign_status == 0) {
           existingOrder.pickup_awb = "0";
           existingOrder.shiprocket_delivery_partner = "0";
           existingOrder.shiprocket_courier_name = "0";
           await existingOrder.save();
           res.redirect("/admin/orderlist");
         }
-
+      }
+      else if (shiprocketResponse.awb_assign_status == 0) {
+        return res.render("pages/error-msg", {
+          errorMsg:shiprocketResponse.response.data.awb_assign_error
+        });
       }
 
 
@@ -1315,7 +1415,6 @@ const sendEmailWithAttachment = async (receiverEmail, labelUrl, invoiceUrl) => {
   };
 
   transporter.sendMail(mailData, function (err, info) {
-    if (err) console.log(err);
   });
 
   try {
@@ -1650,8 +1749,6 @@ exports.getCourierServiceability = async function (req, res, next) {
         const weight = productdeatils.weight;
 
         const shiprocketResponse = await generateCouriresServiceability(pickup_postcode, delivery_postcode, cod, weight);
-
-        console.log("shiprocketResponse",shiprocketResponse);
         if(shiprocketResponse.status != 200) {
           return res.render("pages/error-msg", {
             errorMsg:shiprocketResponse.message
@@ -2253,7 +2350,6 @@ exports.downloadOrderExcel = function (req, res, next) {
         await workbook.xlsx.write(res);
         res.end();
       } catch (err) {
-        console.error('Error generating Excel file:', err);
         res.status(500).json({ error: 'An error occurred while generating Excel file' });
       }
     }
@@ -2364,7 +2460,6 @@ exports.downloadOrderExcel = function (req, res, next) {
 
 //         doc.end();
 //       } catch (err) {
-//         console.error('Error generating PDF:', err);
 //         res.status(500).json({ error: 'An error occurred while generating PDF' });
 //       }
 //     }
@@ -2474,7 +2569,6 @@ exports.downloadOrderPDF = function (req, res, next) {
           stream.pipe(res);
         });
       } catch (err) {
-        console.error('Error generating PDF:', err);
         res.status(500).json({ error: 'An error occurred while generating PDF' });
       }
     }
@@ -2571,7 +2665,6 @@ exports.downloadOrdesecondrPDF = function (req, res, next) {
           stream.pipe(res);
         });
       } catch (err) {
-        console.error('Error generating PDF:', err);
         res.status(500).json({ error: 'An error occurred while generating PDF' });
       }
     }
@@ -2669,7 +2762,6 @@ exports.returninvoicebb = function (req, res, next) {
           stream.pipe(res);
         });
       } catch (err) {
-        console.error('Error generating PDF:', err);
         res.status(500).json({ error: 'An error occurred while generating PDF' });
       }
     }
@@ -2766,7 +2858,6 @@ exports.returninvoicesbr = function (req, res, next) {
           stream.pipe(res);
         });
       } catch (err) {
-        console.error('Error generating PDF:', err);
         res.status(500).json({ error: 'An error occurred while generating PDF' });
       }
     }
@@ -2871,7 +2962,6 @@ exports.sentOrderPDF = async function (req, res, next) {
 
         pdf.create(renderedHtml, options).toStream(async (err, stream) => {
           if (err) {
-            console.error('Error generating PDF:', err);
             return res.status(500).send('An error occurred while generating PDF');
           }
 
@@ -2891,14 +2981,11 @@ exports.sentOrderPDF = async function (req, res, next) {
 
           transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-              //console.error('Error sending email:', error);
               return res.render("pages/error-msg", {
                 errorMsg:"An error occurred while sending the email!"
               });
               //return res.status(500).send('An error occurred while sending the email');
-            }
-
-            //console.log('Email sent:', info.response);
+            };
             //res.status(200).send('PDF sent via email successfully!');
             return res.render("pages/error-msg", {
               errorMsg:"PDF sent via email successfully!"
@@ -2906,7 +2993,6 @@ exports.sentOrderPDF = async function (req, res, next) {
           });
         });
       } catch (err) {
-        //console.error('Error generating PDF:', err);
         return res.render("pages/error-msg", {
           errorMsg:"An error occurred while generating PDF!"
         });
@@ -3008,7 +3094,6 @@ exports.sentOrderPDFInWhatsapp = async function (req, res, next) {
 
         pdf.create(renderedHtml, options).toStream(async (err, stream) => {
           // if (err) {
-          //   console.error('Error generating PDF:', err);
           //   return res.status(500).send('An error occurred while generating PDF');
           // }
           const order_invoice = stream; 
@@ -3016,11 +3101,9 @@ exports.sentOrderPDFInWhatsapp = async function (req, res, next) {
 
           // let response = await send_message({ type: 'media', order_invoice, to_number });
           let response = await send_message({ type: 'media', message: 'https://file-examples-com.github.io/uploads/2017/02/file-sample_100kB.doc',to_number:to_number }).then((res)=> {
-            console.log(res);
           });
         });
       } catch (err) {
-        //console.error('Error generat ing PDF:', err);
         return res.render("pages/error-msg", {
           errorMsg:"An error occurred while generating PDF!"
         });
@@ -3031,7 +3114,6 @@ exports.sentOrderPDFInWhatsapp = async function (req, res, next) {
 };
 
 async function send_message(body) {
-  console.log(`Request Boduuy:${JSON.stringify(body)}`);
   let url = process.env.WP_SMS_API_URL + "/" + process.env.WP_SMS_PRODUCT_ID + "/" + process.env.WP_SMS_PHONE_ID + "/" + "sendMessage";
   let response = await rp(url, {
     method: 'post',
@@ -3042,6 +3124,5 @@ async function send_message(body) {
       'x-maytapi-key': process.env.WP_SMS_API_TOKEN,
     },
   });
-  console.log(`Response: ${JSON.stringify(response)}`);
   return response;
 }

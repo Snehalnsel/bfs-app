@@ -405,11 +405,12 @@ router.get("/orderlist", cors(), (req, res) => {
   const searchValue = req.query.searchValue;
   OrderController.getOrderList(page, searchType, searchValue, req, res);
 });
-router.get("/orderdetails/:id", cors(), OrderController.getOrderDetails);
+router.get("/orderdetails/:id/:flowid", cors(), OrderController.getOrderDetails);
 router.post("/update-orderdetails", cors(), [], OrderController.updateData);
 router.get("/shipmentdetails/:id", cors(), OrderController.getShipmentList);
 router.get("/delete-orderdetails/:id", cors(), OrderController.deleteData);
 router.get("/orderplace/:id", cors(), OrderController.orderplaced);
+router.get("/returnorder/:id", cors(), OrderController.orderplaced);
 // router.get("/generateawb/:id", cors(),OrderController.getAWBnoById);
 router.get("/generateawb/:id/:courier_company_id", cors(), OrderController.getAWBnoById);
 router.get("/generatelabel/:id", cors(), OrderController.getGenerateLabel);

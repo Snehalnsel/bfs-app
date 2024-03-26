@@ -1325,6 +1325,11 @@ router.get("/pay",cors(),
 PaymentController.getPaymentData
 );
 
+router.get("/checkapp-payment",cors(),
+PaymentController.checkPaymentData
+);
+
+
 router.post("/getshipmentvalue",cors(),
 OrderController.shipmentvalue
 );

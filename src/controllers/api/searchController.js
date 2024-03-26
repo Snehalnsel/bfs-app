@@ -397,15 +397,6 @@ exports.filterData = async function (req, res, next) {
 
     const types = type.split(',');
     var ids = (typeof id !== "undefined") ? (id.length > 1) ? id.split(',') : id : "";
-    // const max = 5000;
-    // const min = 1000;
-
-    // if (types.length !== ids.length) {
-    //   return res.status(400).json({
-    //     status: '0',
-    //     message: 'Mismatch in types and IDs',
-    //   });
-    // }
     for (let i = 0; i < types.length; i++) {
       let condID = (ids.length >= 1) ? ids[i] : "";
       switch (types[i]) {
@@ -420,6 +411,10 @@ exports.filterData = async function (req, res, next) {
         case 'condition':
           filterQuery = { ...filterQuery };
           if (condID.length > 0) filterQuery.status = condID;
+          break;
+        case 'gender':
+          filterQuery = { ...filterQuery };
+          if (condID.length > 0) filterQuery.gender_id = condID;
           break;
         case 'price':
           if (min && max) {
@@ -482,10 +477,6 @@ exports.filterData = async function (req, res, next) {
 
      
     }
-
-
-    // productsWithImages = productsWithImages.filter(product => !hasNull(product));
-    // console.log(productsWithImages);
 
     return res.status(200).json({
       respdata: {

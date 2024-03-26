@@ -11,12 +11,12 @@ $(document).ready(async function(){
         rules:{
             oldpassword:{
                 required:true,
-                maxlength:10,
+                maxlength:15,
                 minlength:8
             },
             newpassword:{
                 required:true,
-                maxlength:10,
+                maxlength:15,
                 minlength:8
             },
             cnewpassword: {
@@ -27,12 +27,12 @@ $(document).ready(async function(){
         messages:{
             oldpassword:{
                 required:"Please enter password.",
-                maxlength:"You can enter maximum of 10 characters.",
+                maxlength:"You can enter maximum of 15 characters.",
                 minlength: "You can enter minimum of 8 characters.",
             },
             newpassword:{
                 required:"Please enter password.",
-                maxlength:"You can enter maximum of 10 characters.",
+                maxlength:"You can enter maximum of 15 characters.",
                 minlength: "You can enter minimum of 8 characters.",
             },
             cnewpassword: {

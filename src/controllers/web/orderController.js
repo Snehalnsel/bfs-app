@@ -338,7 +338,6 @@ async function generateReturnOrder(data) {
 //           orderList.forEach((order, index) => {
 //             order.productImage = productImages[index];
 //           });
-//           console.log("orderlist",orderList);
 //           res.render("pages/order/list", {
 //             siteName: req.app.locals.siteName,
 //             pageName: pageName,

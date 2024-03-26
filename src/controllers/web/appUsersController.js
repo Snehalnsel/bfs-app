@@ -303,8 +303,6 @@ exports.getData = async function (req, res, next) {
   exports.updateData = async function (req, res, next) {
     let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     try {
-
-      console.log("body",req.body);
       // return;
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -344,7 +342,6 @@ exports.getData = async function (req, res, next) {
         { $set: updData },
         { upsert: true, new: true }
       ).then(async (result) => {
-        //console.log(result);
       });
 
       const uploadedFile = req.files[0];
@@ -364,15 +361,12 @@ exports.getData = async function (req, res, next) {
         created_dtime: new Date().toISOString(),
       };
   
-      console.log("bank", updBankData);
       const updatedBankDetails = await Bankdetails.findOneAndUpdate(
         { user_id: req.params.user_id },
         { $set: updBankData },
         { upsert: true, new: true }
       ).then(async (result) => {
-        console.log("bank details",result);
       }).catch((err) => {
-        console.log("bank details error",err);
       });
 
       // return;

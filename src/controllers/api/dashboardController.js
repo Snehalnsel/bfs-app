@@ -289,7 +289,7 @@ exports.getJustSoldProducts = async function (req, res) {
 
 
 
-//     console.log('Before Sorting:', products);
+
 
 
 
@@ -309,7 +309,7 @@ exports.getJustSoldProducts = async function (req, res) {
 
 
 
-//     console.log('After Sorting:', products);
+
 
 
 
@@ -480,7 +480,6 @@ exports.getData = async function (req, res,deviceType) {
     // const allImages = await Productimage.find();
     // // Update each document with only the image name and save the changes
     // for (const image of allImages) {
-    //   // console.log(image.image)
     //   const imageName = extractFilename(image.image);
     //   image.image = imageName ? imageName : '';
     //  await image.save();
@@ -590,19 +589,14 @@ async function copyImages() {
           const compressedFilePath = path.join(compressImagesDir, file);
           const stat = await fs.stat(filePath);
            if (stat.isFile() && fileExtension === '.webp') {
-              console.log('Copying image:', file);
               await fs.copyFile(filePath, compressedFilePath);
           }
           else
           {
-            // console.log("filePath",filePath);
-            // console.log("compressImagesDir",compressImagesDir);
             await CompressImage("./public/images/"+file,"./public/compress_images/");
           }
       }
-      //console.log('Images copied successfully!');
   } catch (err) {
-      //console.error('Error copying images:', err);
   }
 }
 

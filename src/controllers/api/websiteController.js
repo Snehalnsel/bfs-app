@@ -3050,10 +3050,8 @@ exports.addShipmentData = async (req, res) => {
 };
 exports.getWhatsHotProductsweb = async function (req, res) {
 
-  const page = parseInt(req.body.page) || 1; // Current page, default: 1
-
-  const pageSize = parseInt(req.body.pageSize) || 10; // Items per page, default: 10
-
+  const page = parseInt(req.body.page) || 1; 
+  const pageSize = parseInt(req.body.pageSize) || 10; 
 
   try {
 
@@ -3066,6 +3064,7 @@ exports.getWhatsHotProductsweb = async function (req, res) {
     const brandList = await brandModel.find({});
     const sizeList = await sizeModel.find({});
     const conditionList = await productconditionModel.find({});
+    const genderList = await Gender.find({});
 
     const hotProducts = await Userproduct.find({ approval_status: 1, flag: 0 }).sort({ hitCount: -1 });
 
@@ -3113,6 +3112,7 @@ exports.getWhatsHotProductsweb = async function (req, res) {
         brandList: brandList,
         sizeList: sizeList,
         conditionList: conditionList,
+        genderList: typeof genderList != "undefined" ? genderList : [],
         productCount: hotProductsCount,
         isLoggedIn: isLoggedIn,
         filter_basedon: "whatshot",
@@ -3145,6 +3145,7 @@ exports.getJustSoldProductsweb = async function (req, res) {
     const brandList = await brandModel.find({});
     const sizeList = await sizeModel.find({});
     const conditionList = await productconditionModel.find({});
+    const genderList = await Gender.find({});
     const solditems = await Userproduct.find({ approval_status: 1, flag: 1 });
     const justSoldProducts = [];
     for (const product of solditems) {
@@ -3172,6 +3173,7 @@ exports.getJustSoldProductsweb = async function (req, res) {
         brandList: brandList,
         sizeList: sizeList,
         conditionList: conditionList,
+        genderList: typeof genderList != "undefined" ? genderList : [],
         productCount: soldItemsCount,
         isLoggedIn: isLoggedIn,
         filter_basedon: "justsold",
@@ -3200,7 +3202,7 @@ exports.getBestDealProductsweb = async function (req, res) {
     const brandList = await brandModel.find({});
     const sizeList = await sizeModel.find({});
     const conditionList = await productconditionModel.find({});
-
+    const genderList = await Gender.find({});
 
     const appSettings = await Appsettings.findOne();
 
@@ -3263,6 +3265,7 @@ exports.getBestDealProductsweb = async function (req, res) {
         brandList: brandList,
         sizeList: sizeList,
         conditionList: conditionList,
+        genderList: typeof genderList != "undefined" ? genderList : [],
         productCount: count,
         websiteUrl:process.env.SITE_URL,
         isLoggedIn: isLoggedIn,
@@ -3646,7 +3649,6 @@ exports.sendotp = async function (req, res, next) {
     else if (!req.body.otp) {
       let randNumber = Math.floor((Math.random() * 1000000) + 1);
 
-      //SEND SMS
       let smsData = {
         textId: "test",
         toMobile: "91" + user.phone_no,

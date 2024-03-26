@@ -22,7 +22,6 @@ var ObjectId = require("mongodb").ObjectId;
 
 
 exports.addData = async function (req, res, next) {
-  //console.log('req.body:', req.body);
 try {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

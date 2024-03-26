@@ -716,7 +716,6 @@ exports.getAllSubcategoriesWithProducts = async function (req, res, next) {
         });
     }
 
-    // console.log(subcategoriesWithProducts);
     
     // return res.status(200).json({
     //   status: '1',

@@ -84,6 +84,31 @@
                      </div>
                   </div>
                   <div class="card">
+                     <div class="card-header">
+                        <button class="accordion-button collapsed" type="button" data-toggle="collapse"
+                           data-target="#card5" aria-expanded="false" aria-controls="card5">Gender</button>
+                     </div>
+                     <div id="card5" class="collapse" data-parent="#theme-accordion" style="">
+                        <div class="card-body">
+                           <div class="filter-list">
+                              <%if(genderList.length> 0) {%>
+                                 <ul class="list-group">
+                                    <% genderList.forEach(function(item) { %>
+                                       <li class="single-list">
+                                          <input type="checkbox" class="chkfield filterByChecked searchByGender"
+                                             data-id="<%=item._id%>" value="">
+                                          <label class="label-check" for="incboxx1">
+                                             <%=item.name%>
+                                          </label>
+                                       </li>
+                                       <% }) %>
+                                 </ul>
+                                 <% } %>
+                           </div>
+                        </div>
+                     </div>
+                  </div>   
+                  <div class="card">
                      <div class="card-header">                           
                         <button class="accordion-button " type="button" data-toggle="collapse" data-target="#card3" aria-expanded="true" aria-controls="card2">Price Range</button>
                      </div>

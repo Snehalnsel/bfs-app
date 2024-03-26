@@ -52,7 +52,6 @@ exports.getBrandList = async function (req, res, next) {
 
 
 exports.addData = async function (req, res, next) {
-    //console.log('req.body:', req.body);
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

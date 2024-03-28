@@ -80,12 +80,9 @@ async function generateSellerPickup(data) {
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = JSON.parse(body);
-       //console.log(responseBody);
-       //console.log("hi");
        const token = responseBody;
        resolve(token);
      } else {
-       //console.error('Errottr:', response);
        reject(new Error(`Error: ${response.statusCode}`));
      }
    });
@@ -96,7 +93,6 @@ async function generateSellerPickup(data) {
 
 
 // exports.addAddress = async function (req, res, next) {
-//   console.log('req.body:', req.body);
 //   try {
 //     const errors = validationResult(req);
 //     if (!errors.isEmpty()) {
@@ -107,7 +103,6 @@ async function generateSellerPickup(data) {
 //       });
 //     }
 
-//     console.log(req.body.street_name);
 //     const newAddress = new AddressBook({
 //       user_id: req.body.user_id,
 //       street_name: req.body.street_name,
@@ -122,9 +117,6 @@ async function generateSellerPickup(data) {
 //       flag: req.body.flag,
 //       created_dtime: dateTime,
 //     });
-
-//     console.log(newAddress);
-
 //     const savedAddress = await newAddress.save();
 
 //     res.status(200).json({
@@ -153,9 +145,6 @@ exports.addAddress = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
-
-    //console.log('req.body:', req.body);
-    //console.log(req.body.street_name);
     const newAddress = new AddressBook({
       user_id: req.body.user_id,
       street_name: req.body.street_name,
@@ -170,8 +159,6 @@ exports.addAddress = async function (req, res, next) {
       flag: req.body.flag,
       created_dtime: dateTime,
     });
-
-    //console.log(newAddress);
 
     const savedAddress = await newAddress.save();
     const user = await Users.findById(req.body.user_id);
@@ -189,12 +176,7 @@ exports.addAddress = async function (req, res, next) {
       pin_code: savedAddress.pin_code
     };
 
-    //console.log(PickupData);
-
-    
       const shiprocketResponse = await generateSellerPickup(PickupData);
-
-      //console.log(shiprocketResponse);
 
       if (shiprocketResponse) {
         savedAddress.shiprocket_address = savedAddress.address_name + ' - ' + user.name;
@@ -226,7 +208,6 @@ exports.addAddress = async function (req, res, next) {
 
 
 exports.getAddressesByUser = async function (req, res, next) {
-  //console.log('req.body:', req.body);
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -238,8 +219,6 @@ exports.getAddressesByUser = async function (req, res, next) {
     }
 
     const { user_id } = req.body;
-
-    //console.log(user_id);
     const addresses = await AddressBook.find({ user_id });
 
     if (!addresses || addresses.length === 0) {
@@ -266,7 +245,6 @@ exports.getAddressesByUser = async function (req, res, next) {
 
 
 exports.getAddressdetails = async function (req, res, next) {
-  //console.log('req.body:', req.body);
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -362,7 +340,6 @@ exports.updateAddress = async function (req, res, next) {
 
 
 exports.deleteAddress = async function (req, res, next) {
-  //console.log('req.body:', req.body);
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

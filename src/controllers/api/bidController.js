@@ -146,8 +146,6 @@ exports.addData = async (req, res) => {
     };
 
     transporter.sendMail(mailData, function (err, info) {
-      //if (err) console.log(err);
-      //else console.log(info);
     });
 
     const mail2Data = {
@@ -162,8 +160,6 @@ exports.addData = async (req, res) => {
     };
 
     transporter.sendMail(mail2Data, function (err, info) {
-      //if (err) console.log(err);
-      //else console.log(info);
     });
 
 
@@ -275,7 +271,6 @@ exports.bidExistReccord = async (req, res, next) => {
       });
     }
   } catch (error) {
-    //console.log(error);
     res.status(500).json({
       status: "error",
       message: "An error occurred while checking exist reccord in db.",
@@ -324,7 +319,6 @@ exports.bidListProduct = async (req, res, next) => {
       isLoggedIn: isLoggedIn
     });
   } catch (error) {
-    //console.log(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the chat page.",

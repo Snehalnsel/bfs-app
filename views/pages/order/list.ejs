@@ -214,7 +214,7 @@
                                                             <td>
                                                                 <% if(value.billing_address && value.billing_address[0] && value.shipping_address && value.shipping_address[0]) {%>
                                                                     <% if(value.delete_status == 0) {%>
-                                                                        <a href="/admin/orderdetails/<%= value._id %>"
+                                                                        <a href="/admin/orderdetails/<%= value._id %>/0"
                                                                             class="btn btn-info btn-circle btn-sm" title="Edit">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
@@ -301,9 +301,21 @@
                                                                    <% } %>
                                                             </td> 
                                                             <td>
-                                                                
+                                                                <% if (value.returnorder) { %>
+                                                                    <a href="/admin/orderdetails/<%= value._id %>/2"
+                                                                        class="btn btn-info btn-circle btn-sm" title="Edit">
+                                                                        <i class="fas fa-pencil-alt"></i>
+                                                                    </a>
+                                                                    <!-- <% if (value.returnorder) { %> -->
+                                                                        <a href="/admin/returnorder/<%= value._id %>" class="btn btn-warning" title="Order Placed">
+                                                                            Order Placed
+                                                                         </a>
+                                                                    <!-- <% } %> -->
+                                                                <% } %>
                                                             </td>
-                                                            <td></td>
+                                                            <td>
+
+                                                            </td>
                                                         </tr>
                                                         <% }); %>
                                                             <% } %>

@@ -289,7 +289,7 @@ exports.getJustSoldProducts = async function (req, res) {
 
 
 
-//     console.log('Before Sorting:', products);
+
 
 
 
@@ -309,7 +309,7 @@ exports.getJustSoldProducts = async function (req, res) {
 
 
 
-//     console.log('After Sorting:', products);
+
 
 
 
@@ -411,7 +411,7 @@ function extractFilename(url) {
   return null;
 }
 
-exports.getData = async function (req, res, next) {
+exports.getData = async function (req, res,deviceType) {
   try {
        //await copyImages();
     //const requrl = req.protocol + '://' + req.get('host');
@@ -480,12 +480,12 @@ exports.getData = async function (req, res, next) {
     // const allImages = await Productimage.find();
     // // Update each document with only the image name and save the changes
     // for (const image of allImages) {
-    //   // console.log(image.image)
     //   const imageName = extractFilename(image.image);
     //   image.image = imageName ? imageName : '';
     //  await image.save();
     // }
    // return;
+
     const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : ""
     var cartCount = (userId != "") ? await Cart.countDocuments({ user_id: mongoose.Types.ObjectId(userId) }) : 0;
     const banner = await Banner.find({ status: 1 });
@@ -501,6 +501,7 @@ exports.getData = async function (req, res, next) {
       isLoggedIn: isLoggedIn,
     }, {async: true});
     res.send(html);
+  
     // res.render("webpages/list", {
     //   title: "Home Page",
     //   websiteUrl: process.env.SITE_URL,
@@ -519,6 +520,20 @@ exports.getData = async function (req, res, next) {
     });
   }
 };
+
+exports.getAppPromotionData = async function (req, res) {
+  try {
+    res.render("webpages/app-promotion", {
+      title: "My Post",
+      message: "Welcome to the My Post page!",
+      websiteUrl: process.env.SITE_URL,
+    });
+  } catch (error) {
+    //console.error('Error fetching top categories:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 exports.bannerlist = async function (req, res) {
   try {
     const banner = await Banner.find({ status: 1 });
@@ -574,19 +589,14 @@ async function copyImages() {
           const compressedFilePath = path.join(compressImagesDir, file);
           const stat = await fs.stat(filePath);
            if (stat.isFile() && fileExtension === '.webp') {
-              console.log('Copying image:', file);
               await fs.copyFile(filePath, compressedFilePath);
           }
           else
           {
-            // console.log("filePath",filePath);
-            // console.log("compressImagesDir",compressImagesDir);
             await CompressImage("./public/images/"+file,"./public/compress_images/");
           }
       }
-      //console.log('Images copied successfully!');
   } catch (err) {
-      //console.error('Error copying images:', err);
   }
 }
 

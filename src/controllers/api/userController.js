@@ -183,8 +183,8 @@ exports.signUp = async function (req, res, next) {
             };
       
             transporter.sendMail(mailData, function (err, info) {
-              if (err) console.log("err", err);
-              else console.log("info", info);
+              // if (err) console.log("err", err);
+              // else console.log("info", info);
             });
       
 
@@ -756,8 +756,8 @@ exports.forgotPassword = async function (req, res, next) {
       };
 
       transporter.sendMail(mailData, function (err, info) {
-        if (err) console.log(err);
-        else console.log(info);
+        // if (err) console.log(err);
+        // else console.log(info);
       });
 
       var updData = {
@@ -859,8 +859,8 @@ exports.resetPassword = async function (req, res, next) {
                       };
                       
                       transporter.sendMail(mailData, function (err, info) {
-                        if (err) console.log("err", err);
-                        else console.log("info", info);
+                        // if (err) console.log("err", err);
+                        // else console.log("info", info);
                       });
                       res.status(200).json({
                         status: "1",

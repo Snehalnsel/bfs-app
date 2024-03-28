@@ -118,7 +118,6 @@ exports.getData = async function (req, res, next) {
   ]).exec(function (error, productList) {
 
     const totalCount = productList.length;
-    console.log(totalCount);
     if (error) {
       return res.status(500).json({ error: 'An error occurred' });
     }
@@ -315,7 +314,6 @@ exports.detailsData = async function (req, res, next) {
       const parentCategory = await Category.findById(CategoryDetails.parent_id);
     }
     const productImages = await Productimage.find({ product_id: productId });
-    console.log(productImages);
     const brandList = await Brand.find();
     const categoryList = await Category.find({ parent_id: '650444488501422c8bf24bdb' });
     const subcategoryList = await Category.find({ parent_id: { $ne: '650444488501422c8bf24bdb' } });
@@ -335,7 +333,7 @@ exports.detailsData = async function (req, res, next) {
       userImage:  req.session.admin.image_url,
       userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
-      requrl: req.app.locals.requrl,
+      requrl: process.env.SITE_URL,
       message: "",
       respdata: productdetails,
       category: categoryList,
@@ -347,7 +345,7 @@ exports.detailsData = async function (req, res, next) {
       productImages: productImages,
       parentCategory: productdetails.hasOwnProperty("category_id") ? parentCategory : null,
       isAdminLoggedIn:isAdminLoggedIn,
-      requrl:requrl
+      //requrl:requrl
     });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred' });
@@ -428,10 +426,10 @@ exports.updatedetailsData = async function (req, res, next) {
               {
                 await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
                   if (err) {
-                      console.log("Error Found:", err);
+                      // console.log("Error Found:", err);
                   }
                   else {
-                      console.log("File copied successfully!");
+                      // console.log("File copied successfully!");
                   }
                 });
               }
@@ -459,10 +457,10 @@ exports.updatedetailsData = async function (req, res, next) {
             {
               await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
                 if (err) {
-                    console.log("Error Found:", err);
+                    // console.log("Error Found:", err);
                 }
                 else {
-                    console.log("File copied successfully!");
+                    // console.log("File copied successfully!");
                 }
               });
             }
@@ -495,10 +493,10 @@ exports.updatedetailsData = async function (req, res, next) {
                 {
                   await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
                     if (err) {
-                        console.log("Error Found:", err);
+                        // console.log("Error Found:", err);
                     }
                     else {
-                        console.log("File copied successfully!");
+                        // console.log("File copied successfully!");
                     }
                   });
                 }
@@ -540,7 +538,6 @@ exports.updatedetailsData = async function (req, res, next) {
       res.redirect("/admin/productlist");
     }
   }).catch((err) => {
-    console.log(err);
     res.status(500).json({
       status: "0",
       message: "An error occurred while updating the product.",

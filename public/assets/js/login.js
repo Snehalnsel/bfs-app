@@ -17,7 +17,7 @@ $(document).ready(async function(){
             },
             password:{
                 required:true,
-                maxlength:10,
+                maxlength:15,
                 minlength:8
             }
         },
@@ -28,7 +28,7 @@ $(document).ready(async function(){
             },
             password:{
                 required:"Please enter password.",
-                maxlength:"You can enter maximum of 10 characters.",
+                maxlength:"You can enter maximum of 15 characters.",
                 minlength: "You can enter minimum of 8 characters.",
             }
         },
@@ -46,12 +46,10 @@ $(document).ready(async function(){
                     cookieRefreshToken:cookieRefreshToken
                 },
                 success: async function(obj){
-                    // let obj = response.responseJSON;
                     let error_success = obj.status;
                     if(error_success == 'success'){
                         $('#success-msg').html(obj.message);
                         $('#success-msg').show();
-                        //Set Coockie in the local machine
                         await setCookeiFunc(accessTokenVar,obj.respdata.accessToken,obj.respdata.accessTokenExpires);
                         await setCookeiFunc(refreshTokenVar,obj.respdata.refreshToken,obj.respdata.refreshTokenExpires);
                         setTimeout(function(){

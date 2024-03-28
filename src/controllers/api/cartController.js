@@ -31,7 +31,6 @@ const Cartremove = require("../../models/api/cartremoveModel");
 
 //     const existingCart = await Cart.findOne({ user_id: req.body.user_id, status: 0 });
 
-//     console.log(existingCart);
 
 //     if (existingCart) {
 //       const existingCartItem = await CartDetail.findOne({
@@ -41,7 +40,6 @@ const Cartremove = require("../../models/api/cartremoveModel");
 //       });
 
 //       if (existingCartItem) {
-//         console.log(existingCartItem.qty);
 //         existingCartItem.qty = parseInt(existingCartItem.qty) + parseInt(qty);
 //         await existingCartItem.save();
 //       } else {
@@ -101,7 +99,6 @@ const Cartremove = require("../../models/api/cartremoveModel");
 //       });
 
 //       const savedata = await cartDetail.save();
-//       console.log(savedata);
 
 //       const user = await Users.findById(user_id);
 //       const product = await Userproduct.findById(product_id);
@@ -135,7 +132,7 @@ const Cartremove = require("../../models/api/cartremoveModel");
 
 //     const existingCart = await Cart.findOne({ user_id: req.body.user_id, status: 0 });
 
-//     console.log(existingCart);
+
 
 //     if (existingCart) {
 //       const existingCartItem = await CartDetail.findOne({
@@ -187,7 +184,6 @@ const Cartremove = require("../../models/api/cartremoveModel");
 //       });
 //     } else {
 
-//       console.log("new");
 //       const newCart = new Cart({
 //         user_id,
 //         status: 0,
@@ -206,7 +202,6 @@ const Cartremove = require("../../models/api/cartremoveModel");
 //       });
 
 //       const savedata = await cartDetail.save();
-//       console.log(savedata);
 
 //       const user = await Users.findById(user_id);
 //       const product = await Userproduct.findById(product_id);
@@ -240,9 +235,6 @@ exports.addToCart = async (req, res) => {
     const { user_id, product_id, qty } = req.body;
 
     const existingCart = await Cart.findOne({ user_id: req.body.user_id, status: 0 });
-
-    //console.log(existingCart);
-
     if (existingCart) {
       const existingCartItem = await CartDetail.findOne({
         cart_id: existingCart._id
@@ -298,7 +290,6 @@ exports.addToCart = async (req, res) => {
     } 
     else {
 
-      //console.log("new");
       const newCart = new Cart({
         user_id,
         status: 0,
@@ -317,7 +308,6 @@ exports.addToCart = async (req, res) => {
       });
 
       const savedata = await cartDetail.save();
-      //console.log(savedata);
 
       const user = await Users.findById(user_id);
       const product = await Userproduct.findById(product_id);
@@ -336,20 +326,12 @@ exports.addToCart = async (req, res) => {
 
       const cartRemove = await Cartremove.findOne({}, { name: 1, _id: 0 });
 
-      const durationInSeconds = cartRemove.name; // Assuming 'name' holds a duration in seconds
-
-      //console.log("removal time");
-      //console.log(durationInSeconds);
-
-      // Convert duration from seconds to milliseconds
+      const durationInSeconds = cartRemove.name; 
+      
       const durationInMilliseconds = durationInSeconds * 60 * 1000;
 
-      //console.log("removal time in miliseond");
-      //console.log(durationInMilliseconds);
-
       setTimeout(() => {
-        removeItemAfterTime(savedCart._id); // savedata._id contains the ID of the added item
-       //console.log('welcome')
+        removeItemAfterTime(savedCart._id); 
       }, durationInMilliseconds);
       
       res.status(200).json({
@@ -422,20 +404,16 @@ exports.getCartListByUserId = async (req, res) => {
 
 
 const removeItemAfterTime = async (cartId) => {
-  //console.log('hi'+cartId)
   try {
-    //console.log("Timer expired for cart:", cartId);
 
     await Cart.findByIdAndDelete(cartId);
-    // Perform logic to remove items from the cart after 1 minute (for testing purposes)
+
     const cartItems = await CartDetail.find({ cart_id: cartId, status: 0 });
 
     for (const cartItem of cartItems) {
       await CartDetail.findByIdAndDelete(cartItem._id);
-      //console.log(`Item ${cartItem._id} removed from the cart after 1 minute (test).`);
     }
   } catch (error) {
-    //console.error('Error while removing item from cart:', error);
   }
 };
 

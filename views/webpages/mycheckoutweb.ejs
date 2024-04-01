@@ -290,13 +290,12 @@
                      //var packingHandlingChargeValue = $('#packingHandlingCharge-hidden').val();
                      var taxvalue = parseFloat(packingHandlingChargeValue) + parseFloat(cashHandlecharges);
                     
-
                      $('#taxvalue').html('<i class="fa fa-inr" aria-hidden="true"></i>' + taxvalue.toFixed(2));
                      var productPrice = parseFloat('<%= product_price %>');
                      var gst = parseFloat('<%= gst %>');
                      var totalAmount = parseFloat(productPrice) + gst + taxvalue;
                      var totalAdvanceAmount = parseFloat(payNowAmount) + gst + taxvalue;
-
+            
                      $('#total-cod-amount-row th').text('₹ ' + totalAmount.toFixed(2));
                      $('#advance-amount th').text('₹ ' + totalAdvanceAmount.toFixed(2));
 

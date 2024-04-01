@@ -166,14 +166,14 @@ async function generateSellerPickup(data) {
     request(options, function (error, response, body) {
       if (error) {
         reject(error);
-      } else if (response.statusCode === 200) {
+      } else {
         const responseBody = JSON.parse(body);
-
         const token = responseBody;
         resolve(token);
-      } else {
+      } /*else {
+        //console.log("response",response);
         reject(new Error(`Error: ${response.statusCode}`));
-      }
+      }*/
     });
   });
 }
@@ -1650,7 +1650,8 @@ exports.userUpdate = async function (req, res, next) {
 };
 exports.userNewCheckOutAddressAdd = async function (req, res, next) {
   try {
-    const addr_name = req.body.addrType;
+    //const addr_name = req.body.addrType;
+    const addr_name = req.body.addr_type;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -1697,6 +1698,7 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
       res.redirect('/checkout-web');
     }
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
@@ -3628,7 +3630,6 @@ exports.forgotPassword = async function (req, res, next) {
 
 
 exports.sendotp = async function (req, res, next) {
-
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(200).json({

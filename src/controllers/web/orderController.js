@@ -2573,7 +2573,11 @@ exports.downloadOrderPDF = function (req, res, next) {
           stream.pipe(res);
         });
       } catch (err) {
-        res.status(500).json({ error: 'An error occurred while generating PDF' });
+        //console.error('Error generating PDF:', err);
+        return res.render("pages/error-msg", {
+          errorMsg:"An error occurred while generating PDF!"
+        });
+        //res.status(500).json({ error: 'An error occurred while generating PDF' });
       }
     }
   });

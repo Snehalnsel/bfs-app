@@ -32,6 +32,7 @@ const insertBidData = require("../../models/fireDbServices/insertBidData");
 const insertBidOfferData = require("../../models/fireDbServices/insertBidOfferData");
 const updateBidData = require("../../models/fireDbServices/updateBidData");
 const updateBidOfferData = require("../../models/fireDbServices/updateBidOfferData")
+const insertNotification = require("../../models/api/insertNotification");
 //const Userproduct = require("../../models/api/userproductModel");
 
 //Socket Details
@@ -223,8 +224,24 @@ exports.bidExistReccord = async (req, res, next) => {
         }; 
         await updateBidData(updateData,bidId);
         await insertBidOfferData(currentOffer,currentOffer.id);
+        //Notification To User Added By Palash 30-03-2024
+        let notificationUserId = '';
+        let notificationTitle = '';
+        let notificationContent = '';
+        let notificationreqUrl = process.env.SITE_URL + "/bid-for-product/" + bidId;
+        notificationUserId = productDetails.user_id;
+        notificationTitle = 'A buyer has bidded on your product';
+        notificationContent =  'Buyer has bidded on your ' + productDetails.name;
+        await insertNotification(
+          notificationTitle,
+          notificationContent,
+          notificationUserId,
+          notificationreqUrl,
+          new Date()
+        );
         return res.status(200).json({
           isExist:true,
+          status:"success",
           bidId:bidId,
           data: updateData
         });
@@ -256,6 +273,21 @@ exports.bidExistReccord = async (req, res, next) => {
         }; 
         await insertBidData(insertData,bidId);
         await insertBidOfferData(currentOffer,currentOffer.id);
+        //Notification To User Added By Palash 30-03-2024
+        let notificationUserId = '';
+        let notificationTitle = '';
+        let notificationContent = '';
+        let notificationreqUrl = process.env.SITE_URL + "/bid-for-product/" + bidId;
+        notificationUserId = productDetails.user_id;
+        notificationTitle = 'A buyer has bidded on your product';
+        notificationContent =  'Buyer has bidded on ' + productDetails.name;
+        await insertNotification(
+          notificationTitle,
+          notificationContent,
+          notificationUserId,
+          notificationreqUrl,
+          new Date()
+        );
         return res.status(200).json({
           isExist:false,
           bidId:bidId,

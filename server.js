@@ -21,6 +21,7 @@ const dateTime = moment().format("YYYY-MM-DD h:mm:ss");
 //Import Bids watcher Model
 const { getFirestore, Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
 const checkChangesInField = require("./src/models/fireDbServices/checkChangesInField");
+const insertNotification = require("./src/models/api/insertNotification");
 
 const Userproduct = require("./src/models/api/userproductModel");
 
@@ -334,6 +335,27 @@ io.on("connection", (socket) => {
       }; 
       await updateBidData(updateData,bidId);
       await insertBidOfferData(currentOffer,currentOffer.id);
+      //Notification To User Added By Palash 30-03-2024
+      let notificationUserId = '';
+      let notificationTitle = '';
+      let notificationContent = '';
+      let notificationreqUrl = process.env.SITE_URL + "/bid-for-product/" + bidId;
+      if(username == bidOldData.buyerId){
+        notificationUserId = bidOldData.sellerId;
+        notificationTitle = 'A buyer has bidded on your product';
+        notificationContent =  'Buyer has bidded on ' + bidProductDetails.name;
+      } else {
+        notificationUserId = bidOldData.buyerId;
+        notificationTitle = 'The seller has replied on your bid';
+        notificationContent =  'The seller has replied on ' + bidProductDetails.name;
+      }
+      await insertNotification(
+        notificationTitle,
+        notificationContent,
+        notificationUserId,
+        notificationreqUrl,
+        new Date()
+      );
       //let currUserDetails = await UserModel.findOne({_id:username});
       //Below line has commented out due to a observer written on the above
       //io.to(roomName).emit("message",formatMessage(currUserDetails.name, msg,username, roomName));

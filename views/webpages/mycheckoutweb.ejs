@@ -381,6 +381,8 @@
                let totalAmtValue = parseFloat(totalAmtText.replace('₹ ', ''));
                formData.total_amt = totalAmtValue;
 
+               console.log(formData);
+
                let addToCartreCookieAccessToken = await getCookieFunc(accessTokenVar);
                let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
                await userReLogin(addToCartreCookieAccessToken, addToCartreCookieRefreshToken);
@@ -392,7 +394,8 @@
                   success: function (response) {
                      if (response.is_orderPlaced == 1) {
                         const tempOrderId = response.order._id;
-                        window.location.href = '/pay?temp=' + tempOrderId;
+                        // window.location.href = '/pay?temp=' + tempOrderId;
+                        window.open('/pay?temp=' + tempOrderId, '_blank');
                      }
                   },
                   error: function (xhr, status, error) {

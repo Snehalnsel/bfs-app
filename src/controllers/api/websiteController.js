@@ -896,6 +896,7 @@ exports.userRelogin = async function (req, res, next) {
 
 exports.userFilter = async function (req, res, next) {
   let { brandList, sizeList, conditionList, priceList, genderList, optionId, productcategoryId, pageNo } = req.body;
+ 
   if (typeof optionId != "undefined") {
     if ((optionId == 0)) {
       optionId = 1;
@@ -921,7 +922,10 @@ exports.userFilter = async function (req, res, next) {
   if (typeof sizeList != "undefined") {
     concatVar["size_id"] = { "$in": sizeList };
   }
-  if (typeof productcategoryId != "undefined") {
+  if (typeof productcategoryId != "undefined" && (productcategoryId == "bestDeal" || productcategoryId == "whatshot" ||     productcategoryId == "justsold")) {
+    
+  }
+  else{
     concatVar["category_id"] = { "$in": mongoose.Types.ObjectId(productcategoryId) };
   }
   if ((typeof conditionList != "undefined") && (objConditionList.length > 0)) {
@@ -3535,7 +3539,6 @@ exports.demoorder = async function (req, res) {
       });
     }
   } catch (error) {
-    // console.error(error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };

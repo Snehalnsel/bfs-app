@@ -171,7 +171,7 @@
                                  <div class="pmnt-hidebox">
                                     <table style="width:100%">
                                        <tr id="pay-now-row">
-                                          <td>Booking Amount</td>
+                                          <td>Booking Amount(5% of product value)</td>
                                           <th><i class="fa fa-inr" aria-hidden="true"></i> 200</th>
                                        </tr>
                                        <tr id="remaining-amount-row">
@@ -264,7 +264,6 @@
                      $('#packingHandlingCharge-hidden').val(newCharge);
                   },
                   error: function (error) {
-                     console.error("Error:", error);
                   }
                });
             }
@@ -273,6 +272,7 @@
          <script>
             $(document).ready(function () {
                $('.pmnt-hidebox').hide();
+               $("#cash-handle-charge").css("display", "none");
                var originalTotalAmount = parseFloat('<%= finalPrice %>');
 
                $(document).on('change', '.payment-method', function () {
@@ -372,13 +372,13 @@
                   formData.booking_amount = parseFloat($('#advance-amount').text().replace(/[^\d.]/g, ''));
                }
                formData.taxable_value = parseFloat($('#taxvalue').text().replace(/[^0-9.]/g, ''));
+               formData.taxable_value = parseFloat($('#taxvalue').text().replace(/[^0-9.]/g, ''));
                //formData.packing_handling_charge = parseFloat($('#packingHandlingCharge').text().replace(/[^0-9.]/g, ''));
                formData.packing_handling_charge =$('#packingHandlingCharge-hidden').val();
 
                let totalAmtText = $('#total-cod-amount-row th').text();
                let totalAmtValue = parseFloat(totalAmtText.replace('₹ ', ''));
                formData.total_amt = totalAmtValue;
-
 
                let addToCartreCookieAccessToken = await getCookieFunc(accessTokenVar);
                let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);

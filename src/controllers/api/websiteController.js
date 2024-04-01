@@ -3069,6 +3069,17 @@ exports.getWhatsHotProductsweb = async function (req, res) {
 
     const hotProducts = await Userproduct.find({ approval_status: 1, flag: 0 }).sort({ hitCount: -1 });
 
+    let maxOfferPrice = -Infinity; 
+    let minOfferPrice = Infinity;
+
+    for (const product of hotProducts) {
+      if (product.offer_price > maxOfferPrice) {
+        maxOfferPrice = product.offer_price;
+      }
+      if (product.offer_price < minOfferPrice) {
+        minOfferPrice = product.offer_price;
+      }
+    }
     const whatsHotProducts = [];
 
     for (const product of hotProducts) {
@@ -3118,6 +3129,8 @@ exports.getWhatsHotProductsweb = async function (req, res) {
         isLoggedIn: isLoggedIn,
         filter_basedon: "whatshot",
         websiteUrl: process.env.SITE_URL,
+        maxvalue: typeof maxOfferPrice != "undefined" ? maxOfferPrice : "0",
+        minvalue: typeof minOfferPrice != "undefined" ? minOfferPrice : "0",
       });
 
   } catch (error) {
@@ -3148,6 +3161,18 @@ exports.getJustSoldProductsweb = async function (req, res) {
     const conditionList = await productconditionModel.find({});
     const genderList = await Gender.find({});
     const solditems = await Userproduct.find({ approval_status: 1, flag: 1 });
+    
+    let maxOfferPrice = -Infinity; 
+    let minOfferPrice = Infinity;
+    for (const product of solditems) {
+      if (product.offer_price > maxOfferPrice) {
+        maxOfferPrice = product.offer_price;
+      }
+      if (product.offer_price < minOfferPrice) {
+        minOfferPrice = product.offer_price;
+      }
+    }
+
     const justSoldProducts = [];
     for (const product of solditems) {
       const productImage = await Productimage.findOne({ product_id: product._id });
@@ -3179,6 +3204,8 @@ exports.getJustSoldProductsweb = async function (req, res) {
         isLoggedIn: isLoggedIn,
         filter_basedon: "justsold",
         websiteUrl: process.env.SITE_URL,
+        maxvalue: typeof maxOfferPrice != "undefined" ? maxOfferPrice : "0",
+        minvalue: typeof minOfferPrice != "undefined" ? minOfferPrice : "0",
       });
 
   } catch (error) {
@@ -3235,9 +3262,6 @@ for (const product of products) {
     minOfferPrice = product.offer_price;
   }
 }
-
-console.log("Max Offer Price:", maxOfferPrice);
-console.log("Min Offer Price:", minOfferPrice);
 
     const bestDealProducts = [];
 

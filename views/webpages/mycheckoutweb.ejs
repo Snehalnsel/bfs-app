@@ -244,7 +244,7 @@
             $(document).on('click', '.paymentmethod', function () {
                let paymentMeythod = $(this).val();
                if (paymentMeythod === 'COD') {
-                  $("#cash-handle-charge").css("display", "block");
+                  $("#cash-handle-charge").css("display", "table-column");
                   //$('#cash-handle-charge').show();
                   $(".changeOnPaymentMethod").html("Taxable value (S&H + CH)");
                } else {

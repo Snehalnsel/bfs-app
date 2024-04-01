@@ -1609,11 +1609,11 @@ exports.returnOrder = async function (req, res) {
       let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
       const delivery_postcode = 700020;
       const product_id = req.body.productid;
-
       const productdeatils = await Userproduct.findById(product_id);
       const weight = productdeatils.weight;
       // const details = await Users.findById(productdeatils.user_id);
       const billingaddress = await AddressBook.findOne({ user_id: productdeatils.user_id });
+      console.log(billingaddress);
       const pickup_postcode = billingaddress.pin_code;
       const cod = "1";
       const shiprocketResponse = await generateCouriresServiceability(pickup_postcode, delivery_postcode, cod, weight);
@@ -1634,6 +1634,7 @@ exports.returnOrder = async function (req, res) {
       });
       
   } catch (error) {
+    console.log(error);
    return res.status(500).json({ message: 'Internal server error' });
  }
  };

@@ -24,7 +24,9 @@ $(document).ready(async function(){
             },
             phoneno: {
                 required: true,
-                minlength:10
+                number:true,
+                minlength:10,
+                maxlength:10
             }
         },
         messages:{
@@ -44,7 +46,10 @@ $(document).ready(async function(){
                 equalTo: "Passwords do not match"
             },
             phoneno: {
-                required: "Contract number is required"
+                required: "Contract number is required",
+                number:"Please enter numeric digits only.",
+                minlength:"Please enter valid phone number.",
+                maxlength:"Please enter valid phone number."
             }
         },
         submitHandler: function() {

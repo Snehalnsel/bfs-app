@@ -70,7 +70,7 @@
                                  <% //if(addressUserList.length=='' ){%>
                                     <div class="address-form-open" style="display:none;">
                                        <form action="/user-new-checkout-address" method="POST"
-                                          onsubmit="setAddressType()">
+                                          onsubmit="setAddressType()" class="checkoutForm" id="checkoutForm">
                                           <div class="form-box">
                                              <div class="loginform-box">
                                                 <div class="">
@@ -240,6 +240,7 @@
 
    <%- include('../../public/assets/include/newsletter'); %>
       <%- include('../../public/assets/include/footer'); %>
+      <script src="/public//assets//js/checkout.js" ></script>
          <script>
             $(document).on('click', '.paymentmethod', function () {
                let paymentMeythod = $(this).val();

@@ -6,6 +6,7 @@ $(document).ready(async function () {
         if ($('.filterByChecked').is(':checked')) {
             searchByFilter(priceList);
         } else {
+            window.location.reload();
             //location.reload(priceList);
         }
     });

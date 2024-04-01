@@ -2068,7 +2068,7 @@ exports.addNewPost = async function (req, res, next) {
         const savedImage = productimageDetail.save();
       });
     }
-    res.redirect('/my-account');
+    res.redirect('/add-post');
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -2262,7 +2262,7 @@ exports.updatePostData = async function (req, res, next) {
       ...updatedProduct.toObject(),
       images: productImages,
     };
-    res.redirect('/my-account');
+    res.redirect('/edit-mypost/'+productId);
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -2397,6 +2397,7 @@ exports.viewWishListByUserId = async function (req, res, next) {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
 
     if (isLoggedIn == "") {
+      console.log(111111);
       res.redirect("/registration");
     }
 

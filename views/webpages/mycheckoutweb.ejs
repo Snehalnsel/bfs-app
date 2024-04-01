@@ -157,13 +157,13 @@
                                  <p>Select Payments Method </p>
                                  <ul>
                                     <li><label class="form-check-label">
-                                          <input type="radio" class="form-check-input payment-method"
+                                          <input type="radio" class="form-check-input payment-method paymentmethod paymentmethodOnline"
                                              name="paymentmethod" value="Online">Pay Now
                                        </label>
                                     </li>
                                     <li>
                                        <label class="form-check-label" for="cod-payments">
-                                          <input type="radio" class="form-check-input payment-method" id="cod-payments"
+                                          <input type="radio" class="form-check-input payment-method paymentmethod" id="cod-payments"
                                              name="paymentmethod" value="COD">Pay On Delivery
                                        </label>
                                     </li>
@@ -184,7 +184,7 @@
                            </td>
                         </tr>
                         <tr>
-                           <td>Packing & Handling Charges</td>
+                           <td>Packing & Handling Charges (S&H)</td>
                            <th id="packingHandlingCharge"><i class="fa fa-inr" aria-hidden="true"></i></th>
                         </tr>
                         <tr>
@@ -193,11 +193,11 @@
                                  class="check-link">Check Shipping Amount</button></td>
                         </tr>
                         <tr id="cash-handle-charge">
-                           <td>cash hand charge(5% of product value) </td>
+                           <td>Cash handle charge(5% of product value)</td>
                            <th><i class="fa fa-inr" aria-hidden="true"></i> 200</th>
                         </tr>
                         <tr>
-                           <td>taxable value (S&H + CH)</td>
+                           <td class="changeOnPaymentMethod">Taxable value (S&H + CH)</td>
                            <th id="taxvalue"><i class="fa fa-inr" aria-hidden="true"></i> </th>
                         </tr>
                         <tr>
@@ -241,6 +241,17 @@
    <%- include('../../public/assets/include/newsletter'); %>
       <%- include('../../public/assets/include/footer'); %>
          <script>
+            $(document).on('click', '.paymentmethod', function () {
+               let paymentMeythod = $(this).val();
+               if (paymentMeythod === 'COD') {
+                  $("#cash-handle-charge").css("display", "block");
+                  //$('#cash-handle-charge').show();
+                  $(".changeOnPaymentMethod").html("Taxable value (S&H + CH)");
+               } else {
+                  $("#cash-handle-charge").css("display", "none");
+                  $(".changeOnPaymentMethod").html("Taxable value (S&H)");
+               }
+            })
             function checkShippingAmount() {
                var productid = $('#productid').val();
                $.ajax({
@@ -368,7 +379,6 @@
                let totalAmtValue = parseFloat(totalAmtText.replace('₹ ', ''));
                formData.total_amt = totalAmtValue;
 
-               console.log(formData);
 
                let addToCartreCookieAccessToken = await getCookieFunc(accessTokenVar);
                let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
@@ -392,5 +402,7 @@
             });
 $(document).ready(function(){
    $("#shipMentAmountCal").trigger( "click" );
+   //$( ".paymentmethodOnline" ).trigger( "click" );
+   //$("#taxvalue").html($("#packingHandlingCharge").html())
 })
 </script>

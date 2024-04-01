@@ -2657,7 +2657,7 @@ exports.viewCartListByUserId = async function (req, res, next) {
           status: cartItem.status,
         };
         const product_price = finalData.product_price;
-        const gst = (product_price * 18) / 100;
+        const gst = (product_price * 28) / 100;
         const finalPrice = parseInt(product_price) + 250 + parseInt(gst);
         res.render("webpages/addtocart", {
           title: "Cart List Page",
@@ -2822,7 +2822,7 @@ exports.checkoutWeb = async function (req, res, next) {
 
         await insertNotification(
           'Order Placed Successfully from Website',
-          `Item ${cartItem.product_id.name} added to order list by ${user.name}`,
+          `Item ${cartItem.product_id.name} added to order list by`,//Added By Palash Samanta
           user_id,
           requestUrl,
           new Date()

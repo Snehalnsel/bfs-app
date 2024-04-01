@@ -3220,10 +3220,24 @@ exports.getBestDealProductsweb = async function (req, res) {
 
     const products = await Userproduct.find({ percentage: { $gte: percentageFilter }, approval_status: 1, flag: 0 }); // Adding approval_status filter
 
-
     if (!products || products.length === 0) {
       return res.status(404).json({ message: 'No products meet the percentage filter criteria' });
     }
+    let maxOfferPrice = -Infinity; 
+    let minOfferPrice = Infinity;
+
+// Iterate over the products array to find max and min offer prices
+for (const product of products) {
+  if (product.offer_price > maxOfferPrice) {
+    maxOfferPrice = product.offer_price;
+  }
+  if (product.offer_price < minOfferPrice) {
+    minOfferPrice = product.offer_price;
+  }
+}
+
+console.log("Max Offer Price:", maxOfferPrice);
+console.log("Min Offer Price:", minOfferPrice);
 
     const bestDealProducts = [];
 
@@ -3234,29 +3248,17 @@ exports.getBestDealProductsweb = async function (req, res) {
         const productCondition = await Productcondition.findById(product.status);
 
         bestDealProducts.push({
-
           _id: product._id,
-
           name: product.name,
-
           price: product.price,
-
           offer_price: product.offer_price,
-
           original_packaging: product.original_packaging,
-
           original_invoice: product.original_invoice,
-
           status_name: productCondition ? productCondition._id : '',
-
           status: productCondition ? productCondition.name : '',
-
           image: productImage,
-
         });
-
       }
-
     }
     res.render("webpages/allhomeproduct",
       {
@@ -3270,7 +3272,9 @@ exports.getBestDealProductsweb = async function (req, res) {
         productCount: count,
         websiteUrl:process.env.SITE_URL,
         isLoggedIn: isLoggedIn,
-        filter_basedon: "bestDeal"
+        filter_basedon: "bestDeal",
+        maxvalue: typeof maxOfferPrice != "undefined" ? maxOfferPrice : "0",
+        minvalue: typeof minOfferPrice != "undefined" ? minOfferPrice : "0",
       });
 
   } catch (error) {

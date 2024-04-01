@@ -113,7 +113,7 @@
                         <button class="accordion-button " type="button" data-toggle="collapse" data-target="#card3" aria-expanded="true" aria-controls="card2">Price Range</button>
                      </div>
 
-                     <div id="card3" class="collapse " data-parent="#theme-accordion">
+                     <!-- <div id="card3" class="collapse " data-parent="#theme-accordion">
                         <div class="card-body">
                            <div class="filter-list">
                               <ul class="list-group">
@@ -150,6 +150,32 @@
                                     <label class="label-check" for="prc5">₹200,000 - ₹500,000</label>                  
                                  </li>
                               </ul>                             
+                           </div>
+                        </div>
+                     </div> -->
+                     <div id="card3" class="collapse " data-parent="#theme-accordion">
+                        <div class="card-body">
+                           <div class="price-rangebox">
+                              <div class="price-input">
+                                 <div class="field">
+                                    <span>Min</span>
+                                    <input type="number" class="input-min price_range_input" value="<%= minvalue %>">
+                                 </div>
+                                 <div class="separator">-</div>
+                                 <div class="field">
+                                    <span>Max</span>
+                                    <input type="number" class="input-max price_range_input" value="<%= maxvalue %>">
+                                 </div>
+                              </div>
+                              <div class="slider">
+                                 <div class="progress"></div>
+                              </div>
+                              <div class="range-input">
+                                 <input type="range" class="range-min price_range_filter" min="<%= minvalue %>"
+                                    max="<%= maxvalue %>" value="<%= minvalue %>" step="100">
+                                 <input type="range" class="range-max price_range_filter" min="<%= minvalue %>"
+                                    max="<%= maxvalue %>" value="<%= maxvalue %>" step="100">
+                              </div>
                            </div>
                         </div>
                      </div>

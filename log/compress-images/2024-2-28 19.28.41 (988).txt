@@ -1,0 +1,7 @@
+File from: [./public/images/image-1711609166903-727100742.jpg]
+
+File to: [./public/compress_images/image-1711609166903-727100742.jpg]
+
+Compression algorithm: [-]
+
+Description: File does not exist!

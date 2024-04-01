@@ -2053,8 +2053,7 @@ exports.addNewPost = async function (req, res, next) {
         } else {
           await fs.copyFile("./public/images/" + imageUrl, "./public/compress_images/" + imageUrl, (err) => {
             if (err) {
-            }
-            else {
+            } else {
             }
           });
         }

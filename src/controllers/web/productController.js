@@ -406,7 +406,8 @@ exports.updatedetailsData = async function (req, res, next) {
               protocol: req.protocol,
               host: req.get("host"),
             });
-            const imageUrl = requrl + "/public/images/" + file.filename;
+            const imageUrl = file.filename;//Changes By Palash 28-03-2024
+            //const imageUrl = requrl + "/public/images/" + file.filename;
             // return file.filename;
             return imageUrl;
           }));

@@ -1,0 +1,13 @@
+File from: [./public/images/image-1711609166923-671286415.jpg]
+
+File to: [./public/compress_images/image-1711609166923-671286415.jpg]
+
+Compression algorithm: [-]
+
+Description: File does not exist!File from: [./public/images/image-1711609166887-529303464.jpg]
+
+File to: [./public/compress_images/image-1711609166887-529303464.jpg]
+
+Compression algorithm: [-]
+
+Description: File does not exist!

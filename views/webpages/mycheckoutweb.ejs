@@ -171,7 +171,7 @@
                                  <div class="pmnt-hidebox">
                                     <table style="width:100%">
                                        <tr id="pay-now-row">
-                                          <td>Booking Amount(5% of product value)</td>
+                                          <td>Booking Amount(10% of product value)</td>
                                           <th><i class="fa fa-inr" aria-hidden="true"></i> 200</th>
                                        </tr>
                                        <tr id="remaining-amount-row">
@@ -245,7 +245,7 @@
             $(document).on('click', '.paymentmethod', function () {
                let paymentMeythod = $(this).val();
                if (paymentMeythod === 'COD') {
-                  $("#cash-handle-charge").css("display", "block");
+                  $("#cash-handle-charge").css("display", "table-column");
                   //$('#cash-handle-charge').show();
                   $(".changeOnPaymentMethod").html("Taxable value (S&H + CH)");
                } else {

@@ -3070,6 +3070,17 @@ exports.getWhatsHotProductsweb = async function (req, res) {
 
     const hotProducts = await Userproduct.find({ approval_status: 1, flag: 0 }).sort({ hitCount: -1 });
 
+    let maxOfferPrice = -Infinity; 
+    let minOfferPrice = Infinity;
+
+    for (const product of hotProducts) {
+      if (product.offer_price > maxOfferPrice) {
+        maxOfferPrice = product.offer_price;
+      }
+      if (product.offer_price < minOfferPrice) {
+        minOfferPrice = product.offer_price;
+      }
+    }
     const whatsHotProducts = [];
 
     for (const product of hotProducts) {
@@ -3119,6 +3130,8 @@ exports.getWhatsHotProductsweb = async function (req, res) {
         isLoggedIn: isLoggedIn,
         filter_basedon: "whatshot",
         websiteUrl: process.env.SITE_URL,
+        maxvalue: typeof maxOfferPrice != "undefined" ? maxOfferPrice : "0",
+        minvalue: typeof minOfferPrice != "undefined" ? minOfferPrice : "0",
       });
 
   } catch (error) {
@@ -3149,6 +3162,18 @@ exports.getJustSoldProductsweb = async function (req, res) {
     const conditionList = await productconditionModel.find({});
     const genderList = await Gender.find({});
     const solditems = await Userproduct.find({ approval_status: 1, flag: 1 });
+    
+    let maxOfferPrice = -Infinity; 
+    let minOfferPrice = Infinity;
+    for (const product of solditems) {
+      if (product.offer_price > maxOfferPrice) {
+        maxOfferPrice = product.offer_price;
+      }
+      if (product.offer_price < minOfferPrice) {
+        minOfferPrice = product.offer_price;
+      }
+    }
+
     const justSoldProducts = [];
     for (const product of solditems) {
       const productImage = await Productimage.findOne({ product_id: product._id });
@@ -3180,6 +3205,8 @@ exports.getJustSoldProductsweb = async function (req, res) {
         isLoggedIn: isLoggedIn,
         filter_basedon: "justsold",
         websiteUrl: process.env.SITE_URL,
+        maxvalue: typeof maxOfferPrice != "undefined" ? maxOfferPrice : "0",
+        minvalue: typeof minOfferPrice != "undefined" ? minOfferPrice : "0",
       });
 
   } catch (error) {
@@ -3221,10 +3248,21 @@ exports.getBestDealProductsweb = async function (req, res) {
 
     const products = await Userproduct.find({ percentage: { $gte: percentageFilter }, approval_status: 1, flag: 0 }); // Adding approval_status filter
 
-
     if (!products || products.length === 0) {
       return res.status(404).json({ message: 'No products meet the percentage filter criteria' });
     }
+    let maxOfferPrice = -Infinity; 
+    let minOfferPrice = Infinity;
+
+// Iterate over the products array to find max and min offer prices
+for (const product of products) {
+  if (product.offer_price > maxOfferPrice) {
+    maxOfferPrice = product.offer_price;
+  }
+  if (product.offer_price < minOfferPrice) {
+    minOfferPrice = product.offer_price;
+  }
+}
 
     const bestDealProducts = [];
 
@@ -3235,29 +3273,17 @@ exports.getBestDealProductsweb = async function (req, res) {
         const productCondition = await Productcondition.findById(product.status);
 
         bestDealProducts.push({
-
           _id: product._id,
-
           name: product.name,
-
           price: product.price,
-
           offer_price: product.offer_price,
-
           original_packaging: product.original_packaging,
-
           original_invoice: product.original_invoice,
-
           status_name: productCondition ? productCondition._id : '',
-
           status: productCondition ? productCondition.name : '',
-
           image: productImage,
-
         });
-
       }
-
     }
     res.render("webpages/allhomeproduct",
       {
@@ -3271,7 +3297,9 @@ exports.getBestDealProductsweb = async function (req, res) {
         productCount: count,
         websiteUrl:process.env.SITE_URL,
         isLoggedIn: isLoggedIn,
-        filter_basedon: "bestDeal"
+        filter_basedon: "bestDeal",
+        maxvalue: typeof maxOfferPrice != "undefined" ? maxOfferPrice : "0",
+        minvalue: typeof minOfferPrice != "undefined" ? minOfferPrice : "0",
       });
 
   } catch (error) {

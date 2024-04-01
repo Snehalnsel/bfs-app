@@ -317,6 +317,22 @@ exports.privacypolicyData = async function (req, res, next) {
   }
 };
 
+exports.returnShipping = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    res.render("webpages/returns-shipping", {
+      title: "Privacy Policy",
+      message: "Welcome to the privacy policy page!",
+      isLoggedIn: isLoggedIn,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the privacy policy.",
+      error: error.message,
+    });
+  }
+};
 
 exports.tremsandconditionData = async function (req, res, next) {
   try {
@@ -2397,8 +2413,7 @@ exports.viewWishListByUserId = async function (req, res, next) {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
 
     if (isLoggedIn == "") {
-      console.log(111111);
-      res.redirect("/registration");
+      return res.redirect("/registration");
     }
 
     const user_id = req.session.user.userId;

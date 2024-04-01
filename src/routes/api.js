@@ -1100,6 +1100,7 @@ router.get("/whatshot",[],WebsiteController.getWhatsHotProductsweb);
 router.get("/justsold",[],WebsiteController.getJustSoldProductsweb);
 router.get("/productdeatils/:id",[],WebsiteController.productData);
 router.get("/privacy-policy",[],WebsiteController.privacypolicyData);
+router.get("/returns-shipping",[],WebsiteController.returnShipping);
 router.get("/trems",[],WebsiteController.tremsandconditionData);
 router.get("/registration",[],WebsiteController.registration);
 

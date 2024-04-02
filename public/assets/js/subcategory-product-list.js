@@ -66,7 +66,7 @@ async function searchByFilter(priceList = '',pageId = '') {
         },
         success: async function (obj) {
             let error_success = obj.status;
-            if (error_success == 'success') {
+            if (error_success == 'success'){
                 let htmlContent = '';
                 if (obj && obj.respdata && obj.respdata.length > 0) {
                     // console.log(obj.respdata.length);

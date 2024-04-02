@@ -29,7 +29,7 @@
                                  <ul class="list-group">
                                     <% brandList.forEach(function(item) { %>
                                        <li class="single-list">                  
-                                          <input type="checkbox" id="" class="chkfield filterByChecked searchByBrand" data-id="<%=item.name%>" value="">
+                                          <input type="checkbox" id="" class="chkfield filterByChecked searchByBrand" data-id="<%=item._id%>" value="">
                                           <label class="label-check" for="incbox1"><%=item.name%></label>                  
                                        </li>
                                     <% }) %>                               
@@ -50,7 +50,7 @@
                                  <ul class="list-group">
                                     <% sizeList.forEach(function(item) { %>
                                        <li class="single-list">                  
-                                          <input type="checkbox" data-id="<%=item.name%>" class="chkfield filterByChecked searchBySize" value="">
+                                          <input type="checkbox" data-id="<%=item._id%>" class="chkfield filterByChecked searchBySize" value="">
                                           <label class="label-check" for="incboxx1"><%=item.name%></label>                  
                                        </li>
                                     <% }) %>  
@@ -187,9 +187,9 @@
             <div class="main_product-wrapper ">
                <div class="top-title shorting-row">
                   <div class="product-result d-flex aling-center">
-                    
-                        <h5>Showing <%= productCount ? productCount : 0 %> products</h5>
-
+                     <h5 class="show-count">Showing <%= filterproductCount ? filterproductCount : 0 %> products of <%=
+                        productCount ? productCount : 0 %>
+                     </h5>
 
                   </div>
                   <div class="shorting-box">
@@ -238,4 +238,4 @@
  <input type="hidden" name="product_category_id" id="product_category_id" value="<%=filter_basedon%>" />
 <%- include('../../public/assets/include/newsletter'); %>
 <%- include('../../public/assets/include/footer'); %>
-<script src="/public/assets/js/subcategory-product-list.js"></script>
+<script src="/public/assets/js/homeproduct.js"></script>

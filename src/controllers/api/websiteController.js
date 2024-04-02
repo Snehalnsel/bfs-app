@@ -1027,6 +1027,163 @@ exports.userFilter = async function (req, res, next) {
   }
 };
 
+exports.userFilterForOthers = async function (req, res, next) {
+  let { brandList, sizeList, conditionList, priceList, genderList, optionId, productcategoryId, pageNo } = req.body;
+ 
+  if (typeof optionId != "undefined") {
+    if ((optionId == 0)) {
+      optionId = 1;
+    } else {
+      optionId = -1;
+    }
+  } else {
+    optionId = 1;
+  }
+  const page = pageNo || 1;
+  const pageSize = 8;
+  const skip = (page - 1) * pageSize;
+  let concatVar = {};
+  let objConditionList = [];
+  if ((typeof conditionList != "undefined") && (conditionList.length > 0)) {
+    conditionList.forEach(function (item) {
+      objConditionList.push(mongoose.Types.ObjectId(item));
+    });
+  }
+  if (typeof brandList != "undefined") {
+    concatVar["brand_id"] = { "$in": brandList };
+  }
+  if (typeof sizeList != "undefined") {
+    concatVar["size_id"] = { "$in": sizeList };
+  }
+  if (typeof productcategoryId != "undefined" && (productcategoryId == "bestDeal" || productcategoryId == "whatshot" ||     productcategoryId == "justsold")) {
+    
+  }
+  else{
+    concatVar["category_id"] = { "$in": mongoose.Types.ObjectId(productcategoryId) };
+  }
+  if ((typeof conditionList != "undefined") && (objConditionList.length > 0)) {
+    concatVar["status"] = { "$in": objConditionList };
+  }
+  if ((typeof genderList != "undefined")) {
+    concatVar["gender_id"] = { "$in": genderList };
+  }
+
+  if (priceList && typeof priceList !== "undefined" && priceList !== '') {
+    let [min, max] = priceList.split('-').map(Number);
+    const priceConditions = {
+      offer_price: {
+        $gte: parseFloat(min),
+        $lte: parseFloat(max)
+      }
+    };
+
+    if (concatVar.$and) {
+      concatVar.$and.push(priceConditions);
+    } else {
+      concatVar.$and = [priceConditions];
+    }
+  }
+  let totalProduct;
+  let allProductData;
+
+  if (productcategoryId == "bestDeal" ) {
+    console.log("best deal");
+    const appSettings = await Appsettings.findOne();
+
+    const percentageFilter = parseInt(appSettings.best_deal);
+    const query = {
+      ...concatVar,
+      approval_status: 1,
+      flag: 0,
+      percentage: { $gte: percentageFilter }
+    };
+
+    console.log("query",query);
+
+    totalProduct = await Userproduct.countDocuments(query);
+    allProductData = await Userproduct.find(query)
+      .sort({ offer_price: optionId })
+      .skip(skip)
+      .limit(pageSize);
+  }
+  if (productcategoryId == "whatshot") {
+    console.log("whatshot");
+    const query = {
+      ...concatVar,
+      approval_status: 1,
+      flag: 0
+    };
+
+    totalProduct = await Userproduct.countDocuments(query);
+    allProductData = await Userproduct.find(query)
+      .sort({ offer_price: optionId })
+      .sort({ hitCount: -1 })
+      .skip(skip)
+      .limit(pageSize);
+  }
+  if (productcategoryId == "justsold") {
+    console.log("justsold");
+    const query = {
+      ...concatVar,
+      approval_status: 1,
+      flag: 1
+    };
+    totalProduct = await Userproduct.countDocuments(query);
+    allProductData = await Userproduct.find(query)
+      .sort({ offer_price: optionId })
+      .skip(skip)
+      .limit(pageSize);
+  }
+  
+  const formattedUserProducts = [];
+  for (const userproduct of allProductData) {
+    const productImages = await Productimage.find({ product_id: userproduct._id });
+    const productCondition = await Productcondition.findById(userproduct.status);
+    const formattedUserProduct = {
+      _id: userproduct._id,
+      name: userproduct.name,
+      description: userproduct.description,
+      category: (typeof userproduct.category_id != "undefined") ? userproduct.category_id.name : "",
+      brand: (typeof userproduct.brand_id != "undefined") ? userproduct.brand_id.name : "",
+      user_id: (typeof userproduct.user_id != "undefined") ? userproduct.user_id._id : "",
+      user_name: (typeof userproduct.user_id != "undefined") ? userproduct.user_id.name : "",
+      size_id: (typeof userproduct.size_id != "undefined") ? userproduct.size_id.name : "",
+      price: (typeof userproduct.price != "undefined") ? userproduct.price : "",
+      offer_price: (typeof userproduct.offer_price != "undefined") ? userproduct.offer_price : "",
+      percentage: (typeof userproduct.percentage != "undefined") ? userproduct.percentage : "",
+      status: (typeof userproduct.status != "undefined") ? userproduct.status : "",
+      flag: (typeof userproduct.flag != "undefined") ? userproduct.flag : "",
+      approval_status: (typeof userproduct.approval_status != "undefined") ? userproduct.approval_status : "",
+      added_dtime: (typeof userproduct.added_dtime != "undefined") ? userproduct.added_dtime : "",
+      __v: (typeof userproduct.__v != "undefined") ? userproduct.__v : "",
+      product_images: productImages,
+      status_name: productCondition.name
+    };
+    formattedUserProducts.push(formattedUserProduct);
+  }
+  const totalPages = Math.ceil(totalProduct / pageSize);
+  const userProductsCount = formattedUserProducts.length;
+  if (formattedUserProducts.length > 0) {
+    return res.json({
+      status: 'success',
+      message: 'Success search result',
+      respdata: formattedUserProducts,
+      productCount: userProductsCount,
+      totalPages: totalPages,
+      currentPage: page,
+      pageSize: pageSize,
+      webUrl: 'user-filter',
+      websiteUrl: process.env.SITE_URL,
+      totalProduct: totalProduct
+    });
+  } else {
+    res.status(200).json({
+      status: "error",
+      message: "No Reccords Found for this search..",
+    });
+  }
+};
+
 exports.getUserLogin = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -1504,10 +1661,12 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
     let brandIds = [];
     let sizeIds = [];
     let statusIds = [];
+    let genderIds = [];
     let brandList = [];
     let sizeList = [];
     let result;
     let conditionList = [];
+    let genderList = [];
     const id = req.params.id;
     const pageno = page || 1;
     const pageSize = 8;
@@ -1545,10 +1704,11 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
       brandIds = userProducts.map(product => product.brand_id).filter(Boolean);
       sizeIds = userProducts.map(product => product.size_id).filter(Boolean);
       statusIds = userProducts.map(product => product.status).filter(Boolean);
+      genderIds = userProducts.map(product => product.gender_id).filter(Boolean);
       brandList = await brandModel.find({ _id: { $in: brandIds } });
       sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
       conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
-      genderList = await Gender.find();
+      genderList = await Gender.find({ _id: { $in: genderIds } });
       // genderIds = userProducts.map(product => product.gender_id).filter(Boolean);
       // genderList = await Gender.find({ _id: { $in: genderIds } });
     }
@@ -3078,16 +3238,23 @@ exports.getWhatsHotProductsweb = async function (req, res) {
 
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const hotProductsCount = await Userproduct.countDocuments({ approval_status: 1, flag: 0 });
+    const filterproductCount = hotProductsCount.length;
 
     const totalPages = Math.ceil(hotProductsCount / pageSize);
 
-
-    const brandList = await brandModel.find({});
-    const sizeList = await sizeModel.find({});
-    const conditionList = await productconditionModel.find({});
-    const genderList = await Gender.find({});
-
     const hotProducts = await Userproduct.find({ approval_status: 1, flag: 0 }).sort({ hitCount: -1 });
+
+    let brandIds = [], sizeIds = [], statusIds = [], genderIds = [];
+    let brandList = [], sizeList = [], conditionList = [], genderList = [];
+
+    brandIds = hotProducts.map(product => product.brand_id).filter(Boolean);
+    sizeIds = hotProducts.map(product => product.size_id).filter(Boolean);
+    statusIds = hotProducts.map(product => product.status).filter(Boolean);
+    genderIds = hotProducts.map(product => product.gender_id).filter(Boolean);
+    brandList = await Brand.find({ _id: { $in: brandIds } });
+    sizeList = await Size.find({ _id: { $in: sizeIds } });
+    conditionList = await Productcondition.find({ _id: { $in: statusIds } });
+    genderList = await Gender.find({ _id: { $in: genderIds } });
 
     let maxOfferPrice = -Infinity; 
     let minOfferPrice = Infinity;
@@ -3146,6 +3313,7 @@ exports.getWhatsHotProductsweb = async function (req, res) {
         conditionList: conditionList,
         genderList: typeof genderList != "undefined" ? genderList : [],
         productCount: hotProductsCount,
+        filterproductCount: typeof filterproductCount != "undefined" ? filterproductCount : "0",
         isLoggedIn: isLoggedIn,
         filter_basedon: "whatshot",
         websiteUrl: process.env.SITE_URL,
@@ -3162,25 +3330,31 @@ exports.getWhatsHotProductsweb = async function (req, res) {
 
 
 exports.getJustSoldProductsweb = async function (req, res) {
-
   const page = parseInt(req.query.page) || 1;
-
   const pageSize = parseInt(req.query.pageSize) || 10;
-
-
-
   try {
-
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const soldItemsCount = await Userproduct.countDocuments({ approval_status: 1, flag: 1 });
-
+    const filterproductCount = soldItemsCount.length;
+    
+    const pageno = page || 1;
+    const pageSize = 8;
+    const skip = (page - 1) * pageSize;
+    
     const totalPages = Math.ceil(soldItemsCount / pageSize);
+    let brandIds = [], sizeIds = [], statusIds = [], genderIds = [];
+    let brandList = [], sizeList = [], conditionList = [], genderList = [];
 
-    const brandList = await brandModel.find({});
-    const sizeList = await sizeModel.find({});
-    const conditionList = await productconditionModel.find({});
-    const genderList = await Gender.find({});
     const solditems = await Userproduct.find({ approval_status: 1, flag: 1 });
+
+    brandIds = solditems.map(product => product.brand_id).filter(Boolean);
+    sizeIds = solditems.map(product => product.size_id).filter(Boolean);
+    statusIds = solditems.map(product => product.status).filter(Boolean);
+    genderIds = solditems.map(product => product.gender_id).filter(Boolean);
+    brandList = await brandModel.find({ _id: { $in: brandIds } });
+    sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
+    conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
+    genderList = await Gender.find({ _id: { $in: genderIds } });
     
     let maxOfferPrice = -Infinity; 
     let minOfferPrice = Infinity;
@@ -3211,6 +3385,9 @@ exports.getJustSoldProductsweb = async function (req, res) {
         });
       }
     }
+    const paginatedData = justSoldProducts.slice(skip, skip + pageSize);
+    const productCount = justSoldProducts.length;
+    const currentPage = parseInt(page);
     res.render("webpages/allhomeproduct",
       {
         title: "Product Sub Categories",
@@ -3221,14 +3398,19 @@ exports.getJustSoldProductsweb = async function (req, res) {
         conditionList: conditionList,
         genderList: typeof genderList != "undefined" ? genderList : [],
         productCount: soldItemsCount,
+        filterproductCount: typeof filterproductCount != "undefined" ? filterproductCount : "0",
         isLoggedIn: isLoggedIn,
         filter_basedon: "justsold",
         websiteUrl: process.env.SITE_URL,
         maxvalue: typeof maxOfferPrice != "undefined" ? maxOfferPrice : "0",
         minvalue: typeof minOfferPrice != "undefined" ? minOfferPrice : "0",
+        totalPages: totalPages,
+        currentPage: currentPage,
+        pageSize: pageSize,
       });
 
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 
@@ -3241,17 +3423,11 @@ exports.getBestDealProductsweb = async function (req, res) {
   const pageSize = parseInt(req.query.pageSize) || 10;
 
   try {
-
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const soldItemsCount = await Userproduct.countDocuments({ approval_status: 1, flag: 1 });
+    const filterproductCount = soldItemsCount.length;
 
     const totalPages = Math.ceil(soldItemsCount / pageSize);
-
-    const brandList = await brandModel.find({});
-    const sizeList = await sizeModel.find({});
-    const conditionList = await productconditionModel.find({});
-    const genderList = await Gender.find({});
-
     const appSettings = await Appsettings.findOne();
 
     if (!appSettings) {
@@ -3267,21 +3443,32 @@ exports.getBestDealProductsweb = async function (req, res) {
 
     const products = await Userproduct.find({ percentage: { $gte: percentageFilter }, approval_status: 1, flag: 0 }); // Adding approval_status filter
 
+    let brandIds = [], sizeIds = [], statusIds = [], genderIds = [];
+    let brandList = [], sizeList = [], conditionList = [], genderList = [];
+
+
+    brandIds = products.map(product => product.brand_id).filter(Boolean);
+    sizeIds = products.map(product => product.size_id).filter(Boolean);
+    statusIds = products.map(product => product.status).filter(Boolean);
+    genderIds = products.map(product => product.gender_id).filter(Boolean);
+    brandList = await Brand.find({ _id: { $in: brandIds } });
+    sizeList = await Size.find({ _id: { $in: sizeIds } });
+    conditionList = await Productcondition.find({ _id: { $in: statusIds } });
+    genderList = await Gender.find({ _id: { $in: genderIds } });
     if (!products || products.length === 0) {
       return res.status(404).json({ message: 'No products meet the percentage filter criteria' });
     }
     let maxOfferPrice = -Infinity; 
     let minOfferPrice = Infinity;
 
-// Iterate over the products array to find max and min offer prices
-for (const product of products) {
-  if (product.offer_price > maxOfferPrice) {
-    maxOfferPrice = product.offer_price;
-  }
-  if (product.offer_price < minOfferPrice) {
-    minOfferPrice = product.offer_price;
-  }
-}
+    for (const product of products) {
+      if (product.offer_price > maxOfferPrice) {
+        maxOfferPrice = product.offer_price;
+      }
+      if (product.offer_price < minOfferPrice) {
+        minOfferPrice = product.offer_price;
+      }
+    }
 
     const bestDealProducts = [];
 
@@ -3314,6 +3501,7 @@ for (const product of products) {
         conditionList: conditionList,
         genderList: typeof genderList != "undefined" ? genderList : [],
         productCount: count,
+        filterproductCount: typeof filterproductCount != "undefined" ? filterproductCount : "0",
         websiteUrl:process.env.SITE_URL,
         isLoggedIn: isLoggedIn,
         filter_basedon: "bestDeal",

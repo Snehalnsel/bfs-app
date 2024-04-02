@@ -1268,6 +1268,11 @@ router.post("/user-relogin",cors(),
 router.post("/user-filter",cors(),
   WebsiteController.userFilter
 );
+
+router.post("/user-filter-forothers",cors(),
+  WebsiteController.userFilterForOthers
+);
+
 router.get("/forgot-password",cors(),
   WebsiteController.forgotPassword
 );

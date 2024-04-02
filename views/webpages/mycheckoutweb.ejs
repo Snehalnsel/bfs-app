@@ -301,10 +301,13 @@
                      var gst = parseFloat('<%= gst %>');
                      $('.pmnt-hidebox').hide();
                      var packingHandlingChargeValue = $('#packingHandlingCharge').text().trim();
+                     console.log("packing", packingHandlingChargeValue);
                      var taxvalue = parseFloat(packingHandlingChargeValue);
-                     $('#taxvalue').html('<i class="fa fa-inr" aria-hidden="true"></i>' + taxvalue);
+                     $('#taxvalue').html('<i class="fa fa-inr" aria-hidden="true"></i> ' + taxvalue);
+                     console.log("gst", gst);
+                     console.log("productPrice", productPrice);
                      var totalAmount = productPrice + gst + taxvalue;
-                     $('#total-cod-amount-row th').text('₹' + originalTotalAmount.toFixed(2));
+                     $('#total-cod-amount-row th').text('₹ ' + totalAmount.toFixed(2));
                   }
                });
             });

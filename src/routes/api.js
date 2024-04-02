@@ -1279,24 +1279,24 @@ router.post(
   [
     check(
       "old_password",
-      "Password length should be 8 to 10 characters!"
+      "Password length should be 8 to 15 characters!"
     ).isLength({
       min: 8,
-      max: 10,
+      max: 15,
     }),
     check(
       "new_password",
-      "Password length should be 8 to 10 characters!"
+      "Password length should be 8 to 15 characters!"
     ).isLength({
       min: 8,
-      max: 10,
+      max: 15,
     }),
     check(
       "repeat_password",
-      "Password length should be 8 to 10 characters!"
+      "Password length should be 8 to 15 characters!"
     ).isLength({
       min: 8,
-      max: 10,
+      max: 15,
     }),
   ],
   WebsiteController.changePassword

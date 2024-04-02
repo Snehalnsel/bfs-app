@@ -3004,7 +3004,7 @@ exports.checkoutWeb = async function (req, res, next) {
 
         await insertNotification(
           'Order Placed Successfully from Website',
-          `Item ${cartItem.product_id.name} added to order list by`,//Added By Palash Samanta
+          `You have placed an order for ${cartItem.product_id.name}`,//Added By Palash Samanta
           user_id,
           requestUrl,
           new Date()

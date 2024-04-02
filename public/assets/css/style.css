@@ -4622,3 +4622,7 @@ td.tp-no-gaptd {
     display: block !important;
 }
 
+#changePasswordLink{
+    cursor:pointer
+}
+

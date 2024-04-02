@@ -146,9 +146,8 @@
                   <table class="table table-borderless">
                      <tbody>
                         <tr>
-                           <td>Price <small>(1 items)</small></td>
-                           <th><i class="fa fa-inr" aria-hidden="true"></i>
-                              <%=product_price%>
+                           <td>Price <small>(1 item)</small></td>
+                           <th><i class="fa fa-inr" aria-hidden="true"></i><%=product_price%>
                            </th>
                         </tr>
                         <tr>
@@ -172,11 +171,11 @@
                                     <table style="width:100%">
                                        <tr id="pay-now-row">
                                           <td>Booking Amount(10% of product value)</td>
-                                          <th><i class="fa fa-inr" aria-hidden="true"></i> 200</th>
+                                          <th><i class="fa fa-inr" aria-hidden="true"></i>200</th>
                                        </tr>
                                        <tr id="remaining-amount-row">
                                           <td><small>Rest Amount Pay on Delivery</small></td>
-                                          <th><i class="fa fa-inr" aria-hidden="true"></i> 200</th>
+                                          <th><i class="fa fa-inr" aria-hidden="true"></i>200</th>
                                        </tr>
                                     </table>
                                  </div>
@@ -194,7 +193,7 @@
                         </tr>
                         <tr id="cash-handle-charge">
                            <td>Cash handle charge(5% of product value)</td>
-                           <th><i class="fa fa-inr" aria-hidden="true"></i> 200</th>
+                           <th><i class="fa fa-inr" aria-hidden="true"></i>200</th>
                         </tr>
                         <tr>
                            <td class="changeOnPaymentMethod">Taxable value (S&H + CH)</td>
@@ -202,14 +201,12 @@
                         </tr>
                         <tr>
                            <td>GST<small>(14% SGST & 14% CGST)</small></td>
-                           <th><i class="fa fa-inr" aria-hidden="true"></i>
-                              <%=gst%>
+                           <th><i class="fa fa-inr" aria-hidden="true"></i><%=gst%>
                            </th>
                         </tr>
                         <tr class="border-top total-table" id="total-cod-amount-row">
                            <td><strong>Total Amount</strong></td>
-                           <th><i class="fa fa-inr" aria-hidden="true"></i>
-                              <%=finalPrice%>
+                           <th><i class="fa fa-inr" aria-hidden="true"></i><%=finalPrice%>
                            </th>
                         </tr>
                         <tr class="border-top total-table pmnt-hidebox" id="advance-amount">
@@ -261,7 +258,7 @@
                   data: { productid: productid },
                   success: function (data) {
                      var newCharge = data.respdata;
-                     $('#packingHandlingCharge').html('<i class="fa fa-inr" aria-hidden="true"></i> ' + newCharge);
+                     $('#packingHandlingCharge').html('<i class="fa fa-inr" aria-hidden="true"></i>' + newCharge);
                      $('#packingHandlingCharge-hidden').val(newCharge);
                   },
                   error: function (error) {
@@ -281,11 +278,11 @@
                      $('.pmnt-hidebox').show();
                      var productPrice = parseFloat('<%= product_price %>');
                      var payNowAmount = productPrice * 0.10;
-                     $('#pay-now-row th').text('₹ ' + payNowAmount.toFixed(2));
+                     $('#pay-now-row th').text('₹' + payNowAmount.toFixed(2));
                      var cashHandlecharges = productPrice * 0.05;
-                     $('#cash-handle-charge th').text('₹ ' + cashHandlecharges.toFixed(2));
+                     $('#cash-handle-charge th').text('₹' + cashHandlecharges.toFixed(2));
                      var remainingAmount = productPrice - payNowAmount;
-                     $('#remaining-amount-row th').text('₹ ' + remainingAmount.toFixed(2));
+                     $('#remaining-amount-row th').text('₹' + remainingAmount.toFixed(2));
                      var packingHandlingChargeValue = $('#packingHandlingCharge').text().trim();
                      //var packingHandlingChargeValue = $('#packingHandlingCharge-hidden').val();
                      var taxvalue = parseFloat(packingHandlingChargeValue) + parseFloat(cashHandlecharges);
@@ -295,22 +292,19 @@
                      var gst = parseFloat('<%= gst %>');
                      var totalAmount = parseFloat(productPrice) + gst + taxvalue;
                      var totalAdvanceAmount = parseFloat(payNowAmount) + gst + taxvalue;
-                   
-                     $('#total-cod-amount-row th').text('₹ ' + totalAmount.toFixed(2));
-                     $('#advance-amount th').text('₹ ' + totalAdvanceAmount.toFixed(2));
+            
+                     $('#total-cod-amount-row th').text('₹' + totalAmount.toFixed(2));
+                     $('#advance-amount th').text('₹' + totalAdvanceAmount.toFixed(2));
 
                   } else {
                      var productPrice = parseFloat('<%= product_price %>');
                      var gst = parseFloat('<%= gst %>');
                      $('.pmnt-hidebox').hide();
                      var packingHandlingChargeValue = $('#packingHandlingCharge').text().trim();
-                     console.log("packing", packingHandlingChargeValue);
                      var taxvalue = parseFloat(packingHandlingChargeValue);
-                     $('#taxvalue').html('<i class="fa fa-inr" aria-hidden="true"></i> ' + taxvalue);
-                     console.log("gst", gst);
-                     console.log("productPrice", productPrice);
+                     $('#taxvalue').html('<i class="fa fa-inr" aria-hidden="true"></i>' + taxvalue);
                      var totalAmount = productPrice + gst + taxvalue;
-                     $('#total-cod-amount-row th').text('₹ ' + totalAmount.toFixed(2));
+                     $('#total-cod-amount-row th').text('₹' + originalTotalAmount.toFixed(2));
                   }
                });
             });
@@ -382,10 +376,10 @@
                formData.packing_handling_charge =$('#packingHandlingCharge-hidden').val();
 
                let totalAmtText = $('#total-cod-amount-row th').text();
-               let totalAmtValue = parseFloat(totalAmtText.replace('₹ ', ''));
+               let totalAmtValue = parseFloat(totalAmtText.replace('₹', ''));
                formData.total_amt = totalAmtValue;
 
-               console.log(formData);
+               //console.log(formData);
 
                let addToCartreCookieAccessToken = await getCookieFunc(accessTokenVar);
                let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
@@ -398,8 +392,8 @@
                   success: function (response) {
                      if (response.is_orderPlaced == 1) {
                         const tempOrderId = response.order._id;
-                        // window.location.href = '/pay?temp=' + tempOrderId;
-                        window.open('/pay?temp=' + tempOrderId, '_blank');
+                        window.location.href = '/pay?temp=' + tempOrderId;
+                        //window.open('/pay?temp=' + tempOrderId, '_blank');
                      }
                   },
                   error: function (xhr, status, error) {

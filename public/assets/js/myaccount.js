@@ -49,15 +49,21 @@ $(document).ready(async function(){
                     repeat_password :$('.cnewpassword').val()
                 },
                 success: function (data) {
+                    if(data.status == 0){
+                        Swal.fire({
+                            html: data.message,
+                            confirmButtonText: "OK",
+                            customClass: { confirmButton: 'alert-box-button' },
+                        });
+                    }
                     if (data.is_passwordchnage == 'true') {
-                      Swal.fire({
-                         html: data.message,
-                         confirmButtonText: "OK",
-                         customClass: { confirmButton: 'alert-box-button' },
-                      }).then(function () {
-                        $('#resetpasswordfrom')[0].reset();
-                      });
-                      
+                        Swal.fire({
+                            html: data.message,
+                            confirmButtonText: "OK",
+                            customClass: { confirmButton: 'alert-box-button' },
+                        }).then(function () {
+                            $('#resetpasswordfrom')[0].reset();
+                        });
                     } else {
                          Swal.fire({
                             html: data.message,

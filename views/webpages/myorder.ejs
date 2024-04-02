@@ -6,9 +6,7 @@
             <div class="dashboard-sidbar">
                <div class="sidbar-box user-profile">
                   <div class="user-icon">
-                     <% if(respdata !=null && typeof respdata !="undefined" && typeof respdata.image !="undefined" ) {%>
-                        <img src="<%=respdata.image%>" alt="user-image">
-                        <% } %>
+                     <img src="<%=websiteUrl%>/public/compress_images/<%= respdata.image && respdata.image !== 'na' ? respdata.image : websiteUrl + '/public/compress_images/nouser.png' %>" alt="user-image">
                   </div>
                   <div class="user-info">
                      <div class="sht-ui">Hello</div>
@@ -150,19 +148,19 @@
                      if (item.delete_by == 1) {
                         hTml += `
                                           <div class="remove-cart">
-                                             <span style="color: blue;">Canceled By Admin</span>
+                                             <span style="color: blue;">Cancelled By Admin</span>
                                           </div>`;
                      }
                      else if (item.delete_by == 2) {
                         hTml += `
                                           <div class="remove-cart">
-                                             <span style="color: rgb(5, 15, 73);">Canceled By Seller</span>
+                                             <span style="color: rgb(5, 15, 73);">Cancelled By Seller</span>
                                           </div>`;
                      }
                      else if (item.delete_by == 3) {
                         hTml += `
                                           <div class="remove-cart">
-                                             <span style="color: rgb(45, 144, 226);">Canceled By You</span>
+                                             <span style="color: rgb(45, 144, 226);">Cancelled By You</span>
                                           </div>`;
                      }
                   }
@@ -241,19 +239,19 @@
                      if (item.delete_by == 1) {
                         hTml += `
                                        <div class="remove-cart">
-                                             <span style="color: blue;">Canceled By Admin</span>
+                                             <span style="color: blue;">Cancelled By Admin</span>
                                           </div>`;
                      }
                      else if (item.delete_by == 2) {
                         hTml += `
                                           <div class="remove-cart">
-                                             <span style="color: rgb(5, 15, 73);">Canceled By Seller</span>
+                                             <span style="color: rgb(5, 15, 73);">Cancelled By Seller</span>
                                           </div>`;
                      }
                      else if (item.delete_by == 3) {
                         hTml += `
                                           <div class="remove-cart">
-                                             <span style="color: rgb(45, 144, 226);">Canceled By You</span>
+                                             <span style="color: rgb(45, 144, 226);">Cancelled By You</span>
                                           </div>`;
                      }
                   }

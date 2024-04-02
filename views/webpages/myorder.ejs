@@ -6,9 +6,7 @@
             <div class="dashboard-sidbar">
                <div class="sidbar-box user-profile">
                   <div class="user-icon">
-                     <% if(respdata !=null && typeof respdata !="undefined" && typeof respdata.image !="undefined" ) {%>
-                        <img src="<%=respdata.image%>" alt="user-image">
-                        <% } %>
+                     <img src="<%=websiteUrl%>/public/compress_images/<%= respdata.image && respdata.image !== 'na' ? respdata.image : websiteUrl + '/public/compress_images/nouser.png' %>" alt="user-image">
                   </div>
                   <div class="user-info">
                      <div class="sht-ui">Hello</div>

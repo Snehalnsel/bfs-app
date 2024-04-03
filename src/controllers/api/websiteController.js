@@ -2830,7 +2830,7 @@ exports.viewCartListByUserId = async function (req, res, next) {
           quantity: cartItem.qty,
           product_id: cartItem.product_id._id,
           product_name: cartItem.product_id.name,
-          product_price: product.offer_price,
+          // product_price: product.offer_price,
           product_est_price: product.price,
           seller_id: product.user_id,
           category_name: product.category_id.name,
@@ -2839,9 +2839,20 @@ exports.viewCartListByUserId = async function (req, res, next) {
           added_dtime: cartItem.added_dtime,
           status: cartItem.status,
         };
-        const product_price = finalData.product_price;
+        let product_price;
+        if(cartItem.finalBidPrice)
+        {
+          product_price = cartItem.finalBidPrice;
+          finalData.product_price = product_price;
+        }
+        else
+        {
+          product_price = product.offer_price;
+          finalData.product_price = product_price;
+        }
+        
         const gst = (product_price * 28) / 100;
-        const finalPrice = parseInt(product_price) + 250 + parseInt(gst);
+        const finalPrice = parseInt(product_price) + 500 + parseInt(gst);
         res.render("webpages/addtocart", {
           title: "Cart List Page",
           message: "Welcome to the Cart List page!",
@@ -2991,7 +3002,7 @@ exports.checkoutWeb = async function (req, res, next) {
           quantity: cartItem.qty,
           product_id: cartItem.product_id._id,
           product_name: cartItem.product_id.name,
-          product_price: product.offer_price,
+         // product_price: product.offer_price,
           product_est_price: product.price,
           seller_id: product.user_id,
           category_name: product.category_id.name,
@@ -3000,6 +3011,18 @@ exports.checkoutWeb = async function (req, res, next) {
           added_dtime: cartItem.added_dtime,
           status: cartItem.status,
         };
+
+        let product_price;
+        if(cartItem.finalBidPrice)
+        {
+          product_price = cartItem.finalBidPrice;
+          finalData.product_price = product_price;
+        }
+        else
+        {
+          product_price = product.offer_price;
+          finalData.product_price = product_price;
+        }
         // const requestUrl =  req.headers.referer;
         const requestUrl = '/web-my-order';
 
@@ -3010,7 +3033,7 @@ exports.checkoutWeb = async function (req, res, next) {
           requestUrl,
           new Date()
         );
-        const product_price = finalData.product_price;
+        // const product_price = finalData.product_price;
         const gst = (product_price * 28) / 100;
         const finalPrice = parseInt(product_price) + 250 + parseInt(gst);
         res.render("webpages/mycheckoutweb", {

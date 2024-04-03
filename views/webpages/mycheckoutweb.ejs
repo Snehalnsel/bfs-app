@@ -184,13 +184,13 @@
                         </tr>
                         <tr>
                            <td>Packing & Handling Charges (S&H)</td>
-                           <th id="packingHandlingCharge"><i class="fa fa-inr" aria-hidden="true"></i></th>
+                           <th id="packingHandlingCharge"><i class="fa fa-inr" aria-hidden="true">500</i></th>
                         </tr>
-                        <tr>
+                        <!-- <tr>
                            <input value="<%=product_id%>" type="hidden" id="productid">
                            <td colspan="2" class="tp-no-gaptd"><button id="shipMentAmountCal" onclick="checkShippingAmount()"
                                  class="check-link">Check Shipping Amount</button></td>
-                        </tr>
+                        </tr> -->
                         <tr id="cash-handle-charge">
                            <td>Cash handle charge(5% of product value)</td>
                            <th><i class="fa fa-inr" aria-hidden="true"></i>200</th>
@@ -283,7 +283,8 @@
                      $('#cash-handle-charge th').text('₹' + cashHandlecharges.toFixed(2));
                      var remainingAmount = productPrice - payNowAmount;
                      $('#remaining-amount-row th').text('₹' + remainingAmount.toFixed(2));
-                     var packingHandlingChargeValue = $('#packingHandlingCharge').text().trim();
+                     // var packingHandlingChargeValue = $('#packingHandlingCharge').text().trim();
+                     var packingHandlingChargeValue = $('#packingHandlingCharge i').text();
                      //var packingHandlingChargeValue = $('#packingHandlingCharge-hidden').val();
                      var taxvalue = parseFloat(packingHandlingChargeValue) + parseFloat(cashHandlecharges);
                     
@@ -300,7 +301,8 @@
                      var productPrice = parseFloat('<%= product_price %>');
                      var gst = parseFloat('<%= gst %>');
                      $('.pmnt-hidebox').hide();
-                     var packingHandlingChargeValue = $('#packingHandlingCharge').text().trim();
+                     // var packingHandlingChargeValue = $('#packingHandlingCharge').text().trim();
+                     var packingHandlingChargeValue = $('#packingHandlingCharge i').text();
                      console.log("packing", packingHandlingChargeValue);
                      var taxvalue = parseFloat(packingHandlingChargeValue);
                      $('#taxvalue').html('<i class="fa fa-inr" aria-hidden="true"></i> ' + taxvalue);
@@ -403,8 +405,8 @@
                });
 
             });
-$(document).ready(function(){
-   $("#shipMentAmountCal").trigger( "click" );
-   $("#shipMentAmountCal").trigger( "click" );
-})
+// $(document).ready(function(){
+//    $("#shipMentAmountCal").trigger( "click" );
+   
+// })
 </script>

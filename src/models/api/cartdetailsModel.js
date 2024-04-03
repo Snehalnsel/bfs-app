@@ -15,6 +15,9 @@ const model = mongoose.Schema({
     ref: 'app_carts', 
     required: true,
   },
+  finalBidPrice: {
+    type: Number,
+  },
   check_status: {
     type: Number,
     enum: [0, 1],

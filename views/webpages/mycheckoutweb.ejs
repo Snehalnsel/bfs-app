@@ -157,7 +157,7 @@
                                  <ul>
                                     <li><label class="form-check-label">
                                           <input type="radio" class="form-check-input payment-method paymentmethod paymentmethodOnline"
-                                             name="paymentmethod" value="Online" checked>Pay Now
+                                             name="paymentmethod" id="payNowButton" value="Online" checked>Pay Now
                                        </label>
                                     </li>
                                     <li>
@@ -405,8 +405,7 @@
                });
 
             });
-// $(document).ready(function(){
-//    $("#shipMentAmountCal").trigger( "click" );
-   
-// })
+   $(document).ready(function(){
+      $("#taxvalue").html(`<i class="fa fa-inr" aria-hidden="true"></i>500`);
+   })
 </script>

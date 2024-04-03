@@ -283,7 +283,8 @@
                      $('#cash-handle-charge th').text('₹' + cashHandlecharges.toFixed(2));
                      var remainingAmount = productPrice - payNowAmount;
                      $('#remaining-amount-row th').text('₹' + remainingAmount.toFixed(2));
-                     var packingHandlingChargeValue = $('#packingHandlingCharge').text().trim();
+                     // var packingHandlingChargeValue = $('#packingHandlingCharge').text().trim();
+                     var packingHandlingChargeValue = $('#packingHandlingCharge i').text();
                      //var packingHandlingChargeValue = $('#packingHandlingCharge-hidden').val();
                      var taxvalue = parseFloat(packingHandlingChargeValue) + parseFloat(cashHandlecharges);
                     
@@ -300,7 +301,8 @@
                      var productPrice = parseFloat('<%= product_price %>');
                      var gst = parseFloat('<%= gst %>');
                      $('.pmnt-hidebox').hide();
-                     var packingHandlingChargeValue = $('#packingHandlingCharge').text().trim();
+                     // var packingHandlingChargeValue = $('#packingHandlingCharge').text().trim();
+                     var packingHandlingChargeValue = $('#packingHandlingCharge i').text();
                      console.log("packing", packingHandlingChargeValue);
                      var taxvalue = parseFloat(packingHandlingChargeValue);
                      $('#taxvalue').html('<i class="fa fa-inr" aria-hidden="true"></i> ' + taxvalue);

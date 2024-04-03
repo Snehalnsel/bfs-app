@@ -1158,8 +1158,7 @@ router.get("/websubcategoriesproductswithsort/:id/:sortid", cors(), (req, res) =
   WebsiteController.getSubCategoriesProductswithSort(page, req, res);
 });
 // Profile Edit API's
-router.post("/useredit",upload.array('image', 1),WebsiteController.userUpdate
-);
+router.post("/useredit",upload.array('image', 1),WebsiteController.userUpdate);
 
 router.post("/user-new-checkout-address",[],WebsiteController.userNewCheckOutAddressAdd);
 

@@ -293,10 +293,8 @@
                      var gst = parseFloat('<%= gst %>');
                      var totalAmount = parseFloat(productPrice) + gst + taxvalue;
                      var totalAdvanceAmount = parseFloat(payNowAmount) + gst + taxvalue;
-            
                      $('#total-cod-amount-row th').text('₹' + totalAmount.toFixed(2));
                      $('#advance-amount th').text('₹' + totalAdvanceAmount.toFixed(2));
-
                   } else {
                      var productPrice = parseFloat('<%= product_price %>');
                      var gst = parseFloat('<%= gst %>');

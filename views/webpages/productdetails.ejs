@@ -134,14 +134,14 @@
                         <li><span>Brand: </span>
                            <%= respdata.brand %>
                         </li>
-                        <% if (respdata.original_invoice==='0' ) { %>
+                        <% if (respdata.original_invoice=='0' ) { %>
                            <li><span>Original Invoice:</span>No</li>
-                           <% } else { %>
+                           <% } else if (respdata.original_invoice=='1' ) { %>
                               <li><span>Original Invoice:</span>Yes</li>
                               <% } %>
-                                 <% if (respdata.original_packaging==='0' ) { %>
+                                 <% if (respdata.original_packaging=='0' ) { %>
                                     <li><span>Original Packaging:</span>No</li>
-                                    <% } else { %>
+                                    <% } else if(respdata.original_packaging=='1' ) { %>
                                        <li><span>Original Packaging:</span>Yes</li>
                                        <% } %>
                      </ul>
@@ -182,14 +182,14 @@
                            <li><span>Brand:</span>
                               <%= respdata.brand %>
                            </li>
-                           <% if (respdata.original_invoice==='0' ) { %>
+                           <% if (respdata.original_invoice=='0' ) { %>
                               <li><span>Original Invoice:</span>No</li>
-                              <% } else { %>
+                              <% } else if (respdata.original_invoice =='1' ) { %>
                                  <li><span>Original Invoice:</span>Yes</li>
                                  <% } %>
-                                    <% if (respdata.original_packaging==='0' ) { %>
+                                    <% if (respdata.original_packaging =='0' ) { %>
                                        <li><span>Original Packaging:</span>No</li>
-                                       <% } else { %>
+                                       <% } else if (respdata.original_packaging =='1') { %>
                                           <li><span>Original Packaging:</span>Yes</li>
                                           <% } %>
                         </ul>

@@ -1803,8 +1803,8 @@ exports.userUpdate = async function (req, res, next) {
       });
     }
     // const imgData = req.files;
-    const uploadedFile = req.files[0];
-    const imagePath = uploadedFile.path;
+    // const uploadedFile = req.files[0];
+    // const imagePath = uploadedFile.path;
     const bankDetails = new Bankdetails({
       user_id: user._id,
       accountnumber: req.body.accountnumber,
@@ -1812,7 +1812,7 @@ exports.userUpdate = async function (req, res, next) {
       ifsccode: req.body.ifsccode,
       accounttype: req.body.accounttype,
       upiid: req.body.upiid,
-      upiid_scaner: imagePath || '',
+      // upiid_scaner: imagePath || '',
       default_status: 1,
       created_dtime: new Date().toISOString(),
     });

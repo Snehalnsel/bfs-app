@@ -1407,6 +1407,7 @@ exports.thankyoupage = async function (req, res, next) {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
     const message = req.query.message;
+    console.log(message);
     res.render("webpages/message", {
       title: "Edit Address",
       message: "Welcome to the Edit Profile page!",

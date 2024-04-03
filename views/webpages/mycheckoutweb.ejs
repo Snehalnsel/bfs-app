@@ -382,8 +382,6 @@
                let totalAmtValue = parseFloat(totalAmtText.replace('₹', ''));
                formData.total_amt = totalAmtValue;
 
-               //console.log(formData);
-
                let addToCartreCookieAccessToken = await getCookieFunc(accessTokenVar);
                let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
                await userReLogin(addToCartreCookieAccessToken, addToCartreCookieRefreshToken);

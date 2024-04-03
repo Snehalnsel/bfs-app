@@ -273,7 +273,7 @@
                $("#cash-handle-charge").css("display", "none");
                var originalTotalAmount = parseFloat('<%= finalPrice %>');
 
-               $(document).on('change', '.payment-method', function () {
+               $(document).on('click', '.payment-method', function () {
                   if ($(this).val() === "COD") {
                      $('.pmnt-hidebox').show();
                      var productPrice = parseFloat('<%= product_price %>');
@@ -405,5 +405,6 @@
             });
    $(document).ready(function(){
       $("#taxvalue").html(`<i class="fa fa-inr" aria-hidden="true"></i>500`);
+      $("#payNowButton").trigger("click");
    })
 </script>

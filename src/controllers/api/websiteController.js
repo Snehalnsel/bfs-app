@@ -1359,7 +1359,7 @@ exports.editProfile = async function (req, res, next) {
       title: "Edit profile",
       message: "Welcome to the Edit Profile page!",
       respdata: req.session.user,
-      bankDetails: bankDetails,
+      bankDetails: typeof bankDetails != "undefined" ? bankDetails : [],
       isLoggedIn: isLoggedIn,
       userData: userData
     });

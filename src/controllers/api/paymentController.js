@@ -102,6 +102,7 @@ exports.getPaymentData = async function (req, res, next) {
       )
       .then(async function (response) {
 
+        console
         const updateData = {
           merchant_transactionid:merchantTransactionId,
           pay_response: response.data,
@@ -186,7 +187,7 @@ exports.getStatus = async function (req, res, next) {
         );
 
         if(updateData.checkstatus_status == "success") {
-          // Continue with creating the new Order
+          console.log("hello",updateData.checkstatus_status);
           const now = new Date();
           const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0'); 
           const currentYear = now.getFullYear().toString();
@@ -197,6 +198,7 @@ exports.getStatus = async function (req, res, next) {
           let delivery_status = '0';          
           
           const lastOrderIndex = await getLastOrderIndex();
+          console.log(lastOrderIndex);
           const nextIncrementingPart = lastOrderIndex + 1;
           const orderCode = `BFSORD${currentMonth}${currentYear}-${nextIncrementingPart}`;
           const order = new Order({
@@ -252,6 +254,7 @@ exports.getStatus = async function (req, res, next) {
           res.redirect('/message?message=failure');
         }
       } catch (error) {
+        console.log(error);
         res.redirect('/message?message=failure');
         /*res.status(500).json({
           status: '0',
@@ -374,8 +377,9 @@ async function getLastOrderNumber() {
 
 async function getLastOrderIndex() {
   try {
-    const result = await Order.findOne({}, {}, { sort: { order_index: -1 } });
-    return result ? result.order_index : '000';
+    const result = await Order.findOne({}, {}, { sort: { order_index: -1 } }).then(()=>{
+    });
+    return typeof result != "undefined" ? result.order_index : '000';
   } catch (error) {
     return 0; // Return 0 in case of an error
   }

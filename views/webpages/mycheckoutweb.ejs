@@ -242,7 +242,7 @@
             $(document).on('click', '.paymentmethod', function () {
                let paymentMeythod = $(this).val();
                if (paymentMeythod === 'COD') {
-                  $("#cash-handle-charge").css("display", "table-column");
+                  $("#cash-handle-charge").css("display", "table-row");
                   //$('#cash-handle-charge').show();
                   $(".changeOnPaymentMethod").html("Taxable value (S&H + CH)");
                } else {
@@ -297,12 +297,17 @@
                      $('#advance-amount th').text('₹' + totalAdvanceAmount.toFixed(2));
 
                   } else {
+                     var productPrice = parseFloat('<%= product_price %>');
+                     var gst = parseFloat('<%= gst %>');
                      $('.pmnt-hidebox').hide();
                      var packingHandlingChargeValue = $('#packingHandlingCharge').text().trim();
+                     console.log("packing", packingHandlingChargeValue);
                      var taxvalue = parseFloat(packingHandlingChargeValue);
-                     $('#taxvalue').html('<i class="fa fa-inr" aria-hidden="true"></i>' + taxvalue);
-                     var totalAmount = payNowAmount + gst + taxvalue + packingHandlingChargeValue;
-                     $('#total-cod-amount-row th').text('₹' + originalTotalAmount.toFixed(2));
+                     $('#taxvalue').html('<i class="fa fa-inr" aria-hidden="true"></i> ' + taxvalue);
+                     console.log("gst", gst);
+                     console.log("productPrice", productPrice);
+                     var totalAmount = productPrice + gst + taxvalue;
+                     $('#total-cod-amount-row th').text('₹ ' + totalAmount.toFixed(2));
                   }
                });
             });
@@ -377,8 +382,6 @@
                let totalAmtValue = parseFloat(totalAmtText.replace('₹', ''));
                formData.total_amt = totalAmtValue;
 
-               //console.log(formData);
-
                let addToCartreCookieAccessToken = await getCookieFunc(accessTokenVar);
                let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
                await userReLogin(addToCartreCookieAccessToken, addToCartreCookieRefreshToken);
@@ -401,6 +404,7 @@
 
             });
 $(document).ready(function(){
+   $("#shipMentAmountCal").trigger( "click" );
    $("#shipMentAmountCal").trigger( "click" );
 })
 </script>

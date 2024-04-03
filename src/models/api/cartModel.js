@@ -7,6 +7,9 @@ const model = mongoose.Schema({
     required: true,
     index: true 
   },
+  finalBidPrice: {
+    type: Number,
+  },
   status: {
     type: Number,
     enum: [0, 1],

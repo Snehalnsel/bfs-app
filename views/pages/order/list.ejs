@@ -106,11 +106,9 @@
                                                             <td>
                                                                 <% if (value.order_code) { %>
                                                                     <a href="/admin/shipmentdetails/<%= value._id %>" target="_blank"><%= value.order_code %></a>
-                                                                    <a href="/admin/download-orderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary table-short-btn">SBFSORD PDF</button></a><br>
-                                                                    <a href="/admin/download-orderbfspdf/<%= value._id %>" target="_blank"><button class="btn btn-primary table-short-btn">BFSBORD PDF</button></a><br>
-                                                                    <a href="/admin/download-returnorderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary table-short-btn">BBReturn PDF</button></a><br>
-                                                                    <a href="/admin/download-returnorderpdfseller/<%= value._id %>" target="_blank"><button class="btn btn-primary table-short-btn">BFSReturn PDF</button></a><br>
-                                                                    <button id="showOptionsBtn" class="btn btn-primary table-short-btn">Show Options</button>
+                                                                    <a href="/admin/download-orderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download PDF</button></a><br>
+                                                                    <a href="/admin/download-orderbfspdf/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download Second PDF</button></a><br>
+                                                                    <button id="showOptionsBtn" class="btn btn-primary">Show Options</button>
                                                                     <div id="optionsContainer" style="display: none;">                                                                      <button id="emailOption" class="btn btn-secondary" onclick="sendViaEmail('<%= value._id %>')">Send via Email</button>
                                                                       <button id="whatsappOption" class="btn btn-secondary" onclick="sendViaWhatsApp('<%= value._id %>')">Send via WhatsApp</button>
                                                                     </div>
@@ -274,7 +272,8 @@
                                                                     <br>
                                                                 <% } %>
                                                             </td>
-                                                            <td>
+
+                                                            <!-- <td>
                                                                 <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 1 && value.trackDetails[1].pickup_awb == undefined && value.trackDetails[1].shiprocket_shipment_id == undefined ) { %>
 
                                                                     <a href="/admin/nextorderplace/<%= value._id %>" class="btn btn-warning" title="Order Placed">
@@ -299,23 +298,60 @@
                                                                    <% } else {%>
                                                                         <span style="color: orange;">Product yet not reached hub</span>
                                                                    <% } %>
-                                                            </td> 
+                                                            </td>  -->
+
                                                             <td>
-                                                                <% if (value.returnorder) { %>
+                                                                <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].order_status=='0') { %>
+
+                                                                    <a href="/admin/orderdetails/<%= value._id %>/1"
+                                                                        class="btn btn-info btn-circle btn-sm" title="Edit">
+                                                                        <i class="fas fa-pencil-alt"></i>
+                                                                    </a>
+                                                                    <% if(value.trackDetails.length > 1 && value.trackDetails[1].order_status=='1') {%>
+                                                                    <a href="/admin/orderplace/<%= value.trackDetails[1]._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                                                                        Generate Seller Pickup
+                                                                    </a>
+                                                                    <% } %>
+                                                                   
+                                                                <% } %>
+
+                                                            </td>
+
+
+                                                            <td>
+                                                                <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 1 ) { %>
+
                                                                     <a href="/admin/orderdetails/<%= value._id %>/2"
                                                                         class="btn btn-info btn-circle btn-sm" title="Edit">
                                                                         <i class="fas fa-pencil-alt"></i>
                                                                     </a>
-                                                                    <!-- <% if (value.returnorder) { %> -->
-                                                                        <a href="/admin/returnorder/<%= value._id %>" class="btn btn-warning" title="Order Placed">
-                                                                            Order Placed
-                                                                         </a>
-                                                                    <!-- <% } %> -->
+                                                                    <% if(value.trackDetails.length > 2 && value.trackDetails[2].order_status=='2') {%>
+                                                                            <a href="/admin/orderplace/<%= value.trackDetails[2]._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                                                                                Generate Seller Pickup
+                                                                           </a>
+                                                                       <% } %>
+                                                                  
+                                                                <% } %>
+                                                                
+                                                            </td>
+
+
+                                                            <td>
+                                                                <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].order_status=='0') { %>
+
+                                                                    <a href="/admin/orderdetails/<%= value._id %>/3"
+                                                                        class="btn btn-info btn-circle btn-sm" title="Edit">
+                                                                        <i class="fas fa-pencil-alt"></i>
+                                                                    </a>
+                                                                    <% if(value.trackDetails.length > 1 && value.trackDetails[1].order_status=='3') {%>
+                                                                        <a href="/admin/orderplace/<%= value.trackDetails[0]._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                                                                            Generate Seller Pickup
+                                                                        </a>
+                                                                        <% } %>
                                                                 <% } %>
                                                             </td>
-                                                            <td>
 
-                                                            </td>
+
                                                         </tr>
                                                         <% }); %>
                                                             <% } %>
@@ -430,12 +466,13 @@
       var optionsContainer = document.getElementById('optionsContainer');
       optionsContainer.style.display = optionsContainer.style.display === 'none' ? 'block' : 'none';
     });
+  
     function sendViaEmail(orderId) {
+      console.log('Sending via Email for order ID:', orderId);
       window.location.href = '/admin/send-order-email/' + orderId;
     }
+  
     function sendViaWhatsApp(orderId) {
       console.log('Sending via WhatsApp for order ID:', orderId);
-      window.location.href = '/admin/send-order-whatsapp/' + orderId;
     }
   </script>
-  

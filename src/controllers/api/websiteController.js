@@ -221,7 +221,7 @@ exports.productData = async function (req, res, next) {
     if (userproducts1) {
 
       for (const userproduct1 of userproducts1) {
-        const productImages1 = await Productimage.find({ product_id: userproduct1._id });
+        const productImages1 = await Productimage.find({ product_id: userproduct1._id }).sort("image_order");
 
         const formattedUserProduct1 = {
           _id: userproduct1._id,
@@ -255,7 +255,7 @@ exports.productData = async function (req, res, next) {
     }
     userproducts.hitCount = (userproducts.hitCount || 0) + 1;
     await userproducts.save();
-    const productImages = await Productimage.find({ product_id: userproducts._id });
+    const productImages = await Productimage.find({ product_id: userproducts._id }).sort("image_order");
     const productCondition = await Productcondition.findById(userproducts.status);
     const formattedUserProduct = {
       _id: userproducts._id,
@@ -2385,11 +2385,11 @@ exports.addToWishlistWeb = async function (req, res, next) {
       });
       const savedFavData = await newFavList.save();
 
-      const requestUrl = req.headers.referer;
+      const requestUrl = process.env.SITE_URL + "/show-wishlist-details";
 
       await insertNotification(
-        'Wishlist Notification',
-        `Item ${product.name} added to wishlist by ${user.name}`,
+        'Item added to the wishlist',
+        `Item ${product.name} has been added to your wishlist`,
         user_id,
         requestUrl,
         new Date()

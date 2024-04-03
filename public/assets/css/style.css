@@ -4625,4 +4625,22 @@ td.tp-no-gaptd {
 #changePasswordLink{
     cursor:pointer
 }
+.description-tab .tab-content button {
+    color: #4a4a4a;
+    padding: 7px 20px;
+    border: solid 1px #565656;
+    border-radius: 5px;
+    font-size: 14px;
+    line-height: 22px;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 500;
+    margin: 3px;
+    background: transparent;
+    transition: 0.5s;
+}
+
+.bids-wrapper .message-box label.bid-amount span {
+    padding-right: 0px;
+}
 

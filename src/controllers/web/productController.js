@@ -313,7 +313,7 @@ exports.detailsData = async function (req, res, next) {
       const CategoryDetails = await Category.findById(productdetails.category_id);
       const parentCategory = await Category.findById(CategoryDetails.parent_id);
     }
-    const productImages = await Productimage.find({ product_id: productId });
+    const productImages = await Productimage.find({ product_id: productId }).sort("image_order");
     const brandList = await Brand.find();
     const categoryList = await Category.find({ parent_id: '650444488501422c8bf24bdb' });
     // const subcategoryList = await Category.find({ parent_id: { $ne: '650444488501422c8bf24bdb' } });
@@ -441,6 +441,7 @@ exports.updatedetailsData = async function (req, res, next) {
                 category_id: req.body.subcategory_id,
                 user_id: exitsProductData.user_id,
                 image: imageUrl,
+                image_order:  req.body.image_order,
                 added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
               });
               return productimageDetail.save();
@@ -472,6 +473,7 @@ exports.updatedetailsData = async function (req, res, next) {
               category_id: req.body.subcategory_id,
               user_id: req.body.user_id,
               image: image,
+              image_order:  req.body.image_order,
               added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
             });
             await productimageDetail.save();

@@ -299,6 +299,7 @@
                                                                                             Download <%= respdata.name
                                                                                                 %>_<%= index + 1 %>.jpg
                                                                                         </a>
+                                                                                        <div style="float: right;">Image order <%= image.image_order %></div>
                                                                                         <button class="close-button"
                                                                                             id="close-button"
                                                                                             type="button"
@@ -318,6 +319,10 @@
                                                 <input type="file" id="images" name="images[]" multiple>
                                                 <input type="hidden" id="displayedImageLinks" name="displayedImageLinks"
                                                     value="">
+                                            </div>
+                                            <div class="form-group" id="upload-button">
+                                                <h5>Images Order</h5>
+                                                <input type="text" id="image_order" name="image_order">
                                             </div>
 
                                             <input type="hidden" id="remainingImages" name="remainingImages"

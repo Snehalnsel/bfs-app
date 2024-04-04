@@ -2249,7 +2249,7 @@ exports.addNewPost = async function (req, res, next) {
         const savedImage = productimageDetail.save();
       });
     }
-    res.redirect('/my-account');
+    res.redirect('/my-post/'+req.session.user.userId);
   } catch (error) {
     res.status(500).json({
       status: "0",

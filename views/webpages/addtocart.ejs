@@ -50,21 +50,21 @@
              <table class="table table-borderless">  
                  <tbody>
                    <tr> 
-                       <td>Price <small>(1 item)</small></td>
-                       <th><i class="fa fa-inr" aria-hidden="true"></i><%=respdata.product_price%></th> 
+                       <td>Sub Total <small>(1 item)</small></td>
+                       <th><i class="fa fa-inr" aria-hidden="true"></i><%=parseFloat(respdata.product_price).toFixed(2)%></th> 
                      </tr>
                      <tr>
                        <td>Packing & Handling Charges</td>
-                       <th><i class="fa fa-inr" aria-hidden="true"></i>500</th> 
+                       <th><i class="fa fa-inr" aria-hidden="true"></i>500.00</th> 
                      </tr>
                      <tr>
                         
                        <td>GST</td>
-                        <th><i class="fa fa-inr" aria-hidden="true"></i><%=(respdata.product_price*28)/100;%></th> 
+                        <th><i class="fa fa-inr" aria-hidden="true"></i><%=parseFloat((respdata.product_price*28)/100).toFixed(2);%></th> 
                      </tr>
                      <tr class="border-top total-table">
                        <td><strong>Total Amount</strong></td>
-                       <th><i class="fa fa-inr" aria-hidden="true"></i><%=respdata1%></th> 
+                       <th><i class="fa fa-inr" aria-hidden="true"></i><%=parseFloat(respdata1).toFixed(2)%></th> 
                      </tr>
                  </tbody>
               </table> 

@@ -2851,7 +2851,7 @@ exports.viewCartListByUserId = async function (req, res, next) {
           finalData.product_price = product_price;
         }
         
-        const gst = (product_price * 28) / 100;
+        const gst = parseFloat((product_price * 28) / 100).toFixed(2);
         const finalPrice = parseInt(product_price) + 500 + parseInt(gst);
         res.render("webpages/addtocart", {
           title: "Cart List Page",
@@ -3034,15 +3034,15 @@ exports.checkoutWeb = async function (req, res, next) {
           new Date()
         );
         // const product_price = finalData.product_price;
-        const gst = (product_price * 28) / 100;
-        const finalPrice = parseInt(product_price) + 250 + parseInt(gst);
+        const gst = parseFloat((product_price * 28) / 100).toFixed(2);
+        const finalPrice = parseInt(product_price) + 250 + parseFloat(gst).toFixed(2);
         res.render("webpages/mycheckoutweb", {
           title: "Check Out Page",
           status: '1',
           is_orderPlaced: 1,
           message: "Welcome to the Checkout page!",
           respdata: finalData,
-          product_price: product_price,
+          product_price: parseFloat(product_price).toFixed(2),
           finalPrice: finalPrice,
           gst: gst,
           product_id: finalData.product_id,

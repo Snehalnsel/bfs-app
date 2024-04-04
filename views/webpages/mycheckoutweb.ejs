@@ -146,7 +146,7 @@
                   <table class="table table-borderless">
                      <tbody>
                         <tr>
-                           <td>Price <small>(1 item)</small></td>
+                           <td>Sub Total <small>(1 item)</small></td>
                            <th><i class="fa fa-inr" aria-hidden="true"></i><%=product_price%>
                            </th>
                         </tr>
@@ -184,7 +184,7 @@
                         </tr>
                         <tr>
                            <td>Packing & Handling Charges (S&H)</td>
-                           <th id="packingHandlingCharge"><i class="fa fa-inr" aria-hidden="true">500</i></th>
+                           <th id="packingHandlingCharge"><i class="fa fa-inr" aria-hidden="true">500.00</i></th>
                         </tr>
                         <!-- <tr>
                            <input value="<%=product_id%>" type="hidden" id="productid">
@@ -200,7 +200,7 @@
                            <th id="taxvalue"><i class="fa fa-inr" aria-hidden="true"></i> </th>
                         </tr>
                         <tr>
-                           <td>GST<small>(14% SGST & 14% CGST)</small></td>
+                           <td>GST</td>
                            <th><i class="fa fa-inr" aria-hidden="true"></i><%=gst%>
                            </th>
                         </tr>
@@ -303,11 +303,11 @@
                      var packingHandlingChargeValue = $('#packingHandlingCharge i').text();
                      console.log("packing", packingHandlingChargeValue);
                      var taxvalue = parseFloat(packingHandlingChargeValue);
-                     $('#taxvalue').html('<i class="fa fa-inr" aria-hidden="true"></i> ' + taxvalue);
+                     $('#taxvalue').html('<i class="fa fa-inr" aria-hidden="true"></i>' + taxvalue.toFixed(2));
                      console.log("gst", gst);
                      console.log("productPrice", productPrice);
                      var totalAmount = productPrice + gst + taxvalue;
-                     $('#total-cod-amount-row th').text('₹ ' + totalAmount.toFixed(2));
+                     $('#total-cod-amount-row th').text('₹' + totalAmount.toFixed(2));
                   }
                });
             });
@@ -406,7 +406,7 @@
 
             });
    $(document).ready(function(){
-      $("#taxvalue").html(`<i class="fa fa-inr" aria-hidden="true"></i>500`);
+      $("#taxvalue").html(`<i class="fa fa-inr" aria-hidden="true"></i>500.00`);
       $("#payNowButton").trigger("click");
    })
 </script>

@@ -3684,10 +3684,13 @@ exports.Demoorder = async function (req, res) {
     let formData = req.body.data;
     let user_id = formData.user_id;
     let seller_id = formData.seller_id;
+    packing_handling_charge = formData.packingHandlingChargeValue;
     let cart_id = formData.cart_id;
     let product_id = formData.product_id;
     let payment_method = formData.payment_method;
+    taxable_value = formData.taxable_value;
     let product =await Userproduct.findById(product_id);
+    let total_price = 0;
 
     if (payment_method == 0)
     {
@@ -3698,15 +3701,15 @@ exports.Demoorder = async function (req, res) {
     let gst =  parseFloat(product.offer_price * 28) / 100;
     if (payment_method == 0)
     {
-      taxable_value =  parseFloat(formData.packing_handling_charge) + cash_handling_charges;
-      booking_amount = pay_now+taxable_value+ gst;
-      total_price = booking_amount + remaining_amount;
+      taxable_value =  parseFloat(packing_handling_charge) + parseFloat(cash_handling_charges);
+      booking_amount = parseFloat(pay_now)+parseFloat(taxable_value)+ parseFloat(gst);
+      total_price = parseFloat(booking_amount) + parseFloat(remaining_amount);
       total_price = total_price.toFixed(2); 
     }
     else if (payment_method == 1)
     {
-      taxable_value =  parseFloat(formData.packing_handling_charge);
-      total_price = product.offer_price + gst + taxable_value ;
+      taxable_value =  parseFloat(packing_handling_charge);
+      total_price = parseFloat(product.offer_price) + parseFloat(gst) + parseFloat(taxable_value) ;
       total_price = total_price.toFixed(2); 
     }
     let order_status = '0';
@@ -3732,12 +3735,12 @@ exports.Demoorder = async function (req, res) {
       payment_method: (typeof payment_method != "undefined") ? payment_method : 0,
       order_status: (typeof order_status != "undefined") ? order_status : 0,
       pay_now: (typeof pay_now != "undefined") ? pay_now : "",
-      remaining_amount: (typeof remaining_amount != "undefined") ? remaining_amount : 0,
-      booking_amount: (typeof booking_amount != "undefined") ? booking_amount : 0,
-      packing_handling_charge: (typeof packing_handling_charge != "undefined") ? packing_handling_charge : 0,
+      remaining_amount: (typeof remaining_amount != "undefined") ? parseFloat(remaining_amount) : 0,
+      booking_amount: (typeof booking_amount != "undefined") ? parseFloat(booking_amount) : 0,
+      packing_handling_charge: (typeof packing_handling_charge != "undefined") ? parseFloat(packing_handling_charge) : 0,
       status: 1,
       gst:(typeof gst != "undefined") ? gst : 0,
-      taxable_value:(typeof taxable_value != "undefined") ? taxable_value : 0,
+      taxable_value:(typeof taxable_value != "undefined") ? parseFloat(taxable_value) : 0,
       added_dtime: new Date().toISOString(),
     });
 

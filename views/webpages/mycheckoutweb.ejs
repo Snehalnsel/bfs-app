@@ -376,7 +376,8 @@
                formData.taxable_value = parseFloat($('#taxvalue').text().replace(/[^0-9.]/g, ''));
                formData.taxable_value = parseFloat($('#taxvalue').text().replace(/[^0-9.]/g, ''));
                //formData.packing_handling_charge = parseFloat($('#packingHandlingCharge').text().replace(/[^0-9.]/g, ''));
-               formData.packing_handling_charge =$('#packingHandlingCharge-hidden').val();
+               //formData.packing_handling_charge =$('#packingHandlingCharge-hidden').val();
+               formData.packingHandlingChargeValue = parseFloat($('#packingHandlingCharge i').text().trim());
 
                let totalAmtText = $('#total-cod-amount-row th').text();
                let totalAmtValue = parseFloat(totalAmtText.replace('₹', ''));
@@ -385,6 +386,7 @@
                let addToCartreCookieAccessToken = await getCookieFunc(accessTokenVar);
                let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
                await userReLogin(addToCartreCookieAccessToken, addToCartreCookieRefreshToken);
+               console.log("format data",formData);
                $.ajax({
                   type: 'POST',
                   url: '/demoplacedorder',

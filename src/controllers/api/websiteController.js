@@ -3752,8 +3752,6 @@ exports.Demoorder = async function (req, res) {
       });
     }
   } catch (error) {
-    console.log(error);
-    console.log(req.body);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };

@@ -3919,9 +3919,9 @@ span.close-icon {
     background-color: #fff8f6;
 }
 
-a#navbarDropdown {
+/*a#navbarDropdown {
     pointer-events: none;
-}
+}*/
 
 .menu-icon img {
     max-width: 100%;

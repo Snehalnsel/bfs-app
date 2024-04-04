@@ -45,7 +45,8 @@ const axios = require("axios");
 const sha256 = require("sha256");
 const uniqid = require("uniqid");
 
-const MERCHANT_ID = "PGTESTPAYUAT";
+// const MERCHANT_ID = "PGTESTPAYUAT";
+const MERCHANT_ID = "M22EUQY70KVBB";
 // const PHONE_PE_HOST_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox";
 const PHONE_PE_HOST_URL = "https://api.phonepe.com/apis/hermes";
 const SALT_INDEX = 1;
@@ -96,10 +97,22 @@ exports.getPaymentData = async function (req, res, next) {
             "X-VERIFY": xVerifyChecksum,
             accept: "application/json",
           },
-        }
+          data:{
+            merchantId: MERCHANT_ID,
+            merchantTransactionId: merchantTransactionId,
+            merchantUserId: userId,
+            amount: amount * 100,
+            redirectUrl: `${APP_BE_URL}/payment-status?temp=${tempOrderId}`,
+            redirectMode: "REDIRECT",
+            mobileNumber: "9999999999",
+            paymentInstrument: {
+              type: "PAY_PAGE",
+            },
+          },
+        },
       )
       .then(async function (response) {
-        console.log("Response for paymenteeeee:", response.data);return false;
+        //console.log("Response for paymenteeeee:", response.data);return false;
         const updateData = {
           merchant_transactionid:merchantTransactionId,
           pay_response: response.data,
@@ -113,7 +126,7 @@ exports.getPaymentData = async function (req, res, next) {
         res.redirect(response.data.data.instrumentResponse.redirectInfo.url);
       })
       .catch(function (error) {
-        console.log("Error for payment:",error);return false;
+        //console.log("Error for payment:",error);return false;
         res.status(500).json({
           status: "0",
           message: "An error occurred during payment.",
@@ -121,7 +134,7 @@ exports.getPaymentData = async function (req, res, next) {
         });
       });
   } catch (error) {
-    console.log("Error for payment error:");return false;
+    //console.log("Error for payment error:");return false;
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the dashboard.",

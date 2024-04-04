@@ -294,9 +294,9 @@
                      //var gst = parseFloat('<%= gst %>');
                      var gst = (taxvalue * 28 /100).toFixed(2);
                      //var totalAmount = parseFloat(productPrice) + parseFloat(gst).toFixed(2) + parseFloat(taxvalue).toFixed(2);
-                     var totalAmount = parseFloat(productPrice + gst).toFixed(2);
-                     console.log("ggggg",totalAmount);
-                     var totalAdvanceAmount = parseFloat(payNowAmount) + gst + taxvalue;
+                     var totalAmount = Number(productPrice) + Number(gst) + Number(taxvalue);
+                     //console.log("total--",Number(productPrice) + Number(gst) + Number(taxvalue));
+                     var totalAdvanceAmount = Number(payNowAmount) + Number(gst) + Number(taxvalue);
                      $(".calCulateGst").html('<i class="fa fa-inr" aria-hidden="true"></i>' + (taxvalue * 28 /100).toFixed(2));
                      $('#total-cod-amount-row th').text('₹' + totalAmount.toFixed(2));
                      $('#advance-amount th').text('₹' + totalAdvanceAmount.toFixed(2));

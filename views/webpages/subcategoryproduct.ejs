@@ -33,6 +33,7 @@
                      <div id="card1" class="collapse" data-parent="#theme-accordion" style="">
                         <div class="card-body">
                            <div class="filter-list">
+                              
                               <%if(brandList.length> 0) {%>
                                  <ul class="list-group">
                                     <% brandList.forEach(function(item) { %>
@@ -112,8 +113,10 @@
                                  <ul class="list-group">
                                     <% genderList.forEach(function(item) { %>
                                        <li class="single-list">
-                                          <input type="checkbox" class="chkfield filterByChecked searchByGender"
-                                             data-id="<%=item._id%>" value="">
+                                          
+                                                <input type="checkbox" class="chkfield filterByChecked searchByGender"
+                                             data-id="<%=item._id%>" value="" >
+                                                
                                           <label class="label-check" for="incboxx1">
                                              <%=item.name%>
                                           </label>
@@ -121,6 +124,7 @@
                                        <% }) %>
                                  </ul>
                                  <% } %>
+                                 <input type="hidden" name="filterGender" id ="filterGender" class="filterGender" value="<%=filterGenderId%>">
                            </div>
                         </div>
                      </div>

@@ -1,5 +1,7 @@
 $(document).ready(async function () {
+
     $(document).on("click", ".filterByChecked", async function () {
+        
         const max = $('.input-max').val();
         const min = $('.input-min').val();
         let priceList = min + '-' + max;
@@ -189,3 +191,14 @@ async function makeHtml(data,totalPages, currentPage, categoryId, websiteUrl, br
     htmlContent += `</div>`;
     return htmlContent;
 }
+
+$(document).ready(function(){
+    $(".searchByGender").each(function() {
+        let curGenderVal = $(this).data("id");
+        let getGenderVal = $('.filterGender').val();
+
+        if(curGenderVal == getGenderVal){
+            $(this).trigger('click')
+        }
+    });
+});

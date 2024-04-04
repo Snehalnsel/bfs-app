@@ -70,6 +70,7 @@ const ApiCallHistory = require("../../models/thirdPartyApi/ApiCallHistory");
 const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 const { log, Console } = require("console");
 const { create } = require('xmlbuilder2');
+const { ConversationContextImpl } = require("twilio/lib/rest/conversations/v1/conversation");
 // const INSTANCE_URL = 'https://api.maytapi.com/api';
 // const PHONE_ID = '18710';
 // const PRODUCT_ID = 'b119f3b5-819b-46e0-ae30-0d1cf1dd8cc8';
@@ -1669,6 +1670,10 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
     let conditionList = [];
     let genderList = [];
     const id = req.params.id;
+    const filterGenderId = (typeof req.query.catid != 'undefined' && req.query.catid != "") ? req.query.catid : '';
+    // console.log("Filter Gender ID :");
+    // console.log(req.query);
+    // return false;
     const pageno = page || 1;
     const pageSize = 8;
     const sortid = req.params.sortid || 0;
@@ -1684,14 +1689,15 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
       approval_status: 1,
       flag: 0,
     })
-      .select('brand_id size_id status');
+      .select('brand_id size_id status gender_id');
     if (userProducts.length > 0) {
       result = await Userproduct.aggregate([
         {
           $match: {
             category_id: mongoose.Types.ObjectId(id),
             approval_status: 1,
-            flag: 0
+            flag: 0,
+            
           }
         },
         {
@@ -1702,16 +1708,17 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
           }
         }
       ]);
+
       brandIds = userProducts.map(product => product.brand_id).filter(Boolean);
+      genderIds = userProducts.map(product => product.gender_id).filter(Boolean);
       sizeIds = userProducts.map(product => product.size_id).filter(Boolean);
       statusIds = userProducts.map(product => product.status).filter(Boolean);
-      genderIds = userProducts.map(product => product.gender_id).filter(Boolean);
+      
       brandList = await brandModel.find({ _id: { $in: brandIds } });
       sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
       conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
       genderList = await Gender.find({ _id: { $in: genderIds } });
-      // genderIds = userProducts.map(product => product.gender_id).filter(Boolean);
-      // genderList = await Gender.find({ _id: { $in: genderIds } });
+      
     }
 
     res.render("webpages/subcategoryproduct", {
@@ -1733,6 +1740,7 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
       totalPages: totalPages,
       currentPage: currentPage,
       pageSize: pageSize,
+      filterGenderId: filterGenderId,
     });
 
   }
@@ -4191,6 +4199,7 @@ exports.genderwomenlistdata = async function (req, res, next) {
       status: '1',
       message: 'Categories fetched successfully.',
       categories: categoryList,
+      filterGenderId: genderId,
     });
   } catch (error) {
     res.status(500).json({
@@ -4216,6 +4225,7 @@ exports.gendermenlistdata = async function (req, res, next) {
       status: '1',
       message: 'Categories fetched successfully.',
       categories: categoryList,
+      filterGenderId: genderId,
     });
   } catch (error) {
     res.status(500).json({
@@ -4242,6 +4252,7 @@ exports.genderkidlistdata = async function (req, res, next) {
       status: '1',
       message: 'Categories fetched successfully.',
       categories: categoryList,
+      filterGenderId: genderId,
     });
   } catch (error) {
     res.status(500).json({
@@ -4267,6 +4278,7 @@ exports.otherlistdata = async function (req, res, next) {
       status: '1',
       message: 'Categories fetched successfully.',
       categories: categoryList,
+      filterGenderId: genderId,
     });
   } catch (error) {
     res.status(500).json({

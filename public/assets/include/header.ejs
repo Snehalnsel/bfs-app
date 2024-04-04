@@ -394,12 +394,16 @@
                 console.error('Error fetching data:', error);
             }
         }
+
         async function womenlistData() {
             try {
                 response = await fetch('/womengender-list');
                 const data = await response.json();
+                
                 const topmenu = data.categories;
-                womenmenu(topmenu);
+                const genderID = data.filterGenderId;
+              
+                womenmenu(topmenu,genderID);
             }
             catch (error) {
                 console.error('Error fetching data:', error);
@@ -409,24 +413,29 @@
             try {
                 response = await fetch('/mengender-list');
                 const data = await response.json();
+                
                 const topmenu = data.categories;
-                menmenu(topmenu);
+                const genderID = data.filterGenderId;
+                menmenu(topmenu,genderID);
             }
             catch (error) {
                 console.error('Error fetching data:', error);
             }
         }
+
         async function kidlistData1() {
             try {
                 response = await fetch('/kidgender-list');
                 const data = await response.json();
                 const topmenu = data.categories;
-                kidmenu(topmenu);
+                const genderID = data.filterGenderId;
+                kidmenu(topmenu,genderID);
             }
             catch (error) {
                 console.error('Error fetching data:', error);
             }
         }
+
         function populateSlider1(data) {
             data.forEach(item => {
                 hTml += `<div class="slider-item">
@@ -442,6 +451,7 @@
             });
             document.getElementById("top-menu").innerHTML = hTml;
         }
+
         function megamenu(data) {
             data.forEach(item => {
                 var hTml1 = `<li><a href="/websubcategoriesproducts/${item._id}">${item.name}</a></li>`;
@@ -451,33 +461,38 @@
                 }
             });
         }
-        function womenmenu(data) {
+
+        function womenmenu(data,genderId) {
             data.forEach(item => {
-                var hTml1 = `<li><a href="/websubcategoriesproducts/${item._id}">${item.name}</a></li>`;
+                var hTml1 = `<li><a href="/websubcategoriesproducts/${item._id}?catid=${genderId}">${item.name}</a></li>`;
                 var ulElements = document.getElementsByClassName('women-list');
                 for (var i = 0; i < ulElements.length; i++) {
                     ulElements[i].innerHTML += hTml1;
                 }
             });
         }
-        function menmenu(data) {
+
+        function menmenu(data,genderId) {
+            
             data.forEach(item => {
-                var hTml1 = `<li><a href="/websubcategoriesproducts/${item._id}">${item.name}</a></li>`;
+                var hTml1 = `<li><a href="/websubcategoriesproducts/${item._id}?catid=${genderId}">${item.name}</a></li>`;
                 var ulElements = document.getElementsByClassName('men-list');
                 for (var i = 0; i < ulElements.length; i++) {
                     ulElements[i].innerHTML += hTml1;
                 }
             });
         }
-        function kidmenu(data) {
+        function kidmenu(data,genderId) {
+            console.log("KIDS:",genderId);
             data.forEach(item => {
-                var hTml1 = `<li><a href="/websubcategoriesproducts/${item._id}">${item.name}</a></li>`;
+                var hTml1 = `<li><a href="/websubcategoriesproducts/${item._id}?catid=${genderId}">${item.name}</a></li>`;
                 var ulElements = document.getElementsByClassName('kids-list');
                 for (var i = 0; i < ulElements.length; i++) {
                     ulElements[i].innerHTML += hTml1;
                 }
             });
         }
+
         async function getHeaderData() {
             try {
                 const response = await fetch('/headerData');
@@ -491,4 +506,5 @@
                 console.error('Error fetching data:', error);
             }
         }
+
     </script>

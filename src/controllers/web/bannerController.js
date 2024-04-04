@@ -25,15 +25,15 @@ exports.getData = async function (req, res, next) {
 
   var pageName = "Banner";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   Banner.find().sort({ _id: -1 }).then((banner) => {
     res.render("pages/banner/list", {
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       status: 0,
@@ -41,6 +41,7 @@ exports.getData = async function (req, res, next) {
       respdata: {
         list: banner,
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
   });
 };
@@ -50,7 +51,7 @@ exports.addData = async function (req, res, next) {
   try {
     
     const categories = await Category.find(); 
-
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     var pageName = "Banner";
     var pageTitle = req.app.locals.siteName + " - Add " + pageName;
 
@@ -59,14 +60,15 @@ exports.addData = async function (req, res, next) {
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       message: "",
       respdata: {},
       categories: categories, 
+      isAdminLoggedIn:isAdminLoggedIn
     });
   } catch (error) {
     next(error);
@@ -77,10 +79,7 @@ exports.addData = async function (req, res, next) {
 exports.createData = async function (req, res, next) {
   var pageName = "Banner";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-
-  console.log(req.file);
-  console.log(req.body);
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   try {
     if (!req.file) {
       return res.status(400).json({
@@ -98,15 +97,16 @@ exports.createData = async function (req, res, next) {
       return res.render("pages/banner/create", {
         status: 0,
         siteName: req.app.locals.siteName,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         pageName: pageName,
         pageTitle: pageTitle,
         year: moment().format("YYYY"),
         message: "Already exists!",
         requrl: req.app.locals.requrl,
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -123,27 +123,29 @@ exports.createData = async function (req, res, next) {
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       message: "Added!",
       requrl: req.app.locals.requrl,
       respdata: savedBanner,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   } catch (error) {
     res.render("pages/banner/create", {
       status: 0,
       pageName: pageName,
       siteName: req.app.locals.siteName,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       pageTitle: pageTitle,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       message: "Error!",
       respdata: error,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };
@@ -153,7 +155,7 @@ exports.editData = async function (req, res, next) {
   
   var pageName = "Brand";
   var pageTitle = req.app.locals.siteName + " - Edit " + pageName;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const banner_id = mongoose.Types.ObjectId(req.params.id);
 
   // const category = await Category.find(); 
@@ -164,15 +166,16 @@ exports.editData = async function (req, res, next) {
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       message: "",
       respdata: {
         banner : banner
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
   });
 };
@@ -181,13 +184,14 @@ exports.editData = async function (req, res, next) {
 exports.updateData = async function (req, res, next) {
   var pageName = "Brand";
   var pageTitle = req.app.locals.siteName + " - Edit " + pageName;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 
@@ -198,6 +202,7 @@ exports.updateData = async function (req, res, next) {
           status: "0",
           message: "Brand not found!",
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
 
@@ -222,25 +227,26 @@ exports.updateData = async function (req, res, next) {
               status: "0",
               message: "Brand not updated!",
               respdata: {},
+              isAdminLoggedIn:isAdminLoggedIn
             });
           }
-          res.redirect("/banner-list");
+          res.redirect("/admin/banner-list");
         })
         .catch((error) => {
-          console.error(error);
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the brand.",
             respdata: {},
+            isAdminLoggedIn:isAdminLoggedIn
           });
         });
     })
     .catch((error) => {
-      console.error(error);
       return res.status(500).json({
         status: "0",
         message: "An error occurred while finding the brand.",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
 };
@@ -248,7 +254,7 @@ exports.updateData = async function (req, res, next) {
 
 exports.updateStatusData = async function (req, res, next) {
   const bannerId = req.params.id;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   Banner.findById(bannerId)
     .then((banner) => {
       if (!banner) {
@@ -256,6 +262,7 @@ exports.updateStatusData = async function (req, res, next) {
           status: "0",
           message: "Brand not found!",
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
 
@@ -270,23 +277,23 @@ exports.updateStatusData = async function (req, res, next) {
               respdata: {},
             });
           }
-          res.redirect("/banner-list"); 
+          res.redirect("/admin/banner-list"); 
         })
         .catch((error) => {
-          console.error(error);
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the brand status.",
             respdata: {},
+            isAdminLoggedIn:isAdminLoggedIn
           });
         });
     })
     .catch((error) => {
-      console.error(error);
       return res.status(500).json({
         status: "0",
         message: "An error occurred while finding the brand.",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
 };
@@ -295,11 +302,13 @@ exports.updateStatusData = async function (req, res, next) {
 exports.deleteData = async function (req, res, next) {
   try {
     const errors = validationResult(req);
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     if (!errors.isEmpty()) {
       return res.status(400).json({
         status: "0",
         message: "Validation error!",
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -309,6 +318,7 @@ exports.deleteData = async function (req, res, next) {
         status: "0",
         message: "Not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -317,13 +327,14 @@ exports.deleteData = async function (req, res, next) {
       { w: "majority", wtimeout: 100 }
     );
 
-    res.redirect("/banner-list");
+    res.redirect("/admin/banner-list");
   } catch (error) {
     
     return res.status(500).json({
       status: "0",
       message: "Error occurred while deleting the category!",
       respdata: error.message,
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };

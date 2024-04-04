@@ -1,44 +1,48 @@
 <%- include('../../public/assets/include/header'); %>
 
-<section class="inner-wrapper">
-    <div class="container">
-       <div class="row">
-          <div class="col-md-5">
-             <div class="left-boxpart full-width hide-mobile">
-             <div class="box-inner">
-                <img src="/public/assets/images/white_logo.png" alt="image" class="lg-logo">
-                <p>Bid for Sale Registration</p>
-             </div>
-          </div>
-          </div>
-          <div class="col-md-7">
-             <div class="signpart">
-                <div class="title-box mb-3">
-             <h1>Sign Up Your Account</h1>
-          </div>
-          <div class="loginform-box">           
-             <form action="/api/signin" method="post">
-                <div class="row">
-                   <div class="col-md-12 "><input type="text" class="form-control mb-3" id="" placeholder="Enter Name" name="name"></div>
-                   <div class="col-md-6"><input type="email" class="form-control mb-3" id="" placeholder="Enter Email" name="email"></div>
-                   <div class="col-md-6"><input type="text" class="form-control mb-3" id="" placeholder="Phone Number" name="phone_no"></div>
-                   <div class="col-md-6"><input type="password" class="form-control mb-3" id="" placeholder="Enter Password" name="password"></div>
-                   <div class="col-md-6"><input type="password" class="form-control mb-3" id="" placeholder="Enter Confirm Password" name="confirmpassword"></div>
-                   <div class="col-md-12" ><button type="submit" class="btn liginbtn">Sign Up Now</button></div>
-                </div>                       
-                      </form>
-          </div>
-          <div class="signup-text">
-                      <p>Already have an account? <a href="#login_modal" data-toggle="modal" >Login Now</a></p>
-                   </div>
-             </div>
-             
-          </div>
-       </div>
-       
-          
-    </div>
- </section>
+   <section class="inner-wrapper">
+      <div class="container">
+         <div class="row">
+            <div class="col-md-5">
+               <div class="left-boxpart full-width hide-mobile">
+                  <div class="box-inner">
+                     <img src="/public/assets/images/white_logo.png" alt="image" class="lg-logo">
+                     <p>Bid for Sale Registration</p>
+                  </div>
+               </div>
+            </div>
+            <div class="col-md-7">
+               <div class="signpart">
+                  <div class="title-box mb-3">
+                     <h1>Sign Up Your Account</h1>
+                  </div>
+                  <div class="loginform-box">
+                     <form id="registerForm" class="registerForm">
+                        <div class="row">
+                           <div class="col-md-12 "><input type="text" class="form-control mb-3" id="name"
+                                 placeholder="Enter Name" name="name"></div>
+                           <div class="col-md-6"><input type="email" class="form-control mb-3" id="remail"
+                                 placeholder="Enter Email" name="remail"></div>
+                           <div class="col-md-6"><input type="text" class="form-control mb-3" id="phoneno"
+                                 placeholder="Phone Number" name="phoneno"></div>
+                           <div class="col-md-6"><input type="password" class="form-control mb-3" id="password"
+                                 placeholder="Enter Password" name="password"></div>
+                           <div class="col-md-6"><input type="password" class="form-control mb-3" id="confirmpassword"
+                                 placeholder="Enter Confirm Password" name="confirmpassword"></div>
+                           <div class="col-md-12"><button type="submit" class="btn liginbtn">Sign Up Now</button></div>
+                        </div>
+                     </form>
+                  </div>
+                  <div class="signup-text">
+                     <p>Already have an account? <a href="#login_modal" data-toggle="modal">Login Now</a></p>
+                  </div>
+               </div>
+
+            </div>
+         </div>
+      </div>
+   </section>
    <%- include('../../public/assets/include/newsletter'); %>
-      <%- include('../../public/assets/include/footer'); %>
+   <%- include('../../public/assets/include/footer'); %>
+   <script src="/public/assets/js/register.js"></script>
 </body>

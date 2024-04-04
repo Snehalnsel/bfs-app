@@ -29,7 +29,7 @@
                                  <ul class="list-group">
                                     <% brandList.forEach(function(item) { %>
                                        <li class="single-list">                  
-                                          <input type="checkbox" id="" class="chkfield filterByChecked searchByBrand" data-id="<%=item.name%>" value="">
+                                          <input type="checkbox" id="" class="chkfield filterByChecked searchByBrand" data-id="<%=item._id%>" value="">
                                           <label class="label-check" for="incbox1"><%=item.name%></label>                  
                                        </li>
                                     <% }) %>                               
@@ -50,7 +50,7 @@
                                  <ul class="list-group">
                                     <% sizeList.forEach(function(item) { %>
                                        <li class="single-list">                  
-                                          <input type="checkbox" data-id="<%=item.name%>" class="chkfield filterByChecked searchBySize" value="">
+                                          <input type="checkbox" data-id="<%=item._id%>" class="chkfield filterByChecked searchBySize" value="">
                                           <label class="label-check" for="incboxx1"><%=item.name%></label>                  
                                        </li>
                                     <% }) %>  
@@ -84,11 +84,36 @@
                      </div>
                   </div>
                   <div class="card">
+                     <div class="card-header">
+                        <button class="accordion-button collapsed" type="button" data-toggle="collapse"
+                           data-target="#card5" aria-expanded="false" aria-controls="card5">Gender</button>
+                     </div>
+                     <div id="card5" class="collapse" data-parent="#theme-accordion" style="">
+                        <div class="card-body">
+                           <div class="filter-list">
+                              <%if(genderList.length> 0) {%>
+                                 <ul class="list-group">
+                                    <% genderList.forEach(function(item) { %>
+                                       <li class="single-list">
+                                          <input type="checkbox" class="chkfield filterByChecked searchByGender"
+                                             data-id="<%=item._id%>" value="">
+                                          <label class="label-check" for="incboxx1">
+                                             <%=item.name%>
+                                          </label>
+                                       </li>
+                                       <% }) %>
+                                 </ul>
+                                 <% } %>
+                           </div>
+                        </div>
+                     </div>
+                  </div>   
+                  <div class="card">
                      <div class="card-header">                           
                         <button class="accordion-button " type="button" data-toggle="collapse" data-target="#card3" aria-expanded="true" aria-controls="card2">Price Range</button>
                      </div>
 
-                     <div id="card3" class="collapse " data-parent="#theme-accordion">
+                     <!-- <div id="card3" class="collapse " data-parent="#theme-accordion">
                         <div class="card-body">
                            <div class="filter-list">
                               <ul class="list-group">
@@ -127,6 +152,32 @@
                               </ul>                             
                            </div>
                         </div>
+                     </div> -->
+                     <div id="card3" class="collapse " data-parent="#theme-accordion">
+                        <div class="card-body">
+                           <div class="price-rangebox">
+                              <div class="price-input">
+                                 <div class="field">
+                                    <span>Min</span>
+                                    <input type="number" class="input-min price_range_input" value="<%= minvalue %>">
+                                 </div>
+                                 <div class="separator">-</div>
+                                 <div class="field">
+                                    <span>Max</span>
+                                    <input type="number" class="input-max price_range_input" value="<%= maxvalue %>">
+                                 </div>
+                              </div>
+                              <div class="slider">
+                                 <div class="progress"></div>
+                              </div>
+                              <div class="range-input">
+                                 <input type="range" class="range-min price_range_filter" min="<%= minvalue %>"
+                                    max="<%= maxvalue %>" value="<%= minvalue %>" step="100">
+                                 <input type="range" class="range-max price_range_filter" min="<%= minvalue %>"
+                                    max="<%= maxvalue %>" value="<%= maxvalue %>" step="100">
+                              </div>
+                           </div>
+                        </div>
                      </div>
                   </div>
                </div>                             
@@ -136,9 +187,9 @@
             <div class="main_product-wrapper ">
                <div class="top-title shorting-row">
                   <div class="product-result d-flex aling-center">
-                    
-                        <h5>Showing <%= productCount ? productCount : 0 %> products</h5>
-
+                     <h5 class="show-count">Showing <%= filterproductCount ? filterproductCount : 0 %> products of <%=
+                        productCount ? productCount : 0 %>
+                     </h5>
 
                   </div>
                   <div class="shorting-box">
@@ -160,15 +211,16 @@
                     
                   <div class="product-box">
                     
-                    <div class="product-image">
-                     <%= console.log(item.product_images); %>
-                       
-                            <a href="/api/productdeatils/<%=item._id%>"><img src="<%=item.image.image%>" alt="images" class="img-fluid"></a>
-                       
+                    <div class="product-image">                       
+                            <a href="/productdeatils/<%=item._id%>">
+                              <img src="<%= (item.image.image && item.image.image.length > 0 && item.image.image) ? 
+                            (websiteUrl + '/public/compress_images/' + item.image.image) : 
+                            (websiteUrl + '/public/images/no-product.webp') %>" alt="images" class="img-fluid">
+                           </a>
                     </div>
                     
                     <div class="prd-short-info">
-                       <div class="prd-name"><a href="/api/productdeatils/<%=item._id%>"><%=item.name%></a></div>
+                       <div class="prd-name"><a href="/productdeatils/<%=item._id%>"><%=item.name%></a></div>
                        <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%=item.offer_price%></div>
                        <div class="rtl-price"><span>Est. Retail:</span><%=item.price%></div>   
                        <div class="prd-batch"><%=item.status%></div>              
@@ -186,4 +238,4 @@
  <input type="hidden" name="product_category_id" id="product_category_id" value="<%=filter_basedon%>" />
 <%- include('../../public/assets/include/newsletter'); %>
 <%- include('../../public/assets/include/footer'); %>
-<script src="/public/assets/js/subcategory-product-list.js"></script>
+<script src="/public/assets/js/homeproduct.js"></script>

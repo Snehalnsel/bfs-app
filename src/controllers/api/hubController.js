@@ -34,7 +34,7 @@ exports.getHubList = async function (req, res, next) {
     res.status(200).json({ status: "1", hub_list: hubs });
   } catch (error) {
     // Handle errors
-    console.error(error);
+    //console.error(error);
     res.status(500).json({
       status: "0",
       message: "Internal server error",

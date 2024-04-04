@@ -32,14 +32,14 @@ const AddressBook = require("../../models/api/addressbookModel");
 const nodemailer = require("nodemailer");
 // const axios = require('axios');
 // const bodyParser = require('body-parser'); 
-const smtpUser = "sneha.lnsel@gmail.com";
+const smtpUser = "hello@bidforsale.com";
 
 const transporter = nodemailer.createTransport({
-  port: 465, 
-  host: "smtp.gmail.com",
+  port: 465,
+  host: "bidforsale.com",
   auth: {
     user: smtpUser,
-    pass: "iysxkkaexpkmfagh",
+    pass: "India_2023",
   },
   secure: true,
 });
@@ -71,7 +71,6 @@ function generateToken(email, password) {
         const token = responseBody.token;
         resolve(token);
       } else {
-        console.error('Error:', response.body);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -82,7 +81,6 @@ function generateToken(email, password) {
 async function generateOrderDetails(shiproket_orderid) {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -101,12 +99,9 @@ async function generateOrderDetails(shiproket_orderid) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Error:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -116,7 +111,6 @@ async function generateOrderDetails(shiproket_orderid) {
 async function trackbyawbid(pickup_awb) {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -135,12 +129,9 @@ async function trackbyawbid(pickup_awb) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Error:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -150,7 +141,6 @@ async function trackbyawbid(pickup_awb) {
 async function trackbyaorderid(order_id){
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -170,12 +160,9 @@ async function trackbyaorderid(order_id){
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Error:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -185,7 +172,6 @@ async function trackbyaorderid(order_id){
 async function trackbyshipmentid(shipment_id) {
   token = await generateToken(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
 
@@ -204,12 +190,9 @@ async function trackbyshipmentid(shipment_id) {
         reject(error);
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
-        console.log(responseBody);
-        console.log("hi");
         const token = responseBody;
         resolve(token);
       } else {
-        console.error('Error:', response);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -220,7 +203,6 @@ async function trackbyshipmentid(shipment_id) {
 async function cancelshipmentbyshipmentid(pickup_awb) {
   token = await generateToken(email,shipPassword);
  if (!token) {
-   console.error('Token not available. Call generateToken first.');
    return Promise.reject('Token not available. Call generateToken first.');
  }
 
@@ -239,7 +221,6 @@ async function cancelshipmentbyshipmentid(pickup_awb) {
   })
  };
 
- console.log(options);
 
  return new Promise((resolve, reject) => {
    request(options, function (error, response, body) {
@@ -247,12 +228,9 @@ async function cancelshipmentbyshipmentid(pickup_awb) {
        reject(error);
      } else if (response.statusCode === 200) {
        const responseBody = JSON.parse(body);
-       console.log(responseBody);
-       console.log("hi");
        const token = responseBody;
        resolve(token);
      } else {
-       console.error('Errottr:', response);
        reject(new Error(`Error: ${response.statusCode}`));
      }
    });
@@ -286,14 +264,11 @@ exports.addData = async (req, res) => {
     
     const track = await Ordertracking.findOne({ order_id: order_id, status: 1 }).exec();
 
-    console.log(track);
-    
     const hubaddress = await Track.findById(track.tracking_id)
       .populate('seller_id', 'name phone_no email')
       .populate('billing_address_id') 
       .populate('hub_address_id');
     
-    console.log(hubaddress);
 
     if (!billingaddress) {
       return res.status(404).json({ message: 'Seller address not found' });
@@ -334,8 +309,8 @@ exports.addData = async (req, res) => {
       };
 
       transporter.sendMail(mailData, function (err, info) {
-        if (err) console.log(err);
-        else console.log(info);
+        // if (err) console.log(err);
+        // else console.log(info);
       });
 
       const productdetails  = await Userproduct.findById(hubaddress.product_id);
@@ -392,7 +367,6 @@ exports.addData = async (req, res) => {
 
           const shiprocketResponse = await generateOrder(orderData);
 
-          console.log('JSON Response:', shiprocketResponse);
 
           res.status(200).json({
               status: "1",
@@ -403,7 +377,6 @@ exports.addData = async (req, res) => {
     }
 
   } catch (error) {
-    console.error('Error placing order:', error); 
     res.status(500).json({ error: 'An error occurred while placing the order' });
   }
 };
@@ -425,15 +398,12 @@ exports.addShipmentData = async (req, res) => {
       return res.status(404).json({ message: 'Order Delivery Partner Not chosse yet' });
     }
 
-    console.log(track);
     
     const hubaddress = await Track.findById(track.tracking_id)
       .populate('seller_id', 'name phone_no email')
       .populate('billing_address_id') 
       .populate('hub_address_id');
     
-    console.log(hubaddress);
-    console.log(hubaddress.seller_id._id);
     // return;
 
     if (!hubaddress) {
@@ -480,8 +450,8 @@ exports.addShipmentData = async (req, res) => {
         };
   
         transporter.sendMail(mailData, function (err, info) {
-          if (err) console.log(err);
-          else console.log(info);
+          // if (err) console.log(err);
+          // else console.log(info);
         });
       }
           res.status(200).json({
@@ -494,7 +464,6 @@ exports.addShipmentData = async (req, res) => {
     }
 
   } catch (error) {
-    console.error('Error placing order:', error); 
     res.status(500).json({ error: 'An error occurred while placing the order' });
   }
 };
@@ -516,7 +485,6 @@ exports.getAWBnoById = async function (req, res, next) {
 
     const existingOrder = await Order.findById(orderId);
 
-    console.log(orderId);
 
     if (!existingOrder) {
       return res.status(404).json({
@@ -551,7 +519,6 @@ exports.getAWBnoById = async function (req, res, next) {
       });
     }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -584,7 +551,6 @@ exports.getListOfCourires = async function (req, res, next) {
      }
     
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -610,7 +576,6 @@ exports.getOrderDetail = async function (req, res, next) {
 
     const existingOrder = await Order.findById(orderId);
 
-    console.log(orderId);
 
     if (!existingOrder) {
       return res.status(404).json({
@@ -631,7 +596,6 @@ exports.getOrderDetail = async function (req, res, next) {
       });
     
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -657,7 +621,6 @@ exports.getTrackByAWB = async function (req, res, next) {
 
     const existingOrder = await Order.findById(orderId);
 
-    console.log(orderId);
 
     if (!existingOrder) {
       return res.status(404).json({
@@ -678,7 +641,6 @@ exports.getTrackByAWB = async function (req, res, next) {
       });
     
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -704,7 +666,6 @@ exports.getTrackByorderid = async function (req, res, next) {
 
     const existingOrder = await Order.findById(orderId);
 
-    console.log(orderId);
 
     if (!existingOrder) {
       return res.status(404).json({
@@ -725,7 +686,6 @@ exports.getTrackByorderid = async function (req, res, next) {
       });
     
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -750,7 +710,6 @@ exports.getTrackByshipmentid = async function (req, res, next) {
 
     const existingOrder = await Order.findById(orderId);
 
-    console.log(orderId);
 
     if (!existingOrder) {
       return res.status(404).json({
@@ -771,7 +730,6 @@ exports.getTrackByshipmentid = async function (req, res, next) {
       });
     
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -796,7 +754,6 @@ exports.getCancelShipment = async function (req, res, next) {
 
     const existingOrder = await Order.findById(orderId);
 
-    console.log(orderId);
 
     if (!existingOrder) {
       return res.status(404).json({
@@ -822,7 +779,6 @@ exports.getCancelShipment = async function (req, res, next) {
       }
     
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -848,7 +804,6 @@ exports.getParticularShipmentDetails = async function (req, res, next) {
 
     const existingOrder = await Order.findById(orderId);
 
-    console.log(orderId);
 
     if (!existingOrder) {
       return res.status(404).json({
@@ -873,7 +828,6 @@ exports.getParticularShipmentDetails = async function (req, res, next) {
       }
     
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "Error!",

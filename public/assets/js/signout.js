@@ -2,17 +2,15 @@ $(document).ready(async function(){
     $(document).on('click', '.signout',async function() {
         $.ajax({
             type: 'POST',
-            url:  webSiteUrl + "/api/sign-out",
+            url:  webSiteUrl + "/sign-out",
             success: async function(obj){                
                 let error_success = obj.status;
                 //return false;
                 if(error_success == 'success'){
                     await setCookeiFunc(accessTokenVar,'',0);
                     await setCookeiFunc(refreshTokenVar,'',0);
-                    location.href = webSiteUrl + "/api/home";
-                } else {
-
-                    
+                    location.href = webSiteUrl + "/";
+                } else {                    
                 }
             },
             error: function(response){

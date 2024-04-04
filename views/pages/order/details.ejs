@@ -28,7 +28,7 @@
                         <!-- Begin Page Content -->
                         <div class="container-fluid">
                             <!-- ... -->
-                            <form class="user" action="/update-orderdetails" method="post">
+                            <form class="user" action="/admin/update-orderdetails" method="post">
                                 <div class="form-group row">
                                     <div class="col-sm-6 mb-3 mb-sm-0">
                                         <input type="hidden" name="order_id" value="<%- respdata.orderDetails._id %>">
@@ -36,6 +36,7 @@
                                             name="seller_name" placeholder="Name"
                                             value="<%= respdata.orderDetails.seller_id ? respdata.orderDetails.seller_id.name : '' %>"
                                             required readonly>
+                                            <input type="hidden" id="flow_id" name="flow_id" value="<%= respdata.flowId %>">
                                     </div>
                                     <div class="col-sm-6 mb-3 mb-sm-0">
                                         <input type="text" class="form-control form-control-user" id="seller_phonno"

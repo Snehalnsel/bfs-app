@@ -5,6 +5,10 @@ const model = mongoose.Schema({
     type: String,
     required: true,
   },
+  order_index:{
+    type: Number,
+    required: true,
+  },
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'users', 
@@ -37,12 +41,28 @@ const model = mongoose.Schema({
     ref: 'hub_list', 
   },
   total_price: {
-    type: String,
+    type: Number,
     required: true,
+  },
+  pay_now: {
+    type: Number,
+    default: 0,
+  },
+  remaining_amount: {
+    type: Number,
+    default: 0,
+  },
+  booking_amount: {
+    type: Number,
+    default: 0,
+  },
+  packing_handling_charge: {
+    type: Number,
+    default: 0,
   },
   payment_method: {
     type: Number,
-    enum: [0, 1],//1 for online 0 for COD
+    enum: [0, 1],
     default: 0,
     required: true,
   },
@@ -53,6 +73,14 @@ const model = mongoose.Schema({
     required: true,
   },
   gst: {
+    type: Number,
+    required: true,
+  },
+  taxable_value: {
+    type: Number,
+    required: true,
+  },
+  taxable_value: {
     type: String,
     required: true,
   },
@@ -124,6 +152,26 @@ const model = mongoose.Schema({
     type: String,
   }, 
   delete_status:{
+    type: Number,
+    enum: [0,1],
+    default: 0,
+  },
+  delete_status:{
+    type: Number,
+    enum: [0,1],
+    default: 0,
+  },
+  delete_by:{
+    type: Number,
+    enum: [0,1,2,3],
+    default: 0,
+  },
+  is_deletedtime:{
+    type: Number,
+    enum: [0,1],
+    default: 0,
+  },
+  is_return:{
     type: Number,
     enum: [0,1],
     default: 0,

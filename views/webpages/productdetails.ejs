@@ -1,12 +1,10 @@
 <%- include('../../public/assets/include/header'); %>
-
    <section class="inner-wrapper white-inner-wrapper bb-none">
       <div class="container">
          <div class="breadcum-product">
             <ul>
-               <%console.log(respdata); %>
-               <li><a href="/api/home">Home</a></li>
-               <li><a href="/api/websubcategoriesproducts/<%=category._id%>">
+               <li><a href="/home">Home</a></li>
+               <li><a href="/websubcategoriesproducts/<%=category._id%>">
                      <%=category.name%>
                   </a></li>
                   <% if (respdata && Object.keys(respdata).length > 0) { %>
@@ -27,7 +25,9 @@
                         <ul class='exzoom_img_ul'>
                            <% if (respdata.product_images) { %>
                               <% respdata.product_images.forEach(function (item) { %>
-                                 <li><img src="<%= item.image %>" /></li>
+                                 <li>
+                                    <img src="<%=websiteUrl %>/public/compress_images/<%= item.image %>" alt="images" class="img-fluid">
+                                 </li>
                                  <% }); %>
                                     <% } %>
                         </ul>
@@ -92,32 +92,32 @@
                                     <a href="javascript:void(0)" class="prd-btn wish-rem-btn"
                                        data-id="<%=respdata._id%>"><i class="fa fa-heart" aria-hidden="true"></i></a>
                                     <% } %>
-                                       <a href="javascript:void(0)" class="prd-btn share-product-icon"><i
+                                       <a href="javascript:void(0)" class="prd-btn" id="share-product-icon"><i
                                              class="fa fa-share-alt" aria-hidden="true"></i></a>
                                        <div class="share-linksbox">
                                           <span class="close-icon"><i class="fa fa-times" aria-hidden="true"></i></span>
                                           <ul>
                                              <li><a target="_blank"
-                                                   href="https://api.whatsapp.com/send?text=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>"
+                                                   href="https://api.whatsapp.com/send?text=<%=websiteUrl%>/productdeatils/<%=respdata._id%>"
                                                    data-action="share/whatsapp/share" class="slc-btn wa-btn "><i
                                                       class="fa fa-whatsapp" aria-hidden="true"></i></a>
                                              </li>
                                              <li>
                                                 <a target="_blank"
-                                                   href="https://twitter.com/share?url=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>&text=<%=respdata.name%>via=<%=respdata.name%>"
+                                                   href="https://twitter.com/share?url=<%=websiteUrl%>/productdeatils/<%=respdata._id%>&text=<%=respdata.name%>via=<%=respdata.name%>"
                                                    class="slc-btn tw-btn "><i class="fa fa-twitter"
                                                       aria-hidden="true"></i></a>
                                              </li>
                                              <li>
                                                 <a target="_blank"
-                                                   href="https://www.facebook.com/sharer/sharer.php?u=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>"
+                                                   href="https://www.facebook.com/sharer/sharer.php?u=<%=websiteUrl%>/productdeatils/<%=respdata._id%>"
                                                    class="slc-btn fb-btn ">
                                                    <i class="fa fa-facebook" aria-hidden="true"></i>
                                                 </a>
                                              </li>
                                              <li>
                                                 <a target="_blank"
-                                                   href="https://www.linkedin.com/shareArticle?url=<%=websiteUrl%>/api/productdeatils/<%=respdata._id%>&title=<%=respdata.name%>&summary=<%=respdata.name%>&source=<%=websiteUrl%>"
+                                                   href="https://www.linkedin.com/shareArticle?url=<%=websiteUrl%>/productdeatils/<%=respdata._id%>&title=<%=respdata.name%>&summary=<%=respdata.name%>&source=<%=websiteUrl%>"
                                                    class="slc-btn lnk-btn ">
                                                    <i class="fa fa-linkedin" aria-hidden="true"></i>
                                                 </a>
@@ -127,21 +127,20 @@
                      </div>
                   </div>
                   <br>
-                  <h6>Product Details</h6>
                   <h6>Specifications:</h6>
                   <div class="featured-list">
                      <ul>
                         <li><span>Brand: </span>
                            <%= respdata.brand %>
                         </li>
-                        <% if (respdata.original_invoice==='0' ) { %>
+                        <% if (respdata.original_invoice=='0' ) { %>
                            <li><span>Original Invoice:</span>No</li>
-                           <% } else { %>
+                           <% } else if (respdata.original_invoice=='1' ) { %>
                               <li><span>Original Invoice:</span>Yes</li>
                               <% } %>
-                                 <% if (respdata.original_packaging==='0' ) { %>
+                                 <% if (respdata.original_packaging=='0' ) { %>
                                     <li><span>Original Packaging:</span>No</li>
-                                    <% } else { %>
+                                    <% } else if(respdata.original_packaging=='1' ) { %>
                                        <li><span>Original Packaging:</span>Yes</li>
                                        <% } %>
                      </ul>
@@ -176,20 +175,20 @@
                      <h6>Specifications:</h6>
                      <div class="featured-list">
                         <ul>
-                           <li><span>Brand:</span>
+                           <li><span>Category:</span>
                               <%= respdata.category %>
                            </li>
                            <li><span>Brand:</span>
                               <%= respdata.brand %>
                            </li>
-                           <% if (respdata.original_invoice==='0' ) { %>
+                           <% if (respdata.original_invoice=='0' ) { %>
                               <li><span>Original Invoice:</span>No</li>
-                              <% } else { %>
+                              <% } else if (respdata.original_invoice =='1' ) { %>
                                  <li><span>Original Invoice:</span>Yes</li>
                                  <% } %>
-                                    <% if (respdata.original_packaging==='0' ) { %>
+                                    <% if (respdata.original_packaging =='0' ) { %>
                                        <li><span>Original Packaging:</span>No</li>
-                                       <% } else { %>
+                                       <% } else if (respdata.original_packaging =='1') { %>
                                           <li><span>Original Packaging:</span>Yes</li>
                                           <% } %>
                         </ul>
@@ -200,7 +199,11 @@
                </div>
                <div id="tab2" class="tab-pane fade">
                   <h4>Shipping & Returns</h4>
-                  <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry...</p>
+                  <b>Packaging, Shipping and Delivery</b>
+                  <p>1. All our packages come with tamper proof packaging. Users (Buyer in this case) are requested not to accept packages where the seal/hologram of the service provider is broken/tampered. Any package where the seal/hologram of the service provider is broken/tampered with/damaged. To ensure the products that are delivered to the User (buyer in this case) the seal/hologram of the service provider that are affixed on the products indicates that the product is good and usable in quality and that the product is genuine in nature, always subject to normal wear and tear. The hologram/seal of the Service Provider on any product delivered to the User indicates thorough and satisfactory quality checks from the end of the Service Provider.</p>
+                  <p>2. Subject to whatever has been mentioned elsewhere in these Terms and Conditions and the Policies, the User must ensure that the adhesive hologram/seal affixed on the product is/are not tampered with/broken/damaged/removed consequent of which shall disqualify the product from return to the service provider and no refund shall be processed to the User regarding the same.</p>
+                  <p>3. The User understands and acknowledges that the Service Provider partners with third party logistics service providers (“Logistics Partners”) in order to carry out Product shipping and delivery to you. Service Provider shall provide the details of the Logistics Partner responsible for processing the shipping and delivery of any Product(s) purchased by the User on the Service Platform at the time such Product is processed and successfully handed over to the Logistics Partner by us. The Products are usually collected and or dispatched, as the case may be, within 2 to 4 days of receiving the Order on the Service Platform. This estimated timeline for collection and dispatch of the product shall be notified if available to the User on the order confirmation page displayed at the time the order is confirmed by us. The time required for such services would differ from time to time and place to place. We will also share details about the orders pursuant to their collection and dispatch, as the case may be, on the e-mail ID ...</p>
+                  <a href="/returns-shipping"><button >Read More</button></a>
                </div>
             </div>
          </div>
@@ -220,18 +223,22 @@
                   <div class="slider-item">
                      <div class="product-box">
                         <div class="product-image">
-                           <a href="<%=item._id%>"><img src="<%=item.product_images[0].image%>" alt="images"
-                                 class="img-fluid"></a>
+                           <% if(typeof item.product_images != "undefined" && typeof item.product_images[0] != "undefined" && typeof item.product_images[0].image != "undefined") {%>
+                              <a href="<%=item._id%>"><img src="<%= item.product_images && item.product_images.length > 0 && item.product_images[0].image ? 
+                                 websiteUrl + '/public/compress_images/' + item.product_images[0].image : 
+                                 websiteUrl + '/public/images/no-product.webp' %>" 
+                           alt="images" class="img-fluid">
+                      </a>
+                           <% } %>
                         </div>
                         <div class="prd-short-info">
                            <div class="prd-name"><a href="<%=item._id%>">
                                  <%=item.name%>
                               </a></div>
-                           <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>
-                              <%=item.offer_price%>
+                           <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%=item.offer_price%>
                            </div>
                            <div class="rtl-price"><span>Est. Retail:</span>
-                              <%=item.price%>
+                              <i class="fa fa-inr" aria-hidden="true"></i><%=item.price%>
                            </div>
                         </div>
                      </div>
@@ -251,9 +258,8 @@
             $(document).ready(function () {
                /*$(document).on('click', ".buy-btn", function (e) {
                   var id = $(this).data('id');
-                  console.log(id);
                   $.ajax({
-                     url: '/api/addtocart/' + id.trim(),
+                     url: '/addtocart/' + id.trim(),
                      method: 'POST',
                      success: function (data) {
                         if (data.is_added) {
@@ -272,7 +278,6 @@
                         }
                      },
                      error: function (err) {
-                        console.error('Error:', err);
                      }
                   });
                });*/

@@ -25,18 +25,18 @@ const upload = multer({ dest: 'public/images/' });
 
 //methods
 exports.getData = async function (req, res, next) {
-
   var pageName = "Size";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
 
   Size.find().sort({ _id: -1 }).then((size) => {
     res.render("pages/size/list", {
       siteName: req.app.locals.siteName,
       pageName: pageName,
       pageTitle: pageTitle,
-      userFullName: req.session.user.name,
-      userImage: req.session.user.image_url,
-      userEmail: req.session.user.email,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
       requrl: req.app.locals.requrl,
       status: 0,
@@ -44,6 +44,7 @@ exports.getData = async function (req, res, next) {
       respdata: {
         list: size,
       },
+      isAdminLoggedIn:isAdminLoggedIn
     });
   });
 };
@@ -52,19 +53,20 @@ exports.addData = async function (req, res, next) {
 
   var pageName = "Size List";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   res.render("pages/size/create", {
     status: 1,
     siteName: req.app.locals.siteName,
     pageName: pageName,
     pageTitle: pageTitle,
-    userFullName: req.session.user.name,
-    userImage: req.session.user.image_url,
-    userEmail: req.session.user.email,
+    userFullName:  req.session.admin.name,
+    userImage:  req.session.admin.image_url,
+    userEmail:  req.session.admin.email,
     year: moment().format("YYYY"),
     requrl: req.app.locals.requrl,
     message: "",
     respdata: {},
+    isAdminLoggedIn:isAdminLoggedIn
   });
  
 };
@@ -72,21 +74,22 @@ exports.addData = async function (req, res, next) {
 exports.createData = async function (req, res, next) {
   var pageName = "Size";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   Size.findOne({ name: req.body.size_name }).then((size) => {
     if (size) {
       res.render("pages/size/create", {
         status: 0,
         siteName: req.app.locals.siteName,
-        userFullName: req.session.user.name,
-        userImage: req.session.user.image_url,
-        userEmail: req.session.user.email,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
         pageName: pageName,
         pageTitle: pageTitle,
         year: moment().format("YYYY"),
         message: "Already exists!",
         requrl: req.app.locals.requrl,
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     } else {
     
@@ -94,9 +97,6 @@ exports.createData = async function (req, res, next) {
         name: req.body.size_name,
         added_dtime: dateTime,
       });
-
-      console.log(newSize);
-
       newSize
         .save()
         .then((size) => {
@@ -105,13 +105,14 @@ exports.createData = async function (req, res, next) {
             siteName: req.app.locals.siteName,
             pageName: pageName,
             pageTitle: pageTitle,
-            userFullName: req.session.user.name,
-            userImage: req.session.user.image_url,
-            userEmail: req.session.user.email,
+            userFullName:  req.session.admin.name,
+            userImage:  req.session.admin.image_url,
+            userEmail:  req.session.admin.email,
             year: moment().format("YYYY"),
             message: "Added!",
             requrl: req.app.locals.requrl,
             respdata: size,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         })
         .catch((error) => {
@@ -119,14 +120,15 @@ exports.createData = async function (req, res, next) {
             status: 0,
             pageName: pageName,
             siteName: req.app.locals.siteName,
-            userFullName: req.session.user.name,
-            userImage: req.session.user.image_url,
-            userEmail: req.session.user.email,
+            userFullName:  req.session.admin.name,
+            userImage:  req.session.admin.image_url,
+            userEmail:  req.session.admin.email,
             pageTitle: pageTitle,
             year: moment().format("YYYY"),
             requrl: req.app.locals.requrl,
             message: "Error!",
             respdata: error,
+            isAdminLoggedIn:isAdminLoggedIn
           });
         });
     }
@@ -135,7 +137,7 @@ exports.createData = async function (req, res, next) {
 
 exports.updateStatusData = async function (req, res, next) {
   const sizeId = req.params.id;
-
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   Size.findById(sizeId)
     .then((size) => {
       if (!size) {
@@ -143,6 +145,7 @@ exports.updateStatusData = async function (req, res, next) {
           status: "0",
           message: "Size not found!",
           respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
         });
       }
 
@@ -157,27 +160,28 @@ exports.updateStatusData = async function (req, res, next) {
               status: "0",
               message: "Size status not updated!",
               respdata: {},
+              isAdminLoggedIn:isAdminLoggedIn
             });
           }
 
           // Redirect to the list page or any other appropriate page
-          res.redirect("/size"); // You can change this URL as needed
+          res.redirect("/admin/size"); // You can change this URL as needed
         })
         .catch((error) => {
-          console.error(error);
           return res.status(500).json({
             status: "0",
             message: "An error occurred while updating the size status.",
             respdata: {},
+            isAdminLoggedIn:isAdminLoggedIn
           });
         });
     })
     .catch((error) => {
-      console.error(error);
       return res.status(500).json({
         status: "0",
         message: "An error occurred while finding the size.",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     });
 };
@@ -186,12 +190,14 @@ exports.updateStatusData = async function (req, res, next) {
 
 exports.deleteData = async function (req, res, next) {
   try {
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
         status: "0",
         message: "Validation error!",
         respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -201,6 +207,7 @@ exports.deleteData = async function (req, res, next) {
         status: "0",
         message: "Not found!",
         respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
       });
     }
 
@@ -210,13 +217,14 @@ exports.deleteData = async function (req, res, next) {
     );
 
     // Redirect after successful deletion
-    res.redirect("/size");
+    res.redirect("/admin/size");
   } catch (error) {
     // Handle any errors that occur during the deletion process
     return res.status(500).json({
       status: "0",
       message: "Error occurred while deleting the category!",
       respdata: error.message, // Include the error message for debugging purposes
+      isAdminLoggedIn:isAdminLoggedIn
     });
   }
 };

@@ -10,6 +10,9 @@ const request = require('request');
 const twilio = require('twilio');
 const crypto = require('crypto');
 const path = require("path");
+const ejs = require('ejs');
+const helper = require("../../helpers/helper");
+const rp = require('request-promise-native');
 const fs = require("fs");
 const mime = require("mime");
 const cors = require('cors');
@@ -25,6 +28,7 @@ var ObjectId = require("mongodb").ObjectId;
 const url = require("url");
 var ObjectId = require("mongodb").ObjectId;
 const Appsettings = require("../../models/api/appSettingsModel");
+const Bankdetails = require("../../models/api/bankdetailsModel");
 const Users = require("../../models/api/userModel");
 const Userproduct = require("../../models/api/userproductModel");
 const Productimage = require("../../models/api/productimageModel");
@@ -38,7 +42,16 @@ const Cart = require('../../models/api/cartModel');
 const CartDetail = require('../../models/api/cartdetailsModel');
 const Order = require("../../models/api/orderModel");
 const Banner = require("../../models/api/bannerModel");
-const smtpUser = "sneha.lnsel@gmail.com";
+const Brand = require("../../models/api/brandModel");
+const Size = require("../../models/api/sizeModel");
+const Gender = require("../../models/api/genderModel");
+const ReturnOrder = require("../../models/api/returnorderModel");
+const Reasonlist = require("../../models/api/reasonlistModel");
+const Iptrnsaction = require("../../models/api/ipTransactionModel");
+const insertNotification = require("../../models/api/insertNotification");
+const Demoorder = require("../../models/api/demoorderModel");
+const smtpUser = "welcome@bidforsale.com";
+//const smtpUser = "hello@bidforsale.com";
 const nodemailer = require("nodemailer");
 const app = express();
 const generateTokens = require("../../utils/generateTokens");
@@ -51,20 +64,36 @@ const Ordertracking = require("../../models/api/ordertrackModel");
 const Shippingkit = require("../../models/api/shippingkitModel");
 //const Ordertracking = require("../../models/api/ordertrackModel");
 const Track = require("../../models/api/trackingModel");
-const { log } = require("console");
+const sendSms = require("../../models/thirdPartyApi/sendSms");
+const sendWhatsapp = require("../../models/thirdPartyApi/sendWhatsapp");
+const ApiCallHistory = require("../../models/thirdPartyApi/ApiCallHistory");
+const CompressImage = require("../../models/thirdPartyApi/CompressImage");
+const { log, Console } = require("console");
+const { create } = require('xmlbuilder2');
+// const INSTANCE_URL = 'https://api.maytapi.com/api';
+// const PHONE_ID = '18710';
+// const PRODUCT_ID = 'b119f3b5-819b-46e0-ae30-0d1cf1dd8cc8';
+// const API_TOKEN = 'c1af8dac-f1fd-4757-8536-c1731ed63eda';
 
-
+// const transporter = nodemailer.createTransport({
+//   port: 465,
+//   host: "mail.bidforsale.com",
+//   auth: {
+//     user: smtpUser,
+//     pass: "aI)q#z@xJQ+u",
+//   },
+//   secure: true,
+// });
 
 const transporter = nodemailer.createTransport({
   port: 465,
-  host: "smtp.gmail.com",
+  host: "mail.bidforsale.com",
   auth: {
     user: smtpUser,
-    pass: "iysxkkaexpkmfagh",
+    pass: "A6K9JAQD%m!s",
   },
   secure: true,
 });
-
 function randNumber(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
@@ -114,21 +143,16 @@ function generateToken1(email, password) {
         const token = responseBody.token;
         resolve(token);
       } else {
-        console.error('Error:', response.body);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
   });
 }
-
 async function generateSellerPickup(data) {
   token = await generateToken1(email, shipPassword);
   if (!token) {
-    console.error('Token not available. Call generateToken first.');
     return Promise.reject('Token not available. Call generateToken first.');
   }
-
-
   const options = {
     method: 'POST',
     url: baseUrl + '/settings/company/addpickup',
@@ -138,37 +162,29 @@ async function generateSellerPickup(data) {
     },
     body: JSON.stringify(data)
   };
-
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
       if (error) {
         reject(error);
-      } else if (response.statusCode === 200) {
+      } else {
         const responseBody = JSON.parse(body);
-
         const token = responseBody;
         resolve(token);
-      } else {
-        console.error('Errottr:', response);
+      } /*else {
+        //console.log("response",response);
         reject(new Error(`Error: ${response.statusCode}`));
-      }
+      }*/
     });
   });
-
-
 }
-
-
 exports.productData = async function (req, res, next) {
   try {
 
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const productId = req.params.id;
     let query = {};
-  
 
     query._id = productId;
-
 
     let isProductInWishlist = "";
     if (isLoggedIn) {
@@ -176,94 +192,81 @@ exports.productData = async function (req, res, next) {
         user_id: isLoggedIn,
         product_id: productId,
       });
-      console.log("product");
     }
-
     const categoydetails = await Userproduct.findById(query)
       .populate('category_id', 'name')
       .exec();
 
-      const userproducts = await Userproduct.findOne({
-        _id: productId,
-        approval_status: 1,
-        flag: 0
-      })
+    const userproducts = await Userproduct.findOne({
+      _id: productId,
+      approval_status: 1
+    })
+      .populate('brand_id', 'name')
+      .populate('category_id', 'name')
+      .populate('user_id', 'name')
+      .populate('size_id', 'name')
+      .exec();
+    const userproducts1 = await Userproduct.find({
+      category_id: categoydetails.category_id,
+      approval_status: 1
+    })
       .populate('brand_id', 'name')
       .populate('category_id', 'name')
       .populate('user_id', 'name')
       .populate('size_id', 'name')
       .exec();
 
-      
+    let formattedUserProducts1 = [];
 
-      const userproducts1 = await Userproduct.find({ 
-        category_id: categoydetails.category_id , 
-        approval_status: 1,
-        flag: 0
-      })
-        .populate('brand_id', 'name')
-        .populate('category_id', 'name')
-        .populate('user_id', 'name')
-        .populate('size_id', 'name')
-        .exec();
-  
-        let formattedUserProducts1 = [];
-  
-        if (userproducts1) {
-            
-            for (const userproduct1 of userproducts1) {
-              const productImages1 = await Productimage.find({ product_id: userproduct1._id });
-        
-              const formattedUserProduct1 = {
-                _id: userproduct1._id,
-                name: userproduct1.name,
-                description: userproduct1.description,
-                price: userproduct1.price,
-                offer_price: userproduct1.offer_price,
-                percentage: userproduct1.percentage,
-                status: userproduct1.status,
-                flag: userproduct1.flag,
-                approval_status: userproduct1.approval_status,
-                added_dtime: userproduct1.added_dtime,
-                __v: userproduct1.__v,
-                product_images: productImages1,
-              };
-        
-              formattedUserProducts1.push(formattedUserProduct1);
-            }
-        }  
-    
-   
+    if (userproducts1) {
 
+      for (const userproduct1 of userproducts1) {
+        const productImages1 = await Productimage.find({ product_id: userproduct1._id }).sort("image_order");
+
+        const formattedUserProduct1 = {
+          _id: userproduct1._id,
+          name: userproduct1.name,
+          description: userproduct1.description,
+          price: userproduct1.price,
+          offer_price: userproduct1.offer_price,
+          percentage: userproduct1.percentage,
+          status: userproduct1.status,
+          flag: userproduct1.flag,
+          approval_status: userproduct1.approval_status,
+          added_dtime: userproduct1.added_dtime,
+          __v: userproduct1.__v,
+          product_images: typeof productImages1 != "undefined" ? productImages1 : [],
+        };
+
+        formattedUserProducts1.push(formattedUserProduct1);
+      }
+    }
     if (!userproducts) {
-  
       return res.render("webpages/productdetails", {
         title: "Not Found",
         message: "The requested product was not found.",
         websiteUrl: process.env.SITE_URL,
         isLoggedIn: isLoggedIn,
         respdata: {},
-        category : categoydetails.category_id,
+        category: categoydetails.category_id,
         relatedProducts: formattedUserProducts1,
         isWhislist: isProductInWishlist != null && Object.keys(isProductInWishlist).length ? true : false
       });
-
     }
-
     userproducts.hitCount = (userproducts.hitCount || 0) + 1;
     await userproducts.save();
-    const productImages = await Productimage.find({ product_id: userproducts._id });
+    const productImages = await Productimage.find({ product_id: userproducts._id }).sort("image_order");
     const productCondition = await Productcondition.findById(userproducts.status);
     const formattedUserProduct = {
       _id: userproducts._id,
       name: userproducts.name,
       description: userproducts.description,
       category_id: userproducts.category_id._id,
-      category: userproducts.category_id ? userproducts.category_id.name : '', // Check if category_id exists before accessing 'name'
-      brand: userproducts.brand_id ? userproducts.brand_id.name : '', // Check if brand_id exists before accessing 'name'
+      category: userproducts.category_id ? userproducts.category_id.name : '',
+      brand: userproducts.brand_id ? userproducts.brand_id.name : '',
       user_id: userproducts.user_id ? userproducts.user_id._id : '',
       user_name: userproducts.user_id ? userproducts.user_id.name : '',
-      size_id: userproducts.size_id ? userproducts.size_id.name : '', // Check if size_id exists before accessing 'name'
+      size_id: userproducts.size_id ? userproducts.size_id.name : '',
       price: userproducts.price,
       offer_price: userproducts.offer_price,
       percentage: userproducts.percentage,
@@ -274,25 +277,21 @@ exports.productData = async function (req, res, next) {
       approval_status: userproducts.approval_status,
       satus_name: productCondition ? productCondition.name : '',
       added_dtime: userproducts.added_dtime,
-      hitCount: userproducts.hitCount || 0, // Provide a default value if hitCount is undefined
+      hitCount: userproducts.hitCount || 0,
       __v: userproducts.__v,
-      product_images: productImages,
+      product_images: typeof productImages != "undefined" ? productImages : [],
     };
-
-
-    
     res.render("webpages/productdetails", {
       title: "Product Details",
       message: "Welcome to the Product page!",
       respdata: formattedUserProduct,
       relatedProducts: formattedUserProducts1,
-      category : categoydetails.category_id,
-      websiteUrl:process.env.SITE_URL,
+      category: categoydetails.category_id,
+      websiteUrl: process.env.SITE_URL,
       isLoggedIn: isLoggedIn,
       isWhislist: isProductInWishlist != null && Object.keys(isProductInWishlist).length ? true : false
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the dashboard.",
@@ -310,7 +309,6 @@ exports.privacypolicyData = async function (req, res, next) {
       isLoggedIn: isLoggedIn,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the privacy policy.",
@@ -319,6 +317,22 @@ exports.privacypolicyData = async function (req, res, next) {
   }
 };
 
+exports.returnShipping = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    res.render("webpages/returns-shipping", {
+      title: "Privacy Policy",
+      message: "Welcome to the privacy policy page!",
+      isLoggedIn: isLoggedIn,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the privacy policy.",
+      error: error.message,
+    });
+  }
+};
 
 exports.tremsandconditionData = async function (req, res, next) {
   try {
@@ -329,7 +343,6 @@ exports.tremsandconditionData = async function (req, res, next) {
       isLoggedIn: isLoggedIn,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the privacy policy.",
@@ -341,15 +354,17 @@ exports.tremsandconditionData = async function (req, res, next) {
 
 exports.registration = async function (req, res, next) {
   try {
-    // console.log("Registration");
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-    res.render("webpages/registration", {
-      title: "Registration",
-      message: "Welcome to the privacy policy page!",
-      isLoggedIn: isLoggedIn,
-    });
+    if (isLoggedIn == "") {
+      res.render("webpages/registration", {
+        title: "Registration",
+        message: "Welcome to the privacy policy page!",
+        isLoggedIn: isLoggedIn,
+      });
+    } else {
+      res.redirect('/my-account');
+    }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the privacy policy.",
@@ -358,9 +373,73 @@ exports.registration = async function (req, res, next) {
   }
 };
 
+// exports.signin = async function (req, res, next) {
+//   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+//   const errors = validationResult(req);
+//   if (!errors.isEmpty()) {
+//     return res.status(400).json({
+//       status: "0",
+//       message: "Validation error!",
+//       respdata: errors.array(),
+//     });
+//   }
+
+//   bcrypt.hash(req.body.password, rounds, (error, hash) => {
+//     if (error) {
+//       res.status(400).json({
+//         status: "0",
+//         message: "Error!",
+//         respdata: error,
+//       });
+//     }
+//     else {
+
+//       Users.findOne({ email: req.body.email }).then((user) => {
+//         if (!user) {
+//           const newUser = Users({
+//             email: req.body.email,
+//             password: hash,
+//             token: "na",
+//             //title: req.body.title,
+//             name: req.body.name,
+//             phone_no: req.body.phone_no,
+//             deviceid: "na",
+//             devicename: "na",
+//             fcm_token: "na",
+//             country: "na",
+//             country_code: "na",
+//             country: "na",
+//             last_login: "na",
+//             last_logout: "na",
+//             created_dtime: dateTime,
+//             app_user_id: "na",
+//             trial_end_date: "na",
+//             image: "na",
+//           });
+
+//           newUser.save();
+//           //res.redirect('/');
+//           await exports.ajaxGetUserLogin(req, res, next, req.body.email, req.body.password);
+//         }
+//         else {
+//           // res.status(400).json({
+//           //   status: "0",
+//           //   message: "User already exists!",
+//           //   respdata: {},
+//           // });
+
+//           res.redirect('/registration?userExists=true');
+//         }
+//       });
+//     }
+//   });
+// };
+
 exports.signin = async function (req, res, next) {
+  let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || null;
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   const errors = validationResult(req);
+
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
@@ -369,23 +448,24 @@ exports.signin = async function (req, res, next) {
     });
   }
 
-  bcrypt.hash(req.body.password, rounds, (error, hash) => {
-    if (error) {
-      res.status(400).json({
-        status: "0",
-        message: "Error!",
-        respdata: error,
-      });
-    }
-    else {
+  try {
+    bcrypt.hash(req.body.password, rounds, async (error, hash) => {
+      if (error) {
+        res.status(400).json({
+          status: "0",
+          message: "Error!",
+          respdata: error,
+        });
+      } else {
+        const user = await Users.findOne({ email: req.body.email });
+        const userIpAddress = ip;
+        //const userIpAddress = req.connection.remoteAddress;
 
-      Users.findOne({ email: req.body.email }).then((user) => {
         if (!user) {
           const newUser = Users({
             email: req.body.email,
             password: hash,
             token: "na",
-            //title: req.body.title,
             name: req.body.name,
             phone_no: req.body.phone_no,
             deviceid: "na",
@@ -400,23 +480,137 @@ exports.signin = async function (req, res, next) {
             app_user_id: "na",
             trial_end_date: "na",
             image: "na",
+            ip_address: userIpAddress,
           });
 
-          newUser.save();
-          res.redirect('/api/home');
-        }
-        else {
-          res.status(400).json({
-            status: "0",
-            message: "User already exists!",
-            respdata: {},
+          await newUser.save();
+          const ipTransaction = new Iptrnsaction({
+            user_id: newUser._id, 
+            Purpose: "Web User Registration",
+            ip_address: userIpAddress,
+            created_dtime: dateTime,
           });
+          await ipTransaction.save();
+
+          let smsData = {
+            textId: "test",
+            toMobile: "91" + newUser.phone_no,
+            text: "Welcome to Bid For Sale, "+newUser.name+"! Explore a world of luxury with access to top brands at exceptional value. Buy and sell pre-owned authentic luxury items globally, all while contributing to environmental conservation. Enjoy your journey with us!-BFS RETAIL SERVICES PRIVATE LIMITED",
+          };
+          let returnData;
+          returnData = await sendSms(smsData);
+          const historyData = new ApiCallHistory({
+            userId: newUser._id,
+            called_for: "register",
+            api_link: process.env.SITE_URL,
+            api_param: smsData,
+            api_response: returnData,
+            send_status: 'send',
+          });
+          await historyData.save();
+
+          const loginHtmlPath = 'views/webpages/welcome.html';;
+          let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+
+          loginHtmlContent = loginHtmlContent.replace('{{username}}', newUser.name);
+
+          const mailData = {
+            from: "Bid For Sale! <" + smtpUser + ">",
+            to: newUser.email,
+            subject: "Order Placed - Bid For Sale!",
+            name: "Bid For Sale!",
+            text: "order placed",
+            html: loginHtmlContent
+          };
+    
+          transporter.sendMail(mailData, function (err, info) {
+            // if (err) console.log("err", err);
+            // else console.log("info", info);
+          });
+    
+          const message = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
+          const to_number = "91" + newUser.phone_no;
+          let response = await send_message({ type: 'text', message, to_number });
+
+          //SEND WHATSAPP
+          const receiverMobileNo = "91" + req.body.phone_no;
+          const root = create({ version: '1.0', encoding: "ISO-8859-1" })
+            .ele('MESSAGE', { VER: '1.2' })
+            .ele('USER', { USERNAME: process.env.WP_SMS_USER_NAME, PASSWORD: process.env.WP_PASSWORD })
+            .ele('SMS', { UDH: "0", CODING: "1", TEXT: "Hi", PROPERTY: "0", ID: "1", TEMPLATE: "bfstest" })
+            .ele('ADDRESS', { FROM: process.env.WP_SMS_SENDER_MOBILE, TO: receiverMobileNo, SEQ: "1" })
+          //.up()
+          //.up();
+
+          // convert the XML tree to string
+          const xml = root.end({ prettyPrint: true });
+          await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
+            if (err) {
+              // return {
+              //   status:false,
+              //   data:err
+              // };
+            }
+            //let obj = JSON.parse(data);
+            //let randNumber = Math.floor((Math.random() * 1000000) + 1);
+            let smsData = xml;
+            let returnData;
+            returnData = await sendWhatsapp(smsData);
+            const historyData = await new ApiCallHistory({
+              userId: mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"),
+              called_for: "whatsapp",
+              api_link: process.env.SITE_URL,
+              api_param: smsData,
+              api_response: returnData,
+              send_status: 'send',
+            });
+            await historyData.save();
+          });
+          //SEND WHATSAPP
+
+          const user = await Users.findOne({ email: req.body.email });
+          const userToken = {
+            userId: user._id,
+            email: user.email,
+            password: user.password,
+            title: user.title,
+            name: user.name,
+            age: user.age,
+            image: user.image ? user.image : '',
+            phone_no: user.phone_no,
+            weight: user.weight,
+            height: user.height,
+            country: user.country,
+            country_code: user.country_code,
+            country: user.country,
+            goal: user.goal,
+            hear_from: user.hear_from,
+          };
+          const { accessToken, refreshToken } = await generateTokens(userToken, "");
+          return res.status(200).json({
+            status: "success",
+            message: "Successfully Registered!",
+            respdata: {
+              accessToken: accessToken,
+              accessTokenExpires: process.env.COOCKIE_ACCESS_TOKEN_EXPIRES_IN,
+              refreshToken: refreshToken,
+              refreshTokenExpires: process.env.COOCKIE_REFRESH_TOKEN_EXPIRES_IN,
+              refreshReset: true,
+            },
+          });
+        } else {
+          res.redirect('/registration?userExists=true');
         }
-      });
-    }
-  });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "Internal Server Error",
+      respdata: error.message || "Unknown error",
+    });
+  }
 };
-
 exports.ajaxGetUserLogin = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -426,91 +620,10 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   const { email, password, cookieAccessToken, cookieRefreshToken } = req.body;
   //Token generate
   let accessTokenGlobal = "";
   let refreshTokenGlobal = "";
-  /*await Users.findOne({ email }).then(async (user) => {
-    const userToken = {
-      userId: user._id,
-      email: user.email,
-      password: user.password,
-      title: user.title,
-      name: user.name,
-      age: user.age,
-      //usertoken:user.token,
-      phone_no:user.phone_no,
-      weight: user.weight,
-      height: user.height,
-      country: user.country,
-      country_code: user.country_code,
-      country: user.country,
-      goal: user.goal,
-      hear_from: user.hear_from,
-    };
-    if(cookieRefreshToken != "") {
-      //Access token validate
-      let getAccessTokenData = await tokenDecode(cookieAccessToken, process.env.ACCESS_TOKEN_PRIVATE_KEY);
-      if(!getAccessTokenData.error) {
-        if((typeof req.session.user != "undefined") && (req.session.user.userId.toString() == getAccessTokenData.tokenDetails.userId.toString())) {
-          //Do Nothing....
-          //console.log("session matched with current data");
-          res.status(200).json({
-            status: "success",
-            refreshReset:false,
-            message:"Already logged In!!"
-          });
-        } else {
-          let getRefreshTokenData = await tokenDecode(cookieRefreshToken, process.env.REFRESH_TOKEN_PRIVATE_KEY);
-          if(!getRefreshTokenData.error) {
-            if(getRefreshTokenData.tokenDetails.exp > (Date.now() / 1000)){
-              //generate access token only
-              const { accessToken, refreshToken } = await generateTokens(userToken, cookieRefreshToken);
-              accessTokenGlobal = accessToken;
-              refreshTokenGlobal = refreshToken;
-            } else {
-              //generate refresh token
-              const { accessToken, refreshToken } = await generateTokens(userToken, "");
-              accessTokenGlobal = accessToken;
-              refreshTokenGlobal = refreshToken;
-            }
-            //user data stored in session
-            req.session.user = userToken;
-            res.status(200).json({
-              status: "success",
-              refreshReset:true,
-              accessToken: accessTokenGlobal,
-              refreshToken:refreshTokenGlobal
-            });
-          } else {
-            //Do something while you will get error in refresh token
-            res.status(200).json({
-              status: "error",
-              refreshReset:false,
-              message: "Error while generating your token!"
-            });
-          }
-        }
-      } else {
-        //Do something while you will get error in access token
-        res.status(200).json({
-          status: "error",
-          refreshReset:false,
-          message: "Error while generating your token!"
-        });
-      }
-    } else {
-      //User is logging for the first time
-      const { accessToken, refreshToken } = await generateTokens(userToken, "");
-      res.status(200).json({
-        status: "success",
-        refreshReset:true,
-        accessToken: accessToken,
-        refreshToken:refreshToken
-      });
-    }
-  });*/
   Users.findOne({
     $or: [
       { email: email },
@@ -542,6 +655,10 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
           // user.devicename = devicename;
           // user.fcm_token = fcm_token;
 
+          //const loginHtmlPath = 'views/webpages/mailbody.html';
+          const loginHtmlPath = 'views/webpages/welcome.html';;
+          const loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+
           user.save(async (err) => {
             if (err) {
               res.status(400).json({
@@ -550,39 +667,42 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
                 respdata: err,
               });
             } else {
-              const mailData = {
-                from: smtpUser,
-                to: user.email,
-                subject: "BFS - Bid For Sale  - Welcome Email",
-                text: "Server Email!",
-                html:
-                  "Hey " +
-                  user.name +
-                  ", <br> <p>Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items </p>",
-              };
-              transporter.sendMail(mailData, function (err, info) {
-                if (err) console.log(err);
-                else console.log(info);
-              });
-
-              // const msg = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
-
-              const whatsappMessage = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
-              const userPhoneNo = "+917044289770";
-
-              twilioClient.messages.create({
-                body: whatsappMessage,
-                // From: 'whatsapp:+12565734549',
-                // to: 'whatsapp:+918116730275'
-                from: 'whatsapp:+14155238886',
-                to: 'whatsapp:+917044289770'
-              })
-                .then((message) => {
-                  console.log(`WhatsApp message sent with SID: ${message.sid}`);
-                })
-                .catch((error) => {
-                  console.error(`Error sending WhatsApp message: ${error.message}`);
-                });
+              // let smsData = {
+              //   textId: "test",
+              //   toMobile: "91" + user.phone_no,
+              //   text: "Welcome to Bid For Sale, "+user.name+"! Explore a world of luxury with access to top brands at exceptional value. Buy and sell pre-owned authentic luxury items globally, all while contributing to environmental conservation. Enjoy your journey with us!-BFS RETAIL SERVICES PRIVATE LIMITED",
+              // };
+              // let returnData;
+              // returnData = await sendSms(smsData);
+              // const historyData = new ApiCallHistory({
+              //   userId: mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"),
+              //   called_for: "register",
+              //   api_link: process.env.SITE_URL,
+              //   api_param: smsData,
+              //   api_response: returnData,
+              //   send_status: 'send',
+              // });
+              // await historyData.save();
+  
+              // const loginHtmlPath = 'views/webpages/welcome.html';;
+              // const loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+  
+              // loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+  
+              // const mailData = {
+              //   from: "Bid For Sale! <" + smtpUser + ">",
+              //   to: user.email,
+              //   subject: "Order Placed - Bid For Sale!",
+              //   name: "Bid For Sale!",
+              //   text: "order placed",
+              //   html: loginHtmlContent
+              // };
+        
+              // transporter.sendMail(mailData, function (err, info) {
+              //   if (err) console.log("err", err);
+              //   else console.log("info", info);
+              // });
+        
               const userToken = {
                 userId: user._id,
                 email: user.email,
@@ -590,7 +710,7 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
                 title: user.title,
                 name: user.name,
                 age: user.age,
-                image: user.image ? user.image:'',
+                image: user.image ? user.image : '',
                 //usertoken:user.token,
                 phone_no: user.phone_no,
                 weight: user.weight,
@@ -605,12 +725,9 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
               //const { accessToken, refreshToken } = await generateTokens(userToken, cookieRefreshToken);
               //Generate Token Required By Condition
               if (cookieRefreshToken != "") {
-                //Access token validate
                 let getAccessTokenData = await tokenDecode(cookieAccessToken, process.env.ACCESS_TOKEN_PRIVATE_KEY);
                 if (!getAccessTokenData.error) {
                   if ((typeof req.session.user != "undefined") && (req.session.user.userId.toString() == getAccessTokenData.tokenDetails.userId.toString())) {
-                    //Do Nothing....
-                    //console.log("session matched with current data");
                     res.status(200).json({
                       status: "success",
                       refreshReset: false,
@@ -620,18 +737,15 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
                     let getRefreshTokenData = await tokenDecode(cookieRefreshToken, process.env.REFRESH_TOKEN_PRIVATE_KEY);
                     if (!getRefreshTokenData.error) {
                       if (getRefreshTokenData.tokenDetails.exp > (Date.now() / 1000)) {
-                        //generate access token only
                         const { accessToken, refreshToken } = await generateTokens(userToken, cookieRefreshToken);
                         accessTokenGlobal = accessToken;
                         refreshTokenGlobal = refreshToken;
                       } else {
-                        //generate refresh token
                         const { accessToken, refreshToken } = await generateTokens(userToken, "");
                         accessTokenGlobal = accessToken;
                         refreshTokenGlobal = refreshToken;
                       }
                     } else {
-                      //Do something while you will get error in refresh token
                       res.status(200).json({
                         status: "error",
                         refreshReset: false,
@@ -640,7 +754,6 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
                     }
                   }
                 } else {
-                  //Do something while you will get error in access token
                   res.status(200).json({
                     status: "error",
                     refreshReset: false,
@@ -648,12 +761,10 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
                   });
                 }
               } else {
-                //User is logging for the first time
                 const { accessToken, refreshToken } = await generateTokens(userToken, "");
                 accessTokenGlobal = accessToken;
                 refreshTokenGlobal = refreshToken;
               }
-              //Generate Token Required By Condition
               let myquery = { _id: user._id };
               let newvalues = { $set: { token: accessTokenGlobal, last_login: dateTime } };
               Users.updateOne(myquery, newvalues, function (err, response) {
@@ -664,9 +775,7 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
                     respdata: {},
                   });
                 } else {
-                  //Store user data into the session
                   req.session.user = userToken;
-
                   res.status(200).json({
                     status: "success",
                     message: "Successfully logged in!",
@@ -703,8 +812,6 @@ exports.userRelogin = async function (req, res, next) {
     if (!tokenDetailsData.error) {
       const email = tokenDetailsData.tokenDetails.email;
       if ((typeof req.session.user != "undefined") && (req.session.user.userId.toString() == tokenDetailsData.tokenDetails.userId.toString())) {
-        //Do Nothing....
-        //console.log("session matched with current data");
         res.status(200).json({
           status: "error",
           message: "Already logged In!!"
@@ -725,7 +832,7 @@ exports.userRelogin = async function (req, res, next) {
             password: user.password,
             title: user.title,
             name: user.name,
-            image: user.image ? user.image:'',
+            image: user.image ? user.image : '',
             age: user.age,
             phone_no: user.phone_no,
             weight: user.weight,
@@ -788,7 +895,8 @@ exports.userRelogin = async function (req, res, next) {
 };
 
 exports.userFilter = async function (req, res, next) {
-  let { brandList, sizeList, conditionList, priceList, optionId,productcategoryId } = req.body;
+  let { brandList, sizeList, conditionList, priceList, genderList, optionId, productcategoryId, pageNo } = req.body;
+ 
   if (typeof optionId != "undefined") {
     if ((optionId == 0)) {
       optionId = 1;
@@ -798,6 +906,9 @@ exports.userFilter = async function (req, res, next) {
   } else {
     optionId = 1;
   }
+  const page = pageNo || 1;
+  const pageSize = 8;
+  const skip = (page - 1) * pageSize;
   let concatVar = {};
   let objConditionList = [];
   if ((typeof conditionList != "undefined") && (conditionList.length > 0)) {
@@ -806,44 +917,71 @@ exports.userFilter = async function (req, res, next) {
     });
   }
   if (typeof brandList != "undefined") {
-    concatVar["brand"] = { "$in": brandList };
+    concatVar["brand_id"] = { "$in": brandList };
   }
-  //if(typeof brandList != "undefined" && concatVar.length > 0) {
-    if (typeof sizeList != "undefined") {
-      concatVar["size"] = { "$in": sizeList };
-    }
-  //}
-  if (typeof productcategoryId != "undefined") {
+  if (typeof sizeList != "undefined") {
+    concatVar["size_id"] = { "$in": sizeList };
+  }
+  if (typeof productcategoryId != "undefined" && (productcategoryId == "bestDeal" || productcategoryId == "whatshot" ||     productcategoryId == "justsold")) {
+    
+  }
+  else{
     concatVar["category_id"] = { "$in": mongoose.Types.ObjectId(productcategoryId) };
   }
   if ((typeof conditionList != "undefined") && (objConditionList.length > 0)) {
     concatVar["status"] = { "$in": objConditionList };
   }
-  if (typeof priceList !== "undefined" && priceList.length > 0) {
-    const priceConditions = priceList.map(item => {
-      const priceArr = item.split("-");
-      return {
-        offer_price: {
-          $gt: parseFloat(priceArr[0]),
-          $lte: parseFloat(priceArr[1])
-        }
-      };
-    });
-  
-    concatVar['$or'] = priceConditions;
+  if ((typeof genderList != "undefined")) {
+    concatVar["gender_id"] = { "$in": genderList };
   }
-  
+  // if (priceList && typeof priceList !== "undefined" && priceList !='') {
+  //   let [min, max] = priceList.split('-').map(Number);
+  //   const priceConditions= {
+  //     offer_price: {
+  //       $gt: parseFloat(min),
+  //       $lte: parseFloat(max)
+  //     }
+  //   };
+  //     // Check if concatVar already has an $and array
+  //     if (concatVar.$and) {
+  //       concatVar.$and.push(priceConditions);
+  //   } else {
+  //       // Create a new $and array
+  //       concatVar.$and = [priceConditions];
+  //   }
+  //   concatVar['$and'] = priceConditions;
+  // }
+  // let allProductData = await Userproduct.find({ $and: concatVar}).sort({ offer_price: optionId });
+  if (priceList && typeof priceList !== "undefined" && priceList !== '') {
+    let [min, max] = priceList.split('-').map(Number);
+    const priceConditions = {
+      offer_price: {
+        $gte: parseFloat(min),
+        $lte: parseFloat(max)
+      }
+    };
 
-  let allProductData = await Userproduct.find({ $and: [concatVar]}).sort({ offer_price: optionId });
- 
-  //let allProductData = await Userproduct.find(concatVar).sort({ offer_price: optionId });  
- 
+    if (concatVar.$and) {
+      concatVar.$and.push(priceConditions);
+    } else {
+      concatVar.$and = [priceConditions];
+    }
+  }
+  // let totalProduct = await Userproduct.find(concatVar).sort({ offer_price: optionId });
+  const query = {
+    ...concatVar,
+    approval_status: 1,
+    flag: 0
+  };
+  let totalProduct = await Userproduct.countDocuments(query);
+  let allProductData = await Userproduct.find(query)
+    .sort({ offer_price: optionId })
+    .skip(skip)
+    .limit(pageSize);
   const formattedUserProducts = [];
   for (const userproduct of allProductData) {
-
     const productImages = await Productimage.find({ product_id: userproduct._id });
     const productCondition = await Productcondition.findById(userproduct.status);
-
     const formattedUserProduct = {
       _id: userproduct._id,
       name: userproduct.name,
@@ -852,7 +990,7 @@ exports.userFilter = async function (req, res, next) {
       brand: (typeof userproduct.brand_id != "undefined") ? userproduct.brand_id.name : "",
       user_id: (typeof userproduct.user_id != "undefined") ? userproduct.user_id._id : "",
       user_name: (typeof userproduct.user_id != "undefined") ? userproduct.user_id.name : "",
-      size_id: (typeof userproduct.size_id != "undefined") ? userproduct.size_id.name: "",
+      size_id: (typeof userproduct.size_id != "undefined") ? userproduct.size_id.name : "",
       price: (typeof userproduct.price != "undefined") ? userproduct.price : "",
       offer_price: (typeof userproduct.offer_price != "undefined") ? userproduct.offer_price : "",
       percentage: (typeof userproduct.percentage != "undefined") ? userproduct.percentage : "",
@@ -866,15 +1004,177 @@ exports.userFilter = async function (req, res, next) {
     };
     formattedUserProducts.push(formattedUserProduct);
   }
-
+  const totalPages = Math.ceil(totalProduct / pageSize);
   const userProductsCount = formattedUserProducts.length;
-
   if (formattedUserProducts.length > 0) {
     return res.json({
       status: 'success',
       message: 'Success search result',
       respdata: formattedUserProducts,
-      userProductsCount:userProductsCount
+      productCount: userProductsCount,
+      totalPages: totalPages,
+      currentPage: page,
+      pageSize: pageSize,
+      webUrl: 'user-filter',
+      websiteUrl: process.env.SITE_URL,
+      totalProduct: totalProduct
+    });
+  } else {
+    res.status(200).json({
+      status: "error",
+      message: "No Reccords Found for this search..",
+    });
+  }
+};
+
+exports.userFilterForOthers = async function (req, res, next) {
+  let { brandList, sizeList, conditionList, priceList, genderList, optionId, productcategoryId, pageNo } = req.body;
+ 
+  if (typeof optionId != "undefined") {
+    if ((optionId == 0)) {
+      optionId = 1;
+    } else {
+      optionId = -1;
+    }
+  } else {
+    optionId = 1;
+  }
+  const page = pageNo || 1;
+  const pageSize = 8;
+  const skip = (page - 1) * pageSize;
+  let concatVar = {};
+  let objConditionList = [];
+  if ((typeof conditionList != "undefined") && (conditionList.length > 0)) {
+    conditionList.forEach(function (item) {
+      objConditionList.push(mongoose.Types.ObjectId(item));
+    });
+  }
+  if (typeof brandList != "undefined") {
+    concatVar["brand_id"] = { "$in": brandList };
+  }
+  if (typeof sizeList != "undefined") {
+    concatVar["size_id"] = { "$in": sizeList };
+  }
+  if (typeof productcategoryId != "undefined" && (productcategoryId == "bestDeal" || productcategoryId == "whatshot" ||     productcategoryId == "justsold")) {
+    
+  }
+  else{
+    concatVar["category_id"] = { "$in": mongoose.Types.ObjectId(productcategoryId) };
+  }
+  if ((typeof conditionList != "undefined") && (objConditionList.length > 0)) {
+    concatVar["status"] = { "$in": objConditionList };
+  }
+  if ((typeof genderList != "undefined")) {
+    concatVar["gender_id"] = { "$in": genderList };
+  }
+
+  if (priceList && typeof priceList !== "undefined" && priceList !== '') {
+    let [min, max] = priceList.split('-').map(Number);
+    const priceConditions = {
+      offer_price: {
+        $gte: parseFloat(min),
+        $lte: parseFloat(max)
+      }
+    };
+
+    if (concatVar.$and) {
+      concatVar.$and.push(priceConditions);
+    } else {
+      concatVar.$and = [priceConditions];
+    }
+  }
+  let totalProduct;
+  let allProductData;
+
+  if (productcategoryId == "bestDeal" ) {
+    console.log("best deal");
+    const appSettings = await Appsettings.findOne();
+
+    const percentageFilter = parseInt(appSettings.best_deal);
+    const query = {
+      ...concatVar,
+      approval_status: 1,
+      flag: 0,
+      percentage: { $gte: percentageFilter }
+    };
+
+    console.log("query",query);
+
+    totalProduct = await Userproduct.countDocuments(query);
+    allProductData = await Userproduct.find(query)
+      .sort({ offer_price: optionId })
+      .skip(skip)
+      .limit(pageSize);
+  }
+  if (productcategoryId == "whatshot") {
+    console.log("whatshot");
+    const query = {
+      ...concatVar,
+      approval_status: 1,
+      flag: 0
+    };
+
+    totalProduct = await Userproduct.countDocuments(query);
+    allProductData = await Userproduct.find(query)
+      .sort({ offer_price: optionId })
+      .sort({ hitCount: -1 })
+      .skip(skip)
+      .limit(pageSize);
+  }
+  if (productcategoryId == "justsold") {
+    console.log("justsold");
+    const query = {
+      ...concatVar,
+      approval_status: 1,
+      flag: 1
+    };
+    totalProduct = await Userproduct.countDocuments(query);
+    allProductData = await Userproduct.find(query)
+      .sort({ offer_price: optionId })
+      .skip(skip)
+      .limit(pageSize);
+  }
+  
+  const formattedUserProducts = [];
+  for (const userproduct of allProductData) {
+    const productImages = await Productimage.find({ product_id: userproduct._id });
+    const productCondition = await Productcondition.findById(userproduct.status);
+    const formattedUserProduct = {
+      _id: userproduct._id,
+      name: userproduct.name,
+      description: userproduct.description,
+      category: (typeof userproduct.category_id != "undefined") ? userproduct.category_id.name : "",
+      brand: (typeof userproduct.brand_id != "undefined") ? userproduct.brand_id.name : "",
+      user_id: (typeof userproduct.user_id != "undefined") ? userproduct.user_id._id : "",
+      user_name: (typeof userproduct.user_id != "undefined") ? userproduct.user_id.name : "",
+      size_id: (typeof userproduct.size_id != "undefined") ? userproduct.size_id.name : "",
+      price: (typeof userproduct.price != "undefined") ? userproduct.price : "",
+      offer_price: (typeof userproduct.offer_price != "undefined") ? userproduct.offer_price : "",
+      percentage: (typeof userproduct.percentage != "undefined") ? userproduct.percentage : "",
+      status: (typeof userproduct.status != "undefined") ? userproduct.status : "",
+      flag: (typeof userproduct.flag != "undefined") ? userproduct.flag : "",
+      approval_status: (typeof userproduct.approval_status != "undefined") ? userproduct.approval_status : "",
+      added_dtime: (typeof userproduct.added_dtime != "undefined") ? userproduct.added_dtime : "",
+      __v: (typeof userproduct.__v != "undefined") ? userproduct.__v : "",
+      product_images: productImages,
+      status_name: productCondition.name
+    };
+    formattedUserProducts.push(formattedUserProduct);
+  }
+  const totalPages = Math.ceil(totalProduct / pageSize);
+  const userProductsCount = formattedUserProducts.length;
+  if (formattedUserProducts.length > 0) {
+    return res.json({
+      status: 'success',
+      message: 'Success search result',
+      respdata: formattedUserProducts,
+      productCount: userProductsCount,
+      totalPages: totalPages,
+      currentPage: page,
+      pageSize: pageSize,
+      webUrl: 'user-filter',
+      websiteUrl: process.env.SITE_URL,
+      totalProduct: totalProduct
     });
   } else {
     res.status(200).json({
@@ -893,10 +1193,8 @@ exports.getUserLogin = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   const { email, password } = req.body;
-
   Users.findOne({ email }).then(async (user) => {
     if (!user)
       res.status(404).json({
@@ -910,7 +1208,6 @@ exports.getUserLogin = async function (req, res, next) {
         host: req.get("host"),
       });
       req.app.locals.requrl = requrl;
-
       bcrypt.compare(password, user.password, async (error, match) => {
         if (error) {
           res.status(400).json({
@@ -919,11 +1216,6 @@ exports.getUserLogin = async function (req, res, next) {
             respdata: error,
           });
         } else if (match) {
-
-          // user.deviceid = deviceid;
-          // user.devicename = devicename;
-          // user.fcm_token = fcm_token;
-
           user.save(async (err) => {
             if (err) {
               res.status(400).json({
@@ -933,7 +1225,7 @@ exports.getUserLogin = async function (req, res, next) {
               });
             } else {
               const mailData = {
-                from: smtpUser,
+                from: "Bid For Sale! <" + smtpUser + ">",
                 to: user.email,
                 subject: "BFS - Bid For Sale  - Welcome Email",
                 text: "Server Email!",
@@ -942,30 +1234,13 @@ exports.getUserLogin = async function (req, res, next) {
                   user.name +
                   ", <br> <p>Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items </p>",
               };
-
               transporter.sendMail(mailData, function (err, info) {
-                if (err) console.log(err);
-                else console.log(info);
+                // if (err) console.log(err);
+                // else console.log(info);
               });
-
-              // const msg = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
-
-              const whatsappMessage = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
-              const userPhoneNo = "+917044289770";
-
-              twilioClient.messages.create({
-                body: whatsappMessage,
-                // From: 'whatsapp:+12565734549',
-                // to: 'whatsapp:+918116730275'
-                from: 'whatsapp:+14155238886',
-                to: 'whatsapp:+917044289770'
-              })
-                .then((message) => {
-                  console.log(`WhatsApp message sent with SID: ${message.sid}`);
-                })
-                .catch((error) => {
-                  console.error(`Error sending WhatsApp message: ${error.message}`);
-                });
+              const message = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
+              const to_number = "91" + user.phone_no;
+              let response = await send_message({ type: 'text', message, to_number });
               const userToken = {
                 userId: user._id,
                 email: user.email,
@@ -983,9 +1258,7 @@ exports.getUserLogin = async function (req, res, next) {
                 goal: user.goal,
                 hear_from: user.hear_from,
               };
-
               //delete req.session.user;
-
               req.session.user = {
                 userId: user._id,
                 email: user.email,
@@ -994,7 +1267,6 @@ exports.getUserLogin = async function (req, res, next) {
                 name: user.name,
                 age: user.age,
                 image: user.image,
-                //usertoken:user.token,
                 phone_no: user.phone_no,
                 weight: user.weight,
                 height: user.height,
@@ -1010,7 +1282,6 @@ exports.getUserLogin = async function (req, res, next) {
                 { $set: { token: await generateToken(userToken), last_login: dateTime } },
                 { upsert: true },
                 function (err, doc) {
-                  console.log("err", err);
                   if (err) {
                     throw err;
                   } else {
@@ -1020,10 +1291,8 @@ exports.getUserLogin = async function (req, res, next) {
                       //   message: "Successful!",
                       //   respdata: updatedUser,
                       // });
-
                     });
-
-                    res.redirect('/api/my-account');
+                    res.redirect('/my-account');
                   }
                 }
               );
@@ -1040,31 +1309,40 @@ exports.getUserLogin = async function (req, res, next) {
     }
   });
 };
-
 exports.myAccount = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
 
     //if (userData === undefined || userData === null)
-    if (isLoggedIn == "")
-    {
-      res.redirect('/api/registration');
+    if (isLoggedIn == "") {
+      res.redirect('/registration');
     }
-    else{
+    else {
       var userData = req.session.user;
-
       const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId) });
-      res.render("webpages/myaccount", {
+
+      const html = await ejs.renderFile("views/webpages/myaccount.ejs", {
+        helper: helper,
         title: "My Account",
         message: "Welcome to the privacy policy page!",
         respdata: req.session.user,
-        respdata1:address,
+        respdata1: address,
         isLoggedIn: isLoggedIn,
-      });
-    }
+        websiteUrl: process.env.SITE_URL,
+      }, { async: true });
+      res.send(html);
 
+      // res.render("webpages/myaccount", {
+      //   helper: helper,
+      //   //async: true,
+      //   title: "My Account",
+      //   message: "Welcome to the privacy policy page!",
+      //   respdata: req.session.user,
+      //   respdata1: address,
+      //   isLoggedIn: isLoggedIn,
+      // });
+    }
   } catch (error) {
-    //console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the privacy policy.",
@@ -1072,22 +1350,20 @@ exports.myAccount = async function (req, res, next) {
     });
   }
 };
-
 exports.editProfile = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
-    //console.log('**************** HI EDIT PROFILE**************');
-    //console.log(userData);
-    //console.log("Edit profile");
+    const bankDetails = await Bankdetails.findOne({ user_id: userData.userId });
     res.render("webpages/edit-profile", {
       title: "Edit profile",
       message: "Welcome to the Edit Profile page!",
       respdata: req.session.user,
+      bankDetails: typeof bankDetails != "undefined" ? bankDetails : [],
       isLoggedIn: isLoggedIn,
+      userData: userData
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
@@ -1095,14 +1371,10 @@ exports.editProfile = async function (req, res, next) {
     });
   }
 };
-
 exports.addAddress = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
-    console.log('**************** HI EDIT Address**************');
-    console.log(userData);
-    console.log("Edit Address");
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -1111,15 +1383,8 @@ exports.addAddress = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
-
     const address = await addressBook.findOne({ user_id: userData.userId });
     var add = address;
-
-    console.log('Address....');
-    console.log(address);
-
-
-
     res.render("webpages/edit-address", {
       title: "Edit Address",
       message: "Welcome to the Edit Profile page!",
@@ -1128,7 +1393,6 @@ exports.addAddress = async function (req, res, next) {
       isLoggedIn: isLoggedIn,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
@@ -1137,6 +1401,28 @@ exports.addAddress = async function (req, res, next) {
   }
 };
 
+
+exports.thankyoupage = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    var userData = req.session.user;
+    const message = req.query.message;
+    console.log(message);
+    res.render("webpages/message", {
+      title: "Edit Address",
+      message: "Welcome to the Edit Profile page!",
+      respdata1: userData,
+      isLoggedIn: isLoggedIn,
+      message: message
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the Edit Profile.",
+      error: error.message,
+    });
+  }
+};
 exports.getParentCategories = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -1145,7 +1431,6 @@ exports.getParentCategories = async function (req, res, next) {
       message: "Welcome to the Product Categories!",
       isLoggedIn: isLoggedIn,
       //respdata: parentCategories,
-
     });
     // return res.status(200).json({
     //   status: "1",
@@ -1156,10 +1441,8 @@ exports.getParentCategories = async function (req, res, next) {
     //   title: "Product Categories",
     //   message: "Welcome to the Product Categories!",
     //   //respdata: parentCategories,
-
     // });
   } catch (error) {
-    console.error('Error fetching unique parent details:', error);
     return res.status(500).json({
       status: "0",
       message: "An error occurred while fetching unique parent details.",
@@ -1173,9 +1456,6 @@ exports.getParentCategories = async function (req, res, next) {
 exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
   try {
     const id = req.params.id;
-
-
-
     const categoriesWithMatchingParentId = await Userproduct.aggregate([
       {
         $lookup: {
@@ -1201,7 +1481,7 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
           name: { $first: '$matchedCategories.name' },
           description: { $first: '$matchedCategories.description' },
           images: { $first: '$matchedCategories.image' },
-          product_ids: { $push: '$_id' }, // Collect product IDs in an array
+          product_ids: { $push: '$_id' },
         },
       },
       {
@@ -1213,10 +1493,6 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
         },
       },
     ]);
-
-    console.log('********** Hi ****************11111');
-    console.log(categoriesWithMatchingParentId);
-
     if (!categoriesWithMatchingParentId || categoriesWithMatchingParentId.length === 0) {
       return res.status(404).json({
         status: '0',
@@ -1224,12 +1500,6 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
         respdata: {},
       });
     }
-
-    // return res.status(200).json({
-    //   status: '1',
-    //   message: 'Found!',
-    //   respdata: categoriesWithMatchingParentId,
-    // });
     res.render("webpages/productsubcategories", {
       title: "Product Sub Categories",
       message: "Welcome to the Product Sub Categories!",
@@ -1238,7 +1508,6 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
 
     });
   } catch (error) {
-    console.error('Error fetching sub categories with matching parent_id:', error);
     return res.status(500).json({
       status: '0',
       message: 'An error occurred while fetching sub categories with matching parent_id.',
@@ -1246,102 +1515,113 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
     });
   }
 };
-
-async function getProductDataWithSort(id, sortid) {
+async function getProductDataWithSort(id, sortid, page, pageSize) {
   try {
-
     let categoryId;
-
     let sortCriteria = {};
 
     if (sortid == 0) {
-      sortCriteria = { offer_price: 1 }; 
+      sortCriteria = { offer_price: 1 };
     } else if (sortid == 1) {
-      sortCriteria = { offer_price: -1 }; 
+      sortCriteria = { offer_price: -1 };
     } else {
       sortCriteria = { offer_price: 1 };
     }
 
+    const skip = (page - 1) * pageSize;
+
     let userproducts = [];
-  
+    let count = [];
     if (id === "whatshot") {
-       userproducts = await Userproduct.find({
+      userproducts = await Userproduct.find({
         approval_status: 1,
-        flag: 1
-    })
+        flag: 0
+      })
         .populate('brand_id', 'name')
         .populate('category_id', 'name')
         .populate('user_id', 'name')
         .populate('size_id', 'name')
-        .sort([
-            sortCriteria,
-            { hitCount: -1 }
-        ])
+        .sort([sortCriteria, { hitCount: -1 }])
         .exec();
-    
-  
+
+      count = await Userproduct.countDocuments({
+        approval_status: 1,
+        flag: 0
+      });
+
     } else if (id === "justsold") {
-       userproducts = await Userproduct.find({
+      userproducts = await Userproduct.find({
         approval_status: 1,
         flag: 1
-    })
+      })
         .populate('brand_id', 'name')
         .populate('category_id', 'name')
         .populate('user_id', 'name')
         .populate('size_id', 'name')
         .sort(sortCriteria)
         .exec();
-    
+
+      count = await Userproduct.countDocuments({
+        approval_status: 1,
+        flag: 1
+      });
+
     } else if (id === "bestDeal") {
-
       const appSettings = await Appsettings.findOne();
-
       const percentageFilter = parseInt(appSettings.best_deal);
-  
-       userproducts = await Userproduct.find({
+
+      userproducts = await Userproduct.find({
         percentage: { $gte: percentageFilter },
         approval_status: 1,
         flag: 0
-    })
+      })
         .populate('brand_id', 'name')
         .populate('category_id', 'name')
         .populate('user_id', 'name')
         .populate('size_id', 'name')
         .sort(sortCriteria)
         .exec();
-    
+
+      count = await Userproduct.countDocuments({
+        percentage: { $gte: percentageFilter },
+        approval_status: 1,
+        flag: 0
+      });
+
     } else {
-      categoryId = id; 
+      categoryId = id;
 
-       userproducts = await Userproduct.find({ category_id: id })
-      .populate('brand_id', 'name')
-      .populate('category_id', 'name')
-      .populate('user_id', 'name')
-      .populate('size_id', 'name')
-      .sort(sortCriteria)
-      .exec();
+      userproducts = await Userproduct.find({
+        category_id: categoryId,
+        approval_status: 1,
+        flag: 0
+      })
+        .populate('brand_id', 'name')
+        .populate('category_id', 'name')
+        .populate('user_id', 'name')
+        .populate('size_id', 'name')
+        .sort(sortCriteria)
+        .exec();
+
+      count = await Userproduct.countDocuments({
+        category_id: categoryId,
+        approval_status: 1,
+        flag: 0
+      });
     }
-
-
-
     const formattedUserProducts = [];
-
     for (const userproduct of userproducts) {
-
       const productImages = await Productimage.find({ product_id: userproduct._id });
-
       const productCondition = await Productcondition.findById(userproduct.status);
-
-
       const formattedUserProduct = {
         _id: userproduct._id,
         name: userproduct.name,
         description: userproduct.description,
-        category: userproduct.category_id.name,
-        brand: userproduct.brand_id.name,
-        user_id: userproduct.user_id._id,
-        user_name: userproduct.user_id.name,
-        size_id: userproduct.size_id.name,
+        category: userproduct.category_id ? userproduct.category_id.name : '',
+        brand: userproduct.brand_id ? userproduct.brand_id.name : '',
+        user_id: userproduct.user_id ? userproduct.user_id._id : '',
+        user_name: userproduct.user_id ? userproduct.user_id.name : '',
+        size_id: userproduct.size_id ? userproduct.size_id.name : '',
         price: userproduct.price,
         offer_price: userproduct.offer_price,
         percentage: userproduct.percentage,
@@ -1350,23 +1630,25 @@ async function getProductDataWithSort(id, sortid) {
         approval_status: userproduct.approval_status,
         added_dtime: userproduct.added_dtime,
         __v: userproduct.__v,
-        product_images: productImages,
+        product_images: (typeof productImages != "undefined") ? productImages : "",
         status_name: productCondition ? productCondition.name : '',
       };
-
       formattedUserProducts.push(formattedUserProduct);
     }
-
+    const paginatedData = formattedUserProducts.slice(skip, skip + pageSize);
+    const productCount = formattedUserProducts.length;
+    const totalPages = Math.ceil(productCount / pageSize);
+    const currentPage = parseInt(page);
     return {
       status: '1',
+      productCount: productCount,
+      totalPages: totalPages,
+      currentPage: currentPage,
+      count: count,
       message: 'Success',
-      respdata: formattedUserProducts,
-      //isLoggedIn: isLoggedIn,
+      respdata: paginatedData,
     };
-
-  }
-  catch (error) {
-    console.error('Error fetching products with matching parent_id:', error);
+  } catch (error) {
     return {
       status: '0',
       message: 'An error occurred while fetching products with matching parent_id.',
@@ -1374,84 +1656,116 @@ async function getProductDataWithSort(id, sortid) {
     };
   }
 }
-
-exports.getSubCategoriesProducts = async function (req, res, next) {
+exports.getSubCategoriesProducts = async function (page, req, res, next) {
   try {
-
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    let brandIds = [];
+    let sizeIds = [];
+    let statusIds = [];
+    let genderIds = [];
+    let brandList = [];
+    let sizeList = [];
+    let result;
+    let conditionList = [];
+    let genderList = [];
     const id = req.params.id;
-
+    const pageno = page || 1;
+    const pageSize = 8;
     const sortid = req.params.sortid || 0;
-
-    const data = await getProductDataWithSort(id, sortid);
+    const data = await getProductDataWithSort(id, sortid, pageno, pageSize);
+    const productCount = data.count;
     const formattedUserProducts = data.respdata;
-    const productCount = formattedUserProducts.length;
+    const filterproductCount = formattedUserProducts.length;
+    const totalPages = data.totalPages;
+    const currentPage = data.currentPage;
+    const categoryName = await Category.find({ _id: id }).populate('name');
+    const userProducts = await Userproduct.find({
+      category_id: id,
+      approval_status: 1,
+      flag: 0,
+    })
+      .select('brand_id size_id status');
+    if (userProducts.length > 0) {
+      result = await Userproduct.aggregate([
+        {
+          $match: {
+            category_id: mongoose.Types.ObjectId(id),
+            approval_status: 1,
+            flag: 0
+          }
+        },
+        {
+          $group: {
+            _id: id,
+            maxPrice: { $max: "$offer_price" },
+            minPrice: { $min: "$offer_price" }
+          }
+        }
+      ]);
+      brandIds = userProducts.map(product => product.brand_id).filter(Boolean);
+      sizeIds = userProducts.map(product => product.size_id).filter(Boolean);
+      statusIds = userProducts.map(product => product.status).filter(Boolean);
+      genderIds = userProducts.map(product => product.gender_id).filter(Boolean);
+      brandList = await brandModel.find({ _id: { $in: brandIds } });
+      sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
+      conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
+      genderList = await Gender.find({ _id: { $in: genderIds } });
+      // genderIds = userProducts.map(product => product.gender_id).filter(Boolean);
+      // genderList = await Gender.find({ _id: { $in: genderIds } });
+    }
 
-    const categoryName = await Category.find({ _id: id}).populate('name');
-    
-    //Get All Filter Data
-    //Brand List
-    const brandList = await brandModel.find({});
-    const sizeList = await sizeModel.find({});
-    const conditionList = await productconditionModel.find({});
-
-
-    res.render("webpages/subcategoryproduct",
-      {
-        title: "Product Sub Categories",
-        message: "Welcome to the Product Sub Categories!",
-        respdata: formattedUserProducts,
-        product_category_id: id,
-        brandList: brandList,
-        sizeList: sizeList,
-        categoryName:categoryName,
-        conditionList: conditionList,
-        productCount:productCount,
-        isLoggedIn: isLoggedIn
-
-      });
-
+    res.render("webpages/subcategoryproduct", {
+      title: "Product Sub Categories",
+      message: "Welcome to the Product Sub Categories!",
+      websiteUrl: process.env.SITE_URL,
+      isLoggedIn: isLoggedIn,
+      categoryName: categoryName,
+      brandList: typeof brandList != "undefined" ? brandList : [],
+      sizeList: typeof sizeList != "undefined" ? sizeList : [],
+      conditionList: typeof conditionList != "undefined" ? conditionList : [],
+      genderList: typeof genderList != "undefined" ? genderList : [],
+      maxvalue: typeof result != "undefined" ? result[0].maxPrice : "0",
+      minvalue: typeof result != "undefined" ? result[0].minPrice : "0",
+      filterproductCount: typeof filterproductCount != "undefined" ? filterproductCount : "0",
+      productCount: typeof productCount != "undefined" ? productCount : "",
+      respdata: typeof formattedUserProducts != "undefined" ? formattedUserProducts : "",
+      product_category_id: id,
+      totalPages: totalPages,
+      currentPage: currentPage,
+      pageSize: pageSize,
+    });
 
   }
   catch (error) {
-    console.error('Error fetching products with matching parent_id:', error);
-    return res.status(500).json({
+    return {
       status: '0',
       message: 'An error occurred while fetching products with matching parent_id.',
       error: error.message,
-    });
+    };
   }
 };
-
-
-exports.getSubCategoriesProductswithSort = async function (req, res, next) {
+exports.getSubCategoriesProductswithSort = async function (page, req, res, next) {
 
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   const id = req.params.id;
-
   const sortid = req.params.sortid || 0;
-
-
-  const data = await getProductDataWithSort(id, sortid);
+  const pageno = page || 1;
+  const pageSize = 8;
+  const data = await getProductDataWithSort(id, sortid, pageno, pageSize);
   const formattedUserProducts = data.respdata;
   const productCount = formattedUserProducts.length;
-
-console.log(productCount);
-console.log("product changes");
   return res.json({
     status: '1',
     message: 'Success',
+    websiteUrl: process.env.SITE_URL,
     respdata: formattedUserProducts,
-    productCount:productCount,
+    productCount: productCount,
     isLoggedIn: isLoggedIn
   });
 
 };
-
-
 exports.userUpdate = async function (req, res, next) {
   try {
-
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -1470,20 +1784,17 @@ exports.userUpdate = async function (req, res, next) {
         respdata: {},
       });
     }
-
     const updData = {
       name: req.body.name,
       email: req.body.email,
       phone_no: req.body.phone_no,
       created_dtime: dateTime,
     };
-
     const updatedUser = await Users.findOneAndUpdate(
       { _id: user._id },
       { $set: updData },
-      { upsert: true, new: true } // Use new: true to get the updated document
+      { upsert: true, new: true }
     );
-
     if (!updatedUser) {
       return res.status(500).json({
         status: "0",
@@ -1491,21 +1802,26 @@ exports.userUpdate = async function (req, res, next) {
         respdata: {},
       });
     }
-
+    // const imgData = req.files;
+    // const uploadedFile = req.files[0];
+    // const imagePath = uploadedFile.path;
+    const bankDetails = new Bankdetails({
+      user_id: user._id,
+      accountnumber: req.body.accountnumber,
+      bankname: req.body.bankname,
+      ifsccode: req.body.ifsccode,
+      accounttype: req.body.accounttype,
+      upiid: req.body.upiid,
+      // upiid_scaner: imagePath || '',
+      default_status: 1,
+      created_dtime: new Date().toISOString(),
+    });
+    const savedBankDetails = await bankDetails.save();
     req.session.user.name = updatedUser.name;
     req.session.user.email = updatedUser.email;
     req.session.user.phone_no = updatedUser.phone_no;
-
-    res.redirect("/api/my-account");
-
-    // res.status(200).json({
-    //   status: "1",
-    //   message: "Successfully updated!",
-    //   respdata: updatedUser,
-    // });
-
+    res.redirect("/my-account");
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
@@ -1513,12 +1829,10 @@ exports.userUpdate = async function (req, res, next) {
     });
   }
 };
-
-// user checkout address add
 exports.userNewCheckOutAddressAdd = async function (req, res, next) {
-  try{
-    
-    const addr_name = req.body.addrType;
+  try {
+    //const addr_name = req.body.addrType;
+    const addr_name = req.body.addr_type;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -1528,7 +1842,7 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
       });
     }
     const newAddress = new addressBook({
-      user_id: req.body.userId ? req.body.userId:req.session.user.userId,
+      user_id: req.body.userId ? req.body.userId : req.session.user.userId,
       street_name: req.body.address2,
       address1: req.body.address1,
       landmark: req.body.landmark,
@@ -1541,16 +1855,12 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
       flag: req.body.flag,
       created_dtime: dateTime,
     });
-    
     const savedAddress = await newAddress.save();
     const user = await Users.findById(newAddress.user_id);
-    console.log("###########hgfhfhfhfh######################");
-    console.log(user);
     const randomSuffix = Math.floor(Math.random() * 1000);
     const pickupLocation = savedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;
-    
     const PickupData = {
-     pickup_location: pickupLocation,
+      pickup_location: pickupLocation,
       name: user.name,
       email: user.email,
       phone: user.phone_no,
@@ -1562,16 +1872,14 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
       pin_code: savedAddress.pin_code
     };
     const shiprocketResponse = await generateSellerPickup(PickupData);
-
     if (shiprocketResponse) {
       savedAddress.shiprocket_address = pickupLocation;
       savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
       await savedAddress.save();
-      res.redirect('/api/checkout-web');
-    }    
-
+      res.redirect('/checkout-web');
+    }
   } catch (error) {
-    console.error(error);
+    console.log(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
@@ -1581,14 +1889,10 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
 
 };
 
-
-
-
 exports.userAddressAdd = async function (req, res, next) {
   try {
-    
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const addr_name = req.body.addrType;
-    //const address = await addressBook.findOne({ _id: req.params.id });
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -1597,7 +1901,6 @@ exports.userAddressAdd = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
-
     const newAddress = new addressBook({
       user_id: req.body.userId,
       street_name: req.body.address2,
@@ -1612,12 +1915,10 @@ exports.userAddressAdd = async function (req, res, next) {
       flag: req.body.flag,
       created_dtime: dateTime,
     });
-
     const savedAddress = await newAddress.save();
     const user = await Users.findById(newAddress.user_id);
     const randomSuffix = Math.floor(Math.random() * 1000);
     const pickupLocation = savedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;
-
     const PickupData = {
       pickup_location: pickupLocation,
       name: user.name,
@@ -1631,15 +1932,13 @@ exports.userAddressAdd = async function (req, res, next) {
       pin_code: savedAddress.pin_code
     };
     const shiprocketResponse = await generateSellerPickup(PickupData);
-
     if (shiprocketResponse) {
       savedAddress.shiprocket_address = pickupLocation;
       savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
       await savedAddress.save();
-      res.redirect('/api/my-account');
+      res.redirect('/my-account');
     }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
@@ -1648,6 +1947,113 @@ exports.userAddressAdd = async function (req, res, next) {
   }
 };
 
+
+exports.updateuserAddressAdd = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    addbook_id = req.body.addressid;
+    const updatedAddress = await addressBook.findOneAndUpdate(
+      { _id: addbook_id },
+      { $set: { default_status: 1 } },
+      { new: true }
+    );
+    const addr_name = req.body.addrType;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        status: "0",
+        message: "Validation error!",
+        respdata: errors.array(),
+      });
+    }
+    const newAddress = new addressBook({
+      user_id: req.body.userId,
+      street_name: req.body.address2,
+      address1: req.body.address1,
+      landmark: req.body.landmark,
+      city_name: req.body.city_name,
+      city_code: req.body.city_code,
+      state_name: req.body.state_name,
+      state_code: req.body.state_code,
+      pin_code: req.body.pin_code,
+      address_name: addr_name,
+      flag: req.body.flag,
+      created_dtime: dateTime,
+    });
+    const savedAddress = await newAddress.save();
+    const user = await Users.findById(newAddress.user_id);
+    const randomSuffix = Math.floor(Math.random() * 1000);
+    const pickupLocation = savedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;
+    const PickupData = {
+      pickup_location: pickupLocation,
+      name: user.name,
+      email: user.email,
+      phone: user.phone_no,
+      address: savedAddress.street_name + ',' + savedAddress.address1,
+      address_2: savedAddress.landmark,
+      city: savedAddress.city_name,
+      state: savedAddress.state_name,
+      country: "India",
+      pin_code: savedAddress.pin_code
+    };
+    const shiprocketResponse = await generateSellerPickup(PickupData);
+    if (shiprocketResponse) {
+      savedAddress.shiprocket_address = pickupLocation;
+      savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
+      await savedAddress.save();
+      res.redirect('/my-account');
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the Edit Profile.",
+      error: error.message,
+    });
+  }
+};
+
+exports.getAddressdetails = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    var userData = req.session.user;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        status: "0",
+        message: "Validation error!",
+        respdata: errors.array(),
+      });
+    }
+    addbook_id = req.params.id;
+    const address = await addressBook.findById(addbook_id);
+    if (!address) {
+      return res.status(404).json({
+        status: "0",
+        message: "Address not found!",
+        respdata: {},
+      });
+    }
+    res.render("webpages/update-address", {
+      title: "My Account",
+      message: "Address fetched successfully!",
+      respdata: req.session.user,
+      respdata1: userData,
+      address: address,
+      isLoggedIn: isLoggedIn,
+    });
+    // res.status(200).json({
+    //   status: "1",
+    //   message: "Address fetched successfully!",
+    //   respdata: address,
+    // });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "Error!",
+      respdata: error.message,
+    });
+  }
+};
 exports.deleteUserAddress = async function (req, res, next) {
   try {
     addbook_id = req.params.id;
@@ -1663,9 +2069,8 @@ exports.deleteUserAddress = async function (req, res, next) {
         respdata: {},
       });
     }
-    res.redirect('/api/my-account');
+    res.redirect('/my-account');
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
@@ -1673,10 +2078,7 @@ exports.deleteUserAddress = async function (req, res, next) {
     });
   }
 };
-
-// My Post
 exports.userWisePost = async function (req, res, next) {
-
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -1686,7 +2088,6 @@ exports.userWisePost = async function (req, res, next) {
     });
   }
   try {
-
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
     const userproducts = await Userproduct.find({ user_id: req.params.id })
@@ -1695,22 +2096,16 @@ exports.userWisePost = async function (req, res, next) {
       .populate('user_id', 'name', { optional: true })
       .populate('size_id', 'name', { optional: true })
       .exec();
-
     const formattedUserProducts = [];
-
     for (const userproduct of userproducts) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
-
       const formattedUserProduct = {
         _id: userproduct._id,
         name: userproduct.name,
         description: userproduct.description,
-        //category: userproduct.category_id.name, 
         brand: userproduct.brand_id ? userproduct.brand_id.name : '',
-        //brand_id: userproduct.brand_id._id, 
         user_id: userproduct.user_id._id,
         user_name: userproduct.user_id.name,
-        //size: userproduct.size_id.name,
         size_id: userproduct.size_id ? userproduct.size_id.name : '',
         price: userproduct.price,
         offer_price: userproduct.offer_price,
@@ -1724,10 +2119,8 @@ exports.userWisePost = async function (req, res, next) {
         __v: userproduct.__v,
         product_images: productImages,
       };
-
       formattedUserProducts.push(formattedUserProduct);
     }
-
     if (formattedUserProducts) {
       res.render("webpages/mypost", {
         title: "My Post",
@@ -1735,11 +2128,10 @@ exports.userWisePost = async function (req, res, next) {
         respdata: formattedUserProducts,
         userData: req.session.user,
         isLoggedIn: isLoggedIn,
+        websiteUrl: process.env.SITE_URL,
       });
     }
-
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
@@ -1751,38 +2143,31 @@ exports.userWisePost = async function (req, res, next) {
 exports.addPostView = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-    //console.log('Add User Post');
-
     if (isLoggedIn == "") {
-      res.redirect("/api/registration");
+      res.redirect("/registration");
     }
     const productConditions = await Productcondition.find();
-
     const parentCategoryId = "650444488501422c8bf24bdb";
     const categoriesWithoutParentId = await Category.find({ parent_id: { $ne: parentCategoryId } });
-
+    const genderList = await Gender.find();
     res.render("webpages/addmypost", {
       title: "My Account",
       message: "Welcome to the Add Post page!",
       respdata: req.session.user,
       productcondition: productConditions,
       subcate: categoriesWithoutParentId,
+      genderList: genderList,
       isLoggedIn: isLoggedIn,
-
+      websiteUrl: process.env.SITE_URL,
     });
-
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
       error: error.message,
     });
   }
-
 };
-
-// New Post Add
 exports.addNewPost = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -1792,36 +2177,28 @@ exports.addNewPost = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   try {
-
-    const existingProduct = await Userproduct.findOne({ name: req.body.name });
-
-    if (existingProduct) {
-      return res.status(404).json({
-        status: "0",
-        message: "Product already exists!",
-        respdata: {},
-      });
-    }
-
     let invoice;
     let packaging;
-
+    let gender;
     if (req.body.original_invoice == 'on' || req.body.original_invoice != '') {
       invoice = '1';
     }
     else {
       invoice = '0';
     }
-
     if (req.body.original_packaging == 'on' || req.body.original_packaging != '') {
       packaging = '1';
     }
     else {
       packaging = '0';
     }
-
+    if (req.body.gender) {
+      gender = req.body.gender;
+    }
+    else {
+      gender = '';
+    }
     const newProduct = new Userproduct({
       category: req.body.product_cate,
       user_id: req.session.user.userId,
@@ -1840,63 +2217,246 @@ exports.addNewPost = async function (req, res, next) {
       percentage: req.body.percentage,
       original_invoice: invoice,
       original_packaging: packaging,
+      gender_id: gender,
       added_dtime: moment().tz('Asia/Kolkata').format("YYYY-MM-DD HH:mm:ss"),
     });
-
     const savedProductdata = await newProduct.save();
-
     const requrl = url.format({
       protocol: req.protocol,
       host: req.get("host"),
     });
-
     const imageUrls = [];
     if (req.files && req.files.length > 0) {
       const imageDetails = [];
-
       req.files.forEach(async (file) => {
-        const imageUrl = requrl + "/public/images/" + file.filename;
-
+        const imageUrl = file.filename;
+        let extension = path.extname(imageUrl);
+        if (typeof extension != "undefined" && extension != "webp" && extension != "WEBP") {
+          await CompressImage("./public/images/" + imageUrl, "./public/compress_images/");
+        } else {
+          await fs.copyFile("./public/images/" + imageUrl, "./public/compress_images/" + imageUrl, (err) => {
+            if (err) {
+            } else {
+            }
+          });
+        }
         const productimageDetail = new Productimage({
           product_id: savedProductdata._id,
-          //category_id: req.body.product_cate,
           user_id: req.session.user.userId,
-          //brand: brand,
           image: imageUrl,
           added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
         });
-
         const savedImage = productimageDetail.save();
-        console.log(savedImage);
       });
-
-      // res.status(200).json({
-      //   status: "1",
-      //   status: "1",
-      //   message: "Product and images added!",
-      //   respdata: savedProductdata
-      // });
     }
-    res.redirect('/api/my-account');
-
-
-
+    res.redirect('/add-post');
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Add Post.",
       error: error.message,
     });
   }
-
 };
 
+exports.editUserWisePost = async function (req, res, next) {
+
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+
+    const productConditions = await Productcondition.find();
+
+    const parentCategoryId = "650444488501422c8bf24bdb";
+    const categoriesWithoutParentId = await Category.find({ parent_id: { $ne: parentCategoryId } });
+    const brands = await Brand.find({ status: 1 });
+    const productsize = await Size.find();
+
+    const productId = req.params.id;
+    const product = await Userproduct.findById(productId);
+    const genderList = await Gender.find();
+
+    if (!product) {
+      return res.status(404).json({
+        status: "0",
+        message: "Product not found!",
+        respdata: {},
+      });
+    }
+
+    const productImages = await Productimage.find({ product_id: req.params.id });
+
+    const productDetails = {
+      ...product.toObject(),
+      images: productImages,
+    };
+
+    res.render("webpages/editmypost", {
+      title: "My Post",
+      message: "Welcome to the My Post page!",
+      respdata: productDetails,
+      userData: req.session.user,
+      productcondition: productConditions,
+      subcate: categoriesWithoutParentId,
+      productId: productId,
+      brands: brands,
+      productsize: productsize,
+      genderList: genderList,
+      isLoggedIn: isLoggedIn,
+      websiteUrl: process.env.SITE_URL,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the Edit Profile.",
+      error: error.message,
+    });
+  }
+};
+exports.updatePostData = async function (req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: "0",
+      message: "Validation error!",
+      respdata: errors.array(),
+    });
+  }
+  try {
+    const productId = req.body.productid;
+    const existingProduct = await Userproduct.findById(productId);
+    if (!existingProduct) {
+      return res.status(404).json({
+        status: "0",
+        message: "Product not found!",
+        respdata: {},
+      });
+    }
+    existingProduct.category_id = req.body.category_id || existingProduct.category_id;
+    existingProduct.user_id = req.body.user_id || existingProduct.user_id;
+    if (req.body.brand) {
+      existingProduct.brand = ((req.body.brand || existingProduct.brand) ?? null);
+    }
+    if (req.body.size) {
+      existingProduct.size = ((req.body.size || existingProduct.size) ?? null);
+    }
+    existingProduct.brand_id = ((req.body.brand_id || existingProduct.brand_id) ?? null);
+    existingProduct.size_id = ((req.body.size_id || existingProduct.size_id) ?? null);
+    existingProduct.name = req.body.name || existingProduct.name;
+    existingProduct.description = req.body.description || existingProduct.description;
+    existingProduct.status = req.body.status || existingProduct.status;
+    existingProduct.price = req.body.price || existingProduct.price;
+    existingProduct.offer_price = req.body.offer_price || existingProduct.offer_price;
+    existingProduct.percentage = req.body.percentage || existingProduct.percentage;
+    existingProduct.gender_id = req.body.gender || existingProduct.gender_id;
+    const newProduct = new Userproduct({
+      category_id: req.body.category_id,
+      user_id: req.body.user_id,
+      brand: req.body.brand,
+      size: req.body.size,
+      name: req.body.name,
+      description: req.body.description,
+      status: req.body.status,
+      price: req.body.price,
+      offer_price: req.body.offerprice,
+      reseller_price: req.body.reseller_price,
+      percentage: req.body.percentage,
+      original_invoice: req.body.original_invoice,
+      original_packaging: req.body.original_packaging,
+      added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
+    });
+    existingProduct.updated_dtime = moment().format("YYYY-MM-DD HH:mm:ss");
+    // if (req.files && req.files.length > 0) {
+
+    //   // await Productimage.deleteMany({ product_id: existingProduct._id });
+
+    //   const imageUrls = [];
+    //   const requrl = url.format({
+    //     protocol: req.protocol,
+    //     host: req.get("host"),
+    //   });
+
+    //   for (const file of req.files) {
+    //     const imageUrl = requrl + "/public/images/" + file.filename;
+
+    //     const productImageDetail = new Productimage({
+    //       product_id: existingProduct._id,
+    //       category_id: existingProduct.category_id,
+    //       user_id: existingProduct.user_id,
+    //       brand_id: existingProduct.brand_id,
+    //       image: imageUrl,
+    //       added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
+    //     });
+
+    //     const savedImage = await productImageDetail.save();
+    //   }
+    // }
+
+    const previousImages = await Productimage.find({ product_id: existingProduct._id });
+    //for (const image of previousImages) {
+    //  const imagePath = path.resolve(__dirname,'../../../public/compress_images/'+image.image);
+    //  const imagePathreal = path.resolve(__dirname,'../../../public/images/'+image.image);
+    //     if (fs.existsSync(imagePath)) {
+    //         fs.unlinkSync(imagePath);
+    //     }
+    //     if (fs.existsSync(imagePathreal)) {
+    //         fs.unlinkSync(imagePathreal);
+    //     }
+    //   await Productimage.findByIdAndDelete(image._id);
+    // }
+
+    if (req.files && Object.keys(req.files).length > 0) {
+      const requrl = url.format({
+        protocol: req.protocol,
+        host: req.get("host"),
+      });
+      for (const fieldName in req.files) {
+        const files = req.files[fieldName];
+        for (const file of files) {
+          const imageUrl = file.filename;
+          let extension = path.extname(imageUrl);
+          if (typeof extension != "undefined" && extension != "webp" && extension != "WEBP") {
+            await CompressImage("./public/images/" + imageUrl, "./public/compress_images/");
+          }
+          else {
+            await fs.copyFile("./public/images/" + imageUrl, "./public/compress_images/" + imageUrl, (err) => {
+              if (err) {
+              }
+              else { 
+              }
+            });
+          }
+          const productImageDetail = new Productimage({
+            product_id: existingProduct._id,
+            category_id: existingProduct.category_id,
+            user_id: existingProduct.user_id,
+            brand_id: existingProduct.brand_id,
+            image: imageUrl,
+            added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
+          });
+          await productImageDetail.save();
+        }
+      }
+    }
+    const updatedProduct = await existingProduct.save();
+    const productImages = await Productimage.find({ product_id: updatedProduct._id });
+    const productDetails = {
+      ...updatedProduct.toObject(),
+      images: productImages,
+    };
+    res.redirect('/edit-mypost/'+productId);
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the Add Post.",
+      error: error.message,
+    });
+  }
+};
 
 exports.signOut = async function (req, res, next) {
   //const banner = await Banner.find({ status: 1 });
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-  if(isLoggedIn != ''){
+  if (isLoggedIn != '') {
     Users.findOne({ _id: req.session.user.userId }).then((user) => {
       if (!user)
         res.status(404).json({
@@ -1919,18 +2479,16 @@ exports.signOut = async function (req, res, next) {
             } else {
               req.session.destroy((err) => {
                 if (err) {
-                  console.error('Error destroying session:', err);
                   res.status(500).json({
                     status: "error",
                     message: "Error logging out",
                     respdata: {},
                   });
                 }
-
                 res.status(200).json({
-                    status: "success",                 
-                    message: "Sign out!",
-              });
+                  status: "success",
+                  message: "Sign out!",
+                });
                 // Session destroyed, redirect or render logout success message
                 // res.render("webpages/list", {
                 //   title: "Wish List Page",
@@ -1945,84 +2503,15 @@ exports.signOut = async function (req, res, next) {
       }
     });
   }
-  else
-  {
+  else {
     res.status(200).json({
       status: "error",
       message: "Unable to logout at this moment.",
-     
+
     });
   }
 };
 
-
-
-// // User wise Post edit
-exports.editUserWisePost = async function (req, res, next) {
-
-  try {
-    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-
-    const productConditions = await Productcondition.find();
-
-    const parentCategoryId = "650444488501422c8bf24bdb";
-    const categoriesWithoutParentId = await Category.find({ parent_id: { $ne: parentCategoryId } });
-
-    //console.log('Product Category');
-    //console.log(categoriesWithoutParentId);
-
-
-    const product = await Userproduct.findById(req.params.id);
-
-    if (!product) {
-      return res.status(404).json({
-        status: "0",
-        message: "Product not found!",
-        respdata: {},
-      });
-    }
-
-    //  console.log('Product');
-    //  console.log(product);
-
-    const productImages = await Productimage.find({ product_id: req.params.id });
-
-    const productDetails = {
-      ...product.toObject(),
-      images: productImages,
-    };
-
-    console.log('Formated_User_Products');
-    console.log(productDetails);
-
-
-    // if(formattedUserProducts)
-    // {
-    res.render("webpages/editmypost", {
-      title: "My Post",
-      message: "Welcome to the My Post page!",
-      respdata: productDetails,
-      //productimg: productImg, 
-      userData: req.session.user,
-      productcondition: productConditions,
-      subcate: categoriesWithoutParentId,
-      isLoggedIn: isLoggedIn,
-    });
-    // }
-
-
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      status: "0",
-      message: "An error occurred while rendering the Edit Profile.",
-      error: error.message,
-    });
-  }
-};
-
-// For Wishlist
 exports.addToWishlistWeb = async function (req, res, next) {
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   const errors = validationResult(req);
@@ -2040,7 +2529,7 @@ exports.addToWishlistWeb = async function (req, res, next) {
     const existingList = await Wishlist.findOne({ user_id, product_id, status: 0 });
     if (existingList) {
       return res.status(200).json({
-        message: 'Item already added to your favorite successfully',
+        message: 'The product has been already added to your wishlist.',
         wishlist: existingList,
         success: true,
         is_wishlisted: true
@@ -2055,19 +2544,26 @@ exports.addToWishlistWeb = async function (req, res, next) {
         status,
         added_dtime: new Date(),
       });
-
       const savedFavData = await newFavList.save();
 
+      const requestUrl = process.env.SITE_URL + "/show-wishlist-details";
+
+      await insertNotification(
+        'Item added to the wishlist',
+        `Item ${product.name} has been added to your wishlist`,
+        user_id,
+        requestUrl,
+        new Date()
+      );
+
       return res.status(200).json({
-        message: 'Item added to your wishlist successfully',
+        message: 'The product has been added to your wishlist',
         success: true,
         is_wishlisted: true
       });
     }
-
   }
   catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       success: false,
@@ -2077,20 +2573,18 @@ exports.addToWishlistWeb = async function (req, res, next) {
     });
   }
 };
-
 exports.viewWishListByUserId = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-    if (!req.session.user) {
-      return res.redirect("/api/registration");
+
+    if (isLoggedIn == "") {
+      return res.redirect("/registration");
     }
 
     const user_id = req.session.user.userId;
     const existingList = await Wishlist.find({ user_id: isLoggedIn })
       .populate('user_id', 'name')
       .exec();
-
-    console.log(existingList);
 
     if (existingList.length === 0) {
       res.render("webpages/wishlist", {
@@ -2099,46 +2593,42 @@ exports.viewWishListByUserId = async function (req, res, next) {
         respdata: [],
         isLoggedIn: isLoggedIn,
         itemCount: 0,
+        websiteUrl: process.env.SITE_URL,
       });
     } else {
       const formattedList = await Promise.all(existingList.map(async (item) => {
-        console.log(item.product_id);
         const product = await Userproduct.findOne({ _id: item.product_id }).populate('category_id', 'name');
-
-
-        console.log(product);
-        const productImages = await Productimage.find({ product_id: item.product_id }).limit(1);
-
-        const date = moment(item.added_dtime);
-        const addedDate = date.format('DD/MM/YYYY');
-
-        return {
-          _id: item._id,
-          user_id: item.user_id._id,
-          user_name: item.user_id.name,
-          product_id: item.product_id,
-          product_name: product.name,
-          product_price: product.price,
-          category_name: product.category_id.name,
-          images: productImages[0].image,
-          status: item.status,
-          added_dtime: addedDate,
-          __v: item.__v,
-        };
+        if (product) {
+          const productImages = await Productimage.find({ product_id: item.product_id }).limit(1);
+          const date = moment(item.added_dtime, 'YYYY-MM-DDTHH:mm:ssZ');
+          const addedDate = date.format('DD/MM/YYYY');
+          const category_name = product.category_id ? product.category_id.name : 'Uncategorized';
+          return {
+            _id: item._id,
+            user_id: item.user_id._id,
+            user_name: item.user_id.name,
+            product_id: item.product_id,
+            product_name: product.name,
+            product_price: product.price,
+            category_name: product.category_id ? product.category_id.name : '',
+            images: productImages[0].image,
+            status: item.status,
+            added_dtime: addedDate,
+            __v: item.__v,
+          };
+        }
       }));
-
       const count = formattedList.length;
-
       res.render("webpages/wishlist", {
         title: "Wish List Page",
         message: "Welcome to the Wish List page!",
         respdata: formattedList,
         isLoggedIn: isLoggedIn,
         itemCount: formattedList.length,
+        websiteUrl: process.env.SITE_URL,
       });
     }
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering Wishlist Listing Page.",
@@ -2146,18 +2636,12 @@ exports.viewWishListByUserId = async function (req, res, next) {
     });
   }
 };
-
-
-
 exports.removeWishlistWeb = async (req, res) => {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const product_id = req.params.id;
     const user_id = req.session.user.userId;
     const existingList = await Wishlist.findOne({ user_id, product_id });
-
-    console.log(existingList);
-    console.log(existingList);
     if (Object.keys(existingList).length == 0) {
       return res.status(404).json({
         message: 'Product is not found in the Wishlist',
@@ -2169,14 +2653,13 @@ exports.removeWishlistWeb = async (req, res) => {
       await existingList.remove();
       const count = await Wishlist.countDocuments({ user_id });
       return res.status(200).json({
-        message: 'Product removed from Wishlist successfully',
+        message: 'The product has been removed from your wishlist',
         success: true,
         count: count
       });
     }
   }
   catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       success: false,
@@ -2190,15 +2673,11 @@ exports.removeWishlistWeb = async (req, res) => {
 
 exports.addToCart = async function (req, res, next) {
   try {
-
     var userData = req.session.user;
     var qty = '1';
-
     const product_id = req.params.id;
     const user_id = req.session.user.userId;
-
     const existingCart = await Cart.findOne({ user_id: user_id, status: 0 });
-
     if (existingCart) {
       const existingCartItem = await CartDetail.findOne({
         cart_id: existingCart._id
@@ -2239,29 +2718,21 @@ exports.addToCart = async function (req, res, next) {
         added_dtime: existingCart.added_dtime,
         __v: existingCart.__v,
       };
-
-
       setTimeout(() => {
-        removeItemAfterTime(existingCart._id); // savedata._id contains the ID of the added item
+        removeItemAfterTime(existingCart._id);
       }, 20 * 60 * 1000);
-
       return res.status(200).json({
         message: 'Item Added to Cart',
         cart: cartResponse,
       });
-
     }
     else {
-
-      console.log("NEW..###############");
       const newCart = new Cart({
         user_id,
         status: 0,
         added_dtime: dateTime,
       });
-
       const savedCart = await newCart.save();
-
       const cartDetail = new CartDetail({
         cart_id: savedCart._id,
         product_id,
@@ -2270,15 +2741,10 @@ exports.addToCart = async function (req, res, next) {
         status: 0,
         added_dtime: dateTime,
       });
-
       const savedata = await cartDetail.save();
-
-      // Cart Count
       var cartCount = await Cart.countDocuments({ user_id: savedCart.user_id });
-
       const user = await Users.findById(user_id);
       const product = await Userproduct.findById(product_id);
-
       const cartResponse = {
         _id: savedCart._id,
         user_id: savedCart.user_id,
@@ -2291,82 +2757,47 @@ exports.addToCart = async function (req, res, next) {
         added_dtime: savedCart.added_dtime,
         __v: savedCart.__v,
       };
-
       const cartRemove = await Cartremove.findOne({}, { name: 1, _id: 0 });
-
-      const durationInSeconds = cartRemove.name; // Assuming 'name' holds a duration in seconds
-
-
+      const durationInSeconds = cartRemove.name;
       const durationInMilliseconds = durationInSeconds * 60 * 1000;
-      console.log("removal time");
-      console.log(durationInSeconds);
-
       setTimeout(() => {
-        removeItemAfterTime(savedCart._id); // savedata._id contains the ID of the added item
-        //console.log('welcome');
+        removeItemAfterTime(savedCart._id);
       }, durationInMilliseconds);
-
-      // Convert duration from seconds to milliseconds
-
-
-      console.log("removal time in miliseond");
-      console.log(durationInMilliseconds);
-
-
-      // render after success 
-
       res.status(200).json({
         cart_count: cartCount,
         message: 'Item Added to Cart',
         cart: cartResponse,
         is_added: true
       });
-
-
     }
-
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
       error: error.message,
     });
   }
-
 };
 
 const removeItemAfterTime = async (cartId) => {
-  console.log('hi' + cartId)
   try {
-    console.log("Timer expired for cart:", cartId);
-
     await Cart.findByIdAndDelete(cartId);
-    // Perform logic to remove items from the cart after 1 minute (for testing purposes)
     const cartItems = await CartDetail.find({ cart_id: cartId, status: 0 });
-
     for (const cartItem of cartItems) {
       await CartDetail.findByIdAndDelete(cartItem._id);
-      console.log(`Item ${cartItem._id} removed from the cart after 1 minute (test).`);
     }
   } catch (error) {
-    console.error('Error while removing item from cart:', error);
   }
 };
-
 exports.viewCartListByUserId = async function (req, res, next) {
   try {
 
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-
-    //if (!req.session.user || !req.session.user.userId) {
     if (isLoggedIn == "") {
-      return res.redirect("/api/registration");
+      return res.redirect("/registration");
     }
-
     const user_id = req.session.user.userId;
     const existingCart = await Cart.findOne({ user_id, status: 0 });
-
     if (!existingCart) {
       res.render("webpages/addtocart", {
         title: "Cart List Page",
@@ -2375,7 +2806,7 @@ exports.viewCartListByUserId = async function (req, res, next) {
         respdata1: [],
         user: user_id,
         isLoggedIn: isLoggedIn,
-
+        websiteUrl: process.env.SITE_URL,
       });
     }
     else {
@@ -2386,23 +2817,20 @@ exports.viewCartListByUserId = async function (req, res, next) {
           select: 'name images',
         })
         .exec();
-
       const user = await Users.findById(existingCart.user_id);
-
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
       const formattedCartList = await Promise.all(cartList.map(async (cartItem) => {
         const product = await Userproduct.findOne({ _id: cartItem.product_id._id }).populate('category_id', 'name');
         const productImages = await Productimage.find({ product_id: cartItem.product_id._id }).limit(1);
-
         const finalData = {
           _id: cartItem._id,
           cart_id: existingCart._id,
           quantity: cartItem.qty,
           product_id: cartItem.product_id._id,
           product_name: cartItem.product_id.name,
-          product_price: product.offer_price,
+          // product_price: product.offer_price,
           product_est_price: product.price,
           seller_id: product.user_id,
           category_name: product.category_id.name,
@@ -2411,11 +2839,20 @@ exports.viewCartListByUserId = async function (req, res, next) {
           added_dtime: cartItem.added_dtime,
           status: cartItem.status,
         };
-
-        const product_price = finalData.product_price;
-        const gst = (product_price * 18) / 100;
-        const finalPrice = parseInt(product_price) + 250 + parseInt(gst);
-
+        let product_price;
+        if(cartItem.finalBidPrice)
+        {
+          product_price = cartItem.finalBidPrice;
+          finalData.product_price = product_price;
+        }
+        else
+        {
+          product_price = product.offer_price;
+          finalData.product_price = product_price;
+        }
+        
+        const gst = (product_price * 28) / 100;
+        const finalPrice = parseInt(product_price) + 500 + parseInt(gst);
         res.render("webpages/addtocart", {
           title: "Cart List Page",
           message: "Welcome to the Cart List page!",
@@ -2423,15 +2860,12 @@ exports.viewCartListByUserId = async function (req, res, next) {
           respdata1: finalPrice,
           user: user_id,
           isLoggedIn: isLoggedIn,
-
+          websiteUrl: process.env.SITE_URL,
         });
-
       }));
-
     }
   }
   catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering Cart List.",
@@ -2439,8 +2873,6 @@ exports.viewCartListByUserId = async function (req, res, next) {
     });
   }
 };
-
-// Delete cart
 exports.deleteCart = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -2466,7 +2898,6 @@ exports.deleteCart = async function (req, res, next) {
     if (cartDetailsCount === 0) {
       await existingCart.remove();
     }
-
     res.render("webpages/deletecart", {
       title: "Delete Cart",
       message: "Welcome to the Delete Cart page!",
@@ -2474,7 +2905,6 @@ exports.deleteCart = async function (req, res, next) {
     });
   }
   catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Cart Page.",
@@ -2485,49 +2915,43 @@ exports.deleteCart = async function (req, res, next) {
 
 exports.changeProfileImgWeb = async function (req, res, next) {
   try {
-
     const requrl = url.format({
       protocol: req.protocol,
       host: req.get("host"),
     });
-
     const imageUrls = [];
     if (req.files && req.files.length > 0) {
       const imageDetails = [];
-
       req.files.forEach(async (file) => {
-        const imageUrl = requrl + "/public/images/" + file.filename;
-        console.log(imageUrl);
-
+        // const imageUrl = requrl + "/public/images/" + file.filename;
+        const imageUrl = file.filename;
+        let extension = path.extname(imageUrl);
+        if (typeof extension != "undefined" && extension != "webp" && extension != "WEBP") {
+          await CompressImage("./public/images/" + imageUrl, "./public/compress_images/");
+        } else {
+          await fs.copyFile("./public/images/" + imageUrl, "./public/compress_images/" + imageUrl, (err) => {
+            if (err) {
+            }
+            else {
+            }
+          });
+        }
         const updData = {
           image: imageUrl,
         };
-
         const updatedUser = await Users.findOneAndUpdate(
           { _id: req.body.user_id },
           { $set: updData },
-          { upsert: true, new: true } // Use new: true to get the updated document
+          { upsert: true, new: true }
         );
-
         if (updatedUser) {
           req.session.user.image = updatedUser.image;
-          res.redirect('/api/my-account');
+          res.redirect('/my-account');
         }
-
-
       });
-
-      // res.status(200).json({
-      //   status: "1",
-      //   status: "1",
-      //   message: "Product and images added!",
-      //   respdata: savedProductdata
-      // });
     }
-
   }
   catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while Profile Image Change.",
@@ -2535,88 +2959,101 @@ exports.changeProfileImgWeb = async function (req, res, next) {
     });
   }
 };
-
 exports.checkoutWeb = async function (req, res, next) {
   try {
-    
-      let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-      
-      if (isLoggedIn == "") {
-        return res.redirect("/api/registration");
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    if (isLoggedIn == "") {
+      return res.redirect("/registration");
+    }
+    const user_id = req.session.user.userId;
+    const existingCart = await Cart.findOne({ user_id, status: 0 });
+    if (!existingCart) {
+      res.render("webpages/addtocart", {
+        title: "Cart List Page",
+        message: "Cart is empty",
+        respdata: [],
+        respdata1: [],
+        user: user_id,
+        isLoggedIn: isLoggedIn,
+      });
+    } else {
+      const cartList = await CartDetail.find({ cart_id: existingCart._id, status: 0 })
+        .populate({
+          path: 'product_id',
+          model: Userproduct,
+          select: 'name images',
+        })
+        .exec();
+      // const addressUserList = await addressBook.find({user_id: user_id });
+      const addressUserList = await addressBook.find({
+        user_id: user_id,
+        default_status: 0
+      });
+      const user = await Users.findById(existingCart.user_id);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
       }
-      const user_id = req.session.user.userId;
-      const existingCart = await Cart.findOne({ user_id, status: 0 });
+      const formattedCartList = await Promise.all(cartList.map(async (cartItem) => {
+        const product = await Userproduct.findOne({ _id: cartItem.product_id._id }).populate('category_id', 'name');
+        const productImages = await Productimage.find({ product_id: cartItem.product_id._id }).limit(1);
+        const finalData = {
+          _id: cartItem._id,
+          cart_id: existingCart._id,
+          quantity: cartItem.qty,
+          product_id: cartItem.product_id._id,
+          product_name: cartItem.product_id.name,
+         // product_price: product.offer_price,
+          product_est_price: product.price,
+          seller_id: product.user_id,
+          category_name: product.category_id.name,
+          images: productImages.length > 0 ? productImages[0].image : null,
+          user_name: user.name,
+          added_dtime: cartItem.added_dtime,
+          status: cartItem.status,
+        };
 
-      if (!existingCart) {
-        res.render("webpages/addtocart", {
-          title: "Cart List Page",
-          message: "Cart is empty",
-          respdata: [],
-          respdata1: [],
-          user: user_id,
-          isLoggedIn: isLoggedIn,
-  
-        });
-      }else{
-        const cartList = await CartDetail.find({ cart_id: existingCart._id, status: 0 })
-          .populate({
-            path: 'product_id',
-            model: Userproduct,
-            select: 'name images',
-          })
-          .exec();
-
-          // Address check
-        const addressUserList = await addressBook.find({user_id: user_id });
-
-        const user = await Users.findById(existingCart.user_id);
-        if (!user) {
-          return res.status(404).json({ error: 'User not found' });
+        let product_price;
+        if(cartItem.finalBidPrice)
+        {
+          product_price = cartItem.finalBidPrice;
+          finalData.product_price = product_price;
         }
-        const formattedCartList = await Promise.all(cartList.map(async (cartItem) => {
-          const product = await Userproduct.findOne({ _id: cartItem.product_id._id }).populate('category_id', 'name');
-          const productImages = await Productimage.find({ product_id: cartItem.product_id._id }).limit(1);
-  
-          const finalData = {
-            _id: cartItem._id,
-            cart_id: existingCart._id,
-            quantity: cartItem.qty,
-            product_id: cartItem.product_id._id,
-            product_name: cartItem.product_id.name,
-            product_price: product.offer_price,
-            product_est_price: product.price,
-            seller_id: product.user_id,
-            category_name: product.category_id.name,
-            images: productImages.length > 0 ? productImages[0].image : null,
-            user_name: user.name,
-            added_dtime: cartItem.added_dtime,
-            status: cartItem.status,
-          };
-  
-          const product_price = finalData.product_price;
-          const gst = (product_price * 18) / 100;
-          const finalPrice = parseInt(product_price) + 250 + parseInt(gst);
-          
-          res.render("webpages/mycheckoutweb", {
-            title: "Check Out Page",
-            status: '1',
-            is_orderPlaced: 1,
-            message: "Welcome to the Checkout page!",
-            respdata: finalData,
-            product_price:product_price,
-            finalPrice:finalPrice,
-            gst:gst,
-            isLoggedIn: isLoggedIn,
-            user: req.session.user,
-            addressUserList:addressUserList,
-          });
-          
-  
-        }));
-  }
+        else
+        {
+          product_price = product.offer_price;
+          finalData.product_price = product_price;
+        }
+        // const requestUrl =  req.headers.referer;
+        const requestUrl = '/web-my-order';
+
+        await insertNotification(
+          'Order Placed Successfully from Website',
+          `You have placed an order for ${cartItem.product_id.name}`,//Added By Palash Samanta
+          user_id,
+          requestUrl,
+          new Date()
+        );
+        // const product_price = finalData.product_price;
+        const gst = (product_price * 28) / 100;
+        const finalPrice = parseInt(product_price) + 250 + parseInt(gst);
+        res.render("webpages/mycheckoutweb", {
+          title: "Check Out Page",
+          status: '1',
+          is_orderPlaced: 1,
+          message: "Welcome to the Checkout page!",
+          respdata: finalData,
+          product_price: product_price,
+          finalPrice: finalPrice,
+          gst: gst,
+          product_id: finalData.product_id,
+          isLoggedIn: isLoggedIn,
+          user: req.session.user,
+          addressUserList: addressUserList,
+        });
+      }));
+    }
   }
   catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred Checkout .",
@@ -2624,21 +3061,18 @@ exports.checkoutWeb = async function (req, res, next) {
     });
   }
 };
-
 exports.myOrderWeb = async (req, res) => {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-
     res.render("webpages/myorder", {
       title: "Wish List Page",
       message: "Welcome to the Wish List page!",
-      respdata: req.session.user,
+      respdata: typeof req.session.user != "undefined" ? req.session.user : null,
       isLoggedIn: isLoggedIn,
+      websiteUrl: process.env.SITE_URL,
     });
-
   }
   catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred My order .",
@@ -2646,26 +3080,19 @@ exports.myOrderWeb = async (req, res) => {
     });
   }
 };
-
-
 exports.myOrderDetailsWeb = async (req, res) => {
   try {
-    
-    const orderlistId = req.params.id; 
-    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : ""; 
-    
+    const orderlistId = req.params.id;
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     if (!orderlistId) {
       return res.status(400).json({ message: 'Order ID is missing in the request' });
     }
-
     const order = await Order.findById(orderlistId)
       .populate('seller_id', 'name')
       .populate('user_id', 'name');
-    
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
-
     let productId;
     if (order.product_id) {
       productId = order.product_id.toString();
@@ -2674,71 +3101,64 @@ exports.myOrderDetailsWeb = async (req, res) => {
     }
 
     const productDetails = await Userproduct.findById(productId);
-    
+
     if (!productDetails) {
       return res.status(404).json({ message: 'Product details not found' });
     }
 
     const productImage = await Productimage.findOne({ product_id: productId }).limit(1);
     const orderTrackStatusOne = await Ordertracking.find({ orderlistId, status: 1 });
-    
+
     let shiprocketResponse = [];
     let shiprocketResponselabel = [];
     let shiprocketResponseinvoice = [];
     let shiprocketResponsefortracking = [];
 
-  //   if (orderTrackStatusOne && orderTrackStatusOne.length > 0)  {
-  //     const trackingId = orderTrackStatusOne[0].tracking_id;
-  //     const trackDetails = await Track.findById(trackingId);
+    //   if (orderTrackStatusOne && orderTrackStatusOne.length > 0)  {
+    //     const trackingId = orderTrackStatusOne[0].tracking_id;
+    //     const trackDetails = await Track.findById(trackingId);
 
-  //     if(trackDetails.shiprocket_shipment_id)
-  //     {
+    //     if(trackDetails.shiprocket_shipment_id)
+    //     {
 
-  //       shiprocketResponselabel = await generateLabel(trackDetails.shiprocket_shipment_id);
+    //       shiprocketResponselabel = await generateLabel(trackDetails.shiprocket_shipment_id);
 
-  //       shiprocketResponseinvoice = await generateInvoice(trackDetails.shiprocket_order_id);
-  //     }
+    //       shiprocketResponseinvoice = await generateInvoice(trackDetails.shiprocket_order_id);
+    //     }
 
-  //     if (trackDetails.shiprocket_shipment_id) {
-  //       shiprocketResponse = await generateOrderDetails(trackDetails.shiprocket_order_id);
-  //     }
+    //     if (trackDetails.shiprocket_shipment_id) {
+    //       shiprocketResponse = await generateOrderDetails(trackDetails.shiprocket_order_id);
+    //     }
 
-  //     if (trackDetails.shiprocket_shipment_id) {
-  //       shiprocketResponsefortracking = await trackbyaorderid(trackDetails.shiprocket_order_id);
-  //     }
-  // }
-    const sellerAddress = await addressBook.findOne({ user_id: order.seller_id });
-    const buyerAddress = await addressBook.findOne({ user_id: order.user_id });
-
+    //     if (trackDetails.shiprocket_shipment_id) {
+    //       shiprocketResponsefortracking = await trackbyaorderid(trackDetails.shiprocket_order_id);
+    //     }
+    // }
+    const sellerAddress = await addressBook.findOne({ _id: order.billing_address_id });
+    const buyerAddress = await addressBook.findOne({ _id: order.shipping_address_id });
     const shippingKitData = await Shippingkit.findOne({ order_id: order._id });
-
-    console.log(shippingKitData);
-    console.log("==============");
-
     let shippingkit_details;
-
     let shipping_user_details;
-
-    if(shippingKitData)
-    {
-       shippingkit_details = await addressBook.findById({ _id: shippingKitData.shipping_address_id });
-
-       shipping_user_details = await Users.findById({ _id: shippingKitData.buyer_id });
+    if (shippingKitData) {
+      shippingkit_details = await addressBook.findById({ _id: shippingKitData.shipping_address_id });
+      shipping_user_details = await Users.findById({ _id: shippingKitData.buyer_id });
     }
-
-    console.log(shippingkit_details);
-
     const orderDetails = {
       _id: order._id,
       total_price: order.total_price,
       payment_method: order.payment_method,
+      pay_now: order.pay_now,
+      booking_amount: order.booking_amount,
+      remaining_amount: order.remaining_amount,
       order_status: order.order_status,
+      delete_by: order.delete_by,
+      delete_status: order.delete_status,
       gst: order.gst,
       seller: {
         _id: order.seller_id._id,
         name: order.seller_id.name,
       },
-      buyeraddress: buyerAddress ? buyerAddress: 'No Buyer Address Found',
+      buyeraddress: buyerAddress ? buyerAddress : 'No Buyer Address Found',
       user: {
         _id: order.user_id._id,
         name: order.user_id.name,
@@ -2747,25 +3167,23 @@ exports.myOrderDetailsWeb = async (req, res) => {
       selleraddress: sellerAddress ? sellerAddress : 'No Buyer Address Found',
       product: {
         name: productDetails ? productDetails.name : 'Unknown Product',
-        offer_price : productDetails ? productDetails.offer_price : 'Unknown Product',
+        offer_price: productDetails ? productDetails.offer_price : 'Unknown Product',
         image: productImage ? productImage.image : 'No Image',
       },
-      shippingKitData :shippingKitData || null,
-      shippingkit_details : shippingkit_details || null,
-      shipping_user_details :shipping_user_details || null
+      shippingKitData: shippingKitData || null,
+      shippingkit_details: shippingkit_details || null,
+      shipping_user_details: shipping_user_details || null
     };
-    //return false;
-    res.render("webpages/myorderdetails",{
+    res.render("webpages/myorderdetails", {
       title: "Wish List Page",
       message: "Welcome to the Wish List page!",
       respdata: orderDetails,
       //respdata1: orderlistId,
       isLoggedIn: isLoggedIn,
+      websiteUrl: process.env.SITE_URL,
     });
-
   }
   catch (error) {
-    console.error(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred My order .",
@@ -2773,85 +3191,51 @@ exports.myOrderDetailsWeb = async (req, res) => {
     });
   }
 };
-
 exports.addShipmentData = async (req, res) => {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-
     const order_id = req.params.id;
-
     const price = 350;
-    const gst = (price * 18)/100;
-    const final_price = price +  gst;
-
+    const gst = (price * 18) / 100;
+    const final_price = price + gst;
     const track = await Ordertracking.findOne({ order_id: order_id }).exec();
-   
-    if (track == null)  {
-      console.log(4556646546);
-      //return res.status(404).json({ message: 'Order Delivery Partner Not chosse yet' });
+    if (track == null) {
       return res.status(200).json({
         status: "0",
         message: 'Order Delivery Partner Not chosse yet',
         is_shippingkit: false,
       });
     }
-  
     const hubaddress = await Track.findById(track.tracking_id)
       .populate('seller_id', 'name phone_no email')
       .populate('billing_address_id')
       .populate('hub_address_id');
-
     if (!hubaddress) {
-      // return res.status(404).json({ message: 'Order Delivery Partner Not chosse yet' });
       res.status(200).json({
         status: "0",
         message: 'Order Delivery Partnerss Not chosse yet',
         is_shippingkit: false,
       });
-
     }
-
     const orderCode = `BFSSHIPKIT${Date.now().toString()}`;
-
     const shippingkit = new Shippingkit({
       track_code: orderCode,
       buyer_id: hubaddress.seller_id._id,
       product_id: hubaddress.product_id,
       shipping_address_id: hubaddress.billing_address_id._id,
       order_id: order_id,
-      total_price : final_price,
-      payment_method : 1,
+      total_price: final_price,
+      payment_method: 1,
       added_dtime: new Date().toISOString(),
     });
-
     const savedOrder = await shippingkit.save();
     if (savedOrder) {
-
       const updatedTrack = await Track.findOneAndUpdate(
         { _id: track.tracking_id },
         { $set: { shippingkit_status: 1 } },
         { new: true }
       );
-
       const user = await Users.findById(savedOrder.buyer_id);
-
-      // if (user.email) {
-      //   const mailData = {
-      //     from: smtpUser,
-      //     to: user.email,
-      //     subject: "BFS - Bid For Sale  - Order Placed Successfully",
-      //     text: "Server Email!",
-      //     html:
-      //       "Hey " +
-      //       user.name +
-      //       ", <br> <p>Congratulations your order is placed.please wait for some times and the delivery details you will show on the app.</p>",
-      //   };
-
-      //   transporter.sendMail(mailData, function (err, info) {
-      //     if (err) console.log(err);
-      //     else console.log(info);
-      //   });
-      // }
       res.status(200).json({
         status: "1",
         message: 'Shipping Kit Order placed successfully',
@@ -2859,14 +3243,10 @@ exports.addShipmentData = async (req, res) => {
         is_shippingkit: true,
         order: savedOrder,
         isLoggedIn: isLoggedIn,
+        websiteUrl: process.env.SITE_URL,
       });
-
-      
-    //}
     }
-
   } catch (error) {
-    console.error('Error placing order:', error);
     res.status(200).json({
       status: "0",
       message: 'Can not Order Shipping kit',
@@ -2874,29 +3254,44 @@ exports.addShipmentData = async (req, res) => {
     });
   }
 };
-
-
 exports.getWhatsHotProductsweb = async function (req, res) {
 
-  const page = parseInt(req.body.page) || 1; // Current page, default: 1
-
-  const pageSize = parseInt(req.body.pageSize) || 10; // Items per page, default: 10
-
+  const page = parseInt(req.body.page) || 1; 
+  const pageSize = parseInt(req.body.pageSize) || 10; 
 
   try {
 
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const hotProductsCount = await Userproduct.countDocuments({ approval_status: 1, flag: 0 });
+    const filterproductCount = hotProductsCount.length;
 
     const totalPages = Math.ceil(hotProductsCount / pageSize);
 
-
-    const brandList = await brandModel.find({});
-    const sizeList = await sizeModel.find({});
-    const conditionList = await productconditionModel.find({});
-
     const hotProducts = await Userproduct.find({ approval_status: 1, flag: 0 }).sort({ hitCount: -1 });
 
+    let brandIds = [], sizeIds = [], statusIds = [], genderIds = [];
+    let brandList = [], sizeList = [], conditionList = [], genderList = [];
+
+    brandIds = hotProducts.map(product => product.brand_id).filter(Boolean);
+    sizeIds = hotProducts.map(product => product.size_id).filter(Boolean);
+    statusIds = hotProducts.map(product => product.status).filter(Boolean);
+    genderIds = hotProducts.map(product => product.gender_id).filter(Boolean);
+    brandList = await Brand.find({ _id: { $in: brandIds } });
+    sizeList = await Size.find({ _id: { $in: sizeIds } });
+    conditionList = await Productcondition.find({ _id: { $in: statusIds } });
+    genderList = await Gender.find({ _id: { $in: genderIds } });
+
+    let maxOfferPrice = -Infinity; 
+    let minOfferPrice = Infinity;
+
+    for (const product of hotProducts) {
+      if (product.offer_price > maxOfferPrice) {
+        maxOfferPrice = product.offer_price;
+      }
+      if (product.offer_price < minOfferPrice) {
+        minOfferPrice = product.offer_price;
+      }
+    }
     const whatsHotProducts = [];
 
     for (const product of hotProducts) {
@@ -2941,16 +3336,17 @@ exports.getWhatsHotProductsweb = async function (req, res) {
         brandList: brandList,
         sizeList: sizeList,
         conditionList: conditionList,
-        productCount:hotProductsCount,
+        genderList: typeof genderList != "undefined" ? genderList : [],
+        productCount: hotProductsCount,
+        filterproductCount: typeof filterproductCount != "undefined" ? filterproductCount : "0",
         isLoggedIn: isLoggedIn,
-        filter_basedon:"whatshot"
-
+        filter_basedon: "whatshot",
+        websiteUrl: process.env.SITE_URL,
+        maxvalue: typeof maxOfferPrice != "undefined" ? maxOfferPrice : "0",
+        minvalue: typeof minOfferPrice != "undefined" ? minOfferPrice : "0",
       });
 
   } catch (error) {
-
-    console.error('Error fetching what\'s hot products:', error);
-
     return res.status(500).json({ message: 'Internal server error' });
 
   }
@@ -2959,71 +3355,64 @@ exports.getWhatsHotProductsweb = async function (req, res) {
 
 
 exports.getJustSoldProductsweb = async function (req, res) {
-
-  const page = parseInt(req.query.page) || 1; 
-
-  const pageSize = parseInt(req.query.pageSize) || 10; 
-
-
-
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 10;
   try {
-
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const soldItemsCount = await Userproduct.countDocuments({ approval_status: 1, flag: 1 });
-
+    const filterproductCount = soldItemsCount.length;
+    
+    const pageno = page || 1;
+    const pageSize = 8;
+    const skip = (page - 1) * pageSize;
+    
     const totalPages = Math.ceil(soldItemsCount / pageSize);
-
-    const brandList = await brandModel.find({});
-    const sizeList = await sizeModel.find({});
-    const conditionList = await productconditionModel.find({});
-
-
-
+    let brandIds = [], sizeIds = [], statusIds = [], genderIds = [];
+    let brandList = [], sizeList = [], conditionList = [], genderList = [];
 
     const solditems = await Userproduct.find({ approval_status: 1, flag: 1 });
 
-    const justSoldProducts = [];
-
-
-
+    brandIds = solditems.map(product => product.brand_id).filter(Boolean);
+    sizeIds = solditems.map(product => product.size_id).filter(Boolean);
+    statusIds = solditems.map(product => product.status).filter(Boolean);
+    genderIds = solditems.map(product => product.gender_id).filter(Boolean);
+    brandList = await brandModel.find({ _id: { $in: brandIds } });
+    sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
+    conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
+    genderList = await Gender.find({ _id: { $in: genderIds } });
+    
+    let maxOfferPrice = -Infinity; 
+    let minOfferPrice = Infinity;
     for (const product of solditems) {
-
-      const productImage = await Productimage.findOne({ product_id: product._id });
-
-
-
-      if (productImage) {
-
-        const productCondition = await Productcondition.findById(product.status);
-
-
-
-        justSoldProducts.push({
-
-          _id: product._id,
-
-          name: product.name,
-
-          price: product.price,
-
-          offer_price: product.offer_price,
-
-          original_packaging: product.original_packaging,
-
-          original_invoice: product.original_invoice,
-
-          status_name: productCondition ? productCondition._id : '',
-
-          status: productCondition ? productCondition.name : '',
-
-          image: productImage,
-
-        });
-
+      if (product.offer_price > maxOfferPrice) {
+        maxOfferPrice = product.offer_price;
       }
-
+      if (product.offer_price < minOfferPrice) {
+        minOfferPrice = product.offer_price;
+      }
     }
 
+    const justSoldProducts = [];
+    for (const product of solditems) {
+      const productImage = await Productimage.findOne({ product_id: product._id });
+      if (productImage) {
+        const productCondition = await Productcondition.findById(product.status);
+        justSoldProducts.push({
+          _id: product._id,
+          name: product.name,
+          price: product.price,
+          offer_price: product.offer_price,
+          original_packaging: product.original_packaging,
+          original_invoice: product.original_invoice,
+          status_name: productCondition ? productCondition._id : '',
+          status: productCondition ? productCondition.name : '',
+          image: productImage,
+        });
+      }
+    }
+    const paginatedData = justSoldProducts.slice(skip, skip + pageSize);
+    const productCount = justSoldProducts.length;
+    const currentPage = parseInt(page);
     res.render("webpages/allhomeproduct",
       {
         title: "Product Sub Categories",
@@ -3032,40 +3421,38 @@ exports.getJustSoldProductsweb = async function (req, res) {
         brandList: brandList,
         sizeList: sizeList,
         conditionList: conditionList,
-        productCount:soldItemsCount,
+        genderList: typeof genderList != "undefined" ? genderList : [],
+        productCount: soldItemsCount,
+        filterproductCount: typeof filterproductCount != "undefined" ? filterproductCount : "0",
         isLoggedIn: isLoggedIn,
-        filter_basedon:"justsold"
-
+        filter_basedon: "justsold",
+        websiteUrl: process.env.SITE_URL,
+        maxvalue: typeof maxOfferPrice != "undefined" ? maxOfferPrice : "0",
+        minvalue: typeof minOfferPrice != "undefined" ? minOfferPrice : "0",
+        totalPages: totalPages,
+        currentPage: currentPage,
+        pageSize: pageSize,
       });
 
   } catch (error) {
-
-    console.error('Error fetching just sold products:', error);
-
+    console.log(error);
     return res.status(500).json({ message: 'Internal server error' });
-
   }
 
 };
 
 exports.getBestDealProductsweb = async function (req, res) {
 
-  const page = parseInt(req.query.page) || 1; 
+  const page = parseInt(req.query.page) || 1;
 
-  const pageSize = parseInt(req.query.pageSize) || 10; 
+  const pageSize = parseInt(req.query.pageSize) || 10;
 
   try {
-
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const soldItemsCount = await Userproduct.countDocuments({ approval_status: 1, flag: 1 });
+    const filterproductCount = soldItemsCount.length;
 
     const totalPages = Math.ceil(soldItemsCount / pageSize);
-
-    const brandList = await brandModel.find({});
-    const sizeList = await sizeModel.find({});
-    const conditionList = await productconditionModel.find({});
-
-
     const appSettings = await Appsettings.findOne();
 
     if (!appSettings) {
@@ -3078,12 +3465,34 @@ exports.getBestDealProductsweb = async function (req, res) {
       approval_status: 1,
       flag: 0
     });
-    
+
     const products = await Userproduct.find({ percentage: { $gte: percentageFilter }, approval_status: 1, flag: 0 }); // Adding approval_status filter
 
+    let brandIds = [], sizeIds = [], statusIds = [], genderIds = [];
+    let brandList = [], sizeList = [], conditionList = [], genderList = [];
 
+
+    brandIds = products.map(product => product.brand_id).filter(Boolean);
+    sizeIds = products.map(product => product.size_id).filter(Boolean);
+    statusIds = products.map(product => product.status).filter(Boolean);
+    genderIds = products.map(product => product.gender_id).filter(Boolean);
+    brandList = await Brand.find({ _id: { $in: brandIds } });
+    sizeList = await Size.find({ _id: { $in: sizeIds } });
+    conditionList = await Productcondition.find({ _id: { $in: statusIds } });
+    genderList = await Gender.find({ _id: { $in: genderIds } });
     if (!products || products.length === 0) {
       return res.status(404).json({ message: 'No products meet the percentage filter criteria' });
+    }
+    let maxOfferPrice = -Infinity; 
+    let minOfferPrice = Infinity;
+
+    for (const product of products) {
+      if (product.offer_price > maxOfferPrice) {
+        maxOfferPrice = product.offer_price;
+      }
+      if (product.offer_price < minOfferPrice) {
+        minOfferPrice = product.offer_price;
+      }
     }
 
     const bestDealProducts = [];
@@ -3095,29 +3504,17 @@ exports.getBestDealProductsweb = async function (req, res) {
         const productCondition = await Productcondition.findById(product.status);
 
         bestDealProducts.push({
-
           _id: product._id,
-
           name: product.name,
-
           price: product.price,
-
           offer_price: product.offer_price,
-
           original_packaging: product.original_packaging,
-
           original_invoice: product.original_invoice,
-
           status_name: productCondition ? productCondition._id : '',
-
           status: productCondition ? productCondition.name : '',
-
           image: productImage,
-
         });
-
       }
-
     }
     res.render("webpages/allhomeproduct",
       {
@@ -3127,15 +3524,17 @@ exports.getBestDealProductsweb = async function (req, res) {
         brandList: brandList,
         sizeList: sizeList,
         conditionList: conditionList,
-        productCount:count,
+        genderList: typeof genderList != "undefined" ? genderList : [],
+        productCount: count,
+        filterproductCount: typeof filterproductCount != "undefined" ? filterproductCount : "0",
+        websiteUrl:process.env.SITE_URL,
         isLoggedIn: isLoggedIn,
-        filter_basedon:"bestDeal"
+        filter_basedon: "bestDeal",
+        maxvalue: typeof maxOfferPrice != "undefined" ? maxOfferPrice : "0",
+        minvalue: typeof minOfferPrice != "undefined" ? minOfferPrice : "0",
       });
 
   } catch (error) {
-
-    console.error('Error fetching just sold products:', error);
-
     return res.status(500).json({ message: 'Internal server error' });
 
   }
@@ -3144,35 +3543,45 @@ exports.getBestDealProductsweb = async function (req, res) {
 
 exports.userPlacedOrder = async function (req, res) {
 
- try{
-     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-     let user_id = req.body.data.user_id;
-     let seller_id = req.body.data.seller_id;
-     let cart_id = req.body.data.cart_id;
-     let product_id = req.body.data.product_id;
-     let total_price = req.body.data.total_amt;
-     let payment_method = req.body.data.payment_method;
-     let gst = req.body.data.gst;
-     let order_status = '0';
-     let delivery_charges = '0';
-     let discount = '0';
-     let pickup_status = '0';
-     let delivery_status = '0';
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    let user_id = req.body.data.user_id;
+    let seller_id = req.body.data.seller_id;
+    let cart_id = req.body.data.cart_id;
+    let product_id = req.body.data.product_id;
+    let total_price = req.body.data.total_amt;
+    let payment_method = req.body.data.payment_method;
+    let gst = req.body.data.gst;
+    let order_status = '0';
+    let delivery_charges = '0';
+    let discount = '0';
+    let pickup_status = '0';
+    let delivery_status = '0';
+    let shipping_address_id = req.body.data.addressBookId;
 
-    // Get Shipping Address id 
-    const shippingaddress = await addressBook.findOne({ user_id: seller_id });
-    if (!shippingaddress) {
-      return res.status(404).json({ message: 'Shipping address not found' });
-    }
-    const shipping_address_id = shippingaddress._id;
+    let pay_now = req.body.data.pay_now || null;
+    let remaining_amount = req.body.data.remaining_amount || null;
+
+    //Get Shipping Address id 
+    // const shippingaddress = await addressBook.findOne({ user_id: seller_id });
+    // if (!shippingaddress) {
+    //   return res.status(404).json({ message: 'Shipping address not found' });
+    // }
+    // const shipping_address_id = shippingaddress._id;
 
     // Get Billing Address id
-    const productdetails = await Userproduct.findById(product_id);
-    if (!productdetails) {
-      return res.status(404).json({ message: 'Billing address not found' });
+    // const productdetails = await Userproduct.findById(product_id);
+    // if (!productdetails) {
+    //   return res.status(404).json({ message: 'Billing address not found' });
+    // }
+    // const billing_address_id = productdetails.user_id;
+    const billingaddress = await addressBook.findOne({ user_id: seller_id });
+
+    if (!billingaddress) {
+      return res.status(404).json({ message: 'Seller address not found' });
     }
-    const billing_address_id = productdetails.user_id;
-    console.log(billing_address_id);
+
+    const billing_address_id = billingaddress._id;
 
     const now = new Date();
     const currentHour = now.getHours().toString().padStart(2, '0');
@@ -3180,10 +3589,7 @@ exports.userPlacedOrder = async function (req, res) {
     const currentSecond = now.getSeconds().toString().padStart(2, '0');
     const currentMillisecond = now.getMilliseconds().toString().padStart(3, '0');
 
-    // Generate the unique code using the current time components
     const orderCode = `BFSORD${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
-
-    // Create value for saving data in order table
     const order = new Order({
       order_code: orderCode,
       user_id,
@@ -3200,15 +3606,22 @@ exports.userPlacedOrder = async function (req, res) {
       discount,
       pickup_status,
       delivery_status,
+      pay_now,
+      remaining_amount,
       added_dtime: new Date().toISOString(),
     });
     const savedOrder = await order.save();
 
     if (savedOrder) {
+      await Iptrnsaction.create({
+        user_id: savedOrder.user_id,
+        Purpose: "Order Placement from Web",
+        ip_address: req.connection.remoteAddress,
+        created_dtime: new Date(),
+      });
       const user = await Users.findById(savedOrder.user_id);
-
       const mailData = {
-        from: smtpUser,
+        from: "Bid For Sale! <" + smtpUser + ">",
         to: user.email,
         subject: "BFS - Bid For Sale  - Order Placed Successfully",
         text: "Server Email!",
@@ -3217,12 +3630,36 @@ exports.userPlacedOrder = async function (req, res) {
           user.name +
           ", <br> <p>Congratulations your order is placed.please wait for some times and the delivery details you will show on the app.</p>",
       };
-
       transporter.sendMail(mailData, function (err, info) {
-        if (err) console.log(err);
-        else console.log(info);
+        // if (err) console.log(err);
+        // else console.log(info);
+      });
+      // const deleteCart;
+      //Delete Cart while place order
+      const existingCart = await Cart.findOne({ user_id, status: 0 });
+      if (!existingCart) {
+        return res.status(404).json({
+          message: 'Cart not found',
+        });
+      }
+      const cartDetail = await CartDetail.findOne({
+        cart_id: existingCart._id,
+        product_id,
+        status: 0,
       });
 
+      /*if (!cartDetail) {
+        return res.status(404).json({
+          message: 'Product not found in cart',
+        });
+      }*/
+      await cartDetail.remove();
+
+      const cartDetailsCount = await CartDetail.countDocuments({ cart_id: existingCart._id });
+
+      if (cartDetailsCount === 0) {
+        await existingCart.remove();
+      }
       const updatedProduct = await Userproduct.findOneAndUpdate(
         { _id: product_id },
         { $set: { flag: 1 } },
@@ -3235,54 +3672,225 @@ exports.userPlacedOrder = async function (req, res) {
         order: savedOrder
       });
     }
- } catch (error) {
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
 
-  console.error('Error fetching Order Palced: ', error);
+exports.Demoorder = async function (req, res) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    let pay_now,booking_amount,remaining_amount,packing_handling_charge,taxable_value,cash_handling_charges;
+    let formData = req.body.data;
+    let user_id = formData.user_id;
+    let seller_id = formData.seller_id;
+    packing_handling_charge = formData.packingHandlingChargeValue;
+    let cart_id = formData.cart_id;
+    let product_id = formData.product_id;
+    let payment_method = formData.payment_method;
+    taxable_value = formData.taxable_value;
+    let product =await Userproduct.findById(product_id);
+    let total_price = 0;
 
-  return res.status(500).json({ message: 'Internal server error' });
+    if (payment_method == 0)
+    {
+      pay_now = parseFloat(product.offer_price) * 0.10;
+      remaining_amount = parseFloat(product.offer_price)-parseFloat(pay_now);
+      cash_handling_charges = parseFloat(product.offer_price) * 0.05;
+    }
+    let gst =  parseFloat(product.offer_price * 28) / 100;
+    if (payment_method == 0)
+    {
+      taxable_value =  parseFloat(packing_handling_charge) + parseFloat(cash_handling_charges);
+      booking_amount = parseFloat(pay_now)+parseFloat(taxable_value)+ parseFloat(gst);
+      total_price = parseFloat(booking_amount) + parseFloat(remaining_amount);
+      total_price = total_price.toFixed(2); 
+    }
+    else if (payment_method == 1)
+    {
+      taxable_value =  parseFloat(packing_handling_charge);
+      total_price = parseFloat(product.offer_price) + parseFloat(gst) + parseFloat(taxable_value) ;
+      total_price = total_price.toFixed(2); 
+    }
+    let order_status = '0';
+    let delivery_charges = '0';
+    let discount = '0';
+    let pickup_status = '0';
+    let delivery_status = '0';
+    let shipping_address_id = formData.addressBookId;
 
-}
+    const billingaddress = await addressBook.findOne({ user_id: seller_id });
+    if (!billingaddress) {
+      return res.status(404).json({ message: 'Seller address not found' });
+    }
+    const billing_address_id = billingaddress._id;
+    const order = new Demoorder({
+      user_id: (typeof user_id != "undefined") ? user_id : "",
+      cart_id: (typeof cart_id != "undefined") ? cart_id : "",
+      seller_id: (typeof seller_id != "undefined") ? seller_id : "",
+      product_id: (typeof product_id != "undefined") ? product_id : "",
+      billing_address_id: (typeof billing_address_id != "undefined") ? billing_address_id : "0",
+      shipping_address_id: (typeof shipping_address_id != "undefined") ? shipping_address_id : "0",
+      total_price: (typeof total_price != "undefined") ? parseFloat(total_price) : 0,
+      payment_method: (typeof payment_method != "undefined") ? payment_method : 0,
+      order_status: (typeof order_status != "undefined") ? order_status : 0,
+      pay_now: (typeof pay_now != "undefined") ? pay_now : "",
+      remaining_amount: (typeof remaining_amount != "undefined") ? parseFloat(remaining_amount) : 0,
+      booking_amount: (typeof booking_amount != "undefined") ? parseFloat(booking_amount) : 0,
+      packing_handling_charge: (typeof packing_handling_charge != "undefined") ? parseFloat(packing_handling_charge) : 0,
+      status: 1,
+      gst:(typeof gst != "undefined") ? gst : 0,
+      taxable_value:(typeof taxable_value != "undefined") ? parseFloat(taxable_value) : 0,
+      added_dtime: new Date().toISOString(),
+    });
+
+    const savedOrder = await order.save();
+
+    if (savedOrder) {
+      res.status(200).json({
+        status: "1",
+        is_orderPlaced: 1,
+        message: 'Order placed successfully',
+        order: savedOrder
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
 };
 
 exports.forgotPassword = async function (req, res, next) {
 
   try {
-
     const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : ""
-
     var cartCount = (userId != "") ? await Cart.countDocuments({ user_id: mongoose.Types.ObjectId(userId) }) : 0;
-
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-
     res.render("webpages/forget-password", {
-
       title: "Home Page 123",
-
       requrl: req.app.locals.requrl,
-
       message: "Welcome to the Dashboard page!",
-
       cart: cartCount,
       isLoggedIn: isLoggedIn,
     });
 
   } catch (error) {
-
-    console.error(error);
-
     res.status(500).json({
-
       status: "0",
-
       message: "An error occurred while rendering the dashboard.",
-
       error: error.message,
-
     });
-
   }
 
 };
+
+// exports.sendotp = async function (req, res, next) {
+//   const errors = validationResult(req);
+//   if (!errors.isEmpty()) {
+//     return res.status(200).json({
+//       status: "0",
+//       message: "Validation error!",
+//       respdata: errors.array(),
+//     });
+//   }
+
+//   try {
+//     const user = await Users.findOne({ email: req.body.email });
+//     if (!user) {
+//       return res.status(200).json({
+//         status: "0",
+//         message: "User not found!",
+//         respdata: {},
+//       });
+//     }
+
+//     if (!req.body.otp) {
+//       //const otp = randNumber(1000, 2000);
+
+//       //SEND SMS
+//       const smsRandNumber = Math.floor((Math.random() * 1000000) + 1);
+//       const smsData = {
+//         textId: "test",
+//         toMobile: "917044289770",
+//         text: "You have been tagged with an invoice " + smsRandNumber + ". Please use OTP " + smsRandNumber + " for approving the invoice. Do not share your OTP with anyone. RJSSLT",
+//       };
+//       let smsReturnData = await sendSms(smsData);
+//       let smsHistoryData = new ApiCallHistory({
+//         userId: mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"),
+//         called_for: "sms",
+//         api_link: process.env.SITE_URL,
+//         api_param: smsData,
+//         api_response: smsReturnData,
+//         send_status: 'send',
+//       });
+//       await smsHistoryData.save();
+
+//       //SEND WHATSAPP
+//       const root = create({ version: '1.0', encoding: "ISO-8859-1" })
+//         .ele('MESSAGE', { VER: '1.2' })
+//         .ele('USER', { USERNAME: process.env.WP_SMS_USER_NAME, PASSWORD: process.env.WP_PASSWORD })
+//         .ele('SMS', { UDH: "0", CODING: "1", TEXT: "Hi", PROPERTY: "0", ID: "1", TEMPLATE: "bfstest" })
+//         .ele('ADDRESS', { FROM: process.env.WP_SMS_SENDER_MOBILE, TO: "917044289770", SEQ: "1" });
+
+//       // convert the XML tree to string
+//       const xml = root.end({ prettyPrint: true });
+//       const whatsappData = xml;
+//       let whatsappReturnData = await sendWhatsapp(whatsappData);
+//       let whatsappHistoryData = await new ApiCallHistory({
+//         userId: mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"),
+//         called_for: "whatsapp",
+//         api_link: process.env.SITE_URL,
+//         api_param: whatsappData,
+//         api_response: whatsappReturnData,
+//         send_status: 'send',
+//       });
+//       await whatsappHistoryData.save();
+
+//       const mailData = {
+//         from: "Bid For Sale! <" + smtpUser + ">",
+//         to: user.email,
+//         subject: "BFS - Bids For Sale - Forgot password OTP",
+//         text: "Server Email!",
+//         html:
+//           "Hey " +
+//           user.name +
+//           ", <br> <p> Please use this OTP : <b>" +
+//           smsRandNumber +
+//           "</b> to reset your password! </p>",
+//       };
+
+//       transporter.sendMail(mailData, function (err, info) {
+//         if (err) console.log(err);
+//         else console.log(info);
+//       });
+
+//       const updData = {
+//         forget_otp: otp,
+//       };
+//       await Users.findOneAndUpdate(
+//         { _id: user._id },
+//         { $set: updData },
+//         { upsert: true }
+//       );
+
+//       return res.status(200).json({
+//         status: "1",
+//         message: "OTP sent!",
+//         resdpata: user,
+//         is_forgetpassword: true
+//       });
+//     } else {
+//       // Handle OTP verification and password update logic here
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({
+//       status: "0",
+//       message: "Internal server error",
+//       respdata: error.message || "Unknown error",
+//     });
+//   }
+// };
+
 
 exports.sendotp = async function (req, res, next) {
   const errors = validationResult(req);
@@ -3294,36 +3902,68 @@ exports.sendotp = async function (req, res, next) {
     });
   }
 
-  Users.findOne({ email: req.body.email }).then((user) => {
+  Users.findOne({ email: req.body.email }).then(async (user) => {
     if (!user)
       res.status(200).json({
         status: "0",
         message: "User not found!",
         respdata: {},
       });
-    else if(!req.body.otp){
-      var otp = randNumber(1000, 2000);
+    else if (!req.body.otp) {
+      let randNumber = Math.floor((Math.random() * 1000000) + 1);
 
-      const mailData = {
-        from: smtpUser, 
-        to: user.email,
-        subject: "BFS - Bids For Sale - Forgot password OTP",
-        text: "Server Email!",
-        html:
-          "Hey " +
-          user.name +
-          ", <br> <p> Please use this OTP : <b>" +
-          otp +
-          "</b> to reset your password! </p>",
+      let smsData = {
+        textId: "test",
+        toMobile: "91" + user.phone_no,
+        text: "Hello! Your OTP for password reset at Bid For Sale is:"+randNumber+". Please use this code to reset your password securely. If you didn't request this, kindly ignore this message. Thank you!-BFS RETAIL SERVICES PRIVATE LIMITED",
       };
+      let returnData;
+      returnData = await sendSms(smsData);
+      
+      const historyData = new ApiCallHistory({
+        userId: user._id,
+        called_for: "forget password",
+        api_link: process.env.SITE_URL,
+        api_param: smsData,
+        api_response: returnData,
+        send_status: 'send',
+      });
+      await historyData.save();
+
+      const loginHtmlPath = 'views/webpages/otp-validation.html';
+      let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+
+      loginHtmlContent = loginHtmlContent.replace('{{otp}}', randNumber);
+      loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+      const mailData = {
+        from: "Bid For Sale! <" + smtpUser + ">",
+        to: user.email,
+        subject: "OTP For Forgot Password- Bid For Sale!",
+        name: "Bid For Sale!",
+        text: "OTP",
+        html: loginHtmlContent
+      };
+      // const mailData = {
+      //   from: "Bid For Sale! <" + smtpUser + ">",
+      //   to: "sneha.lnsel@gmail.com",
+      //   //to: user.email,
+      //   subject: "BFS - Bids For Sale - Forgot password OTP",
+      //   text: "Server Email!",
+      //   html:
+      //     "Hey " +
+      //     user.name +
+      //     ", <br> <p> Please use this OTP : <b>" +
+      //     randNumber +
+      //     "</b> to reset your password! </p>",
+      // };
 
       transporter.sendMail(mailData, function (err, info) {
-        if (err) console.log(err);
-        else console.log(info);
+        // if (err) console.log("err", err);
+        //else console.log("info", info);
       });
 
       var updData = {
-        forget_otp: otp,
+        forget_otp: randNumber,
       };
       Users.findOneAndUpdate(
         { _id: user._id },
@@ -3345,8 +3985,7 @@ exports.sendotp = async function (req, res, next) {
         }
       );
     }
-    else
-    {
+    else {
       if (user.forget_otp == req.body.otp) {
         bcrypt.hash(req.body.newPassword, rounds, (error, hash) => {
           bcrypt.compare(req.body.confirmPassword, hash, (error, match) => {
@@ -3362,14 +4001,14 @@ exports.sendotp = async function (req, res, next) {
                 forget_otp: "0",
               };
               Users.findOneAndUpdate(
-                { _id: req.body.user_id },
+                { email: req.body.email },
                 { $set: updData },
                 { upsert: true },
                 function (err, doc) {
                   if (err) {
                     throw err;
                   } else {
-                    Users.findOne({ _id: req.body.user_id }).then((user) => {
+                    Users.findOne({ email: req.body.email }).then((user) => {
                       res.status(200).json({
                         status: "1",
                         message: "Successfully updated! Please login with your new password",
@@ -3401,3 +4040,277 @@ exports.sendotp = async function (req, res, next) {
     }
   });
 };
+
+exports.changePassword = async function (req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: "0",
+      message: "Validation error!",
+      respdata: errors.array(),
+    });
+  }
+  const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+  Users.findById({ _id: userId }).then((user) => {
+    if (!user)
+      res.status(200).json({
+        status: "0",
+        message: "User not found!",
+        respdata: {},
+        is_passwordchnage: "false"
+      });
+    else {
+      bcrypt.compare(req.body.old_password, user.password, (error, match) => {
+        if (error) {
+          res.status(200).json({
+            status: "0",
+            message: "Old password does not match!!",
+            respdata: error,
+            is_passwordchnage: "false"
+          });
+        } else if (match) {
+          bcrypt.compare(
+            req.body.new_password,
+            user.password,
+            (error, match) => {
+              if (error) {
+                res.status(200).json({
+                  status: "0",
+                  message: "Error!",
+                  respdata: {},
+                  is_passwordchnage: "false"
+                });
+              } else if (!match) {
+                bcrypt.hash(req.body.new_password, rounds, (error, hash) => {
+                  var updData = {
+                    password: hash,
+                  };
+                  Users.findOneAndUpdate(
+                    { _id: userId },
+                    { $set: updData },
+                    { upsert: true },
+                    function (err, doc) {
+                      if (err) {
+                        throw err;
+                      } else {
+                        Users.findById({ _id: userId }).then(
+                          async (user) => {
+                            let smsData = {
+                              textId: "test",
+                              toMobile: "91" +user.phone_no,
+                              text: "Password changed successfully! Your account at Bid For Sale is now updated. If you didn't make this change, please contact support immediately. Thank you!-BFS RETAIL SERVICES PRIVATE LIMITED",
+                            };
+                            let returnData;
+                            returnData = await sendSms(smsData);
+                            const historyData = new ApiCallHistory({
+                              userId: userId,
+                              called_for: "reset password",
+                              api_link: process.env.SITE_URL,
+                              api_param: smsData,
+                              api_response: returnData,
+                              send_status: 'send',
+                            });
+                            await historyData.save();
+                            const loginHtmlPath = 'views/webpages/reset-password.html';
+                            let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+                            loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+                            const mailData = {
+                              from: "Bid For Sale! <" + smtpUser + ">",
+                              to: user.email,
+                              subject: "Reset password successfully!",
+                              name: "Bid For Sale!",
+                              text: "reset password successfully!",
+                              html: loginHtmlContent
+                            };
+                            transporter.sendMail(mailData, function (err, info) {
+                              // if (err) console.log("err", err);
+                              // else console.log("info", info);
+                            });
+                            res.status(200).json({
+                              status: "1",
+                              message: "Successfully updated!",
+                              respdata: user,
+                              is_passwordchnage: "true"
+                            });
+                          }
+                        );
+                      }
+                    }
+                  );
+                });
+              } else {
+                res.status(200).json({
+                  status: "0",
+                  message: "New password cannot be same as your Old password!",
+                  respdata: {},
+                  is_passwordchnage: "false"
+                });
+              }
+            }
+          );
+        } else {
+          res.status(200).json({
+            status: "0",
+            message: "Old password does not match!",
+            respdata: {},
+            is_passwordchnage: "false"
+          });
+        }
+      });
+    }
+  });
+};
+
+exports.reasonlistdata = async function (req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: "0",
+      message: "Validation error!",
+      respdata: errors.array(),
+    });
+  }
+  try {
+    const reasons = await Reasonlist.find();
+    return res.json(reasons);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+exports.genderwomenlistdata = async function (req, res, next) {
+  try {
+    const genderId = "65c5dd7c949c7a8b6173f1a9";
+    const userProducts = await Userproduct.find({
+      approval_status: 1,
+      flag: 0,
+      gender_id: genderId,
+    }).distinct('category_id');
+
+    const categoryList = await Category.find({ _id: { $in: userProducts } });
+
+    res.json({
+      status: '1',
+      message: 'Categories fetched successfully.',
+      categories: categoryList,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: '0',
+      message: 'An error occurred while fetching categories by gender_id.',
+      error: error.message,
+    });
+  }
+};
+
+exports.gendermenlistdata = async function (req, res, next) {
+  try {
+    const genderId = "65c5df544f66e281a6393737";
+    const userProducts = await Userproduct.find({
+      approval_status: 1,
+      flag: 0,
+      gender_id: genderId,
+    }).distinct('category_id');
+
+    const categoryList = await Category.find({ _id: { $in: userProducts } });
+
+    res.json({
+      status: '1',
+      message: 'Categories fetched successfully.',
+      categories: categoryList,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: '0',
+      message: 'An error occurred while fetching categories by gender_id.',
+      error: error.message,
+    });
+  }
+};
+
+
+exports.genderkidlistdata = async function (req, res, next) {
+  try {
+    const genderId = "65c5df684f66e281a639373a";
+    const userProducts = await Userproduct.find({
+      approval_status: 1,
+      flag: 0,
+      gender_id: genderId,
+    }).distinct('category_id');
+
+    const categoryList = await Category.find({ _id: { $in: userProducts } });
+
+    res.json({
+      status: '1',
+      message: 'Categories fetched successfully.',
+      categories: categoryList,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: '0',
+      message: 'An error occurred while fetching categories by gender_id.',
+      error: error.message,
+    });
+  }
+};
+
+exports.otherlistdata = async function (req, res, next) {
+  try {
+    const genderId = "65c5e0db8e59ce8c9788301c";
+    const userProducts = await Userproduct.find({
+      approval_status: 1,
+      flag: 0,
+      gender_id: genderId,
+    }).distinct('category_id');
+
+    const categoryList = await Category.find({ _id: { $in: userProducts } });
+
+    res.json({
+      status: '1',
+      message: 'Categories fetched successfully.',
+      categories: categoryList,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: '0',
+      message: 'An error occurred while fetching categories by gender_id.',
+      error: error.message,
+    });
+  }
+};
+
+// exports.whatsappintegration = async function (req, res, next) {
+//   try {
+//     const to_number = '917044289770'; 
+//     const message = 'Hi, I am interested in your product.';
+// 	  let response = await send_message({ type: 'text', message, to_number });
+
+//     res.json({
+//       status: '1',
+//       message: 'Message sent successfully.',
+//       respdata: response,
+//     });
+//   } catch (error) {
+//     console.error(error); 
+//     res.status(500).json({
+//       status: '0',
+//       message: 'An error occurred while fetching categories by gender_id.',
+//       error: error.message,
+//     });
+//   }
+// };
+
+async function send_message(body) {
+  let url = process.env.WP_SMS_API_URL + "/" + process.env.WP_SMS_PRODUCT_ID + "/" + process.env.WP_SMS_PHONE_ID + "/" + "sendMessage";
+  let response = await rp(url, {
+    method: 'post',
+    json: true,
+    body,
+    headers: {
+      'Content-Type': 'application/json',
+      'x-maytapi-key': process.env.WP_SMS_API_TOKEN,
+    },
+  });
+  return response;
+}

@@ -17,6 +17,19 @@ const model = mongoose.Schema({
     type: String,
     default: null, 
   },
+  link: {
+    type: String,
+  },
+  is_read: {
+    type: Number,
+    enum: [0, 1],
+    default: 0,
+  },
+  status: {
+    type: Number,
+    enum: [0, 1],
+    default: 0,
+  },
   added_dtime: {
     type: String,
     required: true,

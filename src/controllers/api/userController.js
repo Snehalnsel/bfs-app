@@ -9,6 +9,7 @@ const path = require("path");
 const fs = require("fs");
 const mime = require("mime");
 const Users = require("../../models/api/userModel");
+const Iptrnsaction = require("../../models/api/ipTransactionModel");
 // const helper = require("../helpers/helper");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -26,26 +27,37 @@ var ObjectId = require("mongodb").ObjectId;
 const url = require("url");
 const nodemailer = require("nodemailer");
 // const smtpUser = "snigdho.lnsel@gmail.com";onaonfajcxjjwoow
-const smtpUser = "sneha.lnsel@gmail.com";
+// const smtpUser = "sneha.lnsel@gmail.com";
+// const smtpUser = "hello@bidforsale.com";
+const smtpUser = "welcome@bidforsale.com";
 
 const accountSid = 'ACa1b71e8226f3a243196beeee233311a9';
 const authToken = 'ea9a24bf2a9ca43a95b991c9c471ba93';
 const twilioClient = new twilio(accountSid, authToken);
 
+// const transporter = nodemailer.createTransport({
+//   port: 587,
+//   host: "smtp.gmail.com",
+//   auth: {
+//     user: smtpUser,
+//     pass: "iysxkkaexpkmfagh",
+//   },
+//   secure: false, // Setting 'secure' to false
+//   tls: {
+//     rejectUnauthorized: false, // Avoids specifying a TLS version
+//   },
+// });
+
+
 const transporter = nodemailer.createTransport({
-  port: 587,
-  host: "smtp.gmail.com",
+  port: 465,
+  host: "mail.bidforsale.com",
   auth: {
     user: smtpUser,
-    pass: "iysxkkaexpkmfagh",
+    pass: "A6K9JAQD%m!s",
   },
-  secure: false, // Setting 'secure' to false
-  tls: {
-    rejectUnauthorized: false, // Avoids specifying a TLS version
-  },
+  secure: true,
 });
-
-
 
 
 function generateToken(user) {
@@ -96,8 +108,6 @@ exports.signUp = async function (req, res, next) {
   let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   let userCount = await Users.countDocuments();
   let userCode = `BFS${(userCount + 1).toString().padStart(5, '0')}`;
-
-  console.log(userCode);
   bcrypt.hash(req.body.password, rounds, (error, hash) => {
     if (error) {
       res.status(400).json({
@@ -111,7 +121,9 @@ exports.signUp = async function (req, res, next) {
       var trial_date = moment(today, "YYYY-MM-DD").add(14, "days");
       trial_date = trial_date.format("YYYY-MM-DD");
 
-      Users.findOne({ email: req.body.email , status: "0" }).then((user) => {
+      const userIpAddress = req.connection.remoteAddress;
+
+      Users.findOne({ $or: [{ email: req.body.email }, { phone_no: req.body.phone_no }], status: "0" }).then((user) => {
         if (!user) {
           const newUser = Users({
             email: req.body.email,
@@ -132,11 +144,57 @@ exports.signUp = async function (req, res, next) {
             app_user_id: userCode,
             trial_end_date: trial_date,
             image: "na",
+            ip_address: userIpAddress, 
           });
 
           newUser
-            .save()
-            .then((user) => {
+          .save()
+          .then(async (user) => {
+
+            let smsData = {
+              textId: "test",
+              toMobile: "91" + user.phone_no,
+              text: "Welcome to Bid For Sale, "+user.name+"! Explore a world of luxury with access to top brands at exceptional value. Buy and sell pre-owned authentic luxury items globally, all while contributing to environmental conservation. Enjoy your journey with us!-BFS RETAIL SERVICES PRIVATE LIMITED",
+            };
+            let returnData;
+            returnData = await sendSms(smsData);
+            const historyData = new ApiCallHistory({
+              userId: user._id,
+              called_for: "register",
+              api_link: process.env.SITE_URL,
+              api_param: smsData,
+              api_response: returnData,
+              send_status: 'send',
+            });
+            await historyData.save();
+
+            const loginHtmlPath = 'views/webpages/welcome.html';;
+            const loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+
+            loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+
+            const mailData = {
+              from: "Bid For Sale! <" + smtpUser + ">",
+              to: user.email,
+              subject: "Order Placed - Bid For Sale!",
+              name: "Bid For Sale!",
+              text: "order placed",
+              html: loginHtmlContent
+            };
+      
+            transporter.sendMail(mailData, function (err, info) {
+              // if (err) console.log("err", err);
+              // else console.log("info", info);
+            });
+      
+
+            Iptrnsaction.create({
+              user_id: user._id,
+              Purpose: "Registration",
+              ip_address: userIpAddress,
+              created_dtime: new Date(),
+            })
+            .then(() => {
               res.status(200).json({
                 status: "1",
                 message: "Added!",
@@ -151,6 +209,14 @@ exports.signUp = async function (req, res, next) {
                 respdata: error,
               });
             });
+          })
+          .catch((error) => {
+            res.status(400).json({
+              status: "0",
+              message: "Error!",
+              respdata: error,
+            });
+          });
         } else {
           res.status(400).json({
             status: "0",
@@ -354,41 +420,6 @@ exports.getLogin = async function (req, res, next) {
                 respdata: err,
               });
             } else {
-              const mailData = {
-                from: smtpUser,
-                to: user.email,
-                subject: "BFS - Bid For Sale  - Welcome Email",
-                text: "Server Email!",
-                html:
-                  "Hey " +
-                  user.name +
-                  ", <br> <p>Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items </p>",
-              };
-
-              transporter.sendMail(mailData, function (err, info) {
-                if (err) console.log(err);
-                else console.log(info);
-              });
-
-             // const msg = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
-
-              const whatsappMessage = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
-              const userPhoneNo = "+917044289770";
-
-              twilioClient.messages.create({
-                body: whatsappMessage,
-                // From: 'whatsapp:+12565734549',
-                // to: 'whatsapp:+918116730275'
-                from: 'whatsapp:+14155238886',
-                to: 'whatsapp:+917044289770'
-              })
-              .then((message) => {
-                console.log(`WhatsApp message sent with SID: ${message.sid}`);
-              })
-              .catch((error) => {
-                console.error(`Error sending WhatsApp message: ${error.message}`);
-              });
-
               const userToken = {
                 userId: user._id,
                 email: user.email,
@@ -535,7 +566,6 @@ exports.uploadImage = async function (req, res, next) {
       const path = Date.now() + ".png";
     
       fs.writeFileSync(folderPath + path, imgData, "base64", function (err) {
-        console.log(err);
       });
 
       var image_url = req.app.locals.requrl + "/public/images/" + path;
@@ -713,7 +743,7 @@ exports.forgotPassword = async function (req, res, next) {
       var otp = randNumber(1000, 2000);
     
       const mailData = {
-        from: smtpUser, 
+        from: "Bid For Sale! <"+smtpUser+">", 
         to: user.email,
         subject: "BFS - Bids For Sale - Forgot password OTP",
         text: "Server Email!",
@@ -726,8 +756,8 @@ exports.forgotPassword = async function (req, res, next) {
       };
 
       transporter.sendMail(mailData, function (err, info) {
-        if (err) console.log(err);
-        else console.log(info);
+        // if (err) console.log(err);
+        // else console.log(info);
       });
 
       var updData = {
@@ -796,7 +826,42 @@ exports.resetPassword = async function (req, res, next) {
                   if (err) {
                     throw err;
                   } else {
-                    Users.findOne({ _id: req.body.user_id }).then((user) => {
+                    Users.findOne({ _id: req.body.user_id }).then(async (user) => {
+
+                      let smsData = {
+                        textId: "test",
+                        toMobile: "91" + user.phone_no,
+                        text: "Password changed successfully! Your account at Bid For Sale is now updated. If you didn't make this change, please contact support immediately. Thank you!-BFS RETAIL SERVICES PRIVATE LIMITED",
+                      };
+                      let returnData;
+                      returnData = await sendSms(smsData);
+                      const historyData = new ApiCallHistory({
+                        userId: user._id,
+                        called_for: "reset password",
+                        api_link: process.env.SITE_URL,
+                        api_param: smsData,
+                        api_response: returnData,
+                        send_status: 'send',
+                      });
+                      await historyData.save();
+              
+                      const loginHtmlPath = 'views/webpages/reset-password.html';
+                      let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+                      loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+          
+                      const mailData = {
+                        from: "Bid For Sale! <" + smtpUser + ">",
+                        to: user.email,
+                        subject: "Reset Passsword Successfully!",
+                        name: "Bid For Sale!",
+                        text: "reset password successfully!",
+                        html: loginHtmlContent
+                      };
+                      
+                      transporter.sendMail(mailData, function (err, info) {
+                        // if (err) console.log("err", err);
+                        // else console.log("info", info);
+                      });
                       res.status(200).json({
                         status: "1",
                         message: "Successfully updated!",
@@ -856,7 +921,6 @@ exports.deleteData = async function (req, res, next) {
 };
 
 exports.deleteuser = async function (req, res, next) {
-  console.log('req.body:', req.body);
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

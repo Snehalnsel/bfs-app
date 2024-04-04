@@ -12,7 +12,7 @@ $(document).ready(function(){
         },
         messages:{
             msg:{
-                required:"Please enter your amount.",
+                required:"Please enter valid amount.",
                 number: "Enter numeric digits only.",
                 maxlength: "You can enter maximum of 10 digits."
             }

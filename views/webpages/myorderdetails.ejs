@@ -1,5 +1,4 @@
 <%- include('../../public/assets/include/header'); %>
-<% console.log(respdata);%>
 <% if(respdata.shippingKitData){%>
    <section class="bids-wrapper">
       <div class="container">
@@ -9,7 +8,9 @@
                <div class="col-md-5">
                   <div class="br-details ob-details">
                      <% if(respdata.product.image){%>
-                     <div class="bid-images"><img src="<%=respdata.product.image%>" alt="images" class="img-fluid"></div>
+                     <div class="bid-images">
+                        <img src="<%=websiteUrl %>/public/compress_images/<%=respdata.product.image%>" alt="images" class="img-fluid">
+                     </div>
                      <%} else {%>
                         <div class="bid-images"><img src="" alt="images" class="img-fluid"></div>
                      <% } %>
@@ -39,7 +40,7 @@
                         <%}%>
                   </div>               
                </div>
-               <div class="col-md-3">
+               <!--<div class="col-md-3">
                   <div class="od-box">
                      <h5 class="short-title">More actions</h5>
                      <div class="act-btn-row">
@@ -51,14 +52,20 @@
                         </div>
                      </div>                   
                   </div>                            
-               </div>
+               </div>-->
    
                <div class="col-md-9">
                   <div class="od-box">
                      <h5 class="short-title">Order Tracking</h5>
                      <div class="tracking-list">
                         <div class="tracking-steps">
-                           <div class="steps-box step-done">
+                           <div class="steps-box">
+                              <div class="steps-label">
+                                 Waiting for BFS response
+                              </div>
+                              <div class="date-icfo">Mon, 16th Oct</div>                           
+                           </div>
+                           <!-- <div class="steps-box step-done">
                               <div class="steps-label">
                                  Order Confirmed
                               </div>
@@ -81,7 +88,7 @@
                                  Delivered
                               </div>
                               <div class="date-icfo">Mon, 16th Oct</div>                           
-                           </div>
+                           </div> -->
                         </div>                   
                      </div>                 
                   </div>              
@@ -106,7 +113,7 @@
             <div class="col-md-5">
               <div class="br-details ob-details">
                  <% if(respdata.product.image){%>
-                  <div class="bid-images"><img src="<%=respdata.product.image%>" alt="images" class="img-fluid"></div>
+                  <div class="bid-images"><img src="<%=websiteUrl %>/public/compress_images/<%=respdata.product.image%>" alt="images" class="img-fluid"></div>
                   <%} else {%>
                     <div class="bid-images"><img src="" alt="images" class="img-fluid"></div>
                   <% } %>
@@ -134,9 +141,31 @@
                    <%} else{%>
                     <p></p>
                     <%}%>
-               </div>               
+               </div> 
+               <div class="od-box">
+                  <%if(respdata.payment_method == 0 ){%>
+                     <%if(respdata.pay_now){%>
+                        <h5 class="short-title">Total Amoumnt : <%=respdata.total_price ;%></h5>
+                        <h5 class="short-title" >Paid :<%=respdata.booking_amount ;%> </h5>
+                     <%}%>
+                     <%if(respdata.remaining_amount!= null){%>
+                        <h5 class="short-title">Remaining Amount : <%=respdata.remaining_amount ;%></h5>
+                     <%}%>
+                  <%}%>
+              </div>     
+               <div class="od-box">
+                  <%if(respdata.delete_status == 1 ){%>
+                     <%if(respdata.delete_by == 1 ){%>
+                        <h5 class="short-title" style="color: blue;">Order Deleted BY Admin</h5>
+                     <%} else if (respdata.delete_by == 2){%>
+                        <h5 class="short-title" style="color: rgb(5, 15, 73);">Order Deleted BY Seller</h5>
+                     <%} else if(respdata.delete_by == 3){%>
+                        <h5 class="short-title" style="color: rgb(45, 144, 226);">Order Deleted BY Buyer</h5>
+                     <%}%>
+                  <%}%>
+              </div>                 
             </div>
-             <div class="col-md-3">
+            <!--<div class="col-md-3">
                <div class="od-box">
                   <h5 class="short-title">More actions</h5>
                   <div class="act-btn-row">
@@ -148,14 +177,19 @@
                      </div>
                   </div>                   
                </div>                            
-            </div>
-
+            </div>-->
              <div class="col-md-9">
                <div class="od-box">
                   <h5 class="short-title">Order Tracking</h5>
                   <div class="tracking-list">
                      <div class="tracking-steps">
-                        <div class="steps-box step-done">
+                        <div class="steps-box">
+                           <div class="steps-label">
+                              Waiting for BFS response
+                           </div>
+                           <div class="date-icfo">Mon, 16th Oct</div>                           
+                        </div>
+                        <!-- <div class="steps-box step-done">
                            <div class="steps-label">
                               Order Confirmed
                            </div>
@@ -172,13 +206,13 @@
                               Out For Delivery
                            </div>
                            <div class="date-icfo">Mon, 14th Oct</div>                           
-                        </div>
-                        <div class="steps-box">
+                        </div> -->
+                        <!-- <div class="steps-box">
                            <div class="steps-label">
                               Delivered
                            </div>
                            <div class="date-icfo">Mon, 16th Oct</div>                           
-                        </div>
+                        </div> -->
                      </div>                   
                   </div>                 
                </div>              

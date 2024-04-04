@@ -14,6 +14,16 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 app.use("/public", express.static(path.join(__dirname, "public")));
 require('dotenv').config();
+const axios = require("axios")
+const moment = require('moment-timezone');
+const dateTime = moment().format("YYYY-MM-DD h:mm:ss");
+
+//Import Bids watcher Model
+const { getFirestore, Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
+const checkChangesInField = require("./src/models/fireDbServices/checkChangesInField");
+const insertNotification = require("./src/models/api/insertNotification");
+
+const Userproduct = require("./src/models/api/userproductModel");
 
 app.locals.siteName = "BFS - Bid For Sale";
 
@@ -34,6 +44,8 @@ const updateBidOfferData = require("./src/models/fireDbServices/updateBidOfferDa
 const getBidData = require("./src/models/fireDbServices/getBidData");
 
 const UserModel = require("./src/models/api/userModel");
+const Cart = require('./src/models/api/cartModel');
+const CartDetail = require('./src/models/api/cartdetailsModel');
 
 app.use(express.json());
 
@@ -115,13 +127,27 @@ app.use(cors());
 // adding morgan to log HTTP requests
 app.use(morgan("combined"));
 
-//routes
-var routes = require("./src/routes/routes.js");
-var web = require("./src/routes/web.js");
-var api = require("./src/routes/api.js");
+//Add session in app as it was in web.js -- edited by Palash
 
-app.use("/", web);
-app.use("/api", api);
+app.use(
+  session({
+    secret: "fd$e43W7ujyDFw(8@tF",
+    // store: redisStore,
+    saveUninitialized: true,
+    resave: true,
+  })
+);
+
+//routes
+const routes = require("./src/routes/routes.js");
+const web = require("./src/routes/web.js");
+const api = require("./src/routes/api.js");
+const adminRoute = require("./src/routes/adminRoute");
+
+
+app.use("/", api);
+app.use("/admin_2F19C0M", web);
+app.use("/admin",adminRoute);
 app.use("/routes", routes); //test
 
 // catch 404 and forward to error handler
@@ -174,9 +200,75 @@ global.io = require('socket.io')(serv,{
 //Socket 
 const { userJoin, getCurrentUser, userLeave, getRoomUsers} = require("./src/models/socket/socketUser");
 const formatMessage = require("./src/utils/messages");
+const acceptFormatMessage = require("./src/utils/accept_messages");
 const botName = "Bid Chatbot";
 
+//let changesInDb = checkChangesInField();
+
+const initializeApp = require("./src/DB/firebaseInitialize");
+const dbFdb = getFirestore();
+(async function () {
+  const bidsRef = await dbFdb.collection('bids');
+  const observer = bidsRef.onSnapshot(docSnapshot => {
+    docSnapshot.docChanges().forEach(async change => {
+      const changeDoc = change.doc.data();
+      let changeDocDetails = changeDoc.id.split("_");
+      // let chatBuyerId = changeDoc.buyerId;
+      // let chatSellerId = changeDoc.sellerId;
+      // let chatProductId = changeDoc.productId;
+      let chatPrice = changeDoc.currentOffer.price;
+      const queryData = {
+        bidId:changeDoc.id
+      };
+      let currUserDetails = "";
+      let sendFromUserId = changeDoc.currentOffer.userId;
+      if(changeDocDetails[1] != "undefined" && changeDocDetails[1] != "") {
+        currUserDetails = await UserModel.findOne({_id:sendFromUserId});
+      }
+      if (change.type === 'added') {
+        //console.log('New Doc: ', change.doc.data());
+        if(typeof changeDoc.currentOffer.sellerMessage != "undefined" && typeof changeDoc.currentOffer.buyerMessage != "undefined" && changeDoc.currentOffer.sellerMessage != "" && changeDoc.currentOffer.buyerMessage != "") {
+          io.to(changeDoc.id).emit("accept_message", acceptFormatMessage(changeDoc.buyerId, changeDoc.currentOffer.buyerMessage,changeDoc.sellerId,changeDoc.currentOffer.sellerMessage,changeDoc.currentOffer.isFromBuyer, changeDoc.id));
+          //io.to(changeDoc.id).emit("accept_message", acceptFormatMessage(currUserDetails.name, chatPrice,sendFromUserId, changeDoc.id));
+        } else {
+          io.to(changeDoc.id).emit("message", formatMessage(currUserDetails.name, chatPrice,sendFromUserId,changeDoc.buyerId, changeDoc.id));
+        }
+      }
+      if (change.type === 'modified') {
+        if(typeof changeDoc.currentOffer.sellerMessage != "undefined" && typeof changeDoc.currentOffer.buyerMessage != "undefined" && changeDoc.currentOffer.sellerMessage != "" && changeDoc.currentOffer.buyerMessage != "") {
+          io.to(changeDoc.id).emit("accept_message", acceptFormatMessage(changeDoc.buyerId, changeDoc.currentOffer.buyerMessage,changeDoc.sellerId,changeDoc.currentOffer.sellerMessage,changeDoc.currentOffer.isFromBuyer, changeDoc.id));
+          //io.to(changeDoc.id).emit("accept_message", acceptFormatMessage(currUserDetails.name, chatPrice,sendFromUserId, changeDoc.id));
+        } else {
+          io.to(changeDoc.id).emit("message", formatMessage(currUserDetails.name, chatPrice,sendFromUserId,changeDoc.buyerId, changeDoc.id));
+        }
+        //console.log('Modified Doc: ', change.doc.data());
+      }
+      if (change.type === 'removed') {
+        //console.log('Removed Doc: ', change.doc.data());
+      }
+    });
+    // let allData = [];
+    // docSnapshot.forEach(function(doc) {
+    //   allData.push(doc.data());
+    // });
+    //console.log(allData);
+    //let newData = docSnapshot.data();
+    
+    //io.to("bid_65d32286b7cc28e479341711_65659ed980149f0cc691ccb1_1708421970111").emit("message",formatMessage("Antu Dhara",newData.currentOffer.price, "65d32286b7cc28e479341711", "bid_65d32286b7cc28e479341711_65659ed980149f0cc691ccb1_1708421970111"));
+    //return true;
+  }, err => {
+      //return false;
+      //console.log(`Encountered error: ${err}`);
+  });
+})();
+
 io.on("connection", (socket) => {
+  /*let reqData = {
+    userId: "65d32286b7cc28e479341711",
+    productId: "65659ed980149f0cc691ccb1",
+    sellerId: "654f368443db200178350161"
+  };
+  checkChangesInField(reqData);*/
   socket.on("joinRoom", async ({ username, currRoom }) => {
     let room = currRoom;
     const user = userJoin(socket.id, username, room);
@@ -210,34 +302,139 @@ io.on("connection", (socket) => {
     };
     let bidOldData = await getBidData(queryData);
     bidOldData = bidOldData[0];
-    let currIndex = parseInt(bidOldData.currentOffer.offerIndex) + 1;
-    const currDateTime = new Date();
-    let timeMiliSeccond = currDateTime.valueOf();
-    let currentOffer = {
-      bidId: bidId,
-      createdAt: timeMiliSeccond,
-      id:(username == bidOldData.buyerId) ? "offer_buyer_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond : "offer_seller_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond,
-      isFromBuyer:(username == bidOldData.buyerId) ? true: false,
-      offerIndex:currIndex,
-      price: (msg != "") ? msg : 0,
-      status: 0,
-      userId: queryData.userId,
-    };
-    let updateData = {
-      //buyerId:queryData.userId,
-      buyerId:(bidOldData.buyerId != "") ? bidOldData.buyerId : "",
+    let bidProductId = bidOldData.productId;
+    let bidProductDetails = await Userproduct.findOne({_id:bidProductId});
+    if(bidProductDetails.offer_price >= msg) {
+      let currIndex = parseInt(bidOldData.currentOffer.offerIndex) + 1;
+      const currDateTime = new Date();
+      let timeMiliSeccond = currDateTime.valueOf();
+      let currentOffer = {
+        bidId: bidId,
+        createdAt: timeMiliSeccond,
+        id:(username == bidOldData.buyerId) ? "offer_buyer_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond : "offer_seller_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond,
+        isFromBuyer:(username == bidOldData.buyerId) ? true: false,
+        offerIndex:currIndex,
+        price: (msg != "") ? msg : 0,
+        status: 0,
+        userId: queryData.userId,
+        sellerMessage:"",
+        buyerMessage:"",
+      };
+      let updateData = {
+        //buyerId:queryData.userId,
+        buyerId:(bidOldData.buyerId != "") ? bidOldData.buyerId : "",
+        id:bidId,
+        createdAt: timeMiliSeccond,
+        productId: (bidOldData.productId != "") ? bidOldData.productId : "",
+        withdrew: false,
+        acceptedByBuyer:false,
+        acceptedBySeller:false,
+        status:1,
+        currentOffer: currentOffer,
+        sellerId:(bidOldData.sellerId != "") ? bidOldData.sellerId : "",
+      }; 
+      await updateBidData(updateData,bidId);
+      await insertBidOfferData(currentOffer,currentOffer.id);
+      //Notification To User Added By Palash 30-03-2024
+      let notificationUserId = '';
+      let notificationTitle = '';
+      let notificationContent = '';
+      let notificationreqUrl = process.env.SITE_URL + "/bid-for-product/" + bidId;
+      if(username == bidOldData.buyerId){
+        notificationUserId = bidOldData.sellerId;
+        notificationTitle = 'A buyer has bidded on your product';
+        notificationContent =  'Buyer has bidded on ' + bidProductDetails.name;
+      } else {
+        notificationUserId = bidOldData.buyerId;
+        notificationTitle = 'The seller has replied on your bid';
+        notificationContent =  'The seller has replied on ' + bidProductDetails.name;
+      }
+      await insertNotification(
+        notificationTitle,
+        notificationContent,
+        notificationUserId,
+        notificationreqUrl,
+        new Date()
+      );
+      //let currUserDetails = await UserModel.findOne({_id:username});
+      //Below line has commented out due to a observer written on the above
+      //io.to(roomName).emit("message",formatMessage(currUserDetails.name, msg,username, roomName));
+    }
+  });
+  // Buyer Seller Acceptation
+  socket.on("acceptation", async ({username,roomName,}) => {
+    //Save the accpetence in db
+    let bidId = roomName;
+    let queryData = {
       id:bidId,
-      createdAt: timeMiliSeccond,
-      productId: (bidOldData.productId != "") ? bidOldData.productId : "",
-      withdrew: false,
-      status:1,
-      currentOffer: currentOffer,
-      sellerId:(bidOldData.sellerId != "") ? bidOldData.sellerId : "",
-    }; 
-    await updateBidData(updateData,bidId);
-    await insertBidOfferData(currentOffer,currentOffer.id);
-    let currUserDetails = await UserModel.findOne({_id:username});
-    io.to(roomName).emit("message",formatMessage(currUserDetails.name, msg,username, roomName));
+      userId:username
+    };
+    let bidOldData = await getBidData(queryData);
+    bidOldData = bidOldData[0];
+    let currIndex = parseInt(bidOldData.currentOffer.offerIndex) + 1;
+      const currDateTime = new Date();
+      let timeMiliSeccond = currDateTime.valueOf();
+      let currentOffer = {
+        bidId: bidId,
+        createdAt: timeMiliSeccond,
+        id:(username == bidOldData.buyerId) ? "offer_buyer_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond : "offer_seller_"+currIndex+"_"+queryData.userId+"_"+timeMiliSeccond,
+        isFromBuyer:(username == bidOldData.buyerId) ? true: false,
+        offerIndex:currIndex,
+        price: bidOldData.currentOffer.price,
+        status: 0,
+        userId: queryData.userId,
+        sellerMessage: (username == bidOldData.sellerId) ? " Have Accepted Buyer's Offer.": "Buyer Has Accepted Your Offer.",
+        buyerMessage: (username == bidOldData.buyerId) ? " Have Accepted Seller's Offer.": " Has Accpeted Your Offer."
+      };
+      let updateData = {
+        //buyerId:queryData.userId,
+        buyerId:(bidOldData.buyerId != "") ? bidOldData.buyerId : "",
+        id:bidId,
+        createdAt: timeMiliSeccond,
+        productId: (bidOldData.productId != "") ? bidOldData.productId : "",
+        withdrew: false,
+        status:1,
+        acceptedByBuyer:(username == bidOldData.buyerId) ? true : bidOldData.acceptedByBuyer,
+        acceptedBySeller:(username == bidOldData.sellerId) ? true : bidOldData.acceptedBySeller,
+        currentOffer: currentOffer,
+        sellerId:(bidOldData.sellerId != "") ? bidOldData.sellerId : "",
+      }; 
+      //Write code for both side acceptation
+      if(((bidOldData.acceptedByBuyer == true) && (updateData.acceptedBySeller == true)) || ((bidOldData.acceptedBySeller == true) && (updateData.acceptedByBuyer == true))) {
+        //Item added to the cart
+        let user_id = bidOldData.buyerId;
+        let product_id = bidOldData.productId;
+        let finalBidPrice = bidOldData.currentOffer.price;
+        let qty = 1;
+        const newCart = new Cart({
+          user_id,
+          status: 0,
+          finalBidPrice:finalBidPrice,
+          added_dtime: dateTime,
+        });
+        const savedCart = await newCart.save();
+        const cartDetail = new CartDetail({
+          cart_id: savedCart._id,
+          product_id,
+          qty,
+          finalBidPrice,
+          check_status: 0,
+          status: 0,
+          added_dtime: dateTime,
+        });
+        const savedata = await cartDetail.save();
+        currentOffer.buyerMessage = "Item Added to Your Cart!";
+        currentOffer.sellerMessage = "Item Added to Buyer's Cart!";
+        await updateBidData(updateData,bidId);
+        await insertBidOfferData(currentOffer,currentOffer.id);
+      } else {
+        await updateBidData(updateData,bidId);
+        await insertBidOfferData(currentOffer,currentOffer.id);
+      }
+        
+        //let currUserDetails = await UserModel.findOne({_id:username});
+        //io.to(socket.id).emit("message", formatMessage(currUserDetails.name, " Has Accepted the latest bid",username, roomName));
+      //}
   });
   //Get old messages form database
   socket.on("getOldMessages", async ({ roomName,username }) => {
@@ -246,10 +443,21 @@ io.on("connection", (socket) => {
       bidId:roomName
     };
     let allData = await getAllOfferHistory(queryData);
+    let bidId = roomName;
+    let queryData1 = {
+      id:bidId,
+      userId:username
+    };
+    let bidOldData = await getBidData(queryData1);
+    bidOldData = bidOldData[0];
     if(allData.length > 0 ) {
       for(let newElement of allData) {
         let currUserDetails = await UserModel.findOne({_id:newElement.userId});
-        io.to(socket.id).emit("message", formatMessage(currUserDetails.name, newElement.price,newElement.userId, roomName));
+        if(typeof newElement.sellerMessage != "undefined" && typeof newElement.buyerMessage != "undefined" && newElement.sellerMessage != "" && newElement.buyerMessage != "") {
+          io.to(socket.id).emit("accept_message", acceptFormatMessage(bidOldData.buyerId, newElement.buyerMessage,bidOldData.sellerId,newElement.sellerMessage,newElement.isFromBuyer, roomName));
+        }else {
+          io.to(socket.id).emit("message", formatMessage(currUserDetails.name, newElement.price,newElement.userId,bidOldData.buyerId, roomName));
+        }
       }
     }
   });
@@ -259,7 +467,7 @@ io.on("connection", (socket) => {
     if (user) {
       io.to(user.room).emit(
         "message",
-        formatMessage(botName, `Other user has left the chat`, user.room)
+        formatMessage(botName, `Other user has left the chat`,"", user.room)
       );
 
       // Send users and room info

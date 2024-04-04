@@ -8,7 +8,6 @@ const model = mongoose.Schema({
   },
   street_name: {
     type: String,
-    //required: true,
   },
   address1: {
     type: String,
@@ -37,6 +36,7 @@ const model = mongoose.Schema({
   },
   address_name: {
     type: String,
+    required: true,
   },
   shiprocket_address: {
     type: String,

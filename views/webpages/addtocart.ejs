@@ -1,25 +1,23 @@
 <%- include('../../public/assets/include/header'); %>
-
+<% if(respdata != ''){ %>  
 <section class="bids-wrapper">
-    <div class="container">  
-          
-       <div class="bids-lists cart-wrapper"> 
-         <% if(respdata != ''){ %>   
-       <div class="cart-list">
-         <form id="orderPlace"> 
-            <input type="hidden" id="user_id" name="user_id" value="<%=user%>">
-            <input type="hidden" id="seller_id" name="seller_id" value="<%=respdata.seller_id%>">
-            <input type="hidden" id="cart_id" name="cart_id" value="<%=respdata.cart_id%>">
-            <input type="hidden" id="product_id" name="product_id" value="<%=respdata.product_id%>">
-            <input type="hidden" id="total_amt" name="total_amt" value="<%=respdata1%>">
-            <input type="hidden" id="gst" name="gst" value="28">
-            <input type="hidden" id="product_price" name="product_price" value="<%=respdata.product_price%>">
-            <input type="hidden" id="payment_method" name="payment_method" value="0">
-         </form> 
-          <div class="bids-row cart-row">             
+    <div class="container"> 
+       <div class="bids-lists cart-wrapper">
+         <div class="cart-list">
+            <form id="orderPlace"> 
+               <input type="hidden" id="user_id" name="user_id" value="<%=user%>">
+               <input type="hidden" id="seller_id" name="seller_id" value="<%=respdata.seller_id%>">
+               <input type="hidden" id="cart_id" name="cart_id" value="<%=respdata.cart_id%>">
+               <input type="hidden" id="product_id" name="product_id" value="<%=respdata.product_id%>">
+               <input type="hidden" id="total_amt" name="total_amt" value="<%=respdata1%>">
+               <input type="hidden" id="gst" name="gst" value="28">
+               <input type="hidden" id="product_price" name="product_price" value="<%=respdata.product_price%>">
+               <input type="hidden" id="payment_method" name="payment_method" value="0">
+            </form> 
+            <div class="bids-row cart-row">             
              <div class="br-details">
                 <div class="bid-images">
-                    <img src="<%=respdata.images%>" alt="images" class="img-fluid"> 
+                  <img src="<%=websiteUrl %>/public/compress_images/<%=respdata.images%>" alt="images" class="img-fluid">
                 </div>
                 <div class="bid-info">
                    <div class="bd-title"><%=respdata.product_name%></div>
@@ -38,7 +36,7 @@
                 </div>
                 <div class="cart-action">
                    <div class="remove-cart">
-                      <a href="/api/delete-cart/<%=respdata._id%>"><i class="fa fa-times" aria-hidden="true"></i></a>
+                      <a href="/delete-cart/<%=respdata._id%>"><i class="fa fa-times" aria-hidden="true"></i></a>
                    </div>
                 </div>
              </div>
@@ -57,12 +55,12 @@
                      </tr>
                      <tr>
                        <td>Packing & Handling Charges</td>
-                       <th><i class="fa fa-inr" aria-hidden="true"></i> 250</th> 
+                       <th><i class="fa fa-inr" aria-hidden="true"></i>500</th> 
                      </tr>
                      <tr>
                         
-                       <td>GST<small>(18% Packing & Handling Charges)</small></td>
-                        <th><i class="fa fa-inr" aria-hidden="true"></i> <%=(respdata.product_price*28)/100;%></th> 
+                       <td>GST</td>
+                        <th><i class="fa fa-inr" aria-hidden="true"></i><%=(respdata.product_price*28)/100;%></th> 
                      </tr>
                      <tr class="border-top total-table">
                        <td><strong>Total Amount</strong></td>
@@ -78,13 +76,22 @@
          </div> 
           
 
-       </div> 
-       <% } else { %>
-         <div>Cart is Empty</div>
+       </div>
+      </div>        
+   </div>
+</section> 
+       <% } else { %>        
+         <section class="bids-wrapper empty-content ">
+            <div class="container">
+              <div class="ec-box">
+                 <h6>Your shopping cart is empty</h6>
+                 <p>Please browse products to add in your cart!</p>
+                 <a href="/" class="bc-btn">Continue Shopping</a>
+              </div> 
+            </div>
+           </section> 
        <% } %>    
-    </div>        
-    </div>
- </section>
+    
 
 <%- include('../../public/assets/include/newsletter'); %>
 <%- include('../../public/assets/include/footer'); %>
@@ -94,7 +101,7 @@ $(document).on("click", ".check-out", async function(e) {
    
     //e.preventDefault();
 
-    window.location.href = '/api/checkout-web';
+    window.location.href = '/checkout-web';
 
    //  let formData = {
    //      cart_id: $('#cart_id').val(),       
@@ -112,7 +119,7 @@ $(document).on("click", ".check-out", async function(e) {
 
    /* $.ajax({
         type: 'POST',
-        url: '/api/checkout-web', // URL to submit the form data to (process.php in this case)
+        url: '/checkout-web', // URL to submit the form data to (process.php in this case)
         data: { data: formData },
         //dataType: "json",
       //   success: function(response) {
@@ -124,13 +131,12 @@ $(document).on("click", ".check-out", async function(e) {
       //            customClass: { confirmButton: 'alert-box-button' }
       //         });
       //         setTimeout(() => {
-      //            window.location.href = '/api/home';
+      //            window.location.href = '/home';
       //         }, 5000);
       //      }
       //   },
       //   error: function(xhr, status, error) {
       //       // Handle errors
-      //       console.error(xhr.responseText);
       //   }
     });*/
 });

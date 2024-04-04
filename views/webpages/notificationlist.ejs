@@ -1,0 +1,81 @@
+<%- include('../../public/assets/include/header'); %>
+
+<% if (respdata && respdata.length > 0) { %>
+    <section class="bids-wrapper ">
+        <div class="container">
+            <div class="title-box title-with-count">
+                <h1>Notifications</h1>
+                <span class="wishlist-count">(<%= notificationCount %>)</span>
+            </div>
+            <div class="wishlist-group-box">
+                <% respdata.forEach(function(notification) { %>
+                    <div class="bids-lists cart-wrapper">
+                        <div class="cart-list wishlist-list ">
+                            <div class="bids-row wishlist-row overflow-visible <%= notification.is_read === 0 ? 'unread-notification' : '' %>" id="<%= notification._id %>">
+                                <div class="br-details">
+                                    <div class="bid-info">
+                                        <a href="#" onclick="handleNotificationClick('<%= notification._id %>','<%= notification.link %>')">
+                                            <div class="bd-title">
+                                                <%= notification.title %>
+                                            </div>
+                                        </a>                                        
+                                        <div class="bd-content">
+                                           <%= notification.content %>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="br-results">
+                                    <div class="cart-action d-flex">
+                                        <div class="remove-cart">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    </section>
+<% } else { %>
+    <section class="empty-content ">
+        <div class="container">
+            <div class="">
+                <div class="ec-box">
+                    <h6>Notifications</h6>
+                    <p>We will notify you once we have something for you</p>
+                    <a href="/webSubCategories" class="bc-btn">CONTINUE SHOPPING</a>
+                </div>
+            </div>
+        </div>
+    </section>
+<% } %>
+
+<%- include('../../public/assets/include/newsletter'); %>
+<%- include('../../public/assets/include/footer'); %>
+<script>
+    const websiteUrl = '<%= websiteUrl %>'; 
+ 
+    async function handleNotificationClick(notificationId,link) {
+        await fetch('/markNotificationAsRead', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ notificationId })
+        })
+        
+        .then(async response => {
+            let data = await response.json();
+            if (data.notification == true) {
+                window.location.href = websiteUrl + link; 
+            } else {
+                console.error('Failed to mark notification as read');
+            }
+        })
+        .catch(error => {
+            console.error('Error occurred while marking notification as read:', error);
+        });
+    }
+</script>
+

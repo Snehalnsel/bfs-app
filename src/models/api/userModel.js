@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const model = mongoose.Schema({
   token: {
     type: String,
-    required: true,
+    //required: true,
   },
   email: {
     type: String,
@@ -26,15 +26,12 @@ const model = mongoose.Schema({
   },
   deviceid: {
     type: String,
-    required: true,
   },
   devicename: {
     type: String,
-    required: true,
   },
   fcm_token: {
     type: String,
-    required: true,
   },
   country: {
     type: String,
@@ -64,6 +61,9 @@ const model = mongoose.Schema({
     type: String,
   },
   forget_otp: {
+    type: String,
+  },
+  ip_address: {
     type: String,
   },
   status: {

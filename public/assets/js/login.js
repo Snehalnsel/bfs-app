@@ -17,7 +17,7 @@ $(document).ready(async function(){
             },
             password:{
                 required:true,
-                maxlength:10,
+                maxlength:15,
                 minlength:8
             }
         },
@@ -28,7 +28,7 @@ $(document).ready(async function(){
             },
             password:{
                 required:"Please enter password.",
-                maxlength:"You can enter maximum of 10 characters.",
+                maxlength:"You can enter maximum of 15 characters.",
                 minlength: "You can enter minimum of 8 characters.",
             }
         },
@@ -38,7 +38,7 @@ $(document).ready(async function(){
             // form_data.append("email", $('#email').val());
             $.ajax({
                 type: 'POST',
-                url:  webSiteUrl + "/api/ajax-userlogin",
+                url:  webSiteUrl + "/ajax-userlogin",
                 data: {
                     email: $('#email').val(),
                     password:$('#pwd').val(),
@@ -46,12 +46,10 @@ $(document).ready(async function(){
                     cookieRefreshToken:cookieRefreshToken
                 },
                 success: async function(obj){
-                    // let obj = response.responseJSON;
                     let error_success = obj.status;
                     if(error_success == 'success'){
                         $('#success-msg').html(obj.message);
                         $('#success-msg').show();
-                        //Set Coockie in the local machine
                         await setCookeiFunc(accessTokenVar,obj.respdata.accessToken,obj.respdata.accessTokenExpires);
                         await setCookeiFunc(refreshTokenVar,obj.respdata.refreshToken,obj.respdata.refreshTokenExpires);
                         setTimeout(function(){
@@ -60,10 +58,10 @@ $(document).ready(async function(){
                         }, 500);
                         if((typeof obj.respdata.refreshReset != "undefined") && (obj.respdata.refreshReset)) {
                             let pathArray = window.location.pathname.split( '/' );
-                            if(pathArray[2] != "registration") {
+                            if(pathArray[1] != "registration") {
                                 location.reload();
                             } else {
-                                location.href= webSiteUrl + "/api/home";
+                                location.href= webSiteUrl + "/home";
                             }
                         }
                     } else {

@@ -33,147 +33,10 @@ const multer = require("multer");
 const upload = multer({ dest: 'public/images/' });
 const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 
-exports.getData = async function (req, res, next) {
-  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-  var pageName = "Product";
-  var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-  Userproduct.aggregate([
-    {
-      $lookup: {
-        from: 'mt_categories',
-        localField: 'category_id',
-        foreignField: '_id',
-        as: 'category',
-      },
-    },
-    {
-      $lookup: {
-        from: 'mt_brands',
-        localField: 'brand_id',
-        foreignField: '_id',
-        as: 'brand',
-      },
-    },
-    {
-      $lookup: {
-        from: 'mt_sizes',
-        localField: 'size_id',
-        foreignField: '_id',
-        as: 'size',
-      },
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'user_id',
-        foreignField: '_id',
-        as: 'user',
-      },
-    },
-    {
-      $lookup: {
-        from: 'mt_product_images', 
-        let: { productId: '$_id' },
-        pipeline: [
-          {
-            $match: {
-              $expr: { $eq: ['$product_id', '$$productId'] },
-            },
-          },
-          {
-            $limit: 1, 
-          },
-        ],
-        as: 'productImages',
-      },
-    },    
-    {
-      $lookup: {
-        from: 'mt_productconditions',
-        localField: 'status',
-        foreignField: '_id',
-        as: 'productCondition',
-      },
-    },
-    /*
-    {
-      $unwind: '$category',
-    },
-    {
-      $lookup: {
-        from: 'mt_categories',
-        localField: 'category.parent_id',
-        foreignField: '_id',
-        as: 'category.parent'
-      }
-    },*/
-    {
-      $lookup: {
-        from: 'mt_genders',
-        localField: 'gender_id',
-        foreignField: '_id',
-        as: 'gender',
-      },
-    },
-  ]).exec(function (error, productList) {
-
-    const totalCount = productList.length;
-    if (error) {
-      return res.status(500).json({ error: 'An error occurred' });
-    }
-    res.render("pages/product/list", {
-      siteName: req.app.locals.siteName,
-      pageName: pageName,
-      pageTitle: pageTitle,
-      userFullName:  req.session.admin.name,
-      userImage:  req.session.admin.image_url,
-      userEmail:  req.session.admin.email,
-      year: moment().format("YYYY"),
-      requrl: req.app.locals.requrl,
-      status: 0,
-      message: "found!",
-      respdata: {
-        list: productList
-      },
-      isAdminLoggedIn:isAdminLoggedIn
-    });
-  });
-
-};
-// exports.getData = function (page, searchType, searchValue,req, res, next) {
-//   var pageName = "Product List";
-//   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+// exports.getData = async function (req, res, next) {
 //   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-//   let query = {};
-
-//   if (searchValue) {
-//     if (searchType === 'name') {
-//       query.name = { $regex: `${searchValue}`, $options: 'i' };
-//     } else if (searchType === 'description') {
-//       query.description = { $regex: `${searchValue}`, $options: 'i' };
-//     } else if (searchType === 'category_name') {
-//       query['category.name'] = { $regex: `${searchValue}`, $options: 'i' };
-//     } else if (searchType === 'brand_name') {
-//       query['brand.name'] = { $regex: `${searchValue}`, $options: 'i' };
-//     } else if (searchType === 'user_name') {
-//       query['user.name'] = { $regex: `${searchValue}`, $options: 'i' };
-//     } else if (searchType === 'size_name') {
-//       query['size.name'] = { $regex: `${searchValue}`, $options: 'i' };
-//     }else if (searchType === 'productCondition_name') {
-//       query['productCondition.name'] = { $regex: `${searchValue}`, $options: 'i' };
-//     }
-//     else if (searchType === 'approval_status') {
-//        if(searchValue == 'Pending'){
-//         searchValue = 0;
-//        }else if(searchValue == 'Approved'){
-//         searchValue = 1;
-//        }else if(searchValue == 'Rejected'){
-//         searchValue = 2;
-//        }
-//       query.approval_status = { $regex: `${searchValue}`, $options: 'i' };
-//     }
-//   }
-
+//   var pageName = "Product";
+//   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
 //   Userproduct.aggregate([
 //     {
 //       $lookup: {
@@ -209,7 +72,7 @@ exports.getData = async function (req, res, next) {
 //     },
 //     {
 //       $lookup: {
-//         from: 'mt_product_images',
+//         from: 'mt_product_images', 
 //         let: { productId: '$_id' },
 //         pipeline: [
 //           {
@@ -218,12 +81,12 @@ exports.getData = async function (req, res, next) {
 //             },
 //           },
 //           {
-//             $limit: 1,
+//             $limit: 1, 
 //           },
 //         ],
 //         as: 'productImages',
 //       },
-//     },
+//     },    
 //     {
 //       $lookup: {
 //         from: 'mt_productconditions',
@@ -232,47 +95,32 @@ exports.getData = async function (req, res, next) {
 //         as: 'productCondition',
 //       },
 //     },
+//     /*
 //     {
-//       $unwind: {
-//         path: '$category',
-//         preserveNullAndEmptyArrays: true,
-//       },
+//       $unwind: '$category',
 //     },
 //     {
 //       $lookup: {
 //         from: 'mt_categories',
 //         localField: 'category.parent_id',
 //         foreignField: '_id',
-//         as: 'category.parent',
+//         as: 'category.parent'
+//       }
+//     },*/
+//     {
+//       $lookup: {
+//         from: 'mt_genders',
+//         localField: 'gender_id',
+//         foreignField: '_id',
+//         as: 'gender',
 //       },
 //     },
-//     {
-//       $project: {
-//         product: {
-//           $cond: {
-//             if: { $ne: ['$category', null] },
-//             then: '$$ROOT',
-//             else: '$$REMOVE',
-//           },
-//         },
-//       },
-//     },
-//     {
-//       $replaceRoot: { newRoot: '$product' },
-//     },
-//     {
-//       $unwind: {
-//         path: '$user',
-//         preserveNullAndEmptyArrays: true,
-//       },
-//     },
-//     { $match: query },
-//     { $limit: 20 }
 //   ]).exec(function (error, productList) {
+
+//     const totalCount = productList.length;
 //     if (error) {
 //       return res.status(500).json({ error: 'An error occurred' });
 //     }
-
 //     res.render("pages/product/list", {
 //       siteName: req.app.locals.siteName,
 //       pageName: pageName,
@@ -290,7 +138,159 @@ exports.getData = async function (req, res, next) {
 //       isAdminLoggedIn:isAdminLoggedIn
 //     });
 //   });
+
 // };
+exports.getData = function (page, searchType, searchValue,req, res, next) {
+  var pageName = "Product List";
+  var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+  let query = {};
+
+  if (searchValue) {
+    if (searchType === 'name') {
+      query.name = { $regex: `${searchValue}`, $options: 'i' };
+    } else if (searchType === 'description') {
+      query.description = { $regex: `${searchValue}`, $options: 'i' };
+    } else if (searchType === 'category_name') {
+      query['category.name'] = { $regex: `${searchValue}`, $options: 'i' };
+    } else if (searchType === 'brand_name') {
+      query['brand.name'] = { $regex: `${searchValue}`, $options: 'i' };
+    } else if (searchType === 'user_name') {
+      query['user.name'] = { $regex: `${searchValue}`, $options: 'i' };
+    } else if (searchType === 'size_name') {
+      query['size.name'] = { $regex: `${searchValue}`, $options: 'i' };
+    }else if (searchType === 'productCondition_name') {
+      query['productCondition.name'] = { $regex: `${searchValue}`, $options: 'i' };
+    }
+    else if (searchType === 'approval_status') {
+       if(searchValue == 'Pending'){
+        searchValue = 0;
+       }else if(searchValue == 'Approved'){
+        searchValue = 1;
+       }else if(searchValue == 'Rejected'){
+        searchValue = 2;
+       }
+      query.approval_status = { $regex: `${searchValue}`, $options: 'i' };
+    }
+  }
+
+  Userproduct.aggregate([
+    {
+      $lookup: {
+        from: 'mt_categories',
+        localField: 'category_id',
+        foreignField: '_id',
+        as: 'category',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_brands',
+        localField: 'brand_id',
+        foreignField: '_id',
+        as: 'brand',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_sizes',
+        localField: 'size_id',
+        foreignField: '_id',
+        as: 'size',
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user_id',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_product_images',
+        let: { productId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ['$product_id', '$$productId'] },
+            },
+          },
+          {
+            $limit: 1,
+          },
+        ],
+        as: 'productImages',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_productconditions',
+        localField: 'status',
+        foreignField: '_id',
+        as: 'productCondition',
+      },
+    },
+    {
+      $unwind: {
+        path: '$category',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_categories',
+        localField: 'category.parent_id',
+        foreignField: '_id',
+        as: 'category.parent',
+      },
+    },
+    {
+      $project: {
+        product: {
+          $cond: {
+            if: { $ne: ['$category', null] },
+            then: '$$ROOT',
+            else: '$$REMOVE',
+          },
+        },
+      },
+    },
+    {
+      $replaceRoot: { newRoot: '$product' },
+    },
+    {
+      $unwind: {
+        path: '$user',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    { $match: query },
+    { $limit: 20 }
+  ]).exec(function (error, productList) {
+    if (error) {
+      return res.status(500).json({ error: 'An error occurred' });
+    }
+
+    res.render("pages/product/list", {
+      siteName: req.app.locals.siteName,
+      pageName: pageName,
+      pageTitle: pageTitle,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
+      year: moment().format("YYYY"),
+      requrl: req.app.locals.requrl,
+      status: 0,
+      message: "found!",
+      respdata: {
+        list: productList
+      },
+      isAdminLoggedIn:isAdminLoggedIn
+    });
+  });
+};
 exports.detailsData = async function (req, res, next) {
 
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";

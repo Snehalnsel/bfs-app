@@ -201,7 +201,7 @@
                         </tr>
                         <tr>
                            <td>GST</td>
-                           <th><i class="fa fa-inr" aria-hidden="true"></i><%=gst%>
+                           <th class="calCulateGst"><i class="fa fa-inr" aria-hidden="true"></i><%=gst%>
                            </th>
                         </tr>
                         <tr class="border-top total-table" id="total-cod-amount-row">
@@ -287,12 +287,17 @@
                      var packingHandlingChargeValue = $('#packingHandlingCharge i').text();
                      //var packingHandlingChargeValue = $('#packingHandlingCharge-hidden').val();
                      var taxvalue = parseFloat(packingHandlingChargeValue) + parseFloat(cashHandlecharges);
-                    
-                     $('#taxvalue').html('<i class="fa fa-inr" aria-hidden="true"></i>' + taxvalue.toFixed(2));
+                     taxvalue = parseFloat(taxvalue).toFixed(2);
+                     $('#taxvalue').html('<i class="fa fa-inr" aria-hidden="true"></i>' + taxvalue);
                      var productPrice = parseFloat('<%= product_price %>');
-                     var gst = parseFloat('<%= gst %>');
-                     var totalAmount = parseFloat(productPrice) + gst + taxvalue;
+                     productPrice = parseFloat(productPrice).toFixed(2);
+                     //var gst = parseFloat('<%= gst %>');
+                     var gst = (taxvalue * 28 /100).toFixed(2);
+                     //var totalAmount = parseFloat(productPrice) + parseFloat(gst).toFixed(2) + parseFloat(taxvalue).toFixed(2);
+                     var totalAmount = parseFloat(productPrice + gst).toFixed(2);
+                     console.log("ggggg",totalAmount);
                      var totalAdvanceAmount = parseFloat(payNowAmount) + gst + taxvalue;
+                     $(".calCulateGst").html('<i class="fa fa-inr" aria-hidden="true"></i>' + (taxvalue * 28 /100).toFixed(2));
                      $('#total-cod-amount-row th').text('₹' + totalAmount.toFixed(2));
                      $('#advance-amount th').text('₹' + totalAdvanceAmount.toFixed(2));
                   } else {
@@ -301,11 +306,9 @@
                      $('.pmnt-hidebox').hide();
                      // var packingHandlingChargeValue = $('#packingHandlingCharge').text().trim();
                      var packingHandlingChargeValue = $('#packingHandlingCharge i').text();
-                     console.log("packing", packingHandlingChargeValue);
                      var taxvalue = parseFloat(packingHandlingChargeValue);
                      $('#taxvalue').html('<i class="fa fa-inr" aria-hidden="true"></i>' + taxvalue.toFixed(2));
-                     console.log("gst", gst);
-                     console.log("productPrice", productPrice);
+                     $(".calCulateGst").html('<i class="fa fa-inr" aria-hidden="true"></i>' + (taxvalue * 28 /100).toFixed(2));
                      var totalAmount = productPrice + gst + taxvalue;
                      $('#total-cod-amount-row th').text('₹' + totalAmount.toFixed(2));
                   }
@@ -386,7 +389,6 @@
                let addToCartreCookieAccessToken = await getCookieFunc(accessTokenVar);
                let addToCartreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
                await userReLogin(addToCartreCookieAccessToken, addToCartreCookieRefreshToken);
-               console.log("format data",formData);
                $.ajax({
                   type: 'POST',
                   url: '/demoplacedorder',

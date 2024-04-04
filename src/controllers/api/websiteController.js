@@ -2851,7 +2851,8 @@ exports.viewCartListByUserId = async function (req, res, next) {
           finalData.product_price = product_price;
         }
         
-        const gst = parseFloat((product_price * 28) / 100).toFixed(2);
+        //const gst = parseFloat((product_price * 28) / 100).toFixed(2);
+        const gst = parseFloat((500 * 28) / 100).toFixed(2);
         const finalPrice = parseInt(product_price) + 500 + parseInt(gst);
         res.render("webpages/addtocart", {
           title: "Cart List Page",
@@ -3034,7 +3035,8 @@ exports.checkoutWeb = async function (req, res, next) {
           new Date()
         );
         // const product_price = finalData.product_price;
-        const gst = parseFloat((product_price * 28) / 100).toFixed(2);
+        //const gst = parseFloat((product_price * 28) / 100).toFixed(2);
+        const gst = parseFloat((500 * 28) / 100).toFixed(2);
         const finalPrice = parseInt(product_price) + 250 + parseFloat(gst).toFixed(2);
         res.render("webpages/mycheckoutweb", {
           title: "Check Out Page",
@@ -3698,7 +3700,8 @@ exports.Demoorder = async function (req, res) {
       remaining_amount = parseFloat(product.offer_price)-parseFloat(pay_now);
       cash_handling_charges = parseFloat(product.offer_price) * 0.05;
     }
-    let gst =  parseFloat(product.offer_price * 28) / 100;
+    let gst =  parseFloat(taxable_value * 28) / 100;
+    //let gst =  parseFloat(product.offer_price * 28) / 100;
     if (payment_method == 0)
     {
       taxable_value =  parseFloat(packing_handling_charge) + parseFloat(cash_handling_charges);

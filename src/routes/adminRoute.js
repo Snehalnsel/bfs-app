@@ -366,9 +366,9 @@ router.get("/productlist", cors(), (req, res) => {
   const page = req.query.page;
   const searchType = req.query.searchType;
   const searchValue = req.query.searchValue;
-  ProductController.getData(page, searchType, searchValue, req, res);
+  ProductController.getfilterData(page, searchType, searchValue, req, res);
 });
-// router.get("/productlist", cors(), ProductController.getData);
+ //router.get("/productlist", cors(), ProductController.getData);
 router.get("/productdetails/:id", cors(), ProductController.detailsData);
 router.post("/updateproductdetails", cors(), upload.array('images[]'), ProductController.updatedetailsData);
 

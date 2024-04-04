@@ -33,114 +33,114 @@ const multer = require("multer");
 const upload = multer({ dest: 'public/images/' });
 const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 
-// exports.getData = async function (req, res, next) {
-//   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-//   var pageName = "Product";
-//   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-//   Userproduct.aggregate([
-//     {
-//       $lookup: {
-//         from: 'mt_categories',
-//         localField: 'category_id',
-//         foreignField: '_id',
-//         as: 'category',
-//       },
-//     },
-//     {
-//       $lookup: {
-//         from: 'mt_brands',
-//         localField: 'brand_id',
-//         foreignField: '_id',
-//         as: 'brand',
-//       },
-//     },
-//     {
-//       $lookup: {
-//         from: 'mt_sizes',
-//         localField: 'size_id',
-//         foreignField: '_id',
-//         as: 'size',
-//       },
-//     },
-//     {
-//       $lookup: {
-//         from: 'users',
-//         localField: 'user_id',
-//         foreignField: '_id',
-//         as: 'user',
-//       },
-//     },
-//     {
-//       $lookup: {
-//         from: 'mt_product_images', 
-//         let: { productId: '$_id' },
-//         pipeline: [
-//           {
-//             $match: {
-//               $expr: { $eq: ['$product_id', '$$productId'] },
-//             },
-//           },
-//           {
-//             $limit: 1, 
-//           },
-//         ],
-//         as: 'productImages',
-//       },
-//     },    
-//     {
-//       $lookup: {
-//         from: 'mt_productconditions',
-//         localField: 'status',
-//         foreignField: '_id',
-//         as: 'productCondition',
-//       },
-//     },
-//     /*
-//     {
-//       $unwind: '$category',
-//     },
-//     {
-//       $lookup: {
-//         from: 'mt_categories',
-//         localField: 'category.parent_id',
-//         foreignField: '_id',
-//         as: 'category.parent'
-//       }
-//     },*/
-//     {
-//       $lookup: {
-//         from: 'mt_genders',
-//         localField: 'gender_id',
-//         foreignField: '_id',
-//         as: 'gender',
-//       },
-//     },
-//   ]).exec(function (error, productList) {
+exports.getData = async function (req, res, next) {
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+  var pageName = "Product";
+  var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+  Userproduct.aggregate([
+    {
+      $lookup: {
+        from: 'mt_categories',
+        localField: 'category_id',
+        foreignField: '_id',
+        as: 'category',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_brands',
+        localField: 'brand_id',
+        foreignField: '_id',
+        as: 'brand',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_sizes',
+        localField: 'size_id',
+        foreignField: '_id',
+        as: 'size',
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user_id',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_product_images', 
+        let: { productId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ['$product_id', '$$productId'] },
+            },
+          },
+          {
+            $limit: 1, 
+          },
+        ],
+        as: 'productImages',
+      },
+    },    
+    {
+      $lookup: {
+        from: 'mt_productconditions',
+        localField: 'status',
+        foreignField: '_id',
+        as: 'productCondition',
+      },
+    },
+    /*
+    {
+      $unwind: '$category',
+    },
+    {
+      $lookup: {
+        from: 'mt_categories',
+        localField: 'category.parent_id',
+        foreignField: '_id',
+        as: 'category.parent'
+      }
+    },*/
+    {
+      $lookup: {
+        from: 'mt_genders',
+        localField: 'gender_id',
+        foreignField: '_id',
+        as: 'gender',
+      },
+    },
+  ]).exec(function (error, productList) {
 
-//     const totalCount = productList.length;
-//     if (error) {
-//       return res.status(500).json({ error: 'An error occurred' });
-//     }
-//     res.render("pages/product/list", {
-//       siteName: req.app.locals.siteName,
-//       pageName: pageName,
-//       pageTitle: pageTitle,
-//       userFullName:  req.session.admin.name,
-//       userImage:  req.session.admin.image_url,
-//       userEmail:  req.session.admin.email,
-//       year: moment().format("YYYY"),
-//       requrl: req.app.locals.requrl,
-//       status: 0,
-//       message: "found!",
-//       respdata: {
-//         list: productList
-//       },
-//       isAdminLoggedIn:isAdminLoggedIn
-//     });
-//   });
+    const totalCount = productList.length;
+    if (error) {
+      return res.status(500).json({ error: 'An error occurred' });
+    }
+    res.render("pages/product/list", {
+      siteName: req.app.locals.siteName,
+      pageName: pageName,
+      pageTitle: pageTitle,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
+      year: moment().format("YYYY"),
+      requrl: req.app.locals.requrl,
+      status: 0,
+      message: "found!",
+      respdata: {
+        list: productList
+      },
+      isAdminLoggedIn:isAdminLoggedIn
+    });
+  });
 
-// };
-exports.getData = function (page, searchType, searchValue,req, res, next) {
+};
+exports.getfilterData = function (page, searchType, searchValue,req, res, next) {
   var pageName = "Product List";
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
@@ -173,6 +173,8 @@ exports.getData = function (page, searchType, searchValue,req, res, next) {
       query.approval_status = { $regex: `${searchValue}`, $options: 'i' };
     }
   }
+
+  console.log("query",query);
 
   Userproduct.aggregate([
     {
@@ -266,8 +268,7 @@ exports.getData = function (page, searchType, searchValue,req, res, next) {
         preserveNullAndEmptyArrays: true,
       },
     },
-    { $match: query },
-    { $limit: 20 }
+    { $match: query }
   ]).exec(function (error, productList) {
     if (error) {
       return res.status(500).json({ error: 'An error occurred' });

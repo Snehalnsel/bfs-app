@@ -3677,7 +3677,7 @@ exports.userPlacedOrder = async function (req, res) {
   }
 };
 
-exports.demoorder = async function (req, res) {
+exports.Demoorder = async function (req, res) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     let pay_now,booking_amount,remaining_amount,packing_handling_charge,taxable_value,cash_handling_charges;
@@ -3722,22 +3722,22 @@ exports.demoorder = async function (req, res) {
     }
     const billing_address_id = billingaddress._id;
     const order = new Demoorder({
-      user_id,
-      cart_id,
-      seller_id,
-      product_id,
-      billing_address_id,
-      shipping_address_id,
-      total_price,
-      payment_method,
-      order_status,
-      pay_now,
-      remaining_amount,
-      booking_amount,
-      packing_handling_charge,
+      user_id: (typeof user_id != "undefined") ? user_id : "",
+      cart_id: (typeof cart_id != "undefined") ? cart_id : "",
+      seller_id: (typeof seller_id != "undefined") ? seller_id : "",
+      product_id: (typeof product_id != "undefined") ? product_id : "",
+      billing_address_id: (typeof billing_address_id != "undefined") ? billing_address_id : "0",
+      shipping_address_id: (typeof shipping_address_id != "undefined") ? shipping_address_id : "0",
+      total_price: (typeof total_price != "undefined") ? parseFloat(total_price) : 0,
+      payment_method: (typeof payment_method != "undefined") ? payment_method : 0,
+      order_status: (typeof order_status != "undefined") ? order_status : 0,
+      pay_now: (typeof pay_now != "undefined") ? pay_now : "",
+      remaining_amount: (typeof remaining_amount != "undefined") ? remaining_amount : 0,
+      booking_amount: (typeof booking_amount != "undefined") ? booking_amount : 0,
+      packing_handling_charge: (typeof packing_handling_charge != "undefined") ? packing_handling_charge : 0,
       status: 1,
-      gst,
-      taxable_value,
+      gst:(typeof gst != "undefined") ? gst : 0,
+      taxable_value:(typeof taxable_value != "undefined") ? taxable_value : 0,
       added_dtime: new Date().toISOString(),
     });
 
@@ -3752,6 +3752,8 @@ exports.demoorder = async function (req, res) {
       });
     }
   } catch (error) {
+    console.log(error);
+    console.log(req.body);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };

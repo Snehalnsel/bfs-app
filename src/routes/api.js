@@ -1340,7 +1340,7 @@ OrderController.shipmentvalue
 );
 
 router.post("/demoplacedorder",
-  WebsiteController.demoorder
+  WebsiteController.Demoorder
 );
 
 router.get("/payment-status",

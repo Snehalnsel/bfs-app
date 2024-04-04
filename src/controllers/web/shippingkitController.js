@@ -226,6 +226,7 @@ exports.getOrderList = function (req, res, next) {
     }
   ]).exec(function (error, orderList) {
     if (error) {
+      console.log("error",error);
       res.status(500).json({ error: 'An error occurred' });
     } else {
 
@@ -247,7 +248,6 @@ exports.getOrderList = function (req, res, next) {
             order.productImage = productImages[index];
           });
 
-
           res.render("pages/shippingkit/list", {
             siteName: req.app.locals.siteName,
             pageName: pageName,
@@ -266,6 +266,7 @@ exports.getOrderList = function (req, res, next) {
           });
         })
         .catch((err) => {
+          console.log("err",err);
           res.status(500).json({ error: 'Error fetching product images' });
         });
     }

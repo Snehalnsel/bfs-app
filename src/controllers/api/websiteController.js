@@ -2257,7 +2257,7 @@ exports.addNewPost = async function (req, res, next) {
         const savedImage = productimageDetail.save();
       });
     }
-    res.redirect('/add-post');
+    res.redirect('/my-post/'+req.session.user.userId);
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -2859,7 +2859,8 @@ exports.viewCartListByUserId = async function (req, res, next) {
           finalData.product_price = product_price;
         }
         
-        const gst = (product_price * 28) / 100;
+        //const gst = parseFloat((product_price * 28) / 100).toFixed(2);
+        const gst = parseFloat((500 * 28) / 100).toFixed(2);
         const finalPrice = parseInt(product_price) + 500 + parseInt(gst);
         res.render("webpages/addtocart", {
           title: "Cart List Page",
@@ -3042,15 +3043,16 @@ exports.checkoutWeb = async function (req, res, next) {
           new Date()
         );
         // const product_price = finalData.product_price;
-        const gst = (product_price * 28) / 100;
-        const finalPrice = parseInt(product_price) + 250 + parseInt(gst);
+        //const gst = parseFloat((product_price * 28) / 100).toFixed(2);
+        const gst = parseFloat((500 * 28) / 100).toFixed(2);
+        const finalPrice = parseInt(product_price) + 250 + parseFloat(gst).toFixed(2);
         res.render("webpages/mycheckoutweb", {
           title: "Check Out Page",
           status: '1',
           is_orderPlaced: 1,
           message: "Welcome to the Checkout page!",
           respdata: finalData,
-          product_price: product_price,
+          product_price: parseFloat(product_price).toFixed(2),
           finalPrice: finalPrice,
           gst: gst,
           product_id: finalData.product_id,
@@ -3692,10 +3694,13 @@ exports.Demoorder = async function (req, res) {
     let formData = req.body.data;
     let user_id = formData.user_id;
     let seller_id = formData.seller_id;
+    packing_handling_charge = formData.packingHandlingChargeValue;
     let cart_id = formData.cart_id;
     let product_id = formData.product_id;
     let payment_method = formData.payment_method;
+    taxable_value = formData.taxable_value;
     let product =await Userproduct.findById(product_id);
+    let total_price = 0;
 
     if (payment_method == 0)
     {
@@ -3703,18 +3708,19 @@ exports.Demoorder = async function (req, res) {
       remaining_amount = parseFloat(product.offer_price)-parseFloat(pay_now);
       cash_handling_charges = parseFloat(product.offer_price) * 0.05;
     }
-    let gst =  parseFloat(product.offer_price * 28) / 100;
+    let gst =  parseFloat(taxable_value * 28) / 100;
+    //let gst =  parseFloat(product.offer_price * 28) / 100;
     if (payment_method == 0)
     {
-      taxable_value =  parseFloat(formData.packing_handling_charge) + cash_handling_charges;
-      booking_amount = pay_now+taxable_value+ gst;
-      total_price = booking_amount + remaining_amount;
+      taxable_value =  parseFloat(packing_handling_charge) + parseFloat(cash_handling_charges);
+      booking_amount = parseFloat(pay_now)+parseFloat(taxable_value)+ parseFloat(gst);
+      total_price = parseFloat(booking_amount) + parseFloat(remaining_amount);
       total_price = total_price.toFixed(2); 
     }
     else if (payment_method == 1)
     {
-      taxable_value =  parseFloat(formData.packing_handling_charge);
-      total_price = product.offer_price + gst + taxable_value ;
+      taxable_value =  parseFloat(packing_handling_charge);
+      total_price = parseFloat(product.offer_price) + parseFloat(gst) + parseFloat(taxable_value) ;
       total_price = total_price.toFixed(2); 
     }
     let order_status = '0';
@@ -3740,12 +3746,12 @@ exports.Demoorder = async function (req, res) {
       payment_method: (typeof payment_method != "undefined") ? payment_method : 0,
       order_status: (typeof order_status != "undefined") ? order_status : 0,
       pay_now: (typeof pay_now != "undefined") ? pay_now : "",
-      remaining_amount: (typeof remaining_amount != "undefined") ? remaining_amount : 0,
-      booking_amount: (typeof booking_amount != "undefined") ? booking_amount : 0,
-      packing_handling_charge: (typeof packing_handling_charge != "undefined") ? packing_handling_charge : 0,
+      remaining_amount: (typeof remaining_amount != "undefined") ? parseFloat(remaining_amount) : 0,
+      booking_amount: (typeof booking_amount != "undefined") ? parseFloat(booking_amount) : 0,
+      packing_handling_charge: (typeof packing_handling_charge != "undefined") ? parseFloat(packing_handling_charge) : 0,
       status: 1,
       gst:(typeof gst != "undefined") ? gst : 0,
-      taxable_value:(typeof taxable_value != "undefined") ? taxable_value : 0,
+      taxable_value:(typeof taxable_value != "undefined") ? parseFloat(taxable_value) : 0,
       added_dtime: new Date().toISOString(),
     });
 

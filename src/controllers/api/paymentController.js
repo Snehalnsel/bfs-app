@@ -45,8 +45,10 @@ const axios = require("axios");
 const sha256 = require("sha256");
 const uniqid = require("uniqid");
 
-const MERCHANT_ID = "PGTESTPAYUAT";
-const PHONE_PE_HOST_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox";
+// const MERCHANT_ID = "PGTESTPAYUAT";
+const MERCHANT_ID = "M22EUQY70KVBB";
+// const PHONE_PE_HOST_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox";
+const PHONE_PE_HOST_URL = "https://api.phonepe.com/apis/hermes";
 const SALT_INDEX = 1;
 // const SALT_KEY = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";
 const SALT_KEY = "6e2f6cdb-392f-4a06-b2e2-a9af19a1207c";
@@ -57,16 +59,13 @@ exports.getPaymentData = async function (req, res, next) {
   try {
     const tempOrderId = req.query.temp;
     const temporder = await Demoorder.findById(tempOrderId);
-   
     let amount;
     if(temporder.booking_amount == 0) {
       amount= parseInt(temporder.total_price);
-    }
-    else
+    } else
     {
       amount = parseInt(temporder.booking_amount);
     }
-
    // amount = temporder.booking_amount !== 0 ? temporder.booking_amount : temporder.total_price;
 
     let userId = temporder.user_id;
@@ -83,13 +82,11 @@ exports.getPaymentData = async function (req, res, next) {
         type: "PAY_PAGE",
       },
     };
-
     let bufferObj = Buffer.from(JSON.stringify(normalPayLoad), "utf8");
     let base64EncodedPayload = bufferObj.toString("base64");
     let string = base64EncodedPayload + "/pg/v1/pay" + SALT_KEY;
     let sha256_val = sha256(string);
     let xVerifyChecksum = sha256_val + "###" + SALT_INDEX;
-
     axios
       .post(
         `${PHONE_PE_HOST_URL}/pg/v1/pay`,
@@ -100,10 +97,22 @@ exports.getPaymentData = async function (req, res, next) {
             "X-VERIFY": xVerifyChecksum,
             accept: "application/json",
           },
-        }
+          data:{
+            merchantId: MERCHANT_ID,
+            merchantTransactionId: merchantTransactionId,
+            merchantUserId: userId,
+            amount: amount * 100,
+            redirectUrl: `${APP_BE_URL}/payment-status?temp=${tempOrderId}`,
+            redirectMode: "REDIRECT",
+            mobileNumber: "9999999999",
+            paymentInstrument: {
+              type: "PAY_PAGE",
+            },
+          },
+        },
       )
       .then(async function (response) {
-
+        //console.log("Response for paymenteeeee:", response.data);return false;
         const updateData = {
           merchant_transactionid:merchantTransactionId,
           pay_response: response.data,
@@ -117,6 +126,7 @@ exports.getPaymentData = async function (req, res, next) {
         res.redirect(response.data.data.instrumentResponse.redirectInfo.url);
       })
       .catch(function (error) {
+        //console.log("Error for payment:",error);return false;
         res.status(500).json({
           status: "0",
           message: "An error occurred during payment.",
@@ -124,6 +134,7 @@ exports.getPaymentData = async function (req, res, next) {
         });
       });
   } catch (error) {
+    //console.log("Error for payment error:");return false;
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the dashboard.",
@@ -253,6 +264,7 @@ exports.getStatus = async function (req, res, next) {
           res.redirect('/message?message=failure');
         }
       } catch (error) {
+        console.log("Error for payment error status:",error);
         res.redirect('/message?message=failure');
         /*res.status(500).json({
           status: '0',
@@ -265,6 +277,7 @@ exports.getStatus = async function (req, res, next) {
       res.redirect('/message?message=failure');
     }
   } catch (error) {
+    console.log("Error for payment error status console:",error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the dashboard.",

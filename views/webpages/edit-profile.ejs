@@ -103,38 +103,37 @@
                            <h4 class="di-title mr-25" id="changePasswordLink">Bank Deatils<i class="fa fa-angle-down" style="font-size:24px"></i> </h4>              
                         </div>
                         
-            
                         <div class="dsh-shortbox" id="changePasswordForm" style="display: none;">
                             <form id="resetpasswordfrom">
                               <div class="div-row">
                                  <div class="div-6">
                                     <label>Enter BANK Name</label>
-                                    <input type="text" name="bankname" class="ds-form-control" value="<%= bankDetails.bankname %>">
+                                    <input type="text" name="bankname" class="ds-form-control" value="<% if(bankDetails != null){ %><%=bankDetails.bankname%><% } %>">
                                  </div>
             
                                  <div class="div-6">
                                     <label>Enter Account Name:</label>
-                                    <input type="text" name="accountname" id="accountname" class="ds-form-control account number" value="<%= bankDetails.accountnumber %>">
+                                    <input type="text" name="accountname" id="accountname" class="ds-form-control account number" value="<% if(bankDetails != null){ %><%= bankDetails.accountnumber %><% } %>">
                                  </div>
             
                                  <div class="div-6">
                                     <label>IFSC CODE:</label>
-                                    <input type="text" name="ifsccode" id="ifsccode" class="ds-form-control" value="<%= bankDetails.ifsccode %>">
+                                    <input type="text" name="ifsccode" id="ifsccode" class="ds-form-control" value="<% if(bankDetails != null){ %><%= bankDetails.ifsccode %><% } %>">
                                  </div>
 
                                  <div class="div-6">
                                     <label>Account Type:</label>
-                                    <input type="text" name="accounttype" id="accounttype" class="ds-form-control" value="<%= bankDetails.accounttype %>">
+                                    <input type="text" name="accounttype" id="accounttype" class="ds-form-control" value="<% if(bankDetails != null){ %><%= bankDetails.accounttype %><% } %>">
                                  </div>
 
                                  <div class="div-6">
                                     <label>UPI ID:</label>
-                                    <input type="text" name="upiid" id="upiid" class="ds-form-control" value="<%= bankDetails.upiid %>">
+                                    <input type="text" name="upiid" id="upiid" class="ds-form-control" value="<% if(bankDetails != null){ %><%= bankDetails.upiid %><% } %>">
                                  </div>
 
                                  <div class="div-6">
                                     <label>UPI ID SCANER:</label>
-                                    <input type="file" name="image" id="upiscaner" value="<%= bankDetails.upiscaner %>"/>
+                                    <input type="file" name="image" id="upiscaner" value="<% if(bankDetails != null){ %><%= bankDetails.upiscaner %><% } %>"/>
                                  </div>
                               </div>
                            </form>

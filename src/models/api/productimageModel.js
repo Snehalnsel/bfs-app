@@ -23,6 +23,10 @@ const model = mongoose.Schema({
     type: String,
    required: true,
   },
+  image_order: {
+    type: Number,
+   required: false,
+  },
   added_dtime: {
     type: String,
     required: true,

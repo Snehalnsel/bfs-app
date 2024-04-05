@@ -479,67 +479,61 @@ exports.getOrderList = function (page, searchType, searchValue, req, res, next) 
 
 
 exports.getOrderDetails = function (req, res, next) {
-
-  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-  var pageName = "Order Details";
-  var pageTitle = req.app.locals.siteName + " - " + pageName;
-  const orderId = req.params.id;
-  const flowId = req.params.flowid;
-
-  if (!mongoose.Types.ObjectId.isValid(orderId)) {
-    return res.render("pages/error-msg", {
-      errorMsg:"Invalid order ID"
-    });
-    //return res.status(400).json({ error: 'Invalid order ID' });
-  }
-
-  Order.findOne({ _id: orderId })
-    .populate('user_id', 'name phone_no email')
-    .populate('seller_id', 'name phone_no email')
-    .populate('billing_address_id')
-    .populate('shipping_address_id')
-    .populate('hub_address_id')
-    .then(async (orderDetails) => {
-      if (!orderDetails) {
-        return res.render("pages/error-msg", {
-          errorMsg:"Order not found"
+  let id = req.params.id
+  let orderStatus = req.params.order_status
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+    var pageName = "Order Details";
+    var pageTitle = req.app.locals.siteName + " - " + pageName;
+    const orderId = req.params.id;
+  
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+      return res.status(400).json({ error: 'Invalid order ID' });
+    }
+  
+    Order.findOne({ _id: orderId })
+      .populate('user_id', 'name phone_no email')
+      .populate('seller_id', 'name phone_no email')
+      .populate('billing_address_id')
+      .populate('shipping_address_id')
+      .populate('hub_address_id')
+      .then(async (orderDetails) => {
+        if (!orderDetails) {
+          return res.status(404).json({ error: 'Order not found' });
+        }
+  
+        const billingAddress = await AddressBook.find({ user_id: orderDetails.seller_id });
+        const shippingAddress = await AddressBook.find({ user_id: orderDetails.user_id });
+  
+        const hubdata = await Hublist.find({ flag: 1 });
+  
+        const shiprocketResponse = await generateCouriresList();
+  console.log(orderDetails)
+        res.render("pages/order/details", {
+          status: 1,
+          siteName: req.app.locals.siteName,
+          pageName: pageName,
+          pageTitle: pageTitle,
+          userFullName: req.session.admin.name,
+          userImage: req.session.admin.image_url,
+          userEmail: req.session.admin.email,
+          year: moment().format("YYYY"),
+          requrl: req.app.locals.requrl,
+          message: "",
+          respdata: {
+            orderDetails: orderDetails,
+            billingAddress: billingAddress,
+            shippingAddress: shippingAddress,
+            hublist: hubdata,
+            shiprocketResponse: shiprocketResponse,
+            orderStatus: orderStatus
+          },
+          isAdminLoggedIn: isAdminLoggedIn
         });
-        //return res.status(404).json({ error: 'Order not found' });
-      }
-
-      const billingAddress = await AddressBook.find({ user_id: orderDetails.seller_id });
-      const shippingAddress = await AddressBook.find({ user_id: orderDetails.user_id });
-
-      const hubdata = await Hublist.find({ flag: 1 });
-
-      const shiprocketResponse = await generateCouriresList();
-
-      res.render("pages/order/details", {
-        status: 1,
-        siteName: req.app.locals.siteName,
-        pageName: pageName,
-        pageTitle: pageTitle,
-        userFullName: req.session.admin.name,
-        userImage: req.session.admin.image_url,
-        userEmail: req.session.admin.email,
-        year: moment().format("YYYY"),
-        requrl: req.app.locals.requrl,
-        message: "",
-        respdata: {
-          orderDetails: orderDetails,
-          billingAddress: billingAddress,
-          shippingAddress: shippingAddress,
-          hublist: hubdata,
-          shiprocketResponse: shiprocketResponse,
-          flowId :flowId
-        },
-        isAdminLoggedIn: isAdminLoggedIn
+  
+      })
+      .catch((error) => {
+        res.status(500).json({ error: 'An error occurred while fetching order details' });
       });
-
-    })
-    .catch((error) => {
-      res.status(500).json({ error: 'An error occurred while fetching order details',error1:error });
-    });
 };
 
 
@@ -720,7 +714,6 @@ async function generateCouriresServiceability(pickup_postcode, delivery_postcode
 }
 
 exports.updateData = async function (req, res, next) {
-
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -741,6 +734,12 @@ exports.updateData = async function (req, res, next) {
         isAdminLoggedIn: isAdminLoggedIn
       });
     } else {
+      // var updData = {
+      //   billing_address_id: req.body.seller_address,
+      //   shipping_address_id: req.body.buyer_address,
+      //   hub_address_id: req.body.hub_address,
+      //   // shiprocket_delivery_partner: req.body.user_courier,
+      // };
       const orderDetails = await Order.findById(req.body.order_id);
       if (!orderDetails) {
         return res.status(404).json({ message: 'Order not found' });
@@ -750,18 +749,19 @@ exports.updateData = async function (req, res, next) {
       const user_id = orderDetails.user_id;
       const seller_id = orderDetails.seller_id;
       const product_id = orderDetails.product_id;
-      const seller_address_id = orderDetails.billing_address_id;
-      const buyer_address_id = orderDetails.shipping_address_id;
-      const hub_address_id = req.body.hub_address;
+      const billing_address_id = orderDetails.billing_address_id;
+      const shipping_address_id = req.body.hub_address;
       const total_price = orderDetails.total_price;
       const payment_method = orderDetails.payment_method;
-      const order_status = orderDetails.order_status;
+      // const order_status = orderDetails.order_status;
+      const order_status = req.body.order_status;
       const gst = orderDetails.gst;
       const delivery_charges = orderDetails.delivery_charges;
       const discount = orderDetails.discount;
       const pickup_status = orderDetails.pickup_status;
       const delivery_status = orderDetails.delivery_status;
       const added_dtime = orderDetails.added_dtime;
+
 
       const now = new Date();
       const currentHour = now.getHours().toString().padStart(2, '0');
@@ -771,39 +771,23 @@ exports.updateData = async function (req, res, next) {
 
       // Generate the unique code using the current time components
       const transactionCode = `BFSTRANS${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
-
-     
-      let trackInsertData = {
+      const track = new Track({
         track_code: transactionCode,
+        seller_id: seller_id,
         product_id: product_id,
-        hub_address_id: hub_address_id,
+        billing_address_id: billing_address_id,
+        hub_address_id: req.body.hub_address,
         total_price: total_price,
         payment_method: payment_method,
         order_status: order_status,
         gst: gst,
         delivery_charges: delivery_charges,
         discount: discount,
-        order_flow_status: req.body.flow_id,
         added_dtime: new Date().toISOString(),
-      };
-      if(req.body.flow_id == 0) {
-        trackInsertData.seller_id = seller_id;
-        trackInsertData.seller_address_id = seller_address_id;
-      } else if(req.body.flow_id == 1) {
-        trackInsertData.buyer_id = user_id;
-        trackInsertData.buyer_address_id = buyer_address_id;
-      } else if(req.body.flow_id == 2) {
-        trackInsertData.buyer_id = user_id;
-        trackInsertData.buyer_address_id = buyer_address_id;
-      } else if(req.body.flow_id == 3){
-        trackInsertData.seller_id = seller_id;
-        trackInsertData.seller_address_id = seller_address_id;
-      } else if(req.body.flow_id == 4){
-        trackInsertData.seller_id = seller_id;
-        trackInsertData.seller_address_id = seller_address_id;
-      }
-      let track = new Track(trackInsertData);
+      });
+
       const savedTrack = await track.save();
+
       if (savedTrack) {
         const track_id = savedTrack._id;
 
@@ -812,8 +796,8 @@ exports.updateData = async function (req, res, next) {
           tracking_id: track_id,
           order_code: order_code,
           track_code: transactionCode,
+          status: order_status,
           type: 0,
-          status:req.body.flow_id,
           added_dtime: new Date().toISOString(),
         });
 
@@ -833,14 +817,11 @@ exports.updateData = async function (req, res, next) {
     }
   }).catch((err) => {
     ;
-    /*res.status(500).json({
+    res.status(500).json({
       status: "0",
       message: "An error occurred while updating the product.",
       respdata: {},
       isAdminLoggedIn: isAdminLoggedIn
-    });*/
-    return res.render("pages/error-msg", {
-      errorMsg:"An error occurred while updating the product"
     });
   });
 };

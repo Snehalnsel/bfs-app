@@ -209,6 +209,7 @@
                                                                             <span style="color: red;">Inactive</span>
                                                                             <% } %>
                                                             </td> -->
+                                                            
                                                             <td>
                                                                 <% if(value.billing_address && value.billing_address[0] && value.shipping_address && value.shipping_address[0]) {%>
                                                                     <% if(value.delete_status == 0) {%>
@@ -238,117 +239,211 @@
                                                                     title="Status change">
                                                                     <i class="fa fa-solid fa-refresh"></i>
                                                                 </a> -->
-                                                                <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].hub_address_id!== '0' && !value.trackDetails[0].shiprocket_order_id) { %>
+                                                                
+                                                                <%
+                                                                if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0){
 
-                                                                    <a href="/admin/orderplace/<%= value.trackDetails[0]._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                                                                    for(let trackDataVal of value.trackDetails) { 
+                                                                    if(trackDataVal.order_status == '0'){
+                                                                        let tarckId = trackDataVal._id;
+
+                                                                if (trackDataVal.hub_address_id!== '0' && !trackDataVal.shiprocket_order_id) { %>
+
+                                                                    <a href="/admin/orderplace/<%= tarckId %>" class="btn btn-warning newbtn" title="Order Placed">
                                                                         Generate Seller Pickup
                                                                     </a>
-                                                                <% } else if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 &&  value.trackDetails[0].shiprocket_order_id !== undefined) { %>
+                                                                <% } else if(trackDataVal.shiprocket_order_id !== undefined) { %>
                                                                     <span>Order Placed</span>
-                                                                    <% if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].pickup_awb !== '0'  && value.trackDetails[0].pickup_dtime == undefined ){%>
-                                                                    <a href="/admin/schedule-pickup/<%= value.trackDetails[0]._id %>" class="btn btn-success newbtn" target="_blank" title="Schedule Pickup">
+                                                                    <% if(trackDataVal.pickup_awb !== '0'  && trackDataVal.pickup_dtime == undefined ){%>
+                                                                    <a href="/admin/schedule-pickup/<%= tarckId %>" class="btn btn-success newbtn" target="_blank" title="Schedule Pickup">
                                                                         Schedule Pickup
                                                                      </a>
-                                                                     <a href="/admin/generatelabel/<%= value.trackDetails[0]._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
+                                                                     <a href="/admin/generatelabel/<%= tarckId  %>" class="btn btn-secondary newbtn" title="Order Placed">
                                                                         Generate Label
                                                                     </a>
-                                                                    <a href="/admin/generateinvoice/<%= value.trackDetails[0]._id  %>" class="btn btn-info newbtn"  style="margin-top: 16px;" title="Order Placed">
+                                                                    <a href="/admin/generateinvoice/<%= tarckId  %>" class="btn btn-info newbtn"  style="margin-top: 16px;" title="Order Placed">
                                                                         Generate Invoice
                                                                     </a>
-                                                                    <% } else if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].pickup_awb !== '0' ){%>
+                                                                    <% } else if(trackDataVal.pickup_awb !== '0' ){ %>
                                                                         
-                                                                        <span style="color: green;">Pickup is confirmed by Ecom Express Surface For AWB :- <span style="color: blue;"><%= value.trackDetails[0].pickup_awb %> </span></span> 
-                                                                        <a href="/admin/generatelabel/<%= value.trackDetails[0]._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
+                                                                        <span style="color: green;">Pickup is confirmed by Ecom Express Surface For AWB :- <span style="color: blue;"><%= trackDataVal.pickup_awb %> </span></span> 
+                                                                        <a href="/admin/generatelabel/<%= tarckId  %>" class="btn btn-secondary newbtn" title="Order Placed">
                                                                             Generate Label
                                                                         </a>
-                                                                        <a href="/admin/generateinvoice/<%= value.trackDetails[0]._id  %>" class="btn btn-info newbtn"  style="margin-top: 16px;" title="Order Placed">
+                                                                        <a href="/admin/generateinvoice/<%= tarckId  %>" class="btn btn-info newbtn"  style="margin-top: 16px;" title="Order Placed">
                                                                             Generate Invoice
                                                                         </a>
                                                                     <% } else {%>
-                                                                        <a href="/admin/check-Couriresserviceability/<%= value.trackDetails[0]._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                                                                        <a href="/admin/check-Couriresserviceability/<%= tarckId %>" class="btn btn-warning newbtn" title="Order Placed">
                                                                             Check Courier Serviceability
                                                                         </a>
                                                                     <% } %>                                                                         
                                                                     <br>
-                                                                <% } %>
+                                                                <% 
+                                                                    }
+                                                                }
+                                                            }   
+                                                        }
+                                                                %>
+
                                                             </td>
-
-                                                            <!-- <td>
-                                                                <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 1 && value.trackDetails[1].pickup_awb == undefined && value.trackDetails[1].shiprocket_shipment_id == undefined ) { %>
-
-                                                                    <a href="/admin/nextorderplace/<%= value._id %>" class="btn btn-warning" title="Order Placed">
-                                                                       Order Placed
-                                                                    </a>
-                                                                <% }else if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 1 && value.trackDetails[1].shiprocket_shipment_id !== '0' && value.trackDetails[1].pickup_awb == '0' )  {%>
-                                                                    <a href="/admin/check-Couriresserviceability/<%= value.trackDetails[1]._id %>" class="btn btn-outline-warning" title="Order Placed">
-                                                                        Check Courier Serviceability
-                                                                    </a>
-                                                                 <% }else if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 1 && value.trackDetails[1].pickup_awb !== '0'  && value.trackDetails[1].pickup_dtime == undefined )  {%>
-                                                                    <a href="/admin/schedule-pickup/<%= value.trackDetails[1]._id %>" class="btn btn-outline-success" target="_blank" title="Schedule Pickup">
-                                                                        Schedule Pickup
-                                                                     </a>
-                                                                  <% } else if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 1 && value.trackDetails[1].pickup_awb !== '0' ){%>
-                                                                    <a href="/admin/generatelabel/<%= value.trackDetails[1]._id  %>" class="btn btn-secondary" title="Order Placed">
-                                                                        Generate Label
-                                                                    </a>
-                                                                    <a href="/admin/generateinvoice/<%= value.trackDetails[1]._id  %>" class="btn btn-info" style="margin-top: 16px;" title="Order Placed">
-                                                                        Generate Invoice
-                                                                    </a>  
-                                                                    <span style="color: green;">Pickup is confirmed by Ecom Express Surface For AWB :- <span style="color: blue;"><%= value.trackDetails[1].pickup_awb %> </span></span>
-                                                                   <% } else {%>
-                                                                        <span style="color: orange;">Product yet not reached hub</span>
-                                                                   <% } %>
-                                                            </td>  -->
+                                                            
 
                                                             <td>
-                                                                <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].order_status=='0') { %>
-
+                                                                <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 ) { %>
+                                                    
                                                                     <a href="/admin/orderdetails/<%= value._id %>/1"
                                                                         class="btn btn-info btn-circle btn-sm" title="Edit">
                                                                         <i class="fas fa-pencil-alt"></i>
                                                                     </a>
-                                                                    <% if(value.trackDetails.length > 1 && value.trackDetails[1].order_status=='1') {%>
-                                                                    <a href="/admin/orderplace/<%= value.trackDetails[1]._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                                                                    <% for(let trackDataVal of value.trackDetails) { 
+                                                                        if(trackDataVal.order_status == '1'){
+                                                                            let tarckId = trackDataVal._id; %>
+
+                                                                    <% if(trackDataVal.order_status=='1' && trackDataVal.hub_address_id!== '0' && !trackDataVal.shiprocket_order_id) { %>
+                                                                    <a href="/admin/orderplace/<%= trackDataVal._id %>" class="btn btn-warning newbtn" title="Order Placed">
                                                                         Generate Seller Pickup
                                                                     </a>
+                                                                    <% } else if( trackDataVal.shiprocket_order_id !== undefined) { %>
+                                                                        <span>Order Placed</span>
+                                                                        <% if(trackDataVal.pickup_awb !== '0'  && trackDataVal.pickup_dtime == undefined ){%>
+                                                                            <a href="/admin/schedule-pickup/<%= trackDataVal._id %>" class="btn btn-success newbtn" target="_blank" title="Schedule Pickup">
+                                                                                Schedule Pickup
+                                                                             </a>
+                                                                             <a href="/admin/generatelabel/<%= trackDataVal._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
+                                                                                Generate Label
+                                                                            </a>
+                                                                            <a href="/admin/generateinvoice/<%= trackDataVal._id  %>" class="btn btn-info newbtn"  style="margin-top: 16px;" title="Order Placed">
+                                                                                Generate Invoice
+                                                                            </a>
+                                                                            <% } else if(trackDataVal.pickup_awb !== '0' ){%>
+                                                                                
+                                                                                <span style="color: green;">Pickup is confirmed by Ecom Express Surface For AWB :- <span style="color: blue;"><%= trackDataVal.pickup_awb %> </span></span> 
+                                                                                <a href="/admin/generatelabel/<%= trackDataVal._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
+                                                                                    Generate Label
+                                                                                </a>
+                                                                                <a href="/admin/generateinvoice/<%= trackDataVal._id  %>" class="btn btn-info newbtn"  style="margin-top: 16px;" title="Order Placed">
+                                                                                    Generate Invoice
+                                                                                </a>
+                                                                            <% } else {%>
+                                                                                <a href="/admin/check-Couriresserviceability/<%= trackDataVal._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                                                                                    Check Courier Serviceability
+                                                                                </a>
+                                                                            <% } %>   
+
                                                                     <% } %>
-                                                                   
+                                                                    <% } %>
+                                                                    <% } %>
                                                                 <% } %>
-
+                                                    
                                                             </td>
-
-
+                                                    
+                                                    
                                                             <td>
                                                                 <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 1 ) { %>
+                                                                    <% for(let trackDataVal of value.trackDetails) { 
+                                                                        if(trackDataVal.order_status == '1'){ %>
 
                                                                     <a href="/admin/orderdetails/<%= value._id %>/2"
                                                                         class="btn btn-info btn-circle btn-sm" title="Edit">
                                                                         <i class="fas fa-pencil-alt"></i>
                                                                     </a>
-                                                                    <% if(value.trackDetails.length > 2 && value.trackDetails[2].order_status=='2') {%>
-                                                                            <a href="/admin/orderplace/<%= value.trackDetails[2]._id %>" class="btn btn-warning newbtn" title="Order Placed">
-                                                                                Generate Seller Pickup
-                                                                           </a>
-                                                                       <% } %>
+                                                                    <%} }%>
+
+                                                                    <% for(let trackDataVal of value.trackDetails) { 
+                                                                        if(trackDataVal.order_status == '2'){
+                                                                            let tarckId = trackDataVal._id; %>
+
+                                                                    <% if(trackDataVal.hub_address_id!== '0' && !trackDataVal.shiprocket_order_id) { %>
+                                                                    <a href="/admin/orderplace/<%= trackDataVal._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                                                                        Generate Seller Pickup
+                                                                    </a>
+                                                                    <% } else if( trackDataVal.shiprocket_order_id !== undefined) { %>
+                                                                        <span>Order Placed</span>
+                                                                        <% if(trackDataVal.pickup_awb !== '0'  && trackDataVal.pickup_dtime == undefined ){%>
+                                                                            <a href="/admin/schedule-pickup/<%= trackDataVal._id %>" class="btn btn-success newbtn" target="_blank" title="Schedule Pickup">
+                                                                                Schedule Pickup
+                                                                             </a>
+                                                                             <a href="/admin/generatelabel/<%= trackDataVal._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
+                                                                                Generate Label
+                                                                            </a>
+                                                                            <a href="/admin/generateinvoice/<%= trackDataVal._id  %>" class="btn btn-info newbtn"  style="margin-top: 16px;" title="Order Placed">
+                                                                                Generate Invoice
+                                                                            </a>
+                                                                            <% } else if(trackDataVal.pickup_awb !== '0' ){%>
+                                                                                
+                                                                                <span style="color: green;">Pickup is confirmed by Ecom Express Surface For AWB :- <span style="color: blue;"><%= trackDataVal.pickup_awb %> </span></span> 
+                                                                                <a href="/admin/generatelabel/<%= trackDataVal._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
+                                                                                    Generate Label
+                                                                                </a>
+                                                                                <a href="/admin/generateinvoice/<%= trackDataVal._id  %>" class="btn btn-info newbtn"  style="margin-top: 16px;" title="Order Placed">
+                                                                                    Generate Invoice
+                                                                                </a>
+                                                                            <% } else {%>
+                                                                                <a href="/admin/check-Couriresserviceability/<%= trackDataVal._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                                                                                    Check Courier Serviceability
+                                                                                </a>
+                                                                            <% } %>   
+
+                                                                    <% } %>
+                                                                    <% } %>
+                                                                    <% } %>
                                                                   
                                                                 <% } %>
                                                                 
                                                             </td>
-
+                                                            
 
                                                             <td>
-                                                                <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].order_status=='0') { %>
+                                                                <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 ) { %>
+                                                                    
 
                                                                     <a href="/admin/orderdetails/<%= value._id %>/3"
                                                                         class="btn btn-info btn-circle btn-sm" title="Edit">
                                                                         <i class="fas fa-pencil-alt"></i>
                                                                     </a>
-                                                                    <% if(value.trackDetails.length > 1 && value.trackDetails[1].order_status=='3') {%>
-                                                                        <a href="/admin/orderplace/<%= value.trackDetails[0]._id %>" class="btn btn-warning newbtn" title="Order Placed">
-                                                                            Generate Seller Pickup
-                                                                        </a>
-                                                                        <% } %>
+
+                                                                    <% for(let trackDataVal of value.trackDetails) { 
+                                                                        if(trackDataVal.order_status == '3'){
+                                                                            let tarckId = trackDataVal._id; %>
+
+                                                                    <% if(trackDataVal.hub_address_id!== '0' && !trackDataVal.shiprocket_order_id) { %>
+                                                                    <a href="/admin/orderplace/<%= trackDataVal._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                                                                        Generate Seller Pickup
+                                                                    </a>
+                                                                    <% } else if( trackDataVal.shiprocket_order_id !== undefined) { %>
+                                                                        <span>Order Placed</span>
+                                                                        <% if(trackDataVal.pickup_awb !== '0'  && trackDataVal.pickup_dtime == undefined ){%>
+                                                                            <a href="/admin/schedule-pickup/<%= trackDataVal._id %>" class="btn btn-success newbtn" target="_blank" title="Schedule Pickup">
+                                                                                Schedule Pickup
+                                                                             </a>
+                                                                             <a href="/admin/generatelabel/<%= trackDataVal._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
+                                                                                Generate Label
+                                                                            </a>
+                                                                            <a href="/admin/generateinvoice/<%= trackDataVal._id  %>" class="btn btn-info newbtn"  style="margin-top: 16px;" title="Order Placed">
+                                                                                Generate Invoice
+                                                                            </a>
+                                                                            <% } else if(trackDataVal.pickup_awb !== '0' ){%>
+                                                                                
+                                                                                <span style="color: green;">Pickup is confirmed by Ecom Express Surface For AWB :- <span style="color: blue;"><%= trackDataVal.pickup_awb %> </span></span> 
+                                                                                <a href="/admin/generatelabel/<%= trackDataVal._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
+                                                                                    Generate Label
+                                                                                </a>
+                                                                                <a href="/admin/generateinvoice/<%= trackDataVal._id  %>" class="btn btn-info newbtn"  style="margin-top: 16px;" title="Order Placed">
+                                                                                    Generate Invoice
+                                                                                </a>
+                                                                            <% } else {%>
+                                                                                <a href="/admin/check-Couriresserviceability/<%= trackDataVal._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                                                                                    Check Courier Serviceability
+                                                                                </a>
+                                                                            <% } %>   
+
+                                                                    <% } %>
+                                                                    <% } %>
+                                                                    <% } %>
+                                                                  
                                                                 <% } %>
+                                                                
                                                             </td>
 
 

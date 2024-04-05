@@ -31,12 +31,12 @@
                             <form class="user" action="/admin/update-orderdetails" method="post">
                                 <div class="form-group row">
                                     <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <input type="hidden" name="order_status" value="<%- respdata.orderStatus %>">
                                         <input type="hidden" name="order_id" value="<%- respdata.orderDetails._id %>">
                                         <input type="text" class="form-control form-control-user" id="seller_name"
                                             name="seller_name" placeholder="Name"
                                             value="<%= respdata.orderDetails.seller_id ? respdata.orderDetails.seller_id.name : '' %>"
                                             required readonly>
-                                            <input type="hidden" id="flow_id" name="flow_id" value="<%= respdata.flowId %>">
                                     </div>
                                     <div class="col-sm-6 mb-3 mb-sm-0">
                                         <input type="text" class="form-control form-control-user" id="seller_phonno"
@@ -123,8 +123,8 @@
                                             <option value="">Select Hub's Address</option>
                                             <% respdata.hublist.forEach(function(hub) { %>
                                                 <option value="<%= hub._id %>" <% if
-                                                    (respdata.orderDetails.shipping_address_id &&
-                                                    respdata.orderDetails.shipping_address_id._id.equals(hub._id)) {
+                                                    (respdata.orderDetails.hub_address_id &&
+                                                    respdata.orderDetails.hub_address_id._id.equals(hub._id))  {
                                                     %>
                                                     selected
                                                     <% } %>

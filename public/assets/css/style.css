@@ -4644,3 +4644,10 @@ td.tp-no-gaptd {
     padding-right: 0px;
 }
 
+.errorMsgClass {
+    font-size: 12px !important;
+    color: #d50e0e !important;
+    font-weight: 400;
+    font-family: 'Poppins', sans-serif;
+}
+

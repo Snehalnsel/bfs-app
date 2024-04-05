@@ -213,6 +213,7 @@ async function generateReturnOrder(data) {
         const token = responseBody;
         resolve(token);
       } else {
+        console.error(`Error (${response.statusCode}): ${body}`);
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
@@ -423,13 +424,13 @@ exports.getOrderList = function (page, searchType, searchValue, req, res, next) 
         from: 'order_trackings',
         localField: '_id',
         foreignField: 'order_id',
-        as: 'trackingDetails',
+        as: 'ordertracking',
       },
     },
     {
       $lookup: {
         from: 'mt_tracks',
-        localField: 'trackingDetails.tracking_id',
+        localField: 'ordertracking.tracking_id',
         foreignField: '_id',
         as: 'trackDetails',
       },
@@ -456,7 +457,7 @@ exports.getOrderList = function (page, searchType, searchValue, req, res, next) 
       });
       //return res.status(500).json({ error: 'An error occurred' });
     }
-
+    console.log("ordelist",orderList);
     res.render("pages/order/list", {
       siteName: req.app.locals.siteName,
       pageName: pageName,
@@ -814,7 +815,7 @@ exports.updateData = async function (req, res, next) {
           order_code: order_code,
           track_code: transactionCode,
           type: 0,
-          status:req.body.flow_id,
+          order_flow_status:req.body.flow_id,
           added_dtime: new Date().toISOString(),
         });
 
@@ -1074,129 +1075,103 @@ exports.orderplaced = async (req, res) => {
       return res.status(400).json({ error: 'Invalid order ID' });
     }
 
-    // const orderDetails = await Order.findById({ _id: order_id })
-    //   .populate('user_id', 'name phone_no email') 
-    //   .populate('seller_id', 'name phone_no email')
-    //   .populate('billing_address_id') 
-    //   .populate('shipping_address_id') 
-    //   .populate('hub_address_id');
-
-    //   const orderDetails = await Order.findById({ _id: order_id })
-    // .populate('user_id', 'name phone_no email') 
-    // .populate('seller_id', 'name phone_no email')
-    // .populate('billing_address_id') 
-    // .populate('shipping_address_id') 
-    // .populate({
-    //   path: 'mt_track', // Assuming this is the field that refers to mt_track
-    //   populate: {
-    //     path: 'order_tracking', // Assuming this is the field that refers to order_tracking in mt_track
-    //     model: 'order_tracking', // Replace 'order_tracking' with the actual model name if different
-    //     populate: [
-    //       { path: 'buyer_id', select: 'name phone_no email' },
-    //       { path: 'seller_id', select: 'name phone_no email' },
-    //       // Add more populate calls as needed for other fields in order_tracking
-    //     ]
-    //   }
-    // });
-
-
     const orderDetails = await Track.findById({ _id: track_id })
       .populate('seller_id', 'name phone_no email')
-      .populate('billing_address_id')
+      .populate('seller_address_id')
       .populate('hub_address_id');
 
     const productdetails = await Userproduct.findById(orderDetails.product_id);
 
-    if (productdetails) {
-      const orderData = {
-        order_id: orderDetails.track_code,
-        order_date: new Date().toISOString(),
-        pickup_location: orderDetails.billing_address_id.shiprocket_address,
-        channel_id: "",
-        comment: "BFS - Bid For Sale",
-        billing_customer_name: orderDetails.seller_id.name,
-        billing_last_name: "",
-        billing_address: orderDetails.billing_address_id.street_name,
-        billing_address_2: orderDetails.billing_address_id.address1,
-        billing_city: orderDetails.billing_address_id.city_name,
-        billing_pincode: orderDetails.billing_address_id.pin_code,
-        billing_state: "West Benagal",
-        billing_country: "India",
-        billing_email: orderDetails.seller_id.email,
-        billing_phone: orderDetails.seller_id.phone_no,
-        shipping_is_billing: false,
-        shipping_customer_name: orderDetails.hub_address_id.name,
-        shipping_last_name: "",
-        shipping_address: orderDetails.hub_address_id.street_name,
-        shipping_address_2: orderDetails.hub_address_id.address1,
-        shipping_city: orderDetails.hub_address_id.city_name,
-        shipping_pincode: orderDetails.hub_address_id.pin_code,
-        shipping_country: "India",
-        shipping_state: "West Benagal",
-        shipping_email: orderDetails.hub_address_id.email,
-        shipping_phone: orderDetails.hub_address_id.phone_no,
-        order_items: [
-          {
-            name: productdetails.name,
-            sku: "chakra123",
-            units: 1,
-            selling_price: productdetails.offer_price,
-            discount: "",
-            tax: "",
-            hsn: 12345678
-          }
-        ],
-        payment_method: "COD",
-        shipping_charges: 0,
-        giftwrap_charges: 0,
-        transaction_charges: 0,
-        total_discount: 0,
-        sub_total: orderDetails.total_price,
-        length: productdetails.length,
-        breadth: productdetails.breath,
-        height: productdetails.height,
-        weight: productdetails.weight,
-      };
-      const shiprocketResponse = await generateOrder(orderData);
-      if (shiprocketResponse) {
+      if (productdetails) {
+        const orderData = {
+          order_id: orderDetails.track_code,
+          order_date: new Date().toISOString(),
+          pickup_location: orderDetails.seller_address_id.shiprocket_address,
+          channel_id: "",
+          comment: "BFS - Bid For Sale",
+          billing_customer_name: orderDetails.seller_id.name,
+          billing_last_name: "",
+          billing_address: orderDetails.seller_address_id.street_name,
+          billing_address_2: orderDetails.seller_address_id.address1,
+          billing_city: orderDetails.seller_address_id.city_name,
+          billing_pincode: orderDetails.seller_address_id.pin_code,
+          billing_state: "West Benagal",
+          billing_country: "India",
+          billing_email: orderDetails.seller_id.email,
+          billing_phone: orderDetails.seller_id.phone_no,
+          shipping_is_billing: false,
+          shipping_customer_name: orderDetails.hub_address_id.name,
+          shipping_last_name: "",
+          shipping_address: orderDetails.hub_address_id.street_name,
+          shipping_address_2: orderDetails.hub_address_id.address1,
+          shipping_city: orderDetails.hub_address_id.city_name,
+          shipping_pincode: orderDetails.hub_address_id.pin_code,
+          shipping_country: "India",
+          shipping_state: "West Benagal",
+          shipping_email: orderDetails.hub_address_id.email,
+          shipping_phone: orderDetails.hub_address_id.phone_no,
+          order_items: [
+            {
+              name: productdetails.name,
+              sku: "chakra123",
+              units: 1,
+              selling_price: productdetails.offer_price,
+              discount: "",
+              tax: "",
+              hsn: 12345678
+            }
+          ],
+          payment_method: "COD",
+          shipping_charges: 0,
+          giftwrap_charges: 0,
+          transaction_charges: 0,
+          total_discount: 0,
+          sub_total: orderDetails.total_price,
+          length: productdetails.length,
+          breadth: productdetails.breath,
+          height: productdetails.height,
+          weight: productdetails.weight,
+        };
+        const shiprocketResponse = await generateOrder(orderData);
+        console.log("shiprocket",shiprocketResponse);
+        if (shiprocketResponse) {
 
-        const payment_status = '0';
+          const payment_status = '0';
 
-        shiprocket_payment_status = payment_status;
-        shiprocket_order_id = shiprocketResponse.order_id;
-        shiprocket_shipment_id = shiprocketResponse.shipment_id;
-        shiprocket_status_code = shiprocketResponse.status_code;
+          shiprocket_payment_status = payment_status;
+          shiprocket_order_id = shiprocketResponse.order_id;
+          shiprocket_shipment_id = shiprocketResponse.shipment_id;
+          shiprocket_status_code = shiprocketResponse.status_code;
 
 
-        orderDetails.shiprocket_payment_status = shiprocket_payment_status;
-        orderDetails.shiprocket_order_id = shiprocket_order_id;
-        orderDetails.shiprocket_shipment_id = shiprocket_shipment_id;
-        orderDetails.shiprocket_status_code = shiprocket_status_code;
+          orderDetails.shiprocket_payment_status = shiprocket_payment_status;
+          orderDetails.shiprocket_order_id = shiprocket_order_id;
+          orderDetails.shiprocket_shipment_id = shiprocket_shipment_id;
+          orderDetails.shiprocket_status_code = shiprocket_status_code;
 
-        await orderDetails.save();
+          await orderDetails.save();
 
+        }
       }
-    }
-    else {
-      return res.status(404).json({ error: ' product Not found' });
-    }
-    if (!orderDetails) {
-      return res.status(404).json({ error: 'Order not found' });
-    }
-    else {
-      const updatedOrderTracking = await Ordertracking.findOneAndUpdate(
-        { tracking_id: track_id },
-        { $set: { status: 1 } },
-        { new: true }
-      );
-      //res.redirect("/admin/orderlist");
+      else {
+        return res.status(404).json({ error: ' product Not found' });
+      }
+      if (!orderDetails) {
+        return res.status(404).json({ error: 'Order not found' });
+      }
+      else {
+        const updatedOrderTracking = await Ordertracking.findOneAndUpdate(
+          { tracking_id: track_id },
+          { $set: { status: 1 } },
+          { new: true }
+        );
       res.redirect(`/admin/check-Couriresserviceability/${track_id}`);
     }
   } catch (error) {
+    console.log(error);
     return res.render("pages/error-msg", {
       errorMsg:"An error occurred while placing the order!"
     });
-    //res.status(500).json({ error: 'An error occurred while placing the order' });
   }
 };
 
@@ -1205,36 +1180,61 @@ exports.returnorderplaced = async (req, res) => {
   try {
 
     let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-    const track_id = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(track_id)) {
-      return res.status(400).json({ error: 'Invalid order ID' });
-    }
+    const order_id = req.params.id;
 
+    const track_details = await Ordertracking.findOne({ order_id: order_id,status:2 });
+
+    const track_id = track_details.tracking_id;
+   
     const orderDetails = await Track.findById({ _id: track_id })
       .populate('buyer_id', 'name phone_no email')
-      .populate('billing_address_id')
+      .populate('buyer_address_id')
       .populate('hub_address_id');
 
     const productdetails = await Userproduct.findById(orderDetails.product_id);
 
     if (productdetails) {
       const orderData = {
+  // "channel_id": "27202",
+  // "pickup_customer_name": "iron man",
+  // "pickup_last_name": "",
+  // "company_name":"iorn pvt ltd",
+  // "pickup_address": "b 123",
+  // "pickup_address_2": "",
+  // "pickup_city": "Delhi",
+  // "pickup_state": "New Delhi",
+  // "pickup_country": "India",
+  // "pickup_pincode": 110030,
+  // "pickup_email": "deadpool@red.com",
+  // "pickup_phone": "9810363552",
+  // "pickup_isd_code": "91",
+  // "shipping_customer_name": "Jax",
+  // "shipping_last_name": "Doe",
+  // "shipping_address": "Castle",
+  // "shipping_address_2": "Bridge",
+  // "shipping_city": "ghaziabad",
+  // "shipping_country": "India",
+  // "shipping_pincode": 201005,
+  // "shipping_state": "Uttarpardesh",
+  // "shipping_email": "kumar.abhishek@shiprocket.com",
+  // "shipping_isd_code": "91",
+  // "shipping_phone": 8888888888,
         order_id: orderDetails.track_code,
         order_date: new Date().toISOString(),
-        pickup_location: orderDetails.billing_address_id.shiprocket_address,
+        pickup_location: orderDetails.buyer_address_id.shiprocket_address,
         channel_id: "",
         comment: "BFS - Bid For Sale",
-        billing_customer_name: orderDetails.seller_id.name,
-        billing_last_name: "",
-        billing_address: orderDetails.billing_address_id.street_name,
-        billing_address_2: orderDetails.billing_address_id.address1,
-        billing_city: orderDetails.billing_address_id.city_name,
-        billing_pincode: orderDetails.billing_address_id.pin_code,
-        billing_state: "West Benagal",
-        billing_country: "India",
-        billing_email: orderDetails.seller_id.email,
-        billing_phone: orderDetails.seller_id.phone_no,
-        shipping_is_billing: false,
+        pickup_customer_name: orderDetails.buyer_id.name,
+        pickup_last_name: "",
+        pickup_address: orderDetails.buyer_address_id.street_name,
+        pickup_address_2: orderDetails.buyer_address_id.address1,
+        pickup_city: orderDetails.buyer_address_id.city_name,
+        pickup_pincode: orderDetails.buyer_address_id.pin_code,
+        pickup_state: "West Benagal",
+        pickup_country: "India",
+        pickup_email: orderDetails.buyer_id.email,
+        pickup_phone: orderDetails.buyer_id.phone_no,
+        pickup_isd_code: "91",
         shipping_customer_name: orderDetails.hub_address_id.name,
         shipping_last_name: "",
         shipping_address: orderDetails.hub_address_id.street_name,
@@ -1245,6 +1245,7 @@ exports.returnorderplaced = async (req, res) => {
         shipping_state: "West Benagal",
         shipping_email: orderDetails.hub_address_id.email,
         shipping_phone: orderDetails.hub_address_id.phone_no,
+        shipping_isd_code: "91",
         order_items: [
           {
             name: productdetails.name,
@@ -1267,9 +1268,16 @@ exports.returnorderplaced = async (req, res) => {
         height: productdetails.height,
         weight: productdetails.weight,
       };
-      const shiprocketResponse = await generateOrder(orderData);
+      const shiprocketResponse = await generateReturnOrder(orderData);
       if (shiprocketResponse) {
 
+        // {
+        //   "order_id": 170872392,
+        //   "shipment_id": 170411259,
+        //   "status": "RETURN PENDING",
+        //   "status_code": 21,
+        //   "company_name": "shiprocket"
+        // }
         const payment_status = '0';
 
         shiprocket_payment_status = payment_status;
@@ -1302,6 +1310,7 @@ exports.returnorderplaced = async (req, res) => {
       res.redirect(`/admin/check-Couriresserviceability/${track_id}`);
     }
   } catch (error) {
+    console.log(error);
     return res.render("pages/error-msg", {
       errorMsg:"An error occurred while placing the order!"
     });
@@ -1739,8 +1748,8 @@ exports.getCourierServiceability = async function (req, res, next) {
 
     if (existingOrder) {
 
-      if (!existingOrder.shipping_address_id) {
-        const billingaddress = await AddressBook.findById(existingOrder.billing_address_id);
+      if (!existingOrder.buyer_address_id) {
+        const billingaddress = await AddressBook.findById(existingOrder.seller_address_id);
         const shippingaddress = await Hublist.findById(existingOrder.hub_address_id);
 
 
@@ -1797,7 +1806,7 @@ exports.getCourierServiceability = async function (req, res, next) {
       }
       else {
         const billingaddress = await Hublist.findById(existingOrder.hub_address_id);
-        const shippingaddress = await AddressBook.findById(existingOrder.shipping_address_id);
+        const shippingaddress = await AddressBook.findById(existingOrder.buyer_address_id);
 
         const shipment_id = existingOrder.shiprocket_shipment_id;
         const pickup_postcode = billingaddress.pin_code;

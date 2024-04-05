@@ -2,440 +2,583 @@
 <html lang="en">
 
 <head>
-    <%- include('../../partials/head', {pageTitle: pageTitle}); %>
+  <%- include('../../partials/head', {pageTitle: pageTitle}); %>
 </head>
 
 <style>
-    .newbtn{
-        padding: 5px !important;
-        margin: 5px 0 !important;
-        min-width: 120px;
-        font-size: 14px !important;
-        text-align: center;
-        line-height: 1.2;
-    }
-    .btn-warning.newbtn {
-        color: #111111 !important;
-    }
+  .newbtn {
+    padding: 5px !important;
+    margin: 5px 0 !important;
+    min-width: 120px;
+    font-size: 14px !important;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .btn-warning.newbtn {
+    color: #111111 !important;
+  }
 </style>
 
 <body id="page-top">
 
-    <!-- Page Wrapper -->
-    <div id="wrapper">
+  <!-- Page Wrapper -->
+  <div id="wrapper">
 
-        <!-- Sidebar -->
-        <%- include('../../partials/sidebar', {siteName: siteName}); %>
-            <!-- End of Sidebar -->
+    <!-- Sidebar -->
+    <%- include('../../partials/sidebar', {siteName: siteName}); %>
+    <!-- End of Sidebar -->
 
-            <!-- Content Wrapper -->
-            <div id="content-wrapper" class="d-flex flex-column">
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
 
-                <!-- Main Content -->
-                <div id="content">
+      <!-- Main Content -->
+      <div id="content">
 
-                    <!-- Topbar -->
-                    <%- include('../../partials/header', {siteName: siteName, userFullName: userFullName, userImage:
+        <!-- Topbar -->
+        <%- include('../../partials/header', {siteName: siteName, userFullName: userFullName, userImage:
                         userImage}); %>
-                        <!-- End of Topbar -->
+        <!-- End of Topbar -->
 
-                        <!-- Begin Page Content -->
-                        <div class="container-fluid">
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
 
-                            <!-- Page Heading -->
-                            <h1 class="h3 mb-2 text-gray-800"><%-pageName%></h1>
-                            <p class="mb-4">View / edit <%-pageName%> details</p>
-                            <div class="search-container">
-                                <form>
-                                  <div class="searchlist-rowbox">
-                                    <div class="fld-part">
-                                      <select id="categorySelect" class="custom-select sr-field" required>
-                                        <option selected>Select Category</option>
-                                        <option value="orderid">Order Id</option>
-                                        <option value="name">Name</option>
-                                        <option value="soldprice">Sold Price</option>
-                                        <option value="sellername">Seller Name</option>
-                                        <option value="buyername">Buyer Name</option>
-                                      </select>
-                                      <input type="text" placeholder="Product Name" id="productNameInput" class="sr-field">
-                                    </div>
-                                    <div class="sb-box"><button type="button" onclick="searchNow()" placeholder="Submit"
-                                        class="sr-button">Search Now</button>
-                                    </div>
-                                  </div>
-                                </form>
-                              </div>
-                              
-                            <button id="downloadExcelBtn" class="btn btn-primary">Download Excel</button>
-                            <!-- DataTales Example -->
-                            <div class="card shadow mb-4">
-                                
-                                <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary"><%-pageName%> Details</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered"  width="100%" cellspacing="0">
-                                            <thead>
-                                                <tr>
-                                                    <th>Sl No</th>
-                                                    <th>Order Id</th>
-                                                    <th>Product Image</th>
-                                                    <th>Product name</th>
-                                                    <th>Product Sold Price</th>
-                                                    <th>Shipment Kit Status</th>
-                                                    <th>Status(Won Bid / Buy Now)</th>
-                                                    <th>Payment Method</th>
-                                                    <th>Seller Details</th>
-                                                    <th>Buyer Details</th>
-                                                    <th>Order Date</th>
-                                                    <!-- <th>Order Status</th> -->
-                                                    <th>Seller to Hub</th>
-                                                    <th>Hub to Buyer</th>
-                                                    <th>Buyer to Hub</th>
-                                                    <th>Hub to Seller</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <% if(respdata.list){ %>
-                                                    <% respdata.list.forEach(function(value, index) { %>
-                                                        <tr>
-                                                            <td>
-                                                                <%= (index+1) %>
-                                                            </td>
-                                                            <td>
-                                                                <% if (value.order_code) { %>
-                                                                    <a href="/admin/shipmentdetails/<%= value._id %>" target="_blank"><%= value.order_code %></a>
-                                                                    <a href="/admin/download-orderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary table-short-btn">SBFSORD PDF</button></a><br>
-                                                                    <a href="/admin/download-orderbfspdf/<%= value._id %>" target="_blank"><button class="btn btn-primary table-short-btn">BFSBORD PDF</button></a><br>
-                                                                    <a href="/admin/download-returnorderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary table-short-btn">BBReturn PDF</button></a><br>
-                                                                    <a href="/admin/download-returnorderpdfseller/<%= value._id %>" target="_blank"><button class="btn btn-primary table-short-btn">BFSReturn PDF</button></a><br>
-                                                                    <button id="showOptionsBtn" class="btn btn-primary table-short-btn">Show Options</button>
-                                                                    <div id="optionsContainer" style="display: none;">                                                                      <button id="emailOption" class="btn btn-secondary" onclick="sendViaEmail('<%= value._id %>')">Send via Email</button>
-                                                                      <button id="whatsappOption" class="btn btn-secondary" onclick="sendViaWhatsApp('<%= value._id %>')">Send via WhatsApp</button>
-                                                                    </div>
-                                                                <% } else { %>
-                                                                    <span style="color: red;">No Order Code is Found</span>
-                                                                <% } %>
-                                                            </td>
-                                                            <td>
-                                                                <% if (value.product && value.product[0] && value.product[0].name) { %>
-                                                                    <%= value.product[0].name %>
-                                                                <% } else { %>
-                                                                    <span style="color: red;">Product name not available</span>
-                                                                <% } %>
-                                                            </td>
-                                                            
-                                                            <td>
-                                                                <% if (value.productImage && value.productImage.image) { %>
-                                                                    <img src="<%= value.productImage.image %>" alt="Product Image" style="max-width: 100px; max-height: 100px;">
-                                                                <% } else { %>
-                                                                    <span style="color: red;">No Image Available</span>
-                                                                <% } %>
-                                                            </td>
-                                                            <td>
-                                                                <% if (value.total_price) { %>
-                                                                        <%= value.total_price %>
-                                                                <% } else { %>
-                                                                    <span style="color: red;"></span>No offer price is Found</span>
-                                                                <% } %>
-                                                            </td>
-                                                            <td>
-                                                                <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].shippingkit_status === 0) { %>
-                                                                    <span style="color: grey;">Not Ordered Shipping Kit</span>
-                                                                <% } else if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].shippingkit_status === 1) { %>
-                                                                    <% if (value.bid_status === 0) { %>
-                                                                      <span style="color: orange;">Ordered Shipping Kit<a href="/admin/shippingkitdetails/<%= value.shipment._id %>" target="_blank">(<%= value.shipment.track_code %>)</a></span>
-                                                                    <% } %>
-                                                                <% } else { %>  
-                                                                    <span style="color: #98FB98;">Not Ordered Shipping Kit</span>
-                                                                <% } %>                                                              
-                                                            </td>
-                                                            <td>
-                                                                <% if (value.bid_status === 0) { %>
-                                                                    <span style="color: grey;"></span>Buy Now</span>
-                                                                <% } else { %>
-                                                                    <span style="color: orange;">Won Bid</span>
-                                                                <% } %>
-                                                            </td>
-                                                            <td>
-                                                                <% if (value.payment_method === 0) { %>
-                                                                    <span style="color: #3CB371;">COD</span>
-                                                                <% } else { %>
-                                                                    <span style="color: #98FB98;">Online</span>
-                                                                <% } %>
-                                                            </td>
-                                                            <td>
-                                                                <% if (value.seller && value.seller[0] && value.seller[0].name) { %>
-                                                                    <%= value.seller[0].name %> 
-                                                                    <%= value.seller[0].phone_no %>
-                                                                <% } else { %>
-                                                                    <span style="color: red;">Name and other details are not available</span>
-                                                                <% } %> 
-                                                                <% if (value.billing_address && value.billing_address[0]) { %>
-                                                                    <%= value.billing_address[0].street_name %>,
-                                                                    <%= value.billing_address[0].address1 %>,
-                                                                    <%= value.billing_address[0].landmark %>,
-                                                                    <%= value.billing_address[0].city_name %>,
-                                                                    <%= value.billing_address[0].state_name %>
-                                                                <% } else { %>
-                                                                    <span style="color: red;">Address details are not available</span>
-                                                                <% } %>
-                                                            </td>
-                                                            <td>
-                                                                <% if (value.user && value.user[0] && value.user[0].name) { %>
-                                                                    <%= value.user[0].name %>,
-                                                                    <%= value.user[0].phone_no %> 
-                                                                <% } else { %>
-                                                                    <span style="color: red;">Name and other details are not available</span>
-                                                                <% } %>
-                                                                <% if (value.shipping_address && value.shipping_address[0]) { %>
-                                                                    <%= value.shipping_address[0].street_name %>,
-                                                                    <%= value.shipping_address[0].address1 %>,
-                                                                    <%= value.shipping_address[0].landmark %>,
-                                                                    <%= value.shipping_address[0].city_name %>,
-                                                                    <%= value.shipping_address[0].state_name %>
-                                                                <% } else { %>
-                                                                    <span style="color: red;">Address details are not available</span>
-                                                                <% } %>    
-                                                            </td>
-                                                            <td>
-                                                                <%= value.added_dtime %>
-                                                            </td>
-                                                            <!-- <td>
-                                                                <% if (value.order_status===0) { %>
-                                                                    <span style="color: blue;">Pending</span>
-                                                                    <% } else if (value.order_status===1) { %>
-                                                                        <span style="color: green;">Active</span>
-                                                                        <% } else { %>
-                                                                            <span style="color: red;">Inactive</span>
-                                                                            <% } %>
-                                                            </td> -->
-                                                            <td>
-                                                                <% if(value.billing_address && value.billing_address[0] && value.shipping_address && value.shipping_address[0]) {%>
-                                                                    <% if(value.delete_status == 0) {%>
-                                                                        <a href="/admin/orderdetails/<%= value._id %>/0"
-                                                                            class="btn btn-info btn-circle btn-sm" title="Edit">
-                                                                            <i class="fas fa-pencil-alt"></i>
-                                                                        </a>
-                                                                    <% } %>  
-                                                                <% } %>  
-                                                                
-                                                                <% if(value.delete_status == 0) {%>
-                                                                    <a href="/admin/delete-orderdetails/<%= value._id %>" class="btn btn-danger btn-circle btn-sm"  title="Delete" onclick="return confirm('Are you sure you want to delete this item?')">
-                                                                        <i class="fas fa-trash"></i>
-                                                                    </a>
-                                                                <% }else{ %>
-                                                                 
-                                                                    <% if(value.delete_by == 1) {%>
-                                                                        <span style="color: blue;">Canceled By Admin</span>
-                                                                    <% } else if(value.delete_by == 2) {%>
-                                                                        <span style="color: rgb(5, 15, 73);">Canceled By Seller</span>
-                                                                    <% } else if(value.delete_by == 3){ %>   
-                                                                        <span style="color: rgb(45, 144, 226);">Canceled By Buyer</span>
-                                                                    <% } %>   
-                                                                <% } %>  
-                                                                <!-- <a href="/admin/brand-statu-change/<%= value._id %>"
-                                                                    class="btn btn-success btn-circle btn-sm"
-                                                                    title="Status change">
-                                                                    <i class="fa fa-solid fa-refresh"></i>
-                                                                </a> -->
-                                                                <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].hub_address_id!== '0' && !value.trackDetails[0].shiprocket_order_id) { %>
-
-                                                                    <a href="/admin/orderplace/<%= value.trackDetails[0]._id %>" class="btn btn-warning newbtn" title="Order Placed">
-                                                                        Generate Seller Pickup
-                                                                    </a>
-                                                                <% } else if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 &&  value.trackDetails[0].shiprocket_order_id !== undefined) { %>
-                                                                    <span>Order Placed</span>
-                                                                    <% if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].pickup_awb !== '0'  && value.trackDetails[0].pickup_dtime == undefined ){%>
-                                                                    <a href="/admin/schedule-pickup/<%= value.trackDetails[0]._id %>" class="btn btn-success newbtn" target="_blank" title="Schedule Pickup">
-                                                                        Schedule Pickup
-                                                                     </a>
-                                                                     <a href="/admin/generatelabel/<%= value.trackDetails[0]._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
-                                                                        Generate Label
-                                                                    </a>
-                                                                    <a href="/admin/generateinvoice/<%= value.trackDetails[0]._id  %>" class="btn btn-info newbtn"  style="margin-top: 16px;" title="Order Placed">
-                                                                        Generate Invoice
-                                                                    </a>
-                                                                    <% } else if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].pickup_awb !== '0' ){%>
-                                                                        
-                                                                        <span style="color: green;">Pickup is confirmed by Ecom Express Surface For AWB :- <span style="color: blue;"><%= value.trackDetails[0].pickup_awb %> </span></span> 
-                                                                        <a href="/admin/generatelabel/<%= value.trackDetails[0]._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
-                                                                            Generate Label
-                                                                        </a>
-                                                                        <a href="/admin/generateinvoice/<%= value.trackDetails[0]._id  %>" class="btn btn-info newbtn"  style="margin-top: 16px;" title="Order Placed">
-                                                                            Generate Invoice
-                                                                        </a>
-                                                                    <% } else {%>
-                                                                        <a href="/admin/check-Couriresserviceability/<%= value.trackDetails[0]._id %>" class="btn btn-warning newbtn" title="Order Placed">
-                                                                            Check Courier Serviceability
-                                                                        </a>
-                                                                    <% } %>                                                                         
-                                                                    <br>
-                                                                <% } %>
-                                                            </td>
-                                                            <td>
-                                                                <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 1 && value.trackDetails[1].pickup_awb == undefined && value.trackDetails[1].shiprocket_shipment_id == undefined ) { %>
-
-                                                                    <a href="/admin/nextorderplace/<%= value._id %>" class="btn btn-warning" title="Order Placed">
-                                                                       Order Placed
-                                                                    </a>
-                                                                <% }else if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 1 && value.trackDetails[1].shiprocket_shipment_id !== '0' && value.trackDetails[1].pickup_awb == '0' )  {%>
-                                                                    <a href="/admin/check-Couriresserviceability/<%= value.trackDetails[1]._id %>" class="btn btn-outline-warning" title="Order Placed">
-                                                                        Check Courier Serviceability
-                                                                    </a>
-                                                                 <% }else if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 1 && value.trackDetails[1].pickup_awb !== '0'  && value.trackDetails[1].pickup_dtime == undefined )  {%>
-                                                                    <a href="/admin/schedule-pickup/<%= value.trackDetails[1]._id %>" class="btn btn-outline-success" target="_blank" title="Schedule Pickup">
-                                                                        Schedule Pickup
-                                                                     </a>
-                                                                  <% } else if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 1 && value.trackDetails[1].pickup_awb !== '0' ){%>
-                                                                    <a href="/admin/generatelabel/<%= value.trackDetails[1]._id  %>" class="btn btn-secondary" title="Order Placed">
-                                                                        Generate Label
-                                                                    </a>
-                                                                    <a href="/admin/generateinvoice/<%= value.trackDetails[1]._id  %>" class="btn btn-info" style="margin-top: 16px;" title="Order Placed">
-                                                                        Generate Invoice
-                                                                    </a>  
-                                                                    <span style="color: green;">Pickup is confirmed by Ecom Express Surface For AWB :- <span style="color: blue;"><%= value.trackDetails[1].pickup_awb %> </span></span>
-                                                                   <% } else {%>
-                                                                        <span style="color: orange;">Product yet not reached hub</span>
-                                                                   <% } %>
-                                                            </td> 
-                                                            <td>
-                                                                <% if (value.returnorder) { %>
-                                                                    <a href="/admin/orderdetails/<%= value._id %>/2"
-                                                                        class="btn btn-info btn-circle btn-sm" title="Edit">
-                                                                        <i class="fas fa-pencil-alt"></i>
-                                                                    </a>
-                                                                    <!-- <% if (value.returnorder) { %> -->
-                                                                        <a href="/admin/returnorder/<%= value._id %>" class="btn btn-warning" title="Order Placed">
-                                                                            Order Placed
-                                                                         </a>
-                                                                    <!-- <% } %> -->
-                                                                <% } %>
-                                                            </td>
-                                                            <td>
-
-                                                            </td>
-                                                        </tr>
-                                                        <% }); %>
-                                                            <% } %>
-                                            </tbody>
-
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- /.container-fluid -->
-
+          <!-- Page Heading -->
+          <h1 class="h3 mb-2 text-gray-800"><%-pageName%></h1>
+          <p class="mb-4">View / edit <%-pageName%> details</p>
+          <div class="search-container">
+            <form>
+              <div class="searchlist-rowbox">
+                <div class="fld-part">
+                  <select id="categorySelect" class="custom-select sr-field" required>
+                    <option selected>Select Category</option>
+                    <option value="orderid">Order Id</option>
+                    <option value="name">Name</option>
+                    <option value="soldprice">Sold Price</option>
+                    <option value="sellername">Seller Name</option>
+                    <option value="buyername">Buyer Name</option>
+                  </select>
+                  <input type="text" placeholder="Product Name" id="productNameInput" class="sr-field">
                 </div>
-                <!-- End of Main Content -->
+                <div class="sb-box"><button type="button" onclick="searchNow()" placeholder="Submit" class="sr-button">Search Now</button>
+                </div>
+              </div>
+            </form>
+          </div>
 
-                <!-- Footer -->
-                <%- include('../../partials/footer', {year: year, siteName: siteName}); %>
-                    <!-- End of Footer -->
+          <button id="downloadExcelBtn" class="btn btn-primary">Download Excel</button>
+          <!-- DataTales Example -->
+          <div class="card shadow mb-4">
 
+            <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-primary"><%-pageName%> Details</h6>
             </div>
-            <!-- End of Content Wrapper -->
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                  <thead>
+                    <tr>
+                      <th>Sl No</th>
+                      <th>Order Id</th>
+                      <th>Product Image</th>
+                      <th>Product name</th>
+                      <th>Product Sold Price</th>
+                      <th>Shipment Kit Status</th>
+                      <th>Status(Won Bid / Buy Now)</th>
+                      <th>Payment Method</th>
+                      <th>Seller Details</th>
+                      <th>Buyer Details</th>
+                      <th>Order Date</th>
+                      <th>Order Delete</th>
+                      <th>Seller to Hub</th>
+                      <th>Hub to Buyer</th>
+                      <th>Buyer to Hub</th>
+                      <th>Hub to Seller</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if(respdata.list){ %>
+                    <% respdata.list.forEach(function(value, index) { %>
+                    <tr>
+                      <td>
+                        <%= (index+1) %>
+                      </td>
+                      <td>
+                        <% if (value.order_code) { %>
+                        <a href="/admin/shipmentdetails/<%= value._id %>" target="_blank"><%= value.order_code %></a>
+                        <a href="/admin/download-orderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary table-short-btn">SBFSORD PDF</button></a><br>
+                        <a href="/admin/download-orderbfspdf/<%= value._id %>" target="_blank"><button class="btn btn-primary table-short-btn">BFSBORD PDF</button></a><br>
+                        <a href="/admin/download-returnorderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary table-short-btn">BBReturn PDF</button></a><br>
+                        <a href="/admin/download-returnorderpdfseller/<%= value._id %>" target="_blank"><button class="btn btn-primary table-short-btn">BFSReturn PDF</button></a><br>
+                        <button id="showOptionsBtn" class="btn btn-primary table-short-btn">Show Options</button>
+                        <div id="optionsContainer" style="display: none;"> <button id="emailOption" class="btn btn-secondary" onclick="sendViaEmail('<%= value._id %>')">Send via Email</button>
+                          <button id="whatsappOption" class="btn btn-secondary" onclick="sendViaWhatsApp('<%= value._id %>')">Send via WhatsApp</button>
+                        </div>
+                        <% } else { %>
+                        <span style="color: red;">No Order Code is Found</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <% if (value.product && value.product[0] && value.product[0].name) { %>
+                        <%= value.product[0].name %>
+                        <% } else { %>
+                        <span style="color: red;">Product name not available</span>
+                        <% } %>
+                      </td>
+
+                      <td>
+                        <% if (value.productImage && value.productImage.image) { %>
+                        <img src="<%= value.productImage.image %>" alt="Product Image" style="max-width: 100px; max-height: 100px;">
+                        <% } else { %>
+                        <span style="color: red;">No Image Available</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <% if (value.total_price) { %>
+                        <%= value.total_price %>
+                        <% } else { %>
+                        <span style="color: red;"></span>No offer price is Found</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].shippingkit_status === 0) { %>
+                        <span style="color: grey;">Not Ordered Shipping Kit</span>
+                        <% } else if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].shippingkit_status === 1) { %>
+                        <% if (value.bid_status === 0) { %>
+                        <span style="color: orange;">Ordered Shipping Kit<a href="/admin/shippingkitdetails/<%= value.shipment._id %>" target="_blank">(<%= value.shipment.track_code %>)</a></span>
+                        <% } %>
+                        <% } else { %>
+                        <span style="color: #98FB98;">Not Ordered Shipping Kit</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <% if (value.bid_status === 0) { %>
+                        <span style="color: grey;"></span>Buy Now</span>
+                        <% } else { %>
+                        <span style="color: orange;">Won Bid</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <% if (value.payment_method === 0) { %>
+                        <span style="color: #3CB371;">COD</span>
+                        <% } else { %>
+                        <span style="color: #98FB98;">Online</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <% if (value.seller && value.seller[0] && value.seller[0].name) { %>
+                        <%= value.seller[0].name %>
+                        <%= value.seller[0].phone_no %>
+                        <% } else { %>
+                        <span style="color: red;">Name and other details are not available</span>
+                        <% } %>
+                        <% if (value.billing_address && value.billing_address[0]) { %>
+                        <%= value.billing_address[0].street_name %>,
+                        <%= value.billing_address[0].address1 %>,
+                        <%= value.billing_address[0].landmark %>,
+                        <%= value.billing_address[0].city_name %>,
+                        <%= value.billing_address[0].state_name %>
+                        <% } else { %>
+                        <span style="color: red;">Address details are not available</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <% if (value.user && value.user[0] && value.user[0].name) { %>
+                        <%= value.user[0].name %>,
+                        <%= value.user[0].phone_no %>
+                        <% } else { %>
+                        <span style="color: red;">Name and other details are not available</span>
+                        <% } %>
+                        <% if (value.shipping_address && value.shipping_address[0]) { %>
+                        <%= value.shipping_address[0].street_name %>,
+                        <%= value.shipping_address[0].address1 %>,
+                        <%= value.shipping_address[0].landmark %>,
+                        <%= value.shipping_address[0].city_name %>,
+                        <%= value.shipping_address[0].state_name %>
+                        <% } else { %>
+                        <span style="color: red;">Address details are not available</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <%= value.added_dtime %>
+                      </td>
+                      <td>
+                        <% if(value.delete_status == 0) {%>
+                        <a href="/admin/delete-orderdetails/<%= value._id %>" class="btn btn-danger btn-circle btn-sm" title="Delete" onclick="return confirm('Are you sure you want to delete this item?')">
+                          <i class="fas fa-trash"></i>
+                        </a>
+                        <% }else{ %>
+
+                        <% if(value.delete_by == 1) {%>
+                        <span style="color: blue;">Canceled By Admin</span>
+                        <% } else if(value.delete_by == 2) {%>
+                        <span style="color: rgb(5, 15, 73);">Canceled By Seller</span>
+                        <% } else if(value.delete_by == 3){ %>
+                        <span style="color: rgb(45, 144, 226);">Canceled By Buyer</span>
+                        <% } %>
+                        <% } %>
+
+                      </td>
+
+                      <td>
+                        <%  if(!(value.trackDetails.length)) { %>
+                        <% if(value.billing_address && value.billing_address.length && value.shipping_address && value.shipping_address ) {%>
+                        <% if(value.delete_status == 0) {%>
+                        <a href="/admin/orderdetails/<%= value._id %>/0" class="btn btn-info btn-circle btn-sm" title="Edit">
+                          <i class="fas fa-pencil-alt"></i>
+                        </a>
+                        <a href="/admin/delete-orderdetails/<%= value._id %>" class="btn btn-danger btn-circle btn-sm" title="Delete" onclick="return confirm('Are you sure you want to delete this item?')">
+                          <i class="fas fa-trash"></i>
+                        </a>
+                        <% } %>
+                        <% if(value?.delete_by == 1) {%>
+                        <span style="color: blue;">Canceled By Admin</span>
+                        <% } else if(value?.delete_by == 2) {%>
+                        <span style="color: rgb(5, 15, 73);">Canceled By Seller</span>
+                        <% } else if(value?.delete_by == 3){ %>
+                        <span style="color: rgb(45, 144, 226);">Canceled By Buyer</span>
+                        <% } %>
+
+                        <% } %>
+
+                        <% } %>
+
+                        <% value?.trackDetails.forEach(function(data, index) { %>
+                        <% if (data.order_flow_status === 0) { %>
+
+                        <% if(data.shiprocket_order_id && data.shiprocket_shipment_id) {%>
+                        <a href="/admin/check-Couriresserviceability/<%= value.trackDetails[0]._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                          Check Courier Serviceability
+                        </a>
+                        <% } %>
+                        <% if (data.hub_address_id!== '0' && !data.shiprocket_order_id) { %>
+
+                        <a href="/admin/orderplace/<%= data._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                          Generate Seller Pickup
+                        </a>
+                        <% } %>
+                        <% if(data.shiprocket_order_id !== undefined) { %>
+                        <span>Order Placed</span>
+                        <% if(data.pickup_awb !== '0'  && data.pickup_dtime == undefined ){%>
+                        <a href="/admin/schedule-pickup/<%= data._id %>" class="btn btn-success newbtn" target="_blank" title="Schedule Pickup">
+                          Schedule Pickup
+                        </a>
+                        <a href="/admin/generatelabel/<%= data._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
+                          Generate Label
+                        </a>
+                        <a href="/admin/generateinvoice/<%= data._id  %>" class="btn btn-info newbtn" style="margin-top: 16px;" title="Order Placed">
+                          Generate Invoice
+                        </a>
+                        <% } %>
+                        <% if(data.pickup_awb !== '0' ){%>
+
+                        <span style="color: green;">Pickup is confirmed by Ecom Express Surface For AWB :- <span style="color: blue;"><%= data.pickup_awb %> </span></span>
+                        <a href="/admin/generatelabel/<%= data._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
+                          Generate Label
+                        </a>
+                        <a href="/admin/generateinvoice/<%= data._id  %>" class="btn btn-info newbtn" style="margin-top: 16px;" title="Order Placed">
+                          Generate Invoice
+                        </a>
+                        <% } %>
+                        <br>
+                        <% } %>
+                        <% } }); %>
+                      </td>
+
+
+                      <td>
+                        <%  if(!(value.trackDetails.length)) { %>
+                        <% if(value.billing_address && value.billing_address.length && value.shipping_address && value.shipping_address ) {%>
+                        <% if(value.delete_status == 0) {%>
+                        <a href="/admin/orderdetails/<%= value._id %>/0" class="btn btn-info btn-circle btn-sm" title="Edit">
+                          <i class="fas fa-pencil-alt"></i>
+                        </a>
+                        <% } %>
+                        <% } %>
+
+                        <% } %>
+
+                        <% value?.trackDetails.forEach(function(data, index) { %>
+                        <% if (data.order_flow_status === 1) { %>
+
+                        <% if(data.shiprocket_order_id && data.shiprocket_shipment_id) {%>
+                        <a href="/admin/check-Couriresserviceability/<%= value.trackDetails[0]._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                          Check Courier Serviceability
+                        </a>
+                        <% } %>
+                        <% if (data.hub_address_id!== '0' && !data.shiprocket_order_id) { %>
+
+                        <a href="/admin/orderplace/<%= data._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                          Generate Seller Pickup
+                        </a>
+                        <% } %>
+                        <% if(data.shiprocket_order_id !== undefined) { %>
+                        <span>Order Placed</span>
+                        <% if(data.pickup_awb !== '0'  && data.pickup_dtime == undefined ){%>
+                        <a href="/admin/schedule-pickup/<%= data._id %>" class="btn btn-success newbtn" target="_blank" title="Schedule Pickup">
+                          Schedule Pickup
+                        </a>
+                        <a href="/admin/generatelabel/<%= data._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
+                          Generate Label
+                        </a>
+                        <a href="/admin/generateinvoice/<%= data._id  %>" class="btn btn-info newbtn" style="margin-top: 16px;" title="Order Placed">
+                          Generate Invoice
+                        </a>
+                        <% } %>
+                        <% if(data.pickup_awb !== '0' ){%>
+
+                        <span style="color: green;">Pickup is confirmed by Ecom Express Surface For AWB :- <span style="color: blue;"><%= data.pickup_awb %> </span></span>
+                        <a href="/admin/generatelabel/<%= data._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
+                          Generate Label
+                        </a>
+                        <a href="/admin/generateinvoice/<%= data._id  %>" class="btn btn-info newbtn" style="margin-top: 16px;" title="Order Placed">
+                          Generate Invoice
+                        </a>
+                        <% } %>
+                        <br>
+                        <% } %>
+                        <% } }); %>
+                      </td>
+
+
+
+
+                      <td>
+                        <%  if(!(value.trackDetails.length)) { %>
+                        <% if(value.billing_address && value.billing_address.length && value.shipping_address && value.shipping_address ) {%>
+                        <% if(value.delete_status == 0) {%>
+                        <a href="/admin/orderdetails/<%= value._id %>/0" class="btn btn-info btn-circle btn-sm" title="Edit">
+                          <i class="fas fa-pencil-alt"></i>
+                        </a>
+                        <% } %>
+
+                        <% } %>
+
+                        <% } %>
+
+                        <% value?.trackDetails.forEach(function(data, index) { %>
+                        <% if (data.order_flow_status === 2) { %>
+                        <% if(data.shiprocket_order_id && data.shiprocket_shipment_id) {%>
+                        <a href="/admin/check-Couriresserviceability/<%= value.trackDetails[0]._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                          Check Courier Serviceability
+                        </a>
+                        <% } %>
+                        <% if (data.hub_address_id!== '0' && !data.shiprocket_order_id) { %>
+
+                        <a href="/admin/orderplace/<%= data._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                          Generate Seller Pickup
+                        </a>
+                        <% } %>
+                        <% if(data.shiprocket_order_id !== undefined) { %>
+                        <span>Order Placed</span>
+                        <% if(data.pickup_awb !== '0'  && data.pickup_dtime == undefined ){%>
+                        <a href="/admin/schedule-pickup/<%= data._id %>" class="btn btn-success newbtn" target="_blank" title="Schedule Pickup">
+                          Schedule Pickup
+                        </a>
+                        <a href="/admin/generatelabel/<%= data._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
+                          Generate Label
+                        </a>
+                        <a href="/admin/generateinvoice/<%= data._id  %>" class="btn btn-info newbtn" style="margin-top: 16px;" title="Order Placed">
+                          Generate Invoice
+                        </a>
+                        <% } %>
+                        <% if(data.pickup_awb !== '0' ){%>
+
+                        <span style="color: green;">Pickup is confirmed by Ecom Express Surface For AWB :- <span style="color: blue;"><%= data.pickup_awb %> </span></span>
+                        <a href="/admin/generatelabel/<%= data._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
+                          Generate Label
+                        </a>
+                        <a href="/admin/generateinvoice/<%= data._id  %>" class="btn btn-info newbtn" style="margin-top: 16px;" title="Order Placed">
+                          Generate Invoice
+                        </a>
+                        <% } %>
+                        <br>
+                        <% } %>
+                        <%} }); %>
+                      </td>
+
+
+                      <td>
+                        <%  if(!(value.trackDetails.length)) { %>
+                        <% if(value.billing_address && value.billing_address.length && value.shipping_address && value.shipping_address ) {%>
+                        <% if(value.delete_status == 0) {%>
+                        <a href="/admin/orderdetails/<%= value._id %>/0" class="btn btn-info btn-circle btn-sm" title="Edit">
+                          <i class="fas fa-pencil-alt"></i>
+                        </a>
+                        <a href="/admin/delete-orderdetails/<%= value._id %>" class="btn btn-danger btn-circle btn-sm" title="Delete" onclick="return confirm('Are you sure you want to delete this item?')">
+                          <i class="fas fa-trash"></i>
+                        </a>
+                        <% } %>
+                        <% if(value?.delete_by == 1) {%>
+                        <span style="color: blue;">Canceled By Admin</span>
+                        <% } else if(value?.delete_by == 2) {%>
+                        <span style="color: rgb(5, 15, 73);">Canceled By Seller</span>
+                        <% } else if(value?.delete_by == 3){ %>
+                        <span style="color: rgb(45, 144, 226);">Canceled By Buyer</span>
+                        <% } %>
+
+                        <% } %>
+
+                        <% } %>
+
+                        <% value?.trackDetails.forEach(function(data, index) { %>
+                            <% if (data.order_flow_status === 4) { %>
+                        <% if(data.shiprocket_order_id && data.shiprocket_shipment_id) {%>
+                        <a href="/admin/check-Couriresserviceability/<%= value.trackDetails[0]._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                          Check Courier Serviceability
+                        </a>
+                        <% } %>
+                        <% if (data.hub_address_id!== '0' && !data.shiprocket_order_id) { %>
+
+                        <a href="/admin/orderplace/<%= data._id %>" class="btn btn-warning newbtn" title="Order Placed">
+                          Generate Seller Pickup
+                        </a>
+                        <% } %>
+                        <% if(data.shiprocket_order_id !== undefined) { %>
+                        <span>Order Placed</span>
+                        <% if(data.pickup_awb !== '0'  && data.pickup_dtime == undefined ){%>
+                        <a href="/admin/schedule-pickup/<%= data._id %>" class="btn btn-success newbtn" target="_blank" title="Schedule Pickup">
+                          Schedule Pickup
+                        </a>
+                        <a href="/admin/generatelabel/<%= data._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
+                          Generate Label
+                        </a>
+                        <a href="/admin/generateinvoice/<%= data._id  %>" class="btn btn-info newbtn" style="margin-top: 16px;" title="Order Placed">
+                          Generate Invoice
+                        </a>
+                        <% } %>
+                        <% if(data.pickup_awb !== '0' ){%>
+
+                        <span style="color: green;">Pickup is confirmed by Ecom Express Surface For AWB :- <span style="color: blue;"><%= data.pickup_awb %> </span></span>
+                        <a href="/admin/generatelabel/<%= data._id  %>" class="btn btn-secondary newbtn" title="Order Placed">
+                          Generate Label
+                        </a>
+                        <a href="/admin/generateinvoice/<%= data._id  %>" class="btn btn-info newbtn" style="margin-top: 16px;" title="Order Placed">
+                          Generate Invoice
+                        </a>
+                        <% } %>
+                        <br>
+                        <% } %>
+                        <%} }); %>
+                      </td>
+                    </tr>
+                    <% }); %>
+                    <% } %>
+                  </tbody>
+
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /.container-fluid -->
+
+      </div>
+      <!-- End of Main Content -->
+
+      <!-- Footer -->
+      <%- include('../../partials/footer', {year: year, siteName: siteName}); %>
+      <!-- End of Footer -->
 
     </div>
-    <!-- End of Page Wrapper -->
+    <!-- End of Content Wrapper -->
 
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
+  </div>
+  <!-- End of Page Wrapper -->
 
-    <!-- Logout Modal-->
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
 
-    <%- include('../../partials/logoutModal'); %>
+  <!-- Logout Modal-->
 
-        <%- include('../../partials/footerJs'); %>
+  <%- include('../../partials/logoutModal'); %>
+
+  <%- include('../../partials/footerJs'); %>
 
 </body>
 
 </html>
 
 <script>
-    $(document).ready(function () {
-        // $('#dataTable').DataTable({id="dataTable"                                                                                                                                                                                                                                                                                                                                                                                    
-        //     "paging": true,
-        //     "ordering": true,
-        //     "searching": true
-        // });
+  $(document).ready(function() {
+    // $('#dataTable').DataTable({id="dataTable"                                                                                                                                                                                                                                                                                                                                                                                    
+    //     "paging": true,
+    //     "ordering": true,
+    //     "searching": true
+    // });
 
-        document.getElementById('downloadExcelBtn').addEventListener('click', function() {
-            window.location.href = '/admin/download-order-excel';
-        });
+    document.getElementById('downloadExcelBtn').addEventListener('click', function() {
+      window.location.href = '/admin/download-order-excel';
     });
+  });
 </script>
 <script>
+  function searchNow() {
+    var selectedCategory = $('#categorySelect').val();
+    var productName = $('#productNameInput').val();
+    var page = 1;
+    let url = '/admin/orderlist?';
+    if (page && !isNaN(page)) {
+      url = url + 'page=' + page;
+    }
+    if (selectedCategory && (selectedCategory !== '')) {
+      url = url + '&searchType=' + selectedCategory;
+    }
+    if (productName && (productName !== '')) {
+      url = url + '&searchValue=' + productName;
+    }
+    window.location.href = url;
 
-    function searchNow() {
-      var selectedCategory = $('#categorySelect').val();
-      var productName = $('#productNameInput').val();
-      var page = 1;
-      let url = '/admin/orderlist?';
-      if (page && !isNaN(page)) {
-        url = url + 'page=' + page;
-      }
-      if (selectedCategory && (selectedCategory !== '')) {
-        url = url + '&searchType=' + selectedCategory;
-      }
-      if (productName && (productName !== '')) {
-        url = url + '&searchValue=' + productName;
-      }
-      window.location.href = url;
-  
-      $.ajax({
-        url: `/admin/orderlist`,
-        type: 'GET',
-        data: {
-          page: page,
-          searchType: selectedCategory,
-          searchValue: productName,
-        },
-        success: function (response) {
-        },
-        error: function (error) {
-        }
-      });
-  
-    }
-  
-    function getParameterByName(name, url) {
-      if (!url) url = window.location.href;
-      name = name.replace(/[\[\]]/g, "\\$&");
-      var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-        results = regex.exec(url);
-      if (!results) return null;
-      if (!results[2]) return '';
-      return decodeURIComponent(results[2].replace(/\+/g, " "));
-    }
-  
-    var page = getParameterByName('page');
-    var searchType = getParameterByName('searchType');
-    var searchValue = getParameterByName('searchValue');
-  
-    if (searchType) {
-      $('#categorySelect').val(searchType);
-    }
-  
-    if (searchValue) {
-      $('#productNameInput').val(searchValue);
-    }
-  </script>
-  <script>
-    document.getElementById('showOptionsBtn').addEventListener('click', function () {
-      var optionsContainer = document.getElementById('optionsContainer');
-      optionsContainer.style.display = optionsContainer.style.display === 'none' ? 'block' : 'none';
+    $.ajax({
+      url: `/admin/orderlist`,
+      type: 'GET',
+      data: {
+        page: page,
+        searchType: selectedCategory,
+        searchValue: productName,
+      },
+      success: function(response) {},
+      error: function(error) {}
     });
-    function sendViaEmail(orderId) {
-      window.location.href = '/admin/send-order-email/' + orderId;
-    }
-    function sendViaWhatsApp(orderId) {
-      console.log('Sending via WhatsApp for order ID:', orderId);
-      window.location.href = '/admin/send-order-whatsapp/' + orderId;
-    }
-  </script>
-  
+
+  }
+
+  function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+      results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+  }
+
+  var page = getParameterByName('page');
+  var searchType = getParameterByName('searchType');
+  var searchValue = getParameterByName('searchValue');
+
+  if (searchType) {
+    $('#categorySelect').val(searchType);
+  }
+
+  if (searchValue) {
+    $('#productNameInput').val(searchValue);
+  }
+</script>
+<script>
+  document.getElementById('showOptionsBtn').addEventListener('click', function() {
+    var optionsContainer = document.getElementById('optionsContainer');
+    optionsContainer.style.display = optionsContainer.style.display === 'none' ? 'block' : 'none';
+  });
+
+  function sendViaEmail(orderId) {
+    window.location.href = '/admin/send-order-email/' + orderId;
+  }
+
+  function sendViaWhatsApp(orderId) {
+    console.log('Sending via WhatsApp for order ID:', orderId);
+    window.location.href = '/admin/send-order-whatsapp/' + orderId;
+  }
+</script>

@@ -1317,8 +1317,7 @@ exports.myAccount = async function (req, res, next) {
     //if (userData === undefined || userData === null)
     if (isLoggedIn == "") {
       res.redirect('/registration');
-    }
-    else {
+    } else {
       var userData = req.session.user;
       const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId) });
 
@@ -1372,6 +1371,29 @@ exports.editProfile = async function (req, res, next) {
     });
   }
 };
+
+exports.bankDetails = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    var userData = req.session.user;
+    const bankDetails = await Bankdetails.findOne({ user_id: userData.userId });
+    res.render("webpages/bank-details", {
+      title: "My Bank Details",
+      message: "Welcome to the bank details page!",
+      respdata: req.session.user,
+      bankDetails: (typeof bankDetails != "undefined" || bankDetails != null) ? bankDetails : [],
+      isLoggedIn: isLoggedIn,
+      userData: userData
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the bank details page.",
+      error: error.message,
+    });
+  }
+};
+
 exports.addAddress = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";

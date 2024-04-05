@@ -1,60 +1,73 @@
 $(document).ready(async function(){
-
-    $('#registerForm').validate({
+    $('#editBankDetails').validate({
         debug:false,
         errorElement:"p",
         errorClass:"errorMsgClass",
         rules:{
-            name:{
+            bankname:{
+                required:true,
+                maxlength:100
+            },
+            branchname:{
+                required:true,
+                maxlength:100
+            },
+            accountname:{
+                required:true,
+                maxlength:100
+            },
+            accountnumber:{
+                required:true,
+                maxlength:100
+            },
+            ifsccode:{
+                required:true,
+                maxlength:100
+            },
+            accounttype:{
                 required:true,
             },
-            remail:{
+            upiid:{
                 required:true,
-                maxlength: 70,
-                email: true  
+                maxlength:100
             },
-            password:{
+            upiscaner:{
                 required:true,
-                maxlength:15,
-                minlength:8
             },
-            confirmpassword: {
-                required: true,
-                equalTo: "#password"  
-            },
-            phoneno: {
-                required: true,
-                number:true,
-                minlength:10,
-                maxlength:10
-            }
         },
         messages:{
-            name:{
-                required:"Please enter your full name.",
-            }, 
-            remail:{
-                required:"Please enter your email.",
-                maxlength: "You can enter maximum of 70 charecters."
+            bankname:{
+                required:"Please enter bank name.",
+                maxlength:"Please enter valid name."
             },
-            password:{
-                required:"Please enter password.",
-                maxlength:"Password can be maximum 15 characters long.",
-                minlength: "Password must be at least 8 characters long.",
+            branchname:{
+                required:"Please enter branch name.",
+                maxlength:"Please enter valid name."
             },
-            confirmPassword: {
-                required: "Please enter confirm password.",
-                equalTo: "Passwords do not match"
+            accountname:{
+                required:"Please enter account holder name.",
+                maxlength:"Please enter valid name."
             },
-            phoneno: {
-                required: "Contract number is required",
-                number:"Please enter numeric digits only.",
-                minlength:"Please enter valid phone number.",
-                maxlength:"Please enter valid phone number."
-            }
+            accountnumber:{
+                required:"Please enter bank account no.",
+                maxlength:"Please enter valid account number."
+            },
+            ifsccode:{
+                required:"Please enter bank ifsc.",
+                maxlength:"Please enter valid input."
+            },
+            accounttype:{
+                required:"Please select a option",
+            },
+            upiid:{
+                required:"Please enter upi id.",
+                maxlength:"Please enter valid upi id."
+            },
+            upiscaner:{
+                required:"Please enter a upi ",
+            },
         },
-        submitHandler: function() {
-         
+        /*submitHandler: function() {
             $.ajax({
                 type: 'POST',
                 url:  webSiteUrl + "/signin",
@@ -103,7 +116,7 @@ $(document).ready(async function(){
                     }, 5000);
                 }
             });
-        }
+        }*/
     });
     
 });

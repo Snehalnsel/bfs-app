@@ -4644,3 +4644,7 @@ td.tp-no-gaptd {
     padding-right: 0px;
 }
 
+th#packingHandlingCharge i strong {
+    font-family: 'Poppins', sans-serif;
+}
+

@@ -1147,6 +1147,7 @@ router.post("/sign-out",[],WebsiteController.signOut);
 // // Web user Profile API's
 
 router.get("/my-account",[],WebsiteController.myAccount);
+router.get("/bank-details",[],WebsiteController.bankDetails);
 router.get("/edit-profile",[],WebsiteController.editProfile);
 router.get("/add-address",[],WebsiteController.addAddress);
 

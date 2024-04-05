@@ -138,14 +138,13 @@
 <script>
    async function fetchData() {
      try {
-       const response = await fetch('/app-home');
+       //const response = await fetch('/app-home');
+       const response = await fetch('/web-app-home');
        const data = await response.json();
-
       isLoggedIn = data.isLoggedIn;
      // Best deal populate
        const bestDeals = data.respdata.best_deal;
        const bestDealsSlider = document.getElementById('best-deals-slider');
-       console.log(bestDealsSlider);
        populateSlider(bestDealsSlider, bestDeals);
 
         const whatshot = data.respdata.whats_hot;

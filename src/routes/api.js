@@ -809,6 +809,13 @@ router.get(
   DashboardController.homedetails
 );
 
+//This route added by palash
+router.get(
+  "/web-app-home",
+  [],
+  DashboardController.webHomeDetails
+);
+
 
 
 router.get(

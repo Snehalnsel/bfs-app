@@ -5,7 +5,7 @@
        <div class="dashboard-sidbar">
          <div class="sidbar-box user-profile">
             <div class="user-icon">
-               <img src="<%= respdata && respdata.image ? respdata.image : '/default-image.jpg' %>" alt="user-image">
+               <img src="<%=websiteUrl%>/public/compress_images/<%= respdata && respdata.image ? respdata.image : '/default-image.jpg' %>" alt="user-image">
             </div>
             <div class="user-info">
                <div class="sht-ui">Hello</div>
@@ -80,24 +80,8 @@
           <div class="dashboard-infobox">
              
              <div class="dsh-shortbox">
-                <form action="/useredit" method="post" id="editBankDetails" class="editBankDetails" enctype="multipart/form-data">
+                <form action="" method="post" id="editBankDetails" class="editBankDetails" enctype="multipart/form-data">
                    <div class="div-row">
-                      <!--<div class="div-12">
-                         <label>Name:</label>
-                         <input type="type" name="name" class="ds-form-control" value="<%=respdata.name%>" placeholder="Enter Name">
-                         <input type="hidden" name="userId" value="<%=respdata.userId%>">
-                      </div>
-                       
-                      <div class="div-6">
-                         <label>Email:</label>
-                         <input type="email" name="email" class="ds-form-control" value="<%=respdata.email%>" placeholder="Enter Email">
-                      </div>
- 
-                      <div class="div-6">
-                         <label>Phone Number:</label>
-                         <input type="type" name="phone_no" class="ds-form-control" value="<%=respdata.phone_no%>" placeholder="Phone Number">
-                      </div>-->
-
                      <div class="dashboard-infobox mt-50" >
                         <div class="dashboard-title-arrow mb-25">
                            <h4 class="di-title mr-25" id="bankDetails">Bank Deatils<i class="fa fa-angle-down" style="font-size:24px"></i> </h4>              
@@ -150,7 +134,10 @@
                                  </div>
                               </div>
                            </form>
-                           
+                           <div class="success-error">
+                              <div id="success-bank-msg"></div>
+                              <div id="error-bank-msg"></div>
+                           </div>
                         </div>
                         
                      </div> 

@@ -67,12 +67,12 @@ $(document).ready(async function(){
                 required:"Please enter a upi ",
             },
         },
-        /*submitHandler: function() {
+        submitHandler: function() {
             $.ajax({
                 type: 'POST',
-                url:  webSiteUrl + "/signin",
+                url:  webSiteUrl + "/edit-bank-details",
                 data: {
-                    name:$('#name').val(),
+                    bankname:$('#name').val(),
                     phone_no: $('#phoneno').val(),
                     email: $('#remail').val(),
                     password:$('#password').val(),
@@ -82,41 +82,29 @@ $(document).ready(async function(){
                     // let obj = response.responseJSON;
                     let error_success = obj.status;
                     if(error_success == 'success'){
-                        $('#success-msg').html(obj.message);
-                        $('#success-msg').show();
-                        //Set Coockie in the local machine
-                        await setCookeiFunc(accessTokenVar,obj.respdata.accessToken,obj.respdata.accessTokenExpires);
-                        await setCookeiFunc(refreshTokenVar,obj.respdata.refreshToken,obj.respdata.refreshTokenExpires);
-                        setTimeout(function(){
-                            $('#success-msg').fadeOut();
-                            $('#loginForm')[0].reset();
-                        }, 500);
-                        if((typeof obj.respdata.refreshReset != "undefined") && (obj.respdata.refreshReset)) {
-                            let pathArray = window.location.pathname.split( '/' );
-                            if(pathArray[1] != "registration") {
-                                location.reload();
-                            } else {
-                                location.href= webSiteUrl + "/";
-                            }
-                        }
-                    } else {
-                        $('#error-msg').html(obj.message);
-                        $('#error-msg').show();
+                        $('#success-bank-msg').html(obj.message);
+                        $('#success-bank-msg').show();
                         setTimeout(function(){ 
-                            $('#error-msg').fadeOut();
+                            $('#success-bank-msg').fadeOut();
+                        }, 5000);
+                    } else {
+                        $('#error-bank-msg').html(obj.message);
+                        $('#error-bank-msg').show();
+                        setTimeout(function(){ 
+                            $('#error-bank-msg').fadeOut();
                         }, 5000);
                     }
                 },
                 error: function(response){
-                    let obj = response.responseJSON;
-                    $('#error-msg').html(obj.message);
-                    $('#error-msg').show();
+                    let obj = response;
+                    $('#error-bank-msg').html(obj.message);
+                    $('#error-bank-msg').show();
                     setTimeout(function(){ 
-                        $('#error-msg').fadeOut();
+                        $('#error-bank-msg').fadeOut();
                     }, 5000);
                 }
             });
-        }*/
+        }
     });
     
 });

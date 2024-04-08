@@ -143,6 +143,15 @@ router.post(
   UserController.editProfile
 );
 
+
+router.post(
+  "/edit-bank-details",
+  auth.isAuthorized,
+  [],
+  //upload.single('image'),
+  WebsiteController.userBankDetailsUpdate
+);
+
 router.post(
   "/upload-image",
   auth.isAuthorized,

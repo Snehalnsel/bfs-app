@@ -99,16 +99,16 @@ exports.createData = async function (req, res, next) {
   var pageName = "Brand";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-  if (!req.file) {
+  // if (!req.file) {
     
-    return res.status(400).json({
-      status: "0",
-      message: "Image is required!",
-      respdata: []
-    });
-  }
+  //   return res.status(400).json({
+  //     status: "0",
+  //     message: "Image is required!",
+  //     respdata: []
+  //   });
+  // }
   const requrl = req.protocol + '://' + req.get('host');
-  const imagePath = requrl + '/public/images/' + req.file.filename;
+  //const imagePath = requrl + '/public/images/' + req.file.filename;
   Brand.findOne({ name: req.body.focus_name }).then((brand) => {
     if (brand) {
       res.render("pages/body-focus/create", {
@@ -129,7 +129,7 @@ exports.createData = async function (req, res, next) {
       const newBrand = Brand({
         name: req.body.focus_name,
         description: req.body.description,
-        image: imagePath,
+        //image: imagePath,
         //category_id : req.body.category_id,
         status : '1',
         added_dtime: dateTime,

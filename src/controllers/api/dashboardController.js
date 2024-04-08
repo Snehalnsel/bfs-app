@@ -180,6 +180,20 @@ exports.webHomeDetails = async function (req, res) {
           status: "$productCondition.name",
           image: "$productImage.image"
         }
+      },
+      {
+        $group: {
+          _id: "$_id", // Group by product ID
+          name: { $first: "$name" }, // Take the first name encountered
+          flag: { $first: "$flag" }, // Take the first flag encountered
+          price: { $first: "$price" }, // Take the first price encountered
+          offer_price: { $first: "$offer_price" }, // Take the first offer price encountered
+          original_packaging: { $first: "$original_packaging" }, // Take the first original packaging encountered
+          original_invoice: { $first: "$original_invoice" }, // Take the first original invoice encountered
+          status_name: { $first: "$status_name" }, // Take the first status name encountered
+          status: { $first: "$status" }, // Take the first status encountered
+          image: { $first: "$image" } // Take the first image encountered
+        }
       }
     ]);
     
@@ -237,8 +251,24 @@ exports.webHomeDetails = async function (req, res) {
           image: "$productImage.image",
           hitCount: 1 
         }
+      },
+      {
+        $group: {
+          _id: "$_id", // Group by product ID
+          name: { $first: "$name" }, // Take the first name encountered
+          flag: { $first: "$flag" }, // Take the first flag encountered
+          price: { $first: "$price" }, // Take the first price encountered
+          offer_price: { $first: "$offer_price" }, // Take the first offer price encountered
+          original_packaging: { $first: "$original_packaging" }, // Take the first original packaging encountered
+          original_invoice: { $first: "$original_invoice" }, // Take the first original invoice encountered
+          status_name: { $first: "$status_name" }, // Take the first status name encountered
+          status: { $first: "$status" }, // Take the first status encountered
+          image: { $first: "$image" }, // Take the first image encountered
+          hitCount: { $first: "$hitCount" } // Take the first hit count encountered
+        }
       }
     ]);
+    
     
     const topCategories = await Category.find({ priority_status: 1 });
     const justSoldProducts = await Userproduct.aggregate([
@@ -289,8 +319,23 @@ exports.webHomeDetails = async function (req, res) {
           status: "$productCondition.name",
           image: "$productImage.image"
         }
+      },
+      {
+        $group: {
+          _id: "$_id", // Group by product ID
+          name: { $first: "$name" }, // Take the first name encountered
+          flag: { $first: "$flag" }, // Take the first flag encountered
+          price: { $first: "$price" }, // Take the first price encountered
+          offer_price: { $first: "$offer_price" }, // Take the first offer price encountered
+          original_packaging: { $first: "$original_packaging" }, // Take the first original packaging encountered
+          original_invoice: { $first: "$original_invoice" }, // Take the first original invoice encountered
+          status_name: { $first: "$status_name" }, // Take the first status name encountered
+          status: { $first: "$status" }, // Take the first status encountered
+          image: { $first: "$image" } // Take the first image encountered
+        }
       }
     ]);
+    
     
     res.status(200).json({
       status: "1",

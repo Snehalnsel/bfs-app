@@ -170,48 +170,36 @@ exports.getData = async function (req, res, next) {
   };
 
   exports.editData = async function (req, res, next) {
-  
-  
     var pageName = "App Users";
     var pageTitle = req.app.locals.siteName + " - Edit " + pageName;
     let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-    const user_id = mongoose.Types.ObjectId(req.params.id);
-  
-    // Users.findOne({ _id: user_id }).then((users) => {
-    //   res.render("pages/app-users/edit", {
-    //     status: 1,
-    //     siteName: req.app.locals.siteName,
-    //     pageName: pageName,
-    //     pageTitle: pageTitle,
-    //     userFullName:  req.session.admin.name,
-    //     userImage:  req.session.admin.image_url,
-    //     userEmail:  req.session.admin.email,
-    //     year: moment().format("YYYY"),
-    //     requrl: req.app.locals.requrl,
-    //     message: "",
-    //     respdata: users,
-    //     isAdminLoggedIn:isAdminLoggedIn
-    //   });
-    // });
-    const user = await Users.findOne({ _id: user_id });
-    const bankDetails = await Bankdetails.findOne({ user_id: user_id });
- 
-  res.render("pages/app-users/edit", {
-    status: 1,
-    siteName: req.app.locals.siteName,
-    pageName: pageName,
-    pageTitle: pageTitle,
-    userFullName:  req.session.admin.name,
-    userImage:  req.session.admin.image_url,
-    userEmail:  req.session.admin.email,
-    year: moment().format("YYYY"),
-    requrl: req.app.locals.requrl,
-    message: "",
-    respdata: user,
-    bankDetails: bankDetails,
-    isAdminLoggedIn: isAdminLoggedIn
-  });
-  };
+    
+    // Validate req.params.id as a valid ObjectId
+    const { id } = req.params;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).send('Invalid user ID');
+    }
+
+    const user = await Users.findOne({ _id: id });
+    const bankDetails = await Bankdetails.findOne({ user_id: id });
+
+    res.render("pages/app-users/edit", {
+        status: 1,
+        siteName: req.app.locals.siteName,
+        pageName: pageName,
+        pageTitle: pageTitle,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
+        year: moment().format("YYYY"),
+        requrl: req.app.locals.requrl,
+        message: "",
+        respdata: user,
+        bankDetails: bankDetails ? bankDetails : [],
+        isAdminLoggedIn: isAdminLoggedIn
+    });
+};
+
 
 
   // exports.updateData = async function (req, res, next) {
@@ -299,11 +287,12 @@ exports.getData = async function (req, res, next) {
   //     });
   //   }
   // };
-
+  
   exports.updateData = async function (req, res, next) {
-    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+    let isAdminLoggedIn = req.session.admin ? req.session.admin.userId : "";
+    console.log(isAdminLoggedIn);
     try {
-      // return;
+      console.log("req data", req.body);
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -318,12 +307,12 @@ exports.getData = async function (req, res, next) {
       if (!user) {
         return res.status(404).json({
           status: "0",
-          message: "Not found!",
+          message: "User not found!",
           respdata: {},
           isAdminLoggedIn: isAdminLoggedIn,
         });
       }
-      
+  
       const requrl = req.app.locals.requrl;
       const image_url = requrl + "/public/images/no-image.jpg";
   
@@ -332,23 +321,23 @@ exports.getData = async function (req, res, next) {
         email: req.body.email,
         phone_no: req.body.phone_no,
         image: image_url,
-        created_dtime: dateTime,
+        created_dtime: new Date().toISOString(),
       };
-
-      
   
       const updatedUser = await Users.findOneAndUpdate(
         { _id: req.params.user_id },
         { $set: updData },
         { upsert: true, new: true }
-      ).then(async (result) => {
-      });
-
-      const uploadedFile = req.files[0];
-      const imagePath = uploadedFile.path; 
-
-      imagePath = imagePath ? imagePath: req.body.upiid_scaner;
-      
+      );
+  
+      let imagePath = '';
+      if (req.files && req.files[0]) {
+        const uploadedFile = req.files[0];
+        imagePath = uploadedFile.path;
+      } else {
+        imagePath = req.body.upiid_scaner || '';
+      }
+  
       const updBankData = {
         user_id: req.params.user_id,
         accountnumber: req.body.accountnumber,
@@ -356,7 +345,7 @@ exports.getData = async function (req, res, next) {
         ifsccode: req.body.ifsccode,
         accounttype: req.body.accounttype,
         upiid: req.body.upiid,
-        upiid_scaner: imagePath || '',
+        upiid_scaner: imagePath,
         default_status: 1,
         created_dtime: new Date().toISOString(),
       };
@@ -365,22 +354,17 @@ exports.getData = async function (req, res, next) {
         { user_id: req.params.user_id },
         { $set: updBankData },
         { upsert: true, new: true }
-      ).then(async (result) => {
-      }).catch((err) => {
-      });
-
-      // return;
+      );
   
       res.status(200).json({
         status: "1",
         message: "Successfully updated!",
         respdata: updatedUser,
-        bankdetails:updatedBankDetails,
+        bankdetails: updatedBankDetails,
         isAdminLoggedIn: isAdminLoggedIn,
       });
-  
-      res.redirect("/admin/app-users");
     } catch (error) {
+      console.log(error);
       res.status(500).json({
         status: "0",
         message: "An error occurred while updating the user!",
@@ -389,6 +373,8 @@ exports.getData = async function (req, res, next) {
       });
     }
   };
+  
+  
   
   
   exports.deleteData = async function (req, res, next) {

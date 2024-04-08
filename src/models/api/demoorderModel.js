@@ -84,6 +84,9 @@ const model = mongoose.Schema({
   checkstatus_status: {
     type: String,
   },
+  user_ip:{
+    type: String,
+  },
   added_dtime: {
     type: String,
     required: true,

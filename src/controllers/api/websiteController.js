@@ -1383,6 +1383,7 @@ exports.bankDetails = async function (req, res, next) {
       respdata: req.session.user,
       bankDetails: (typeof bankDetails != "undefined" || bankDetails != null) ? bankDetails : [],
       isLoggedIn: isLoggedIn,
+      websiteUrl:process.env.SITE_URL,
       userData: userData
     });
   } catch (error) {
@@ -1835,7 +1836,8 @@ exports.userUpdate = async function (req, res, next) {
     // const imgData = req.files;
     // const uploadedFile = req.files[0];
     // const imagePath = uploadedFile.path;
-    const bankDetails = new Bankdetails({
+    /* Now it is a separate module named bank details */
+    /*const bankDetails = new Bankdetails({
       user_id: user._id,
       accountnumber: req.body.accountnumber,
       bankname: req.body.bankname,
@@ -1846,7 +1848,73 @@ exports.userUpdate = async function (req, res, next) {
       default_status: 1,
       created_dtime: new Date().toISOString(),
     });
-    const savedBankDetails = await bankDetails.save();
+    const savedBankDetails = await bankDetails.save();*/
+    req.session.user.name = updatedUser.name;
+    req.session.user.email = updatedUser.email;
+    req.session.user.phone_no = updatedUser.phone_no;
+    res.redirect("/my-account");
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the Edit Profile.",
+      error: error.message,
+    });
+  }
+};
+exports.userBankDetailsUpdate = async function (req, res, next) {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        status: "0",
+        message: "Validation error!",
+        respdata: errors.array(),
+      });
+    }
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    const user = await Users.findOne({ _id: req.body.userId });
+
+    if (!user) {
+      return res.status(404).json({
+        status: "0",
+        message: "Not found!",
+        respdata: {},
+      });
+    }
+    const updData = {
+      name: req.body.name,
+      email: req.body.email,
+      phone_no: req.body.phone_no,
+      created_dtime: dateTime,
+    };
+    const updatedUser = await Users.findOneAndUpdate(
+      { _id: user._id },
+      { $set: updData },
+      { upsert: true, new: true }
+    );
+    if (!updatedUser) {
+      return res.status(500).json({
+        status: "0",
+        message: "Failed to update user!",
+        respdata: {},
+      });
+    }
+    // const imgData = req.files;
+    // const uploadedFile = req.files[0];
+    // const imagePath = uploadedFile.path;
+    /* Now it is a separate module named bank details */
+    /*const bankDetails = new Bankdetails({
+      user_id: user._id,
+      accountnumber: req.body.accountnumber,
+      bankname: req.body.bankname,
+      ifsccode: req.body.ifsccode,
+      accounttype: req.body.accounttype,
+      upiid: req.body.upiid,
+      // upiid_scaner: imagePath || '',
+      default_status: 1,
+      created_dtime: new Date().toISOString(),
+    });
+    const savedBankDetails = await bankDetails.save();*/
     req.session.user.name = updatedUser.name;
     req.session.user.email = updatedUser.email;
     req.session.user.phone_no = updatedUser.phone_no;
@@ -3757,6 +3825,7 @@ exports.Demoorder = async function (req, res) {
       return res.status(404).json({ message: 'Seller address not found' });
     }
     const billing_address_id = billingaddress._id;
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || null;
     const order = new Demoorder({
       user_id: (typeof user_id != "undefined") ? user_id : "",
       cart_id: (typeof cart_id != "undefined") ? cart_id : "",
@@ -3772,6 +3841,7 @@ exports.Demoorder = async function (req, res) {
       booking_amount: (typeof booking_amount != "undefined") ? parseFloat(booking_amount) : 0,
       packing_handling_charge: (typeof packing_handling_charge != "undefined") ? parseFloat(packing_handling_charge) : 0,
       status: 1,
+      user_ip: ip,
       gst:(typeof gst != "undefined") ? gst : 0,
       taxable_value:(typeof taxable_value != "undefined") ? parseFloat(taxable_value) : 0,
       added_dtime: new Date().toISOString(),

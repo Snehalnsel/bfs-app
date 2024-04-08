@@ -5,7 +5,7 @@
        <div class="dashboard-sidbar">
          <div class="sidbar-box user-profile">
             <div class="user-icon">
-               <img src="<%= respdata && respdata.image ? respdata.image : '/default-image.jpg' %>" alt="user-image">
+               <img src="<%=websiteUrl%>/public/compress_images/<%= respdata && respdata.image ? respdata.image : '/default-image.jpg' %>" alt="user-image">
             </div>
             <div class="user-info">
                <div class="sht-ui">Hello</div>
@@ -80,24 +80,8 @@
           <div class="dashboard-infobox">
              
              <div class="dsh-shortbox">
-                <form action="/useredit" method="post" id="editBankDetails" class="editBankDetails" enctype="multipart/form-data">
+                <form action="" method="post" id="editBankDetails" class="editBankDetails" enctype="multipart/form-data">
                    <div class="div-row">
-                      <!--<div class="div-12">
-                         <label>Name:</label>
-                         <input type="type" name="name" class="ds-form-control" value="<%=respdata.name%>" placeholder="Enter Name">
-                         <input type="hidden" name="userId" value="<%=respdata.userId%>">
-                      </div>
-                       
-                      <div class="div-6">
-                         <label>Email:</label>
-                         <input type="email" name="email" class="ds-form-control" value="<%=respdata.email%>" placeholder="Enter Email">
-                      </div>
- 
-                      <div class="div-6">
-                         <label>Phone Number:</label>
-                         <input type="type" name="phone_no" class="ds-form-control" value="<%=respdata.phone_no%>" placeholder="Phone Number">
-                      </div>-->
-
                      <div class="dashboard-infobox mt-50" >
                         <div class="dashboard-title-arrow mb-25">
                            <h4 class="di-title mr-25" id="bankDetails">Bank Deatils<i class="fa fa-angle-down" style="font-size:24px"></i> </h4>              
@@ -108,12 +92,12 @@
                               <div class="div-row">
                                  <div class="div-6">
                                     <label>Bank Name</label>
-                                    <input type="text" name="bankname" class="ds-form-control" value="<% if(bankDetails != null){ %><%=bankDetails.bankname%><% } %>">
+                                    <input type="text" name="bankname" class="ds-form-control bankname" id="bankname" value="<% if(bankDetails != null){ %><%=bankDetails.bankname%><% } %>">
                                  </div>
             
                                  <div class="div-6">
                                     <label>Branch Name:</label>
-                                    <input type="text" name="branchname" id="branchname" class="ds-form-control account number" value="<% if(bankDetails != null){ %><%= bankDetails.branchname %><% } %>">
+                                    <input type="text" name="branchname" id="branchname" class="ds-form-control account number branchname" value="<% if(bankDetails != null){ %><%= bankDetails.branchname %><% } %>">
                                  </div>
 
                                  <div class="div-6">
@@ -128,29 +112,32 @@
             
                                  <div class="div-6">
                                     <label>IFSC CODE:</label>
-                                    <input type="text" name="ifsccode" id="ifsccode" class="ds-form-control" value="<% if(bankDetails != null){ %><%= bankDetails.ifsccode %><% } %>">
+                                    <input type="text" name="ifsccode" id="ifsccode" class="ds-form-control ifsccode" value="<% if(bankDetails != null){ %><%= bankDetails.ifsccode %><% } %>">
                                  </div>
 
                                  <div class="div-6">
                                     <label>Account Type:</label>
                                     <select name="accounttype" id="accounttype" class="ds-form-control">
-                                       <option value="savings">Savings Account</option>
-                                       <option value="current">Current Account</option>
+                                       <option value="savings" <% if(bankDetails != null && bankDetails.accounttype == 'savings'){ %>selected<% } %> >Savings Account</option>
+                                       <option value="current" <% if(bankDetails != null && bankDetails.accounttype == 'current'){ %>selected<% } %>>Current Account</option>
                                     </select>
                                  </div>
 
                                  <div class="div-6">
                                     <label>UPI ID:</label>
-                                    <input type="text" name="upiid" id="upiid" class="ds-form-control" value="<% if(bankDetails != null){ %><%= bankDetails.upiid %><% } %>">
+                                    <input type="text" name="upiid" id="upiid" class="ds-form-control upiid" value="<% if(bankDetails != null){ %><%= bankDetails.upiid %><% } %>">
                                  </div>
 
                                  <div class="div-6">
                                     <label>UPI ID SCANER:</label>
-                                    <input type="file" name="image" id="upiscaner" value="<% if(bankDetails != null){ %><%= bankDetails.upiscaner %><% } %>"/>
+                                    <input type="file" name="upiscaner" id="upiscaner" class="upiscaner" value="<% if(bankDetails != null){ %><%= bankDetails.upiscaner %><% } %>"/>
                                  </div>
                               </div>
                            </form>
-                           
+                           <div class="success-error">
+                              <div id="success-bank-msg"></div>
+                              <div id="error-bank-msg"></div>
+                           </div>
                         </div>
                         
                      </div> 

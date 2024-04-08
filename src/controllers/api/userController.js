@@ -10,6 +10,8 @@ const fs = require("fs");
 const mime = require("mime");
 const Users = require("../../models/api/userModel");
 const Iptrnsaction = require("../../models/api/ipTransactionModel");
+const sendSms = require("../../models/thirdPartyApi/sendSms");
+const ApiCallHistory = require("../../models/thirdPartyApi/ApiCallHistory");
 // const helper = require("../helpers/helper");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -169,7 +171,7 @@ exports.signUp = async function (req, res, next) {
             await historyData.save();
 
             const loginHtmlPath = 'views/webpages/welcome.html';;
-            const loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+            let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
 
             loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
 
@@ -203,6 +205,7 @@ exports.signUp = async function (req, res, next) {
               });
             })
             .catch((error) => {
+              console.log(error);
               res.status(400).json({
                 status: "0",
                 message: "Error!",
@@ -211,6 +214,7 @@ exports.signUp = async function (req, res, next) {
             });
           })
           .catch((error) => {
+            console.log(error);
             res.status(400).json({
               status: "0",
               message: "Error!",

@@ -1902,8 +1902,7 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
     // const imgData = req.files;
     // const uploadedFile = req.files[0];
     // const imagePath = uploadedFile.path;
-    /* Now it is a separate module named bank details */
-    /*const bankDetails = new Bankdetails({
+    const bankDetails = new Bankdetails({
       user_id: user._id,
       accountnumber: req.body.accountnumber,
       bankname: req.body.bankname,
@@ -1914,11 +1913,8 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
       default_status: 1,
       created_dtime: new Date().toISOString(),
     });
-    const savedBankDetails = await bankDetails.save();*/
-    req.session.user.name = updatedUser.name;
-    req.session.user.email = updatedUser.email;
-    req.session.user.phone_no = updatedUser.phone_no;
-    res.redirect("/my-account");
+    const savedBankDetails = await bankDetails.save();
+    res.redirect("/bank-details");
   } catch (error) {
     res.status(500).json({
       status: "0",

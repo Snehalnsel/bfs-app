@@ -45,6 +45,21 @@ async function compressYourImages(fromUrl, toUrl) {
   );
 }
 
+const storage = multer.diskStorage({
+  destination: './public/images/',
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const fileExtension = path.extname(file.originalname);
+    cb(null, 'image-' + uniqueSuffix + fileExtension);
+  },
+});
+
+const upload = multer({ storage: storage });
+const uploadFields = [
+  { name: 'image', maxCount: 1 },
+  { name: 'upiid_scaner', maxCount: 1 },
+];
+
 router.get("/dashboard", cors(), DashboardController.getData);
 
 router.get("/profile", cors(), UsersController.getProfile);
@@ -205,6 +220,7 @@ router.post(
       .trim()
       .escape()
   ],
+  upload.fields(uploadFields),
   AppusersController.updateData
 );
 
@@ -223,17 +239,6 @@ router.get(
 router.get("/body-focus", cors(), BodyFocusController.getData);
 router.get("/add-body-focus", cors(), BodyFocusController.addData);
 
-
-const storage = multer.diskStorage({
-  destination: './public/images/',
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const fileExtension = path.extname(file.originalname);
-    cb(null, 'image-' + uniqueSuffix + fileExtension);
-  },
-});
-
-const upload = multer({ storage: storage });
 
 router.post(
   "/create-body-focus",

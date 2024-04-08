@@ -180,6 +180,20 @@ exports.webHomeDetails = async function (req, res) {
           status: "$productCondition.name",
           image: "$productImage.image"
         }
+      },
+      {
+        $group: {
+          _id: "$_id", 
+          name: { $first: "$name" },
+          flag: { $first: "$flag" }, 
+          price: { $first: "$price" }, 
+          offer_price: { $first: "$offer_price" }, 
+          original_packaging: { $first: "$original_packaging" },
+          original_invoice: { $first: "$original_invoice" },
+          status_name: { $first: "$status_name" }, 
+          status: { $first: "$status" },
+          image: { $first: "$image" } 
+        }
       }
     ]);
     
@@ -237,8 +251,24 @@ exports.webHomeDetails = async function (req, res) {
           image: "$productImage.image",
           hitCount: 1 
         }
+      },
+      {
+        $group: {
+          _id: "$_id", 
+          name: { $first: "$name" },
+          flag: { $first: "$flag" }, 
+          price: { $first: "$price" },
+          offer_price: { $first: "$offer_price" },
+          original_packaging: { $first: "$original_packaging" }, 
+          original_invoice: { $first: "$original_invoice" }, 
+          status_name: { $first: "$status_name" },
+          status: { $first: "$status" }, 
+          image: { $first: "$image" }, 
+          hitCount: { $first: "$hitCount" } 
+        }
       }
     ]);
+    
     
     const topCategories = await Category.find({ priority_status: 1 });
     const justSoldProducts = await Userproduct.aggregate([
@@ -289,8 +319,23 @@ exports.webHomeDetails = async function (req, res) {
           status: "$productCondition.name",
           image: "$productImage.image"
         }
+      },
+      {
+        $group: {
+          _id: "$_id", 
+          name: { $first: "$name" }, 
+          flag: { $first: "$flag" }, 
+          price: { $first: "$price" }, 
+          offer_price: { $first: "$offer_price" }, 
+          original_packaging: { $first: "$original_packaging" }, 
+          original_invoice: { $first: "$original_invoice" }, 
+          status_name: { $first: "$status_name" }, 
+          status: { $first: "$status" },
+          image: { $first: "$image" } 
+        }
       }
     ]);
+    
     
     res.status(200).json({
       status: "1",

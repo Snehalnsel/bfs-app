@@ -92,12 +92,12 @@
                               <div class="div-row">
                                  <div class="div-6">
                                     <label>Bank Name</label>
-                                    <input type="text" name="bankname" class="ds-form-control" value="<% if(bankDetails != null){ %><%=bankDetails.bankname%><% } %>">
+                                    <input type="text" name="bankname" class="ds-form-control bankname" id="bankname" value="<% if(bankDetails != null){ %><%=bankDetails.bankname%><% } %>">
                                  </div>
             
                                  <div class="div-6">
                                     <label>Branch Name:</label>
-                                    <input type="text" name="branchname" id="branchname" class="ds-form-control account number" value="<% if(bankDetails != null){ %><%= bankDetails.branchname %><% } %>">
+                                    <input type="text" name="branchname" id="branchname" class="ds-form-control account number branchname" value="<% if(bankDetails != null){ %><%= bankDetails.branchname %><% } %>">
                                  </div>
 
                                  <div class="div-6">
@@ -112,25 +112,25 @@
             
                                  <div class="div-6">
                                     <label>IFSC CODE:</label>
-                                    <input type="text" name="ifsccode" id="ifsccode" class="ds-form-control" value="<% if(bankDetails != null){ %><%= bankDetails.ifsccode %><% } %>">
+                                    <input type="text" name="ifsccode" id="ifsccode" class="ds-form-control ifsccode" value="<% if(bankDetails != null){ %><%= bankDetails.ifsccode %><% } %>">
                                  </div>
 
                                  <div class="div-6">
                                     <label>Account Type:</label>
                                     <select name="accounttype" id="accounttype" class="ds-form-control">
-                                       <option value="savings">Savings Account</option>
-                                       <option value="current">Current Account</option>
+                                       <option value="savings" <% if(bankDetails != null && bankDetails.accounttype == 'savings'){ %>selected<% } %> >Savings Account</option>
+                                       <option value="current" <% if(bankDetails != null && bankDetails.accounttype == 'current'){ %>selected<% } %>>Current Account</option>
                                     </select>
                                  </div>
 
                                  <div class="div-6">
                                     <label>UPI ID:</label>
-                                    <input type="text" name="upiid" id="upiid" class="ds-form-control" value="<% if(bankDetails != null){ %><%= bankDetails.upiid %><% } %>">
+                                    <input type="text" name="upiid" id="upiid" class="ds-form-control upiid" value="<% if(bankDetails != null){ %><%= bankDetails.upiid %><% } %>">
                                  </div>
 
                                  <div class="div-6">
                                     <label>UPI ID SCANER:</label>
-                                    <input type="file" name="image" id="upiscaner" value="<% if(bankDetails != null){ %><%= bankDetails.upiscaner %><% } %>"/>
+                                    <input type="file" name="upiscaner" id="upiscaner" class="upiscaner" value="<% if(bankDetails != null){ %><%= bankDetails.upiscaner %><% } %>"/>
                                  </div>
                               </div>
                            </form>

@@ -28,11 +28,11 @@ $(document).ready(async function(){
                 required:true,
             },
             upiid:{
-                required:true,
+                //required:true,
                 maxlength:100
             },
             upiscaner:{
-                required:true,
+                //required:true,
             },
         },
         messages:{
@@ -60,24 +60,37 @@ $(document).ready(async function(){
                 required:"Please select a option",
             },
             upiid:{
-                required:"Please enter upi id.",
+                //required:"Please enter upi id.",
                 maxlength:"Please enter valid upi id."
             },
             upiscaner:{
-                required:"Please enter a upi ",
+                //required:"Please enter a upi ",
             },
         },
         submitHandler: function() {
+            let form_data = new FormData();
+            let files = $('#upiscaner')[0].files;
+			let error = '';
+			for(let count = 0; count<files.length; count++) {
+			    let name = files[count].name;
+			    let extension = name.split('.').pop().toLowerCase();
+			    if(jQuery.inArray(extension, ['jpg','jpeg','png','gif']) == -1) {
+				    error += "Invalid " + count + " Image File"
+			    } else {
+				    form_data.append("upiscaner", files[count]);
+			    }
+			}
+            form_data.append("bankname", $('#bankname').val());
+            form_data.append("branchname", $('#branchname').val());
+            form_data.append("accountname", $('#accountname').val());
+            form_data.append("accountnumber", $('#accountnumber').val());
+            form_data.append("ifsccode", $('#ifsccode').val());
+            form_data.append("accounttype", $('#accounttype').val());
+            form_data.append("upiid", $('#upiid').val());
             $.ajax({
                 type: 'POST',
                 url:  webSiteUrl + "/edit-bank-details",
-                data: {
-                    bankname:$('#name').val(),
-                    phone_no: $('#phoneno').val(),
-                    email: $('#remail').val(),
-                    password:$('#password').val(),
-                    confirmpassword:$('#confirmpassword').val(),
-                },
+                data: form_data,
                 success: async function(obj){
                     // let obj = response.responseJSON;
                     let error_success = obj.status;

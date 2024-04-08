@@ -4644,7 +4644,18 @@ td.tp-no-gaptd {
     padding-right: 0px;
 }
 
-th#packingHandlingCharge i strong {
+.errorMsgClass {
+    font-size: 12px !important;
+    color: #d50e0e !important;
+    font-weight: 400;
     font-family: 'Poppins', sans-serif;
 }
-
+th#packingHandlingCharge i strong {
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+}
+button.btn.liginbtn.resetpass.pd-resetpass {
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-top: 15px;
+}

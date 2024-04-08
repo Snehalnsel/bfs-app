@@ -42,7 +42,8 @@ router.get('/', (req, res) => {
   const deviceType = req.query.deviceType; 
   DashboardController.getData(req, res, deviceType);
 });
-router.get("/app-promotion",[],DashboardController.getAppPromotionData);
+router.get("/app-promotion-android",[],DashboardController.getAppPromotionAndroid);
+router.get("/app-promotion-ios",[],DashboardController.getAppPromotionIos);
 /*router.get("/", function (req, res) {
   res.status(401).json({
     status: "0",

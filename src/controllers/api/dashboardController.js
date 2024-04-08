@@ -608,9 +608,22 @@ exports.getData = async function (req, res,deviceType) {
   }
 };
 
-exports.getAppPromotionData = async function (req, res) {
+exports.getAppPromotionAndroid = async function (req, res) {
   try {
-    res.render("webpages/app-promotion", {
+    res.render("webpages/app-promotion-android", {
+      title: "My Post",
+      message: "Welcome to the My Post page!",
+      websiteUrl: process.env.SITE_URL,
+    });
+  } catch (error) {
+    //console.error('Error fetching top categories:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+exports.getAppPromotionIos = async function (req, res) {
+  try {
+    res.render("webpages/app-promotion-ios", {
       title: "My Post",
       message: "Welcome to the My Post page!",
       websiteUrl: process.env.SITE_URL,

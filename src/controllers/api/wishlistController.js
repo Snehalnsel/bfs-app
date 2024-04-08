@@ -51,7 +51,7 @@ exports.addToWishlist = async (req, res) => {
         user_id,
         product_id,
         status,
-        added_dtime: new Date(), 
+        added_dtime: new Date(),
       });
       const savedFavData = await newFavList.save();
       const requestUrl = req.originalUrl || req.url;
@@ -66,15 +66,15 @@ exports.addToWishlist = async (req, res) => {
         message: 'Item added to your wishlist successfully',
         wishlist: {
           user_id: user_id,
-          user_name: user.name, 
+          user_name: user.name,
           product_id: product_id,
-          product_name: product.name, 
+          product_name: product.name,
           category_name: product.category_id.name,
           status: 0,
           added_dtime: savedFavData.added_dtime,
           _id: savedFavData._id,
           __v: savedFavData.__v,
-        } 
+        }
       });
     }
   } catch (error) {
@@ -98,64 +98,62 @@ exports.getWishlistByUserId = async (req, res) => {
         existingList.map(async (item) => {
           const product = await Userproduct.findById(item.product_id).populate('category_id', 'name');
 
-          if (product.length === 0) {
-            return res.status(200).json({
-              message: 'Product is not found',
-              existingList: [],
-            });
-          }  
-          
-          const productImages = await Productimage.find({ product_id: item.product_id }).limit(1);
+          let productImages = [];
+          if (product) {
+            productImages = await Productimage.find({ product_id: item.product_id }).limit(1);
 
-          return {
-            _id: item._id,
-            user_id: item.user_id._id,
-            user_name: item.user_id.name,
-            product_id: item.product_id,
-            product_name: product.name, 
-            product_price : product.price,
-            category_name: product.category_id.name, 
-            images: productImages[0].image, 
-            status: item.status,
-            added_dtime: item.added_dtime,
-            __v: item.__v,
-          };
+
+            return {
+              _id: item._id,
+              user_id: item.user_id._id,
+              user_name: item.user_id.name,
+              product_id: item.product_id ? item.product_id : null,
+              product_name: product && product.name ? product.name : null,
+              product_price: product && product.price ? product.price : null,
+              category_name: product && product.category_id && product.category_id.name ? product.category_id.name : null,
+              images: productImages && productImages.length > 0 ? productImages[0].image : null,
+              status: item.status !== undefined ? item.status : null,
+              added_dtime: item.added_dtime,
+              __v: item.__v,
+            };
+
+          }
         })
       );
+      const filteredList = formattedList.filter(item => item != null);
 
       res.status(200).json({
         message: 'Wishlist details retrieved successfully',
-        existingList: formattedList,
+        existingList: filteredList,
       });
     }
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: 'An error occurred while fetching Wishlist' });
   }
 };
 
-  exports.deleteProductFromWishlist = async (req, res) => {
-    try {
-        const { user_id, product_id } = req.body;
+exports.deleteProductFromWishlist = async (req, res) => {
+  try {
+    const { user_id, product_id } = req.body;
 
-        const existingList = await Wishlist.findOne({ user_id, product_id});
-  
-      if (!existingList) {
-        return res.status(404).json({
-          message: 'Product are not found in the Wishlist',
-        });
-      }
-      else
-      {
-        await existingList.remove();
+    const existingList = await Wishlist.findOne({ user_id, product_id });
 
-        res.status(200).json({
-          message: 'Product removed from Wishlist successfully',
-        });
-      }
-    } catch (error) {
-      res.status(500).json({
-        error: 'An error occurred while deleting product from cart',
+    if (!existingList) {
+      return res.status(404).json({
+        message: 'Product are not found in the Wishlist',
       });
     }
-  };
-  
+    else {
+      await existingList.remove();
+
+      res.status(200).json({
+        message: 'Product removed from Wishlist successfully',
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      error: 'An error occurred while deleting product from cart',
+    });
+  }
+};

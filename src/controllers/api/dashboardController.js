@@ -134,77 +134,171 @@ exports.homedetails = async function (req, res) {
 exports.webHomeDetails = async function (req, res) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-    const products = await Userproduct.find({ approval_status: 1, flag: 0 }); // Adding approval_status filter
-    const bestDealProducts = [];
-    for (const product of products) {
-      const productImage = await Productimage.findOne({ product_id: product._id });
-      if (productImage) {
-        const productCondition = await Productcondition.findById(product.status);
-        bestDealProducts.push({
-          _id: product._id,
-          name: product.name,
-          flag: (typeof product.flag != "undefined") ? product.flag : 0, 
-          price: product.price,
-          offer_price: product.offer_price,
-          original_packaging: product.original_packaging,
-          original_invoice: product.original_invoice,
-          status_name: productCondition ? productCondition._id : '',
-          status: productCondition ? productCondition.name : '',
-          image: productImage.image,
-        });
+    //const products = await Userproduct.find({ approval_status: 1, flag: 0 }); // Adding approval_status filter
+    const bestDealProducts = await Userproduct.aggregate([
+      { 
+        $match: { 
+          approval_status: 1, 
+          flag: 0 
+        } 
+      },
+      {
+        $lookup: {
+          from: "mt_product_images",
+          localField: "_id",
+          foreignField: "product_id",
+          as: "productImage"
+        }
+      },
+      { 
+        $unwind: "$productImage" 
+      },
+      {
+        $lookup: {
+          from: "mt_productconditions",
+          localField: "status",
+          foreignField: "_id",
+          as: "productCondition"
+        }
+      },
+      { 
+        $unwind: { 
+          path: "$productCondition", 
+          preserveNullAndEmptyArrays: true 
+        } 
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          flag: { $ifNull: ["$flag", 0] },
+          price: 1,
+          offer_price: 1,
+          original_packaging: 1,
+          original_invoice: 1,
+          status_name: "$productCondition._id",
+          status: "$productCondition.name",
+          image: "$productImage.image"
+        }
       }
-    }
-    const hotProducts = await Userproduct.find({ approval_status: 1, flag: 0 }).sort({ hitCount: -1 });
-    const whatsHotProducts = [];
-    for (const product of hotProducts) {
-      const productImage = await Productimage.findOne({ product_id: product._id });
-      if (productImage) {
-        const productCondition = await Productcondition.findById(product.status);
-        whatsHotProducts.push({
-          _id: product._id,
-          name: product.name,
-          flag: (typeof product.flag != "undefined") ? product.flag : 0,
-          price: product.price,
-          offer_price: product.offer_price,
-          original_packaging: product.original_packaging,
-          original_invoice: product.original_invoice,
-          status_name: productCondition ? productCondition._id : '',
-          status: productCondition ? productCondition.name : '',
-          image: productImage.image,
-        });
+    ]);
+    
+    const hotProducts = await Userproduct.aggregate([
+      {
+        $match: {
+          approval_status: 1,
+          flag: 0
+        }
+      },
+      {
+        $sort: {
+          hitCount: -1
+        }
+      },
+      {
+        $lookup: {
+          from: "mt_product_images",
+          localField: "_id",
+          foreignField: "product_id",
+          as: "productImage"
+        }
+      },
+      {
+        $unwind: {
+          path: "$productImage",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: "mt_productconditions",
+          localField: "status",
+          foreignField: "_id",
+          as: "productCondition"
+        }
+      },
+      {
+        $unwind: {
+          path: "$productCondition",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          flag: { $ifNull: ["$flag", 0] },
+          price: 1,
+          offer_price: 1,
+          original_packaging: 1,
+          original_invoice: 1,
+          status_name: "$productCondition._id",
+          status: "$productCondition.name",
+          image: "$productImage.image",
+          hitCount: 1 
+        }
       }
-    }
+    ]);
+    
     const topCategories = await Category.find({ priority_status: 1 });
-    const solditems = await Userproduct.find({
-      approval_status: 1,
-      flag: 1
-    });
-    const justSoldProducts = [];
-    for (const product of solditems) {
-      const productImage = await Productimage.findOne({ product_id: product._id });
-      if (productImage) {
-        const productCondition = await Productcondition.findById(product.status);
-        justSoldProducts.push({
-          _id: product._id,
-          name: product.name,
-          flag: (typeof product.flag != "undefined") ? product.flag : 0,//Added By Palash 13-01-2024
-          price: product.price,
-          offer_price: product.offer_price,
-          original_packaging: product.original_packaging,
-          original_invoice: product.original_invoice,
-          status_name: productCondition ? productCondition._id : '',
-          status: productCondition ? productCondition.name : '',
-          image: productImage.image,
-        });
+    const justSoldProducts = await Userproduct.aggregate([
+      {
+        $match: {
+          approval_status: 1,
+          flag: 1
+        }
+      },
+      {
+        $lookup: {
+          from: "productimages",
+          localField: "_id",
+          foreignField: "product_id",
+          as: "productImage"
+        }
+      },
+      {
+        $unwind: {
+          path: "$productImage",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: "productconditions",
+          localField: "status",
+          foreignField: "_id",
+          as: "productCondition"
+        }
+      },
+      {
+        $unwind: {
+          path: "$productCondition",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          flag: { $ifNull: ["$flag", 0] },
+          price: 1,
+          offer_price: 1,
+          original_packaging: 1,
+          original_invoice: 1,
+          status_name: "$productCondition._id",
+          status: "$productCondition.name",
+          image: "$productImage.image"
+        }
       }
-    }
+    ]);
+    
     res.status(200).json({
       status: "1",
       message: "Dashboard details are here!",
       requrl: req.app.locals.requrl,
       respdata: {
         best_deal: bestDealProducts,
-        whats_hot: whatsHotProducts,
+        whats_hot: hotProducts,
         top_categories: topCategories,
         just_sold: justSoldProducts
       },
@@ -213,7 +307,7 @@ exports.webHomeDetails = async function (req, res) {
       fs: fs
     });
   } catch (error) {
-    //console.error('Error fetching best deal and whats hot products with images:', error);
+    
     res.status(500).json({ message: 'Internal server error' });
   }
 };

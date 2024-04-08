@@ -183,16 +183,16 @@ exports.webHomeDetails = async function (req, res) {
       },
       {
         $group: {
-          _id: "$_id", // Group by product ID
-          name: { $first: "$name" }, // Take the first name encountered
-          flag: { $first: "$flag" }, // Take the first flag encountered
-          price: { $first: "$price" }, // Take the first price encountered
-          offer_price: { $first: "$offer_price" }, // Take the first offer price encountered
-          original_packaging: { $first: "$original_packaging" }, // Take the first original packaging encountered
-          original_invoice: { $first: "$original_invoice" }, // Take the first original invoice encountered
-          status_name: { $first: "$status_name" }, // Take the first status name encountered
-          status: { $first: "$status" }, // Take the first status encountered
-          image: { $first: "$image" } // Take the first image encountered
+          _id: "$_id", 
+          name: { $first: "$name" },
+          flag: { $first: "$flag" }, 
+          price: { $first: "$price" }, 
+          offer_price: { $first: "$offer_price" }, 
+          original_packaging: { $first: "$original_packaging" },
+          original_invoice: { $first: "$original_invoice" },
+          status_name: { $first: "$status_name" }, 
+          status: { $first: "$status" },
+          image: { $first: "$image" } 
         }
       }
     ]);
@@ -254,17 +254,17 @@ exports.webHomeDetails = async function (req, res) {
       },
       {
         $group: {
-          _id: "$_id", // Group by product ID
-          name: { $first: "$name" }, // Take the first name encountered
-          flag: { $first: "$flag" }, // Take the first flag encountered
-          price: { $first: "$price" }, // Take the first price encountered
-          offer_price: { $first: "$offer_price" }, // Take the first offer price encountered
-          original_packaging: { $first: "$original_packaging" }, // Take the first original packaging encountered
-          original_invoice: { $first: "$original_invoice" }, // Take the first original invoice encountered
-          status_name: { $first: "$status_name" }, // Take the first status name encountered
-          status: { $first: "$status" }, // Take the first status encountered
-          image: { $first: "$image" }, // Take the first image encountered
-          hitCount: { $first: "$hitCount" } // Take the first hit count encountered
+          _id: "$_id", 
+          name: { $first: "$name" },
+          flag: { $first: "$flag" }, 
+          price: { $first: "$price" },
+          offer_price: { $first: "$offer_price" },
+          original_packaging: { $first: "$original_packaging" }, 
+          original_invoice: { $first: "$original_invoice" }, 
+          status_name: { $first: "$status_name" },
+          status: { $first: "$status" }, 
+          image: { $first: "$image" }, 
+          hitCount: { $first: "$hitCount" } 
         }
       }
     ]);
@@ -322,16 +322,16 @@ exports.webHomeDetails = async function (req, res) {
       },
       {
         $group: {
-          _id: "$_id", // Group by product ID
-          name: { $first: "$name" }, // Take the first name encountered
-          flag: { $first: "$flag" }, // Take the first flag encountered
-          price: { $first: "$price" }, // Take the first price encountered
-          offer_price: { $first: "$offer_price" }, // Take the first offer price encountered
-          original_packaging: { $first: "$original_packaging" }, // Take the first original packaging encountered
-          original_invoice: { $first: "$original_invoice" }, // Take the first original invoice encountered
-          status_name: { $first: "$status_name" }, // Take the first status name encountered
-          status: { $first: "$status" }, // Take the first status encountered
-          image: { $first: "$image" } // Take the first image encountered
+          _id: "$_id", 
+          name: { $first: "$name" }, 
+          flag: { $first: "$flag" }, 
+          price: { $first: "$price" }, 
+          offer_price: { $first: "$offer_price" }, 
+          original_packaging: { $first: "$original_packaging" }, 
+          original_invoice: { $first: "$original_invoice" }, 
+          status_name: { $first: "$status_name" }, 
+          status: { $first: "$status" },
+          image: { $first: "$image" } 
         }
       }
     ]);

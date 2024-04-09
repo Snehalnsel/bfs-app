@@ -136,4 +136,42 @@ exports.getData = async function (req, res, next) {
       }
     });
   };
+
+  exports.deleteData = async function (req, res, next) {
+    try {
+      const errors = validationResult(req);
+      let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          status: "0",
+          message: "Validation error!",
+          respdata: errors.array(),
+          isAdminLoggedIn:isAdminLoggedIn
+        });
+      }
+      const bestdeal = await Bestdeal.findOne({ _id: req.params.id });
+      if (!bestdeal) {
+        return res.status(404).json({
+          status: "0",
+          message: "Not found!",
+          respdata: {},
+          isAdminLoggedIn:isAdminLoggedIn
+        });
+      }
+      await Bestdeal.deleteOne(
+        { _id: req.params.id },
+        { w: "majority", wtimeout: 100 }
+      );
+      res.redirect("/admin/bestdeal");
+    } catch (error) {
+      return res.status(500).json({
+        status: "0",
+        message: "Error occurred while deleting the category!",
+        respdata: error.message,
+        isAdminLoggedIn:isAdminLoggedIn
+      });
+    }
+  };
+  
   

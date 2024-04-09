@@ -463,6 +463,7 @@ router.post(
   ],
   BestDealController.createData
 );
+router.get("/delete-bestdeal/:id", cors(), BestDealController.deleteData);
 // Shipping Charges Master (Add List)
 router.get("/shippingchrgs", cors(), ShippingchargesController.getData);
 router.get("/add-shippingchrgs", cors(), ShippingchargesController.addData);

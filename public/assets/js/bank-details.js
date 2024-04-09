@@ -10,7 +10,7 @@ $(document).ready(async function(){
             },
             branchname:{
                 required:true,
-                maxlength:100
+                //maxlength:100
             },
             accountname:{
                 required:true,
@@ -42,7 +42,7 @@ $(document).ready(async function(){
             },
             branchname:{
                 required:"Please enter branch name.",
-                maxlength:"Please enter valid name."
+                //maxlength:"Please enter valid name."
             },
             accountname:{
                 required:"Please enter account holder name.",
@@ -68,7 +68,7 @@ $(document).ready(async function(){
             },
         },
         submitHandler: function() {
-            let form_data = new FormData();
+            /*let form_data = new FormData();
             let files = $('#upiscaner')[0].files;
 			let error = '';
 			for(let count = 0; count<files.length; count++) {
@@ -116,7 +116,7 @@ $(document).ready(async function(){
                         $('#error-bank-msg').fadeOut();
                     }, 5000);
                 }
-            });
+            });*/
         }
     });
     

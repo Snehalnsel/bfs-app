@@ -1873,6 +1873,7 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
     }
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const user = await Users.findOne({ _id: mongoose.Types.ObjectId(isLoggedIn) });
+    const userBankDetails = await Bankdetails.findOne({ user_id: mongoose.Types.ObjectId(isLoggedIn) });
 
     if (!user) {
       return res.status(404).json({
@@ -1881,16 +1882,12 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
         respdata: {},
       });
     }
-    const updData = {
-      name: req.body.name,
-      email: req.body.email,
-      phone_no: req.body.phone_no,
-      created_dtime: dateTime,
-    };
+    
     // const imgData = req.files;
     // const uploadedFile = req.files[0];
     // const imagePath = uploadedFile.path;
-    const bankDetails = new Bankdetails({
+    
+    let userAllBankDetails = {
       user_id: user._id,
       accountnumber: req.body.accountnumber,
       branchname: req.body.branchname,
@@ -1902,12 +1899,33 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
       upiid_scaner:"",
       // upiid_scaner: imagePath || '',
       default_status: 1,
-      created_dtime: new Date().toISOString(),
+      //created_dtime: new Date().toISOString(),
+    };
+    if(typeof req.file != "undefined" && req.file.filename != "undefined") {
+      userAllBankDetails.upiid_scaner = req.file.filename;
+    }
+    if(!userBankDetails) {
+      userAllBankDetails.created_dtime = new Date().toISOString();
+      const bankDetails = new Bankdetails(userAllBankDetails);
+      await bankDetails.save();
+    } else {
+      userAllBankDetails.updated_dtime = new Date().toISOString();
+      await Bankdetails.findOneAndUpdate(
+        { user_id: mongoose.Types.ObjectId(isLoggedIn) },
+        { $set: userAllBankDetails },
+        { new: true }
+      );
+    }
+    return res.json({
+      status:"success",
+      message:"Successfully updated your details."
     });
-    await bankDetails.save();
-    res.redirect("/bank-details");
+    //res.redirect("/bank-details");
   } catch (error) {
-    res.redirect("/");
+    return res.json({
+      status:"error",
+      message:"Something went wrong please try later."
+    });
     /*res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Bank Details.",

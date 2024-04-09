@@ -5,7 +5,7 @@ $(document).ready(async function(){
         errorClass:"errorMsgClass",
         rules:{
             bankname:{
-                required:true,
+                //required:true,
                 maxlength:100
             },
             branch:{
@@ -76,7 +76,7 @@ $(document).ready(async function(){
         },
         messages:{
             bankname:{
-                required:"Please enter bank name.",
+                //required:"Please enter bank name.",
                 maxlength:"Please enter valid name."
             },
             branch:{
@@ -116,7 +116,7 @@ $(document).ready(async function(){
 			    if(jQuery.inArray(extension, ['jpg','jpeg','png','gif']) == -1) {
 				    error += "Invalid " + count + " Image File"
 			    } else {
-				    form_data.append("upiscaner", files[count]);
+				    form_data.append("image", files[count]);
 			    }
 			}
             form_data.append("bankname", $('#bankname').val());
@@ -128,8 +128,11 @@ $(document).ready(async function(){
             form_data.append("upiid", $('#upiid').val());
             $.ajax({
                 type: 'POST',
-                url:  webSiteUrl + "/edit-bank-details",
+                url:  "/edit-bank-details",
                 data: form_data,
+                processData: false,
+                contentType: false,
+                cache: false,
                 success: async function(obj){
                     // let obj = response.responseJSON;
                     let error_success = obj.status;
@@ -154,7 +157,7 @@ $(document).ready(async function(){
                     setTimeout(function(){ 
                         $('#error-bank-msg').fadeOut();
                     }, 5000);
-                }
+                },
             });
         }
     });

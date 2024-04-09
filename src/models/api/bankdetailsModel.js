@@ -34,6 +34,9 @@ const model = mongoose.Schema({
     type: String,
     required: true,
   },
+  updated_dtime: {
+    type: String,
+  },
 });
 
 module.exports = new mongoose.model("bankdetails_list", model);

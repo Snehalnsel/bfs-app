@@ -210,12 +210,12 @@
                   html += `<a href="javascript:void(0)" class="prd-btn orng-btn bidButton">Bid Now</a>`;
                //}
             }
-               
-           html += `</div>`;
-            if (item.status === 'Prefer Not to Say') {
-                    } else {
-                     html += `<div class="prd-batch">${item.status}</div>`;
-                    }   
+           
+          html += `</div> <div class="prd-batch">${item.status}</div>`;
+         //    if (item.status === 'Gently Used') {
+         //            } else {
+         //             html += `<div class="prd-batch">${item.status}</div>`;
+         //            }   
                     html += `</div>`;
          sliderItem.innerHTML = html;
          sliderElement.appendChild(sliderItem);

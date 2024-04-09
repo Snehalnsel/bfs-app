@@ -51,13 +51,13 @@
                                     <tbody>
                                         <% if(respdata.list){ %>
                                             <% respdata.list.forEach(function(value, index) { %> 
-                                            <tr>
-                                                <td><%= (index+1) %></td>
-                                                <td><%= value.user_id.name %></td>
-                                                <td><%= value.purpose%></td>
-                                                <td><%= value.ip_address%></td>
-                                                <td><%= value.created_dtime%></td>
-                                            </tr>
+                                                <tr>
+                                                    <td><%= (index+1) %></td>
+                                                    <td><%= value.user_id.name %></td>
+                                                    <td><%= value.purpose%></td>
+                                                    <td><%= value.ip_address%></td>
+                                                    <td><%= value.created_dtime%></td>
+                                                </tr>
                                             <% });  %>
                                         <% } %> 
                                     </tbody>

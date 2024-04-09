@@ -2185,27 +2185,31 @@ exports.userWisePost = async function (req, res, next) {
     const formattedUserProducts = [];
     for (const userproduct of userproducts) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
-      const formattedUserProduct = {
-        _id: userproduct._id,
-        name: userproduct.name,
-        description: userproduct.description,
-        brand: userproduct.brand_id ? userproduct.brand_id.name : '',
-        user_id: userproduct.user_id._id,
-        user_name: userproduct.user_id.name,
-        size_id: userproduct.size_id ? userproduct.size_id.name : '',
-        price: userproduct.price,
-        offer_price: userproduct.offer_price,
-        percentage: userproduct.percentage,
-        status: userproduct.status,
-        flag: userproduct.flag,
-        approval_status: userproduct.approval_status,
-        original_invoice: userproduct.original_invoice,
-        original_packaging: userproduct.original_packaging,
-        added_dtime: userproduct.added_dtime,
-        __v: userproduct.__v,
-        product_images: productImages,
-      };
-      formattedUserProducts.push(formattedUserProduct);
+      if (productImages) {
+          const productCondition = await Productcondition.findById(userproduct.status);
+          const formattedUserProduct = {
+            _id: userproduct._id,
+            name: userproduct.name,
+            description: userproduct.description,
+            brand: userproduct.brand_id ? userproduct.brand_id.name : '',
+            user_id: userproduct.user_id._id,
+            user_name: userproduct.user_id.name,
+            size_id: userproduct.size_id ? userproduct.size_id.name : '',
+            price: userproduct.price,
+            offer_price: userproduct.offer_price,
+            percentage: userproduct.percentage,
+            status: userproduct.status,
+            status_name: productCondition.name,
+            flag: userproduct.flag,
+            approval_status: userproduct.approval_status,
+            original_invoice: userproduct.original_invoice,
+            original_packaging: userproduct.original_packaging,
+            added_dtime: userproduct.added_dtime,
+            __v: userproduct.__v,
+            product_images: productImages,
+          };
+        formattedUserProducts.push(formattedUserProduct);
+      }
     }
     if (formattedUserProducts) {
       res.render("webpages/mypost", {

@@ -141,6 +141,7 @@ exports.getData = async function (req, res, next) {
     try {
       const errors = validationResult(req);
       let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+
       if (!errors.isEmpty()) {
         return res.status(400).json({
           status: "0",
@@ -158,7 +159,7 @@ exports.getData = async function (req, res, next) {
           isAdminLoggedIn:isAdminLoggedIn
         });
       }
-      await Brand.deleteOne(
+      await Bestdeal.deleteOne(
         { _id: req.params.id },
         { w: "majority", wtimeout: 100 }
       );

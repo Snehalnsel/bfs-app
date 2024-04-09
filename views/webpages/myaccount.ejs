@@ -133,8 +133,10 @@
                    <div class="div-row">
                      <% respdata1.forEach(function(item) { %>                        
                       <% if(item.address_name == 'Home' && item.default_status == '0') {%>
-                      <div class="div-12">
-                         <div class="edit-link"><a href="/delete-address/<%=item._id%>"><i class="fa fa-trash-o" aria-hidden="true"></i></a></div>
+                      <div class="div-12" id="<%=item._id%>">
+                         <!-- <div class="edit-link"><a href="/delete-address/<%=item._id%>"><i class="fa fa-trash-o" aria-hidden="true"></i></a></div> -->
+                         <div class="edit-link"><a href="javascript:void(0)" class="prd-btn address-remove-button"
+                           data-id="<%=item._id%>"><i class="fa fa-trash-o" aria-hidden="true"></i></a></div>
                          <br><br>
                          <div class="edit-link2"><a href="/edituseraddress/<%=item._id%>"><i class="fa fa-edit" aria-hidden="true"></i></a></div>                     
                          <textarea class="ds-form-control" value="" disabled>Home:<%=item.address1%>, <%=item.street_name%>, <%=item.landmark%>, <%=item.state_name%>, <%=item.city_name%>, <%=item.pin_code%></textarea>

@@ -131,8 +131,13 @@
 
                                  <div class="div-6">
                                     <label>UPI ID SCANER:</label>
-                                    <input type="file" name="upiscaner" id="upiscaner" class="upiscaner" value="<% if(bankDetails != null){ %><%= bankDetails.upiscaner %><% } %>"/>
-                                 </div>
+                                    <input type="file" name="upiscaner" id="upiscaner" class="upiscaner" value=""/>
+                                    <div class="account-user-image">
+                                       <%if((typeof bankDetails != "undefined") && (bankDetails != null) && (bankDetails.upiid_scaner != "undefined") && (bankDetails.upiid_scaner != "")) {%>
+                                          <img src="/public/images/<%=bankDetails.upiid_scaner%>" />
+                                       <% } %>
+                                    </div>
+                                 </div>                                 
                               </div>
                            </form>
                            <div class="success-error">

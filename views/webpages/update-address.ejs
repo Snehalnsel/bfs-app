@@ -93,7 +93,7 @@
                </div>
 
                <div class="dsh-shortbox">
-                  <form action="/updateuseraddress" method="post">
+                  <form action="/updateuseraddress" method="post" class="checkoutForm" id="checkoutForm">
                      <div class="div-row">
                         <div class="div-12 mb-15">
                            <label class="full-label">Address Type:</label>
@@ -169,6 +169,7 @@
    <%- include('../../public/assets/include/newsletter'); %>
       <%- include('../../public/assets/include/footer'); %>
          </body>
+         <script src="/public//assets//js/checkout.js" ></script>
          <script>
             $(document).ready(function () {
                // Get the value passed from the controller

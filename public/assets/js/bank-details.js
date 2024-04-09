@@ -8,27 +8,66 @@ $(document).ready(async function(){
                 required:true,
                 maxlength:100
             },
-            branchname:{
-                required:true,
-                //maxlength:100
+            branch:{
+                required:{
+                    depends:function(){
+                      if ($('#bankname').val() != '' ){
+                        return true;  
+                      }else{
+                        return false;
+                      }
+                    }
+                },
             },
             accountname:{
-                required:true,
+                required:{
+                    depends:function(){
+                      if ($('#bankname').val() != '' ){
+                        return true;  
+                      }else{
+                        return false;
+                      }
+                    }
+                },
                 maxlength:100
             },
             accountnumber:{
-                required:true,
+                required:{
+                    depends:function(){
+                      if ($('#bankname').val() != '' ){
+                        return true;  
+                      }else{
+                        return false;
+                      }
+                    }
+                },
                 maxlength:100
             },
             ifsccode:{
-                required:true,
+                required:{
+                    depends:function(){
+                      if ($('#bankname').val() != '' ){
+                        return true;  
+                      }else{
+                        return false;
+                      }
+                    }
+                },
                 maxlength:100
             },
             accounttype:{
-                required:true,
+                required:{
+                    depends:function(){
+                      if ($('#bankname').val() != '' ){
+                        return true;  
+                      }else{
+                        return false;
+                      }
+                    }
+                },
             },
             upiid:{
-                //required:true,
+                //required: required,
                 maxlength:100
             },
             upiscaner:{
@@ -40,8 +79,8 @@ $(document).ready(async function(){
                 required:"Please enter bank name.",
                 maxlength:"Please enter valid name."
             },
-            branchname:{
-                required:"Please enter branch name1111.",
+            branch:{
+                required:"Please enter branch name.",
                 //maxlength:"Please enter valid name."
             },
             accountname:{
@@ -68,7 +107,7 @@ $(document).ready(async function(){
             },
         },
         submitHandler: function() {
-            /*let form_data = new FormData();
+            let form_data = new FormData();
             let files = $('#upiscaner')[0].files;
 			let error = '';
 			for(let count = 0; count<files.length; count++) {
@@ -81,7 +120,7 @@ $(document).ready(async function(){
 			    }
 			}
             form_data.append("bankname", $('#bankname').val());
-            form_data.append("branchname", $('#branchname').val());
+            form_data.append("branchname", $('#branch').val());
             form_data.append("accountname", $('#accountname').val());
             form_data.append("accountnumber", $('#accountnumber').val());
             form_data.append("ifsccode", $('#ifsccode').val());
@@ -116,7 +155,7 @@ $(document).ready(async function(){
                         $('#error-bank-msg').fadeOut();
                     }, 5000);
                 }
-            });*/
+            });
         }
     });
     

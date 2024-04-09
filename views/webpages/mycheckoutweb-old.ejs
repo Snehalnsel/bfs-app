@@ -137,49 +137,6 @@
                                        </div>
                   </div>
                </div>
-
-               <div class="bids-row checkout-row">
-                  <div class="checkout-top">
-                     <div class="checkout-info">
-                        <div class="ci-count"><span>3</span></div>
-                        <div class="ci-content">
-                           <div class="bd-title">Payment Details</div>
-                        </div>
-                     </div>
-                  </div>
-
-                  <div class="checkout-tab">
-
-                        <div class="form-check-inline">
-                           <label class="tab1 select-tab" for="radio2">
-                              <div class="st-tab"><input type="radio" class="form-check-input payment-method paymentmethod paymentmethodOnline"
-                                 name="paymentmethod" id="payNowButton" value="Online" checked></div>
-                              <div class="st-info">
-                                 <h6 class="active-title">Pay Now</h6>
-                              </div>
-                           </label>
-                        </div>
-
-                        <div class="form-check-inline">
-                           <label class="tab1 select-tab" for="radio2">
-                              <div class="st-tab"><input type="radio" class="form-check-input payment-method paymentmethod" id="cod-payments"
-                                 name="paymentmethod" value="COD"></div>
-                              <div class="st-info">
-                                 <h6 class="active-title">Pay On Delivery</h6>
-                              </div>
-                           </label>
-                        </div>
-                                 
-                                     
-                  </div>
-               </div>
-
-               
-
-
-
-
-
             </div>
             <div class="cart-summery">
                <div class="summery-title">
@@ -197,7 +154,7 @@
                            <td colspan="2">
                               <div class="payment-methodbox">
                                  <p>Select Payments Method </p>
-                                 <!-- <ul>
+                                 <ul>
                                     <li><label class="form-check-label">
                                           <input type="radio" class="form-check-input payment-method paymentmethod paymentmethodOnline"
                                              name="paymentmethod" id="payNowButton" value="Online" checked>Pay Now
@@ -209,7 +166,7 @@
                                              name="paymentmethod" value="COD">Pay On Delivery
                                        </label>
                                     </li>
-                                 </ul> -->
+                                 </ul>
                                  <div class="pmnt-hidebox">
                                     <table style="width:100%">
                                        <tr id="pay-now-row">
@@ -381,22 +338,14 @@
             }
 
             $(document).on("click", ".check-out", async function (e) {
-               let checkAddress = $('input[name="optradio"]:checked').val();
                e.preventDefault();
                $("#error-message").html("");
                let agreeCheckbox = $(".checkbox-input");
-               
-               if (checkAddress == 'option2') {
-                  displayErrorMessage("Please add address.");
-                  return;
-               }
 
                if (!agreeCheckbox.prop("checked")) {
                   displayErrorMessage("Please agree to the Terms & Conditions.");
                   return;
                }
-
-              
 
                let selectedPaymentMethod = $(".payment-method:checked").val();
                if (!selectedPaymentMethod) {

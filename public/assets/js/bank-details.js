@@ -41,7 +41,7 @@ $(document).ready(async function(){
                 maxlength:"Please enter valid name."
             },
             branchname:{
-                required:"Please enter branch name.",
+                required:"Please enter branch name1111.",
                 //maxlength:"Please enter valid name."
             },
             accountname:{

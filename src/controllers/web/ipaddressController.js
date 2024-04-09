@@ -34,6 +34,8 @@ exports.getList = async function (req, res, next) {
     ipTransactions.forEach(transaction => {
       transaction.created_dtime = moment(transaction.created_dtime).format("YYYY-MM-DD HH:mm:ss");
     });
+
+    console.log("transaction", ipTransactions);
     
     res.render("pages/ip/list", {
       siteName: req.app.locals.siteName,

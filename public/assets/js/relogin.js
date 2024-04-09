@@ -19,7 +19,7 @@ async function userReLogin(reCookieAccessToken, reCookieRefreshToken) {
                 //Set Coockie in the local machine
                 await setCookeiFunc(accessTokenVar,obj.accessToken,obj.accessTokenExpires);
                 await setCookeiFunc(refreshTokenVar,obj.refreshToken,obj.refreshTokenExpires);
-                location.reload();
+                //location.reload();
             } else {
                 //Write something for occuring the error
             }

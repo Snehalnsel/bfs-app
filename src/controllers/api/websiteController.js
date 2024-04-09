@@ -1907,11 +1907,12 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
     await bankDetails.save();
     res.redirect("/bank-details");
   } catch (error) {
-    res.status(500).json({
+    res.redirect("/");
+    /*res.status(500).json({
       status: "0",
-      message: "An error occurred while rendering the Edit Profile.",
+      message: "An error occurred while rendering the Edit Bank Details.",
       error: error.message,
-    });
+    });*/
   }
 };
 exports.userNewCheckOutAddressAdd = async function (req, res, next) {

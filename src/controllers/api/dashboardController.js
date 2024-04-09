@@ -280,7 +280,7 @@ exports.webHomeDetails = async function (req, res) {
       },
       {
         $lookup: {
-          from: "productimages",
+          from: "mt_product_images",
           localField: "_id",
           foreignField: "product_id",
           as: "productImage"
@@ -294,7 +294,7 @@ exports.webHomeDetails = async function (req, res) {
       },
       {
         $lookup: {
-          from: "productconditions",
+          from: "mt_productconditions",
           localField: "status",
           foreignField: "_id",
           as: "productCondition"
@@ -329,8 +329,8 @@ exports.webHomeDetails = async function (req, res) {
           offer_price: { $first: "$offer_price" }, 
           original_packaging: { $first: "$original_packaging" }, 
           original_invoice: { $first: "$original_invoice" }, 
-          status_name: { $first: "$status_name" }, 
-          status: { $first: "$status" },
+          status_name: { $first: "$status_name" },
+          status: { $first: "$status" }, 
           image: { $first: "$image" } 
         }
       }

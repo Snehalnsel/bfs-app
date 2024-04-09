@@ -525,6 +525,8 @@ router.get("/delete-gender/:id", cors(), GenderController.deleteData);
 router.get("/colorlist", cors(), ColorController.getData);
 router.get("/add-color", cors(), ColorController.addData);
 router.post("/create-color",ColorController.createData);
+router.get("/edit-color/:id", cors(), ColorController.editData);
+router.post("/upload-color",ColorController.updateData);
 router.get("/delete-color/:id", cors(), ColorController.deleteData);
 
 //IP Address LIST

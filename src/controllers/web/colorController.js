@@ -162,6 +162,86 @@ exports.updateStatusData = async function (req, res, next) {
       });
     });
 };
+
+exports.editData = async function (req, res, next) {
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+  var pageName = "Product Condition";
+  var pageTitle = req.app.locals.siteName + " - Edit " + pageName;
+  const id = mongoose.Types.ObjectId(req.params.id);
+  Color.findOne({ _id: id }).then((color) => {
+    res.render("pages/color/edit", {
+      status: 1,
+      siteName: req.app.locals.siteName,
+      pageName: pageName,
+      pageTitle: pageTitle,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
+      year: moment().format("YYYY"),
+      requrl: req.app.locals.requrl,
+      message: "",
+      respdata: color,
+      isAdminLoggedIn:isAdminLoggedIn
+    });
+  });
+};
+
+exports.updateData = async function (req, res, next) {
+  try {
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        status: "0",
+        message: "Validation error!",
+        respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
+      });
+    }
+    const color = await Color.findById(req.body.color_id);
+
+    if (!color) {
+      return res.status(404).json({
+        status: "0",
+        message: "color not found!",
+        respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
+      });
+    }
+
+    const updData = {
+      name: req.body.name || color.name,
+      short_code: req.body.short_code || color.short_code,
+      status: req.body.status || color.status,
+    };
+
+
+    const updatedColor = await Color.findByIdAndUpdate(
+      req.body.color_id,
+      updData,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedColor) {
+      return res.status(404).json({
+        status: "0",
+        message: "Colort data not  updated!",
+        respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
+      });
+    }
+    res.redirect("/admin/colorlist");
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      status: "0",
+      message: "An error occurred while updating the brand.",
+      respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
+    });
+  }
+};
 exports.deleteData = async function (req, res, next) {
   try {
     let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";

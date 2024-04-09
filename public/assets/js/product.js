@@ -296,3 +296,40 @@ rangeInput.forEach((input) => {
     }
     });
 });
+
+$(document).on('click', ".address-remove-button", async function (e) {
+    Swal.fire({
+        title: "Do you want to remove this address?",
+        iconHtml: '<img src="'+ src +'">',
+        customClass: {  
+            icon: 'alert-logo-item',
+            popup: "bid-alert-modal"
+        },
+        //customClass:"bid-alert-modal",
+        showCancelButton: true,
+        confirmButtonText: "Ok",
+      }).then(async (result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+            let wishlistCookieAccessToken = await getCookieFunc(accessTokenVar);
+            let wishlistCookieRefreshToken = await getCookieFunc(refreshTokenVar);
+            await userReLogin(wishlistCookieAccessToken, wishlistCookieRefreshToken);
+
+            var divid = $(this).closest('.bids-row').attr('id');
+            console.log(divid);
+
+            var id = $(this).data('id');
+            $.ajax({
+            url: '/delete-address/' + id.trim(),
+            method: 'GET',
+            success: function (data) {
+                $("#" + id).remove();
+                
+            },
+            error: function (err) {
+                console.error('Error:', err);
+            }
+            });
+        }
+    });
+});

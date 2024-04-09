@@ -94,13 +94,13 @@
              </div>
  
              <div class="dsh-shortbox">
-                <form action="/adduseraddress" method="post">
+                <form action="/adduseraddress" method="post" class="checkoutForm" id="checkoutForm">
                    <div class="div-row">
                       <div class="div-12 mb-15">
                           <label class="full-label">Address Type:</label>
                          <div class="form-check-inline">                           
                               <label class="form-check-label">
-                                <input type="radio" class="form-check-input addr_type" id="add_type1" name="addr_type" >Home
+                                <input type="radio" class="form-check-input addr_type" id="add_type1"  name="addr_type" checked>Home
                               </label>
                             </div>
 
@@ -116,7 +116,7 @@
                               </label>
                             </div>
                       </div>                      
-                      <input type="hidden" name="addrType" id="addrType">
+                      <input type="hidden" name="addrType" id="addrType" value="Home">
                       
                       <div class="div-12">
                          <label>Address 1:</label>                        
@@ -156,6 +156,7 @@
                       </div>
                       <div class="div-12">
                          <input type="submit" name="" class="ds-form-control" value="Save">
+                         <!-- <button type="submit" class="ds-form-control">Save</button> -->
                       </div>
                    </div>
                 </form>
@@ -170,6 +171,7 @@
    <%- include('../../public/assets/include/newsletter'); %>
       <%- include('../../public/assets/include/footer'); %>
 </body>
+<script src="/public//assets//js/checkout.js" ></script>
 <script>
    $(document).on('change','.addr_type',function(){
       if ($(this).is(":checked")) 

@@ -48,7 +48,7 @@
                                        <%=item.address_name%>
                                     </h6>
                                     <p>
-                                       <%=item.address1%>,<%=item.street_name;%>, <%=item.city_name;%>,
+                                       <%=item.address1%>,<%=item.street_name;%>, <%=item.city_name;%>,<%=item.landmark%>,
                                                 <%=item.state_name;%>, <%=item.pin_code;%>
                                     </p>
                                  </div>
@@ -89,9 +89,8 @@
                                                             id="add_type3" name="addr_type" value="Other">Other
                                                       </label>
                                                    </div>
-                                                   <input type="hidden" name="addrType" id="addrType">
+                                                   <input type="hidden" name="addrType" id="addrType" value="Home">
                                                 </div>
-                                                <input type="hidden" name="addrType" id="addrType">
                                                 <div class="row">
                                                    <div class="col-md-12 "><input type="text" class="form-control mb-3"
                                                          id="address1" placeholder="Address 1" name="address1"></div>
@@ -155,7 +154,7 @@
                               <div class="st-tab"><input type="radio" class="form-check-input payment-method paymentmethod paymentmethodOnline"
                                  name="paymentmethod" id="payNowButton" value="Online" checked></div>
                               <div class="st-info">
-                                 <h6 class="active-title">Pay Now</h6>
+                                 <h6 class="active-title">Make full Payment</h6>
                               </div>
                            </label>
                         </div>
@@ -165,7 +164,7 @@
                               <div class="st-tab"><input type="radio" class="form-check-input payment-method paymentmethod" id="cod-payments"
                                  name="paymentmethod" value="COD"></div>
                               <div class="st-info">
-                                 <h6 class="active-title">Pay On Delivery</h6>
+                                 <h6 class="active-title">Pay 10% now rest on COD</h6>
                               </div>
                            </label>
                         </div>

@@ -1872,7 +1872,7 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
       });
     }
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-    const user = await Users.findOne({ _id: req.body.userId });
+    const user = await Users.findOne({ _id: mongoose.Types.ObjectId(isLoggedIn) });
 
     if (!user) {
       return res.status(404).json({
@@ -1887,33 +1887,24 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
       phone_no: req.body.phone_no,
       created_dtime: dateTime,
     };
-    const updatedUser = await Users.findOneAndUpdate(
-      { _id: user._id },
-      { $set: updData },
-      { upsert: true, new: true }
-    );
-    if (!updatedUser) {
-      return res.status(500).json({
-        status: "0",
-        message: "Failed to update user!",
-        respdata: {},
-      });
-    }
     // const imgData = req.files;
     // const uploadedFile = req.files[0];
     // const imagePath = uploadedFile.path;
     const bankDetails = new Bankdetails({
       user_id: user._id,
       accountnumber: req.body.accountnumber,
-      bankname: req.body.bankname,
+      branchname: req.body.branchname,
+      accountname: req.body.accountname,
+      accountnumber: req.body.accountnumber,
       ifsccode: req.body.ifsccode,
       accounttype: req.body.accounttype,
       upiid: req.body.upiid,
+      upiid_scaner:"",
       // upiid_scaner: imagePath || '',
       default_status: 1,
       created_dtime: new Date().toISOString(),
     });
-    const savedBankDetails = await bankDetails.save();
+    await bankDetails.save();
     res.redirect("/bank-details");
   } catch (error) {
     res.status(500).json({

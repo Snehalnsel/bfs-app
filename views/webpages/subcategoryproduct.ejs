@@ -258,9 +258,13 @@
                               <div class="rtl-price"><span>Est. Retail:</span>
                                  <%=item.price%>
                               </div>
-                              <div class="prd-batch">
-                                 <%=item.status_name%>
-                              </div>
+                              <% if (item.status_name==='Prefer Not to Say' ) { %>
+
+                                 <% } else { %>
+                                    <div class="prd-batch">
+                                       <%=item.status_name%>
+                                    </div>
+                                    <% } %>
                            </div>
                         </div>
                         <% }); %>

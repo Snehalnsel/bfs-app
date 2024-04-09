@@ -212,12 +212,11 @@
             }
                
             html += `</div>`;
-            if(item.status != "Prefer Not to Say") {
-               html += ` <div class="prd-batch">${item.status}</div>`;
-            } 
-            html += `  
-         </div>
-         `;
+            if (item.status === 'Prefer Not to Say') {
+                    } else {
+                     html += `<div class="prd-batch">${item.status}</div>`;
+                    }   
+                    html += `</div>`;
          sliderItem.innerHTML = html;
          sliderElement.appendChild(sliderItem);
       });

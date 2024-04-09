@@ -173,7 +173,7 @@ async function makeHtml(data,totalPages, currentPage, categoryId, websiteUrl, br
                     <div class="rtl-price">
                         <span>Est. Retail:</span>${item.price}
                     </div>
-                    <div class="prd-batch">${item.status_name}</div>                 
+                    ${item.status_name === 'Prefer Not to Say' ? '' : `<div class="prd-batch">${item.status_name}</div>`}               
                 </div> 
             </div>`;
     });

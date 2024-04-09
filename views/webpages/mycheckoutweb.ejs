@@ -188,14 +188,14 @@
                   <table class="table table-borderless">
                      <tbody>
                         <tr>
-                           <td>Sub Total <small>(1 item)</small></td>
+                           <td>Sub Total</td>
                            <th><i class="fa fa-inr" aria-hidden="true"></i><%=product_price%>
                            </th>
                         </tr>
                         <tr>
                            <td colspan="2">
                               <div class="payment-methodbox">
-                                 <p>Select Payments Method </p>
+                                 <!-- <p>Select Payments Method </p> -->
                                  <!-- <ul>
                                     <li><label class="form-check-label">
                                           <input type="radio" class="form-check-input payment-method paymentmethod paymentmethodOnline"
@@ -212,7 +212,7 @@
                                  <div class="pmnt-hidebox">
                                     <table style="width:100%">
                                        <tr id="pay-now-row">
-                                          <td>Booking Amount(10% of product value)</td>
+                                          <td>Booking Amount<br/>(10% of product value)</td>
                                           <th><i class="fa fa-inr" aria-hidden="true"></i>200</th>
                                        </tr>
                                        <tr id="remaining-amount-row">
@@ -225,7 +225,7 @@
                            </td>
                         </tr>
                         <tr>
-                           <td>Packing & Handling Charges (S&H)</td>
+                           <td>Packing & Handling Charges</td>
                            <th id="packingHandlingCharge"><i class="fa fa-inr" aria-hidden="true"><strong>500.00</strong></i></th>
                         </tr>
                         <!-- <tr>
@@ -234,10 +234,10 @@
                                  class="check-link">Check Shipping Amount</button></td>
                         </tr> -->
                         <tr id="cash-handle-charge">
-                           <td>Cash handle charge(5% of product value)</td>
+                           <td>Cash Handling Charges<br/>(5% of product value)</td>
                            <th><i class="fa fa-inr" aria-hidden="true"></i>200</th>
                         </tr>
-                        <tr>
+                        <tr class="taxable-value">
                            <td class="changeOnPaymentMethod">Taxable value (S&H + CH)</td>
                            <th id="taxvalue"><i class="fa fa-inr" aria-hidden="true"></i> </th>
                         </tr>

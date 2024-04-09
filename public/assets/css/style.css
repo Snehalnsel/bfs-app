@@ -4659,3 +4659,6 @@ button.btn.liginbtn.resetpass.pd-resetpass {
     padding-right: 10px;
     margin-top: 15px;
 }
+.taxable-value{
+    display: none;
+}

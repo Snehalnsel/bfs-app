@@ -442,7 +442,7 @@ exports.updatedetailsData = async function (req, res, next) {
                 category_id: req.body.subcategory_id,
                 user_id: exitsProductData.user_id,
                 image: imageUrl,
-                image_order:  req.body.image_order,
+                image_order:  git,
                 added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
               });
               return productimageDetail.save();

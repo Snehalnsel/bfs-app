@@ -55,13 +55,13 @@ exports.addToWishlist = async (req, res) => {
       });
       const savedFavData = await newFavList.save();
       const requestUrl = req.originalUrl || req.url;
-      // await insertNotification(
-      //   'Wishlist Notification', 
-      //   `Item ${product.name} added to wishlist by ${user.name}`, 
-      //   user_id, 
-      //   requestUrl, 
-      //   new Date()
-      // );
+      await insertNotification(
+        'Wishlist Notification', 
+        `Item ${product.name} added to wishlist by ${user.name}`, 
+        user_id, 
+        requestUrl, 
+        new Date()
+      );
       return res.status(200).json({
         message: 'Item added to your wishlist successfully',
         wishlist: {

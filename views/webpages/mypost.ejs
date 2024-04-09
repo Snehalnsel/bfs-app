@@ -115,18 +115,28 @@
                      </div>
                   </div>
                   <% if (item.status_name === 'Prefer Not to Say') {  %>
-                     <%} else { %>
+                  <%} else { %>
                         <div class="prd-batch"><%=item.status_name%></div>
                    <%}  %>
-                  <div class="link-top top-circle1"><a href="javascript:void(0)"><i class="fa fa-print" aria-hidden="true"></i></a></div>
-                  <div class="link-top top-circle2"><a href="javascript:void(0)"><i class="fa fa-gift" aria-hidden="true"></i></a></div>
+                   <div class="link-top top-circle1">
+                     <% if (item.original_invoice === 1) { %>
+                       <a href="javascript:void(0)">
+                         <i class="fa fa-print" aria-hidden="true"></i>
+                       </a>
+                     <% } %>
+                   </div>
+                   <div class="link-top top-circle2">
+                     <% if (item.original_packaging === 1) { %>
+                       <a href="javascript:void(0)">
+                         <i class="fa fa-gift" aria-hidden="true"></i>
+                       </a>
+                     <% } %>
+                   </div>
+                   
                   </div>
                </div>
                <% }); %>
                <%}%>
-               
-              
-
             </div>
             <!-- <div class="dsh-shortbox">
                <form>

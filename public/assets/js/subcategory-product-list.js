@@ -173,7 +173,7 @@ async function makeHtml(data,totalPages, currentPage, categoryId, websiteUrl, br
                     <div class="rtl-price">
                         <span>Est. Retail:</span>${item.price}
                     </div>
-                    ${item.status_name === 'Prefer Not to Say' ? '' : `<div class="prd-batch">${item.status_name}</div>`}               
+                    <div class="prd-batch">${item.status_name}</div>               
                 </div> 
             </div>`;
     });
@@ -183,7 +183,7 @@ async function makeHtml(data,totalPages, currentPage, categoryId, websiteUrl, br
     // for (let i = 1; i <= totalPages; i++) {
     //     htmlContent += `<a href="/api/${webUrl}/${product_category_id}?page=${i}" class="${(i === currentPage) ? 'active' : ''}">${i}</a>`;
     // }
-    // htmlContent += `</div>`;
+    // htmlContent += `</div>`;${item.status_name === 'Prefer Not to Say' ? '' : `<div class="prd-batch">${item.status_name}</div>`}
     htmlContent += `<div class="pagination custome-pagination">`;
     for (let i = 1; i <= totalPages; i++) {
         htmlContent += `<a class="ajax_pagination" data-id="${i}" href="javascript:void(0)">${i}</a>`;

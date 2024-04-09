@@ -52,7 +52,7 @@ exports.getList = async function (req, res, next) {
         list: ipTransactions,
       },
       isAdminLoggedIn: isAdminLoggedIn
-    });
+    }); 
   } catch (err) {
     // Handle errors
     console.error(err);

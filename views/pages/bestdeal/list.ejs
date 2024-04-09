@@ -69,7 +69,7 @@
                                                     <a href="/admin/bestdeal-status-change/<%= value._id %>" class="btn btn-success btn-circle btn-sm"  title="Status change">
                                                         <i class="fa fa-solid fa-refresh"></i>
                                                     </a>
-                                                    <a href="/admin/delete-bestdeal/<%= value._id %>" class="btn btn-danger btn-circle btn-sm"  title="Delete">
+                                                    <a href="/admin/delete-bestdeal/<%= value._id %>" class="btn btn-danger btn-circle btn-sm"  title="Delete"  onclick="return confirm('Are you sure you want to delete this best deal?')">
                                                         <i class="fas fa-trash"></i>
                                                     </a>
                                                 </td>

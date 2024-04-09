@@ -36,6 +36,19 @@ const PaymentController = require("../controllers/api/paymentController");
 //others
 const dateTime = moment().format("YYYY-MM-DD h:mm:ss");
 
+
+const storage = multer.diskStorage({
+  destination: './public/images/',
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const fileExtension = path.extname(file.originalname);
+    cb(null, 'image-' + uniqueSuffix + fileExtension);
+  },
+});
+const upload = multer({ storage: storage, limits: { files: 5 } });
+const firstSetUpload = multer({ storage: storage, limits: { files: 5 } }).array('firstSetFiles', 5);
+const secondSetUpload = multer({ storage: storage, limits: { files: 5 } }).array('secondSetFiles', 5);
+
 //apis
 // router.get("/",[],DashboardController.getData);
 router.get('/', (req, res) => {
@@ -146,9 +159,9 @@ router.post(
 
 router.post(
   "/edit-bank-details",
-  auth.isAuthorized,
+  //auth.isAuthorized,
   [],
-  //upload.single('image'),
+  upload.single('image'),
   WebsiteController.userBankDetailsUpdate
 );
 
@@ -285,19 +298,6 @@ router.post(
   ],
   CategoryController.getCategoryWithParent
 );
-
-const storage = multer.diskStorage({
-  destination: './public/images/',
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const fileExtension = path.extname(file.originalname);
-    cb(null, 'image-' + uniqueSuffix + fileExtension);
-  },
-});
-
-const upload = multer({ storage: storage, limits: { files: 5 } });
-const firstSetUpload = multer({ storage: storage, limits: { files: 5 } }).array('firstSetFiles', 5);
-const secondSetUpload = multer({ storage: storage, limits: { files: 5 } }).array('secondSetFiles', 5);
 
 router.post(
   "/add-category",

@@ -28,6 +28,7 @@ const ShippingkitController = require("../controllers/web/shippingkitController"
 const CartremoveController = require("../controllers/web/cartremoveController");
 const BannerController = require("../controllers/web/bannerController");
 const GenderController = require("../controllers/web/genderController");
+const ColorController = require("../controllers/web/colorController");
 const IpaddressController = require("../controllers/web/ipaddressController");
 const compress_images = require("compress-images");
 
@@ -519,6 +520,12 @@ router.get("/genderlist", cors(), GenderController.getData);
 router.get("/add-gender", cors(), GenderController.addData);
 router.post("/create-gender",GenderController.createData);
 router.get("/delete-gender/:id", cors(), GenderController.deleteData);
+
+//Color
+router.get("/colorlist", cors(), ColorController.getData);
+router.get("/add-color", cors(), ColorController.addData);
+router.post("/create-color",ColorController.createData);
+router.get("/delete-color/:id", cors(), ColorController.deleteData);
 
 //IP Address LIST
 router.get("/iplist", cors(), IpaddressController.getList);

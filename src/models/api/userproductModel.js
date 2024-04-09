@@ -30,6 +30,10 @@ const model = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'mt_gender', 
   },
+  color_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'mt_color', 
+  },
   price: {
     type: String,
     required: true,

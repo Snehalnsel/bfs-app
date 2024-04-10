@@ -131,7 +131,7 @@
       var hTml = `<div class="product-box">
          <div class="product-image">`;
          
-            if (typeof(item.images) != 'undefined') { 
+            if (item.images == null) { 
                hTml += ` <a href="/websubcategoriesproducts/${item._id}"><img src="${webSiteUrl}/public/assets/images/noimage.jpg" alt="images" class="img-fluid"></a>`;
             } else { 
                hTml += `<a href="/websubcategoriesproducts/${item._id}"><img src="${webSiteUrl}/public/assets/images/${item.images}" alt="images" class="img-fluid"></a>`;

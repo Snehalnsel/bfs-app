@@ -320,7 +320,6 @@ exports.detailsData = async function (req, res, next) {
     const categoryList = await Category.find({ parent_id: '650444488501422c8bf24bdb' });
     // const subcategoryList = await Category.find({ parent_id: { $ne: '650444488501422c8bf24bdb' } });
     const subcategoryList = await Category.find({ parent_id: { $ne: '650444488501422c8bf24bdb' } }).sort({ name: 1 });
-    console.log(subcategoryList);
     const sizeList = await Size.find();
     const productcondition = await Productcondition.find();
     const genderList = await Gender.find();
@@ -771,7 +770,6 @@ exports.downloadProductExcel = async function (req, res, next) {
         await workbook.xlsx.write(res);
         res.end();
       } catch (err) {
-        console.error('Error generating Excel file:', err);
         return res.status(500).json({ error: 'An error occurred while generating Excel file' });
       }
     });

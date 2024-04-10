@@ -200,7 +200,6 @@ exports.updateData = async function (req, res, next) {
       });
     }
     const color = await Color.findById(req.body.color_id);
-
     if (!color) {
       return res.status(404).json({
         status: "0",
@@ -209,20 +208,16 @@ exports.updateData = async function (req, res, next) {
         isAdminLoggedIn:isAdminLoggedIn
       });
     }
-
     const updData = {
       name: req.body.name || color.name,
       short_code: req.body.short_code || color.short_code,
       status: req.body.status || color.status,
     };
-
-
     const updatedColor = await Color.findByIdAndUpdate(
       req.body.color_id,
       updData,
       { new: true, runValidators: true }
     );
-
     if (!updatedColor) {
       return res.status(404).json({
         status: "0",

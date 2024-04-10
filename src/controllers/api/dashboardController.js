@@ -424,6 +424,7 @@ exports.getTopCategoriesweb = async function (req, res) {
       status: "1",
       message: "Top categories",
       respdata: topCategories,
+      websiteUrl: process.env.SITE_URL,
     });
   } catch (error) {
     //console.error('Error fetching top categories:', error);

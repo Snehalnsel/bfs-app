@@ -396,7 +396,8 @@ exports.filterData = async function (req, res, next) {
     };
 
     const types = type.split(',');
-    var ids = (typeof id !== "undefined") ? (id.length > 1) ? id.split(',') : id : "";
+    // var ids = (typeof id !== "undefined") ? (id.length > 1) ? id.split(',') : id : "";
+    var ids = (typeof id !== "undefined" && id !== null) ? (id.length > 1) ? id.split(',') : id : [];
     for (let i = 0; i < types.length; i++) {
       let condID = (ids.length >= 1) ? ids[i] : "";
       switch (types[i]) {
@@ -488,6 +489,7 @@ exports.filterData = async function (req, res, next) {
     });
 
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       status: '0',
       message: 'An error occurred while filtering products',

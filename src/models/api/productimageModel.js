@@ -25,11 +25,13 @@ const model = mongoose.Schema({
   },
   image_order: {
     type: Number,
-   required: false,
   },
   added_dtime: {
     type: String,
     required: true,
+  },
+  update_dtime: {
+    type: String,
   },
 });
 

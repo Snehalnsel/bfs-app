@@ -1458,6 +1458,7 @@ exports.getParentCategories = async function (req, res, next) {
       title: "Product Categories",
       message: "Welcome to the Product Categories!",
       isLoggedIn: isLoggedIn,
+      websiteUrl: process.env.SITE_URL,
       //respdata: parentCategories,
     });
     // return res.status(200).json({
@@ -1532,8 +1533,7 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
       title: "Product Sub Categories",
       message: "Welcome to the Product Sub Categories!",
       respdata: categoriesWithMatchingParentId,
-
-
+      websiteUrl: process.env.SITE_URL,
     });
   } catch (error) {
     return res.status(500).json({

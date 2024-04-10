@@ -29,14 +29,12 @@ exports.getList = async function (req, res, next) {
   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   try {
-    const ipTransactions = await Iptrnsaction.find().populate('user_id').sort({ _id: -1 });
+    const filteredTransactions = await Iptrnsaction.find().populate('user_id').sort({ _id: -1 });
 
-    ipTransactions.forEach(transaction => {
+   // const filteredTransactions = ipTransactions.filter(transaction => transaction.userd_id != null);
+    filteredTransactions.forEach(transaction => {
       transaction.created_dtime = moment(transaction.created_dtime).format("YYYY-MM-DD HH:mm:ss");
-    });
-
-    console.log("transaction", ipTransactions);
-    
+    });    
     res.render("pages/ip/list", {
       siteName: req.app.locals.siteName,
       pageName: pageName,
@@ -49,7 +47,7 @@ exports.getList = async function (req, res, next) {
       status: 0,
       message: "found!",
       respdata: {
-        list: ipTransactions,
+        list: filteredTransactions,
       },
       isAdminLoggedIn: isAdminLoggedIn
     }); 

@@ -5,8 +5,12 @@ const model = mongoose.Schema({
     type: String,
     required: true,
   },
-  dimensions: {
-    type: String,
+  height: {
+    type: Number,
+    required: true,
+  },
+  width: {
+    type: Number,
     required: true,
   },
   amount: {
@@ -22,6 +26,9 @@ const model = mongoose.Schema({
   added_dtime: {
     type: String,
     required: true,
+  },
+  updated_dtime: {
+    type: String,
   },
 });
 

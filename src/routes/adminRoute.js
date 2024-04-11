@@ -468,18 +468,10 @@ router.get("/delete-bestdeal/:id", cors(), BestDealController.deleteData);
 // Shipping Charges Master (Add List)
 router.get("/shippingchrgs", cors(), ShippingchargesController.getData);
 router.get("/add-shippingchrgs", cors(), ShippingchargesController.addData);
-router.post(
-  "/create-shippingchrgs",
-  cors(),
-  [
-    check("shipping_name", "This is a required field!")
-      .not()
-      .isEmpty()
-      .trim()
-      .escape(),
-  ],
-  ShippingchargesController.createData
-);
+router.post("/create-shippingchrgs",cors(),ShippingchargesController.createData);
+router.get("/edit-shippingchrgs/:id", cors(), ShippingchargesController.editData);
+router.post("/updated-shippingchrgs",ShippingchargesController.updateData);
+router.get("/delete-shippingchrgs/:id", cors(), ShippingchargesController.deleteData);
 //  SHIPPING KIT MASTER
 router.get("/shippingkitlist", cors(), ShippingkitController.getOrderList);
 router.get("/shippingkitdetails/:id", cors(), ShippingkitController.getShipmentKit);

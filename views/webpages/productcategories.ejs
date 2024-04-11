@@ -127,23 +127,22 @@
    }
 
    function populateHtml(data) {
-   data.forEach(item => {
-      var hTml = `<div class="product-box">
-         <div class="product-image">`;
-         
-            if (item.images == null) { 
-               hTml += ` <a href="/websubcategoriesproducts/${item._id}"><img src="${webSiteUrl}/public/assets/images/noimage.jpg" alt="images" class="img-fluid"></a>`;
-            } else { 
-               hTml += `<a href="/websubcategoriesproducts/${item._id}"><img src="${webSiteUrl}/public/assets/images/${item.images}" alt="images" class="img-fluid"></a>`;
-            } 
-            hTml += `</div>
-         <div class="prd-short-info">
-            <div class="prd-name"><a href="/websubcategoriesproducts/${item._id}">${item.name}</a></div>                 
-         </div> 
-      </div>`;
-      $("#render-div").append(hTml);
-   });
-}
+      data.forEach(item => {
+         var hTml = `<div class="product-box">
+            <div class="product-image">`;
+               if (item.images == null) { 
+                  hTml += ` <a href="/websubcategoriesproducts/${item._id}"><img src="${webSiteUrl}/public/assets/images/noimage.jpg" alt="images" class="img-fluid"></a>`;
+               } else { 
+                  hTml += `<a href="/websubcategoriesproducts/${item._id}"><img src="${webSiteUrl}/public/assets/images/${item.images}" alt="images" class="img-fluid"></a>`;
+               } 
+               hTml += `</div>
+            <div class="prd-short-info">
+               <div class="prd-name"><a href="/websubcategoriesproducts/${item._id}">${item.name}</a></div>                 
+            </div> 
+         </div>`;
+         $("#render-div").append(hTml);
+      });
+   }
 
    window.onload = fetchData;
 </script>

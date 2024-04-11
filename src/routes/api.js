@@ -1126,17 +1126,13 @@ router.get("/headerData",[],DashboardController.getHeaderData);
 router.post(
   "/signin",
   [
-    check("name", "This is a required field!").not().isEmpty().trim().escape(),
-    check("phone_no", "This is a required field!").not().isEmpty().trim().escape(),
+    check("name", "This is a required field!").not().isEmpty().trim().escape().isLength({max: 50 }),
+    check("phone_no", "This is a required field!").not().isEmpty().trim().escape().isLength({max: 12 }),
     check("email", "Email length should be 10 to 30 characters!")
       .isEmail()
       .isLength({ min: 10, max: 30 }),
-    check("password", "Password length should be 8 to 10 characters!").isLength(
-      {
-        min: 8
-      }
-    ),
-    check("confirmpassword", "This is a required field!").not().isEmpty().trim().escape(),
+    check("password", "Password length should be 8 to 10 characters!").isLength({min: 8,max:15}),
+    check("confirmpassword", "This is a required field!").not().isEmpty().trim().escape().isLength({min: 8,max:15}),
   ],
   WebsiteController.signin
 );

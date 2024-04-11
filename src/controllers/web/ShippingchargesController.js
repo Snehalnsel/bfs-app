@@ -108,7 +108,7 @@ exports.addData = async function (req, res, next) {
   exports.getData = async function (req, res, next) {
 
     let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-    var pageName = "Shipping Charges";
+    var pageName = "Shipping Boxes";
     var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
   
     Shippingchrgs.find().sort({ _id: -1 }).then((shippingchrgs) => {

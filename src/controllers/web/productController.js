@@ -15,6 +15,7 @@ const Userproduct = require("../../models/api/userproductModel");
 const Productimage = require("../../models/api/productimageModel");
 const Productcondition = require("../../models/api/productconditionModel");
 const Gender = require("../../models/api/genderModel");
+const Color = require("../../models/api/colorModel");
 // const helper = require("../helpers/helper");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -319,10 +320,10 @@ exports.detailsData = async function (req, res, next) {
     const categoryList = await Category.find({ parent_id: '650444488501422c8bf24bdb' });
     // const subcategoryList = await Category.find({ parent_id: { $ne: '650444488501422c8bf24bdb' } });
     const subcategoryList = await Category.find({ parent_id: { $ne: '650444488501422c8bf24bdb' } }).sort({ name: 1 });
-    console.log(subcategoryList);
     const sizeList = await Size.find();
     const productcondition = await Productcondition.find();
     const genderList = await Gender.find();
+    const colorList = await Color.find();
     const requrl = url.format({
       protocol: req.protocol,
       host: req.get("host"),
@@ -345,6 +346,7 @@ exports.detailsData = async function (req, res, next) {
       size: sizeList,
       productCondition: productcondition,
       genderList: genderList,
+      colorList : colorList,
       productImages: productImages,
       parentCategory: productdetails.hasOwnProperty("category_id") ? parentCategory : null,
       isAdminLoggedIn:isAdminLoggedIn,
@@ -392,6 +394,7 @@ exports.updatedetailsData = async function (req, res, next) {
       if (req.body.length) updData.length = req.body.length;
       if (req.body.breath) updData.breath = req.body.breath;
       if (req.body.gender_id) updData.gender_id = req.body.gender_id;
+      if (req.body.color_id) updData.color_id = req.body.color_id;
       const exitsProductData= await Userproduct.findOneAndUpdate({ _id: req.body.product_id }, { $set: updData }, { upsert: true });
       if (req.body.remainingImages.length > 0) {
         
@@ -767,7 +770,6 @@ exports.downloadProductExcel = async function (req, res, next) {
         await workbook.xlsx.write(res);
         res.end();
       } catch (err) {
-        console.error('Error generating Excel file:', err);
         return res.status(500).json({ error: 'An error occurred while generating Excel file' });
       }
     });

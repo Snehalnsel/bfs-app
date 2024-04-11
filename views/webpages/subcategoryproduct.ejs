@@ -131,6 +131,33 @@
                   </div>
                   <div class="card">
                      <div class="card-header">
+                        <button class="accordion-button collapsed" type="button" data-toggle="collapse"
+                           data-target="#card6" aria-expanded="false" aria-controls="card6">Color</button>
+                     </div>
+                     <div id="card6" class="collapse" data-parent="#theme-accordion" style="">
+                        <div class="card-body">
+                           <div class="filter-list">
+                              <%if(colorList.length> 0) {%>
+                                 <ul class="list-group">
+                                    <% colorList.forEach(function(item) { %>
+                                       <li class="single-list">
+                                          
+                                                <input type="checkbox" class="chkfield filterByChecked searchByColor"
+                                             data-id="<%=item._id%>" value="" >
+                                                
+                                          <label class="label-check" for="incboxx1">
+                                             <%=item.name%>
+                                          </label>
+                                       </li>
+                                       <% }) %>
+                                 </ul>
+                                 <% } %>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="card">
+                     <div class="card-header">
                         <button class="accordion-button collapsed " type="button" data-toggle="collapse"
                            data-target="#card3" aria-expanded="true" aria-controls="card2">Price Range</button>
                      </div>

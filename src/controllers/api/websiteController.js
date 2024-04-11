@@ -45,6 +45,7 @@ const Banner = require("../../models/api/bannerModel");
 const Brand = require("../../models/api/brandModel");
 const Size = require("../../models/api/sizeModel");
 const Gender = require("../../models/api/genderModel");
+const Color = require("../../models/api/colorModel");
 const ReturnOrder = require("../../models/api/returnorderModel");
 const Reasonlist = require("../../models/api/reasonlistModel");
 const Iptrnsaction = require("../../models/api/ipTransactionModel");
@@ -896,7 +897,7 @@ exports.userRelogin = async function (req, res, next) {
 };
 
 exports.userFilter = async function (req, res, next) {
-  let { brandList, sizeList, conditionList, priceList, genderList, optionId, productcategoryId, pageNo } = req.body;
+  let { brandList, sizeList, conditionList, priceList, genderList,colorList, optionId, productcategoryId, pageNo } = req.body;
  
   if (typeof optionId != "undefined") {
     if ((optionId == 0)) {
@@ -934,6 +935,9 @@ exports.userFilter = async function (req, res, next) {
   }
   if ((typeof genderList != "undefined")) {
     concatVar["gender_id"] = { "$in": genderList };
+  }
+  if ((typeof colorList != "undefined")) {
+    concatVar["color_id"] = { "$in": colorList };
   }
   // if (priceList && typeof priceList !== "undefined" && priceList !='') {
   //   let [min, max] = priceList.split('-').map(Number);
@@ -1454,6 +1458,7 @@ exports.getParentCategories = async function (req, res, next) {
       title: "Product Categories",
       message: "Welcome to the Product Categories!",
       isLoggedIn: isLoggedIn,
+      websiteUrl: process.env.SITE_URL,
       //respdata: parentCategories,
     });
     // return res.status(200).json({
@@ -1528,8 +1533,7 @@ exports.getSubCategoriesWithMatchingParentId = async function (req, res, next) {
       title: "Product Sub Categories",
       message: "Welcome to the Product Sub Categories!",
       respdata: categoriesWithMatchingParentId,
-
-
+      websiteUrl: process.env.SITE_URL,
     });
   } catch (error) {
     return res.status(500).json({
@@ -1712,7 +1716,7 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
       approval_status: 1,
       flag: 0,
     })
-      .select('brand_id size_id status gender_id');
+      .select('brand_id size_id status gender_id color_id');
     if (userProducts.length > 0) {
       result = await Userproduct.aggregate([
         {
@@ -1736,12 +1740,13 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
       genderIds = userProducts.map(product => product.gender_id).filter(Boolean);
       sizeIds = userProducts.map(product => product.size_id).filter(Boolean);
       statusIds = userProducts.map(product => product.status).filter(Boolean);
+      colorIds = userProducts.map(product => product.color_id).filter(Boolean);
       
       brandList = await brandModel.find({ _id: { $in: brandIds } });
       sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
       conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
       genderList = await Gender.find({ _id: { $in: genderIds } });
-      
+      colorList = await Color.find({ _id: { $in: colorIds } });
     }
 
     res.render("webpages/subcategoryproduct", {
@@ -1753,6 +1758,7 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
       brandList: typeof brandList != "undefined" ? brandList : [],
       sizeList: typeof sizeList != "undefined" ? sizeList : [],
       conditionList: typeof conditionList != "undefined" ? conditionList : [],
+      colorList: typeof colorList != "undefined" ? colorList : [],
       genderList: typeof genderList != "undefined" ? genderList : [],
       maxvalue: typeof result != "undefined" ? result[0].maxPrice : "0",
       minvalue: typeof result != "undefined" ? result[0].minPrice : "0",

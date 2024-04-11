@@ -55,13 +55,13 @@
                      </tr>
                      <tr>
                        <td>Packing & Handling Charges</td>
-                       <th><i class="fa fa-inr" aria-hidden="true"></i>500.00</th> 
+                       <th><i class="fa fa-inr" aria-hidden="true"></i><%= respdata.shippingChargeAmount%></th> 
                      </tr>
                      <tr>
                         
                        <td>GST</td>
                        <!--<th><i class="fa fa-inr" aria-hidden="true"></i><%=parseFloat((respdata.product_price*28)/100).toFixed(2);%></th> -->
-                       <th><i class="fa fa-inr" aria-hidden="true"></i><%=parseFloat((500*28)/100).toFixed(2);%></th> 
+                       <th><i class="fa fa-inr" aria-hidden="true"></i><%=parseFloat((respdata.shippingChargeAmount*28)/100).toFixed(2);%></th> 
                      </tr>
                      <tr class="border-top total-table">
                        <td><strong>Total Amount</strong></td>

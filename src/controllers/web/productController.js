@@ -16,6 +16,7 @@ const Productimage = require("../../models/api/productimageModel");
 const Productcondition = require("../../models/api/productconditionModel");
 const Gender = require("../../models/api/genderModel");
 const Color = require("../../models/api/colorModel");
+const Shippingchrgs = require("../../models/api/shippingchrgsModel");
 // const helper = require("../helpers/helper");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -324,6 +325,7 @@ exports.detailsData = async function (req, res, next) {
     const productcondition = await Productcondition.find();
     const genderList = await Gender.find();
     const colorList = await Color.find();
+    const shippingList = await Shippingchrgs.find();
     const requrl = url.format({
       protocol: req.protocol,
       host: req.get("host"),
@@ -347,6 +349,7 @@ exports.detailsData = async function (req, res, next) {
       productCondition: productcondition,
       genderList: genderList,
       colorList : colorList,
+      shippingList :shippingList,
       productImages: productImages,
       parentCategory: productdetails.hasOwnProperty("category_id") ? parentCategory : null,
       isAdminLoggedIn:isAdminLoggedIn,
@@ -395,6 +398,7 @@ exports.updatedetailsData = async function (req, res, next) {
       if (req.body.breath) updData.breath = req.body.breath;
       if (req.body.gender_id) updData.gender_id = req.body.gender_id;
       if (req.body.color_id) updData.color_id = req.body.color_id;
+      if (req.body.shipping_charges_id) updData.shipping_charges_id = req.body.shipping_charges_id;
       const exitsProductData= await Userproduct.findOneAndUpdate({ _id: req.body.product_id }, { $set: updData }, { upsert: true });
       let getMaxValue = await Productimage.findOne({product_id: req.body.product_id}).sort({image_order:-1});
       let imageOrderMaxValue = 1;

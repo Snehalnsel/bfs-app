@@ -34,6 +34,10 @@ const model = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'mt_color', 
   },
+  shipping_charges_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'mt_shipping_chrgs', 
+  },
   price: {
     type: String,
     required: true,

@@ -45,13 +45,20 @@ const axios = require("axios");
 const sha256 = require("sha256");
 const uniqid = require("uniqid");
 
+
+/*
+//TEST Phone Pay Key
 // const MERCHANT_ID = "PGTESTPAYUAT";
-const MERCHANT_ID = "M22EUQY70KVBB";
 // const PHONE_PE_HOST_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox";
-const PHONE_PE_HOST_URL = "https://api.phonepe.com/apis/hermes";
-const SALT_INDEX = 1;
 // const SALT_KEY = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";
+*/
+
+//Live Phone Pay Key
+const MERCHANT_ID = "M22EUQY70KVBB";
+const PHONE_PE_HOST_URL = "https://api.phonepe.com/apis/hermes";
 const SALT_KEY = "6e2f6cdb-392f-4a06-b2e2-a9af19a1207c";
+
+const SALT_INDEX = 1;
 const APP_BE_URL = process.env.SITE_URL;
 //6e2f6cdb-392f-4a06-b2e2-a9af19a1207c
 

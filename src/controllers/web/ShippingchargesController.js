@@ -74,6 +74,8 @@ exports.addData = async function (req, res, next) {
       
         const newShippingchrgs = Shippingchrgs({
           name: req.body.shipping_name,
+          name: req.body.shipping_dimensions,
+          name: req.body.shipping_amount,
           added_dtime: dateTime,
         });  
         newShippingchrgs

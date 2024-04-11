@@ -5,6 +5,14 @@ const model = mongoose.Schema({
     type: String,
     required: true,
   },
+  dimensions: {
+    type: String,
+    required: true,
+  },
+  amount: {
+    type: Number,
+    required: true,
+  },
   status: {
     type: Number,
     enum: [0, 1 , 2],

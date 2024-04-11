@@ -180,3 +180,65 @@ tbody.category-listtable{
     padding-top: 50px;
     text-align: center;
   }
+
+  .primage-uploadbox {
+    width: 100%;    
+    grid-gap: 10px;
+    display: flex;
+}
+
+  .image-item.pupload-box {
+    background: #eee;
+    padding: 15px;
+    border-radius: 10px;
+    position: relative;
+    text-align: center;
+    width: 19%;
+}
+
+.image-item.pupload-box img.product-image {
+    max-width: 80px;
+    height: 80px;
+    width: auto;
+    object-fit: cover;
+    margin: 0 auto;
+}
+
+.image-item.pupload-box .order-fgroup {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-item.pupload-box button.close-button {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    border: solid 1px #ddd;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-item.pupload-box .order-fgroup h5 {
+    font-size: 14px;
+    color: #242424;
+    margin-right: 5px;
+}
+
+.image-item.pupload-box  input.image_order {
+    width: 50px;
+    height: 30px;
+    border: solid 1px #e5e3e3;
+    outline: none;
+    text-align: center;
+    background: #e5e3e3;
+}
+
+.image-item.pupload-box  .dndl-btn {
+    font-size: 14px;
+    padding: 5px 12px;
+}

@@ -396,8 +396,12 @@ exports.updatedetailsData = async function (req, res, next) {
       if (req.body.gender_id) updData.gender_id = req.body.gender_id;
       if (req.body.color_id) updData.color_id = req.body.color_id;
       const exitsProductData= await Userproduct.findOneAndUpdate({ _id: req.body.product_id }, { $set: updData }, { upsert: true });
+      let getMaxValue = await Productimage.findOne({product_id: req.body.product_id}).sort({image_order:-1});
+      let imageOrderMaxValue = 1;
+      if(typeof getMaxValue != "undefined" && getMaxValue != null && getMaxValue.length > 0 && typeof getMaxValue.image_order != "undefined") {
+        imageOrderMaxValue = getMaxValue.image_order;
+      }
       if (req.body.remainingImages.length > 0) {
-        
         const remainingImages = req.body.remainingImages ? JSON.parse(req.body.remainingImages) : [];
         const imagesArray = [];
         for (const image of remainingImages) {
@@ -423,14 +427,14 @@ exports.updatedetailsData = async function (req, res, next) {
           if (allImages && allImages.length > 0) {
             const remainingSlots = 5 - countAllImages;
             const imagesToInsert = allImages.slice(0, Math.min(5, allImages.length));
-
-            const imageDetails = imagesToInsert.map(async imageUrl => {
+            let imageOrderIndex = imageOrderMaxValue;
+            //const imageDetails = imagesToInsert.map(async imageUrl => {
+            for(let imageUrl of imagesToInsert) {
+              imageOrderIndex++;
               let extension = path.extname(imageUrl);
               if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){ 
                 await CompressImage("./public/images/"+imageUrl,"./public/compress_images/");
-              }
-              else
-              {
+              } else {
                 await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
                   if (err) {
                       // console.log("Error Found:", err);
@@ -445,29 +449,29 @@ exports.updatedetailsData = async function (req, res, next) {
                 category_id: req.body.subcategory_id,
                 user_id: exitsProductData.user_id,
                 image: imageUrl,
-                image_order:  req.body.image_order,
+                image_order:  imageOrderIndex,
+                //image_order:  req.body.image_order,
                 added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
               });
-              return productimageDetail.save();
-            });
-            await Promise.all(imageDetails);
+              await productimageDetail.save();
+            }
+            //await Promise.all(imageDetails);
           }
-        }
-        else {
+        } else {
           await Productimage.deleteMany({ product_id: req.body.product_id });
           const imagesToUpload = imagesArray.slice(0, 5);
+          let imageOrderIndex = 0;
           for (const image of imagesToUpload) {
-            let extension = path.extname(imageUrl);
+            imageOrderIndex++;
+            //let extension = path.extname(imageUrl);
+            let extension = path.extname(image); // It was not worked so changed by Palash 10-04-2024
             if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){
               await CompressImage("./public/images/"+image,"./public/compress_images/");
-            }
-            else
-            {
+            } else {
               await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
                 if (err) {
                     // console.log("Error Found:", err);
-                }
-                else {
+                } else {
                     // console.log("File copied successfully!");
                 }
               });
@@ -475,31 +479,63 @@ exports.updatedetailsData = async function (req, res, next) {
             const productimageDetail = new Productimage({
               product_id: req.body.product_id,
               category_id: req.body.subcategory_id,
-              user_id: req.body.user_id,
+              user_id: exitsProductData.user_id,
               image: image,
-              image_order:  req.body.image_order,
+              image_order:  imageOrderIndex,
+              //image_order:  req.body.image_order,
               added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
             });
             await productimageDetail.save();
           }
         }
-      }
-      else {
+      } else {
         const List = await Productimage.find({ product_id: req.body.product_id });
         const count = await Productimage.countDocuments({ product_id: req.body.product_id });
+        if(typeof List != "undefined" && List.length > 0) {
+          let imageOrderIndex = -1;
+          for(let eachImage of List) {
+            imageOrderIndex++;
+            let imageDetails = {
+              //product_id: req.body.product_id,
+              // category_id: req.body.subcategory_id,
+              // user_id: exitsProductData.user_id,
+              // image: imageUrl,
+              image_order: req.body.image_order[imageOrderIndex],
+              update_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
+            };
+            await Productimage.findByIdAndUpdate(
+              eachImage._id,
+              imageDetails,
+              { new: true, runValidators: true }
+            );
+            //let insertDetail = new Productimage(imageDetails);
+            //await insertDetail.fin();
+          }
+        }
         if (count !== 5 || count < 5) {
           if (req.files && req.files.length > 0) {
-            const imageDetails = req.files.slice(0, 5 - count).map(async (file) => {
+            //let imageOrderIndex = (imageOrderMaxValue != 1) ? imageOrderMaxValue : 0;
+
+            //const imageDetails = req.files.slice(0, 5 - count).map(async (file) => {
+            const imageDetails = req.files.slice(0, 5 - count);
+            let currentImageMaxValue = 0;
+            for(let file of imageDetails) {
+              let getOrderMaxValue = await Productimage.findOne({product_id: req.body.product_id}).sort({image_order:-1});
+              if(getOrderMaxValue == null) {
+                currentImageMaxValue = 1;
+              } else {
+                currentImageMaxValue = parseInt(getOrderMaxValue.image_order) + 1;
+              }
               // const requrl = url.format({
               //   protocol: req.protocol,
               //   host: req.get("host"),
               // });
-               const imageUrl = file.filename;
+                
+                const imageUrl = file.filename;
                 let extension = path.extname(imageUrl);
                 if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){
                   await CompressImage("./public/images/"+imageUrl,"./public/compress_images/");
-                } else
-                {
+                } else {
                   await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
                     if (err) {
                         // console.log("Error Found:", err);
@@ -509,17 +545,18 @@ exports.updatedetailsData = async function (req, res, next) {
                     }
                   });
                 }
-             
               const productimageDetail = new Productimage({
                 product_id: req.body.product_id,
                 category_id: req.body.subcategory_id,
                 user_id: exitsProductData.user_id,
                 image: imageUrl,
+                image_order: currentImageMaxValue,
+                //image_order: req.body.image_order[imageOrderIndex],
                 added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
               });
-              return productimageDetail.save();
-            });
-            await Promise.all(imageDetails);
+              await productimageDetail.save();
+            }
+            //await Promise.all(imageDetails);
           }
         }
       }
@@ -547,6 +584,7 @@ exports.updatedetailsData = async function (req, res, next) {
       res.redirect("/admin/productlist");
     }
   }).catch((err) => {
+    console.log(err);
     res.status(500).json({
       status: "0",
       message: "An error occurred while updating the product.",

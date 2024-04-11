@@ -1999,6 +1999,7 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
 
 };
 
+
 exports.userAddressAdd = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -2056,6 +2057,64 @@ exports.userAddressAdd = async function (req, res, next) {
     });
   }
 };
+
+/*exports.userAddressAdd = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    const addr_name = req.body.addrType;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        status: "0",
+        message: "Validation error!",
+        respdata: errors.array(),
+      });
+    }
+    const newAddress = new addressBook({
+      user_id: req.body.userId,
+      street_name: req.body.address2,
+      address1: req.body.address1,
+      landmark: req.body.landmark,
+      city_name: req.body.city_name,
+      city_code: req.body.city_code,
+      state_name: req.body.state_name,
+      state_code: req.body.state_code,
+      pin_code: req.body.pin_code,
+      address_name: addr_name,
+      flag: req.body.flag,
+      created_dtime: dateTime,
+    });
+    const savedAddress = await newAddress.save();
+    const user = await Users.findById(newAddress.user_id);
+    const randomSuffix = Math.floor(Math.random() * 1000);
+    const pickupLocation = savedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;
+    const PickupData = {
+      pickup_location: pickupLocation,
+      name: user.name,
+      email: user.email,
+      phone: user.phone_no,
+      address: savedAddress.street_name + ',' + savedAddress.address1,
+      address_2: savedAddress.landmark,
+      city: savedAddress.city_name,
+      state: savedAddress.state_name,
+      country: "India",
+      pin_code: savedAddress.pin_code
+    };
+    const shiprocketResponse = await generateSellerPickup(PickupData);
+    if (shiprocketResponse) {
+      savedAddress.shiprocket_address = pickupLocation;
+      savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
+      await savedAddress.save();
+      res.redirect('/my-account');
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the Edit Profile.",
+      error: error.message,
+    });
+  }
+};*/
 
 
 exports.updateuserAddressAdd = async function (req, res, next) {

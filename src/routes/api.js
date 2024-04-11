@@ -1176,7 +1176,14 @@ router.post("/useredit",upload.array('image', 1),WebsiteController.userUpdate);
 
 router.post("/user-new-checkout-address",[],WebsiteController.userNewCheckOutAddressAdd);
 
-router.post("/adduseraddress",[],WebsiteController.userAddressAdd);
+router.post("/adduseraddress",[
+  check("address1", "This is a required field!").isLength({max: 120 }),
+    check("address2", "This is a required field!").isLength({max: 120 }),
+    check("landmark", "This is a required field!").isLength({max: 50 }),
+    check("city_name", "This is a required field!").isLength({max:30}),
+    check("state_name", "This is a required field!").isLength({max:30}),
+    check("pin_code", "This is a required field!").isLength({max:30})
+],WebsiteController.userAddressAdd);
 
 router.get("/edituseraddress/:id",[],WebsiteController.getAddressdetails);
 router.post("/updateuseraddress",[],WebsiteController.updateuserAddressAdd);
@@ -1187,7 +1194,21 @@ router.get("/my-post/:id",[],WebsiteController.userWisePost);
 
 router.get("/add-post",[],WebsiteController.addPostView);
 
-router.post("/addnewpost",[], upload.array('image', 5),WebsiteController.addNewPost);
+router.post("/addnewpost",[
+  check("name", "This is a required field!").isLength({max: 50 }),
+    check("description", "This is a required field!").optional({nullable: true}).isLength({max: 120 }),
+    check("product_cate", "This is a required field!").optional({nullable: true}).isLength({max: 120 }),
+    check("brand", "This is a required field!").isLength({max:30}),
+    check("product_condition", "This is a required field!").optional({nullable: true}).isLength({max: 120 }),
+    check("size", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),
+    check("height", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),
+    check("weight", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),
+    check("length", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),
+    check("breath", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),
+    check("price", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),
+    check("offer_price", "This is a required field!").optional({nullable: true}).isLength({max: 12 })
+
+], upload.array('image', 5),WebsiteController.addNewPost);
 
 router.get("/edit-mypost/:id",[],WebsiteController.editUserWisePost);
 
@@ -1264,7 +1285,7 @@ router.post(
   SearchController.searchByKeyword
 );
 
-router.post("/ajax-userlogin",cors(),[check("email", "Email length should be 10 to 30 characters"),
+router.post("/ajax-userlogin",cors(),[check("email", "Email length should be 10 to 30 characters").isLength({ min: 10, max: 30 }),
 // .isEmail(),
 check("password", "Password length should be 8 to 10 characters").isLength({
 min: 8,
@@ -1289,7 +1310,7 @@ router.post("/user-filter-forothers",cors(),
 router.get("/forgot-password",cors(),
   WebsiteController.forgotPassword
 );
-router.post("/forgotpassword-sendotp",cors(),
+router.post("/forgotpassword-sendotp",cors(),[check("email","Email length should be 10 to 30 characters").isLength({min:10,max:30 })],
   WebsiteController.sendotp
 );
 router.post(

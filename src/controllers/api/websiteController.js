@@ -72,6 +72,7 @@ const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 const { log, Console } = require("console");
 const { create } = require('xmlbuilder2');
 const { ConversationContextImpl } = require("twilio/lib/rest/conversations/v1/conversation");
+const shippingchrgsModel = require("../../models/api/shippingchrgsModel");
 // const INSTANCE_URL = 'https://api.maytapi.com/api';
 // const PHONE_ID = '18710';
 // const PRODUCT_ID = 'b119f3b5-819b-46e0-ae30-0d1cf1dd8cc8';
@@ -2987,16 +2988,25 @@ exports.viewCartListByUserId = async function (req, res, next) {
         .populate({
           path: 'product_id',
           model: Userproduct,
-          select: 'name images',
+          select: 'name shipping_charges_id images',
         })
         .exec();
       const user = await Users.findById(existingCart.user_id);
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
+     
       const formattedCartList = await Promise.all(cartList.map(async (cartItem) => {
         const product = await Userproduct.findOne({ _id: cartItem.product_id._id }).populate('category_id', 'name');
         const productImages = await Productimage.find({ product_id: cartItem.product_id._id }).limit(1);
+        let shippingChargeAmount = 0;
+        if(cartList.length > 0){
+          let shippingCharges = await shippingchrgsModel.findOne({_id: cartList[0].product_id.shipping_charges_id})
+          if(shippingCharges){
+            shippingChargeAmount = Number(shippingCharges.amount);
+          }
+        }
+        
         const finalData = {
           _id: cartItem._id,
           cart_id: existingCart._id,
@@ -3011,7 +3021,9 @@ exports.viewCartListByUserId = async function (req, res, next) {
           user_name: user.name,
           added_dtime: cartItem.added_dtime,
           status: cartItem.status,
+          shippingChargeAmount: shippingChargeAmount
         };
+        
         let product_price;
         if(cartItem.finalBidPrice)
         {
@@ -3025,8 +3037,8 @@ exports.viewCartListByUserId = async function (req, res, next) {
         }
         
         //const gst = parseFloat((product_price * 28) / 100).toFixed(2);
-        const gst = parseFloat((500 * 28) / 100).toFixed(2);
-        const finalPrice = parseInt(product_price) + 500 + parseInt(gst);
+        const gst = parseFloat((shippingChargeAmount * 28) / 100).toFixed(2);
+        const finalPrice = parseInt(product_price) + shippingChargeAmount + parseInt(gst);
         res.render("webpages/addtocart", {
           title: "Cart List Page",
           message: "Welcome to the Cart List page!",
@@ -3155,7 +3167,7 @@ exports.checkoutWeb = async function (req, res, next) {
         .populate({
           path: 'product_id',
           model: Userproduct,
-          select: 'name images',
+          select: 'name shipping_charges_id images',
         })
         .exec();
       // const addressUserList = await addressBook.find({user_id: user_id });
@@ -3170,6 +3182,13 @@ exports.checkoutWeb = async function (req, res, next) {
       const formattedCartList = await Promise.all(cartList.map(async (cartItem) => {
         const product = await Userproduct.findOne({ _id: cartItem.product_id._id }).populate('category_id', 'name');
         const productImages = await Productimage.find({ product_id: cartItem.product_id._id }).limit(1);
+        let shippingChargeAmount = 0;
+        if(cartList.length > 0){
+          let shippingCharges = await shippingchrgsModel.findOne({_id: cartList[0].product_id.shipping_charges_id})
+          if(shippingCharges){
+            shippingChargeAmount = Number(shippingCharges.amount);
+          }
+        }
         const finalData = {
           _id: cartItem._id,
           cart_id: existingCart._id,
@@ -3184,6 +3203,7 @@ exports.checkoutWeb = async function (req, res, next) {
           user_name: user.name,
           added_dtime: cartItem.added_dtime,
           status: cartItem.status,
+          shippingChargeAmount: shippingChargeAmount
         };
 
         let product_price;
@@ -3209,8 +3229,8 @@ exports.checkoutWeb = async function (req, res, next) {
         );
         // const product_price = finalData.product_price;
         //const gst = parseFloat((product_price * 28) / 100).toFixed(2);
-        const gst = parseFloat((500 * 28) / 100).toFixed(2);
-        const finalPrice = parseInt(product_price) + 250 + parseFloat(gst).toFixed(2);
+        const gst = parseFloat((shippingChargeAmount * 28) / 100).toFixed(2);
+        const finalPrice = parseInt(product_price) + shippingChargeAmount + parseFloat(gst).toFixed(2);
         res.render("webpages/mycheckoutweb", {
           title: "Check Out Page",
           status: '1',

@@ -283,11 +283,10 @@
                                                     <h4>Product Images</h4>
                                                     <div style="font-size: 12px;color: orangered;">(Only 5 images you
                                                         can upload)</div>
-                                                    <div class="image-gallery d-flex">
+                                                    <div class="image-gallery primage-uploadbox d-flex">
                                                         <% if(productImages && productImages.length> 0) { %>
                                                             <% productImages.forEach(function(image, index) { %>
-                                                                <div class="image-item" style="margin: 15px;"
-                                                                    id="image-item" data-id="<%= image._id %>">
+                                                                <div class="image-item pupload-box" id="image-item" data-id="<%= image._id %>">
                                                                     <% if (/^(ftp|http|https):\/\/[^ "]+$/.test(image.image)) { %>
                                                                         <!-- Valid URL: Render the image -->
                                                                         <img src=" <%=requrl %>/public/compress_images/
@@ -303,27 +302,22 @@
                                                                                         class="product-image"
                                                                                         style="padding:10px; height:100px; width:100;">
                                                                                     <% } %>
-
-                                                                                        <a href="<%= requrl %>/public/images/<%= image.image %>"
-                                                                                            download="<%= respdata.name %>_<%= index + 1 %>.jpg"
-                                                                                            class="btn btn-success btn-sm mt-2"
-                                                                                            title="Download">
-                                                                                            <i
-                                                                                                class="fas fa-download"></i>
-                                                                                            Download <%= respdata.name
-                                                                                                %>_<%= index + 1 %>.jpg
-                                                                                        </a>
-                                                                                        <div style="float: right;">Image order <%= image.image_order %></div>
-                                                                                        <button class="close-button"
-                                                                                            id="close-button"
-                                                                                            type="button"
-                                                                                            style="float: right;"
-                                                                                            data-index="<%= index %>"
-                                                                                            onclick='handleCloseButtonClick("<%= image._id %>")'>&times;close</button>
-                                                                                    <div class="form-group" id="upload-button">
+                                                                                        
+                                                                                    <button class="close-button" id="close-button" type="button" data-index="<%= index %>"
+                                                                                            onclick='handleCloseButtonClick("<%= image._id %>")'><i class="fa fa-times" aria-hidden="true"></i></button>
+                                                                                    <div class="form-group order-fgroup" id="upload-button">
                                                                                         <h5>Image Order</h5>
                                                                                         <input type="text" class="image_order" name="image_order[]" value="<% if(typeof image.image_order != 'undefined'){  %><%=image.image_order%><% } else {%>0<% } %>" required>
                                                                                     </div>
+                                                                                    <a href="<%= requrl %>/public/images/<%= image.image %>"
+                                                                                        download="<%= respdata.name %>_<%= index + 1 %>.jpg"
+                                                                                        class="btn btn-success btn-sm mt-2 dndl-btn"
+                                                                                        title="Download">
+                                                                                        <i
+                                                                                            class="fas fa-download"></i>
+                                                                                        Download <%= respdata.name
+                                                                                            %>_<%= index + 1 %>.jpg
+                                                                                    </a>
                                                                 </div>
                                                                 <% }); %>
                                                                     <% } %>

@@ -479,7 +479,7 @@ exports.updatedetailsData = async function (req, res, next) {
             const productimageDetail = new Productimage({
               product_id: req.body.product_id,
               category_id: req.body.subcategory_id,
-              user_id: req.body.user_id,
+              user_id: exitsProductData.user_id,
               image: image,
               image_order:  imageOrderIndex,
               //image_order:  req.body.image_order,

@@ -171,8 +171,8 @@ exports.listofWebNotification = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-    const notifications = await Notifications.find({ user_id:mongoose.Types.ObjectId(userId) }).sort({ added_dtime: -1 ,is_read: 0 ,status : 0});
-    const notificationCount = await Notifications.countDocuments({ userId, is_read: 0 ,status : 0});
+    const notifications = await Notifications.find({ user_id:mongoose.Types.ObjectId(userId) }).sort({ added_dtime: -1 ,is_read: 0});
+    const notificationCount = await Notifications.countDocuments({ user_id: mongoose.Types.ObjectId(userId), is_read: 0 });
       res.render("webpages/notificationlist",
       {
         title: "Users Notificartion List",

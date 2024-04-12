@@ -434,7 +434,7 @@ exports.getOrderList = function (page, searchType, searchValue, req, res, next) 
       },
     },
     {
-            $lookup: {
+       $lookup: {
               from: 'mt_returnorders',
               localField: 'returnorder.order_id',
               foreignField: '_id',
@@ -476,6 +476,63 @@ exports.getOrderList = function (page, searchType, searchValue, req, res, next) 
 };
 
 
+exports.getOrderAllDetails = function (req, res, next) {
+  let id = req.params.id
+  let orderStatus = req.params.order_status
+    let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+    var pageName = "Order Details";
+    var pageTitle = req.app.locals.siteName + " - " + pageName;
+    const orderId = req.params.id;
+  
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+      return res.status(400).json({ error: 'Invalid order ID' });
+    }
+  
+    Order.findOne({ _id: orderId })
+      .populate('user_id', 'name phone_no email')
+      .populate('seller_id', 'name phone_no email')
+      .populate('billing_address_id')
+      .populate('shipping_address_id')
+      .populate('hub_address_id')
+      .then(async (orderDetails) => {
+        if (!orderDetails) {
+          return res.status(404).json({ error: 'Order not found' });
+        }
+        const billingAddress = await AddressBook.find({ user_id: orderDetails.seller_id });
+        const shippingAddress = await AddressBook.find({ user_id: orderDetails.user_id });
+        const productDetails = await Product.find({ _id: { $in: orderDetails.products } });
+        const productImages = productDetails.map(product => product.images.length > 0 ? product.images[0] : null);
+
+        const shiprocketResponse = await generateCouriresList();
+        res.render("pages/order/alldeatils", {
+          status: 1,
+          siteName: req.app.locals.siteName,
+          pageName: pageName,
+          pageTitle: pageTitle,
+          userFullName: req.session.admin.name,
+          userImage: req.session.admin.image_url,
+          userEmail: req.session.admin.email,
+          year: moment().format("YYYY"),
+          requrl: req.app.locals.requrl,
+          message: "",
+          respdata: {
+            orderDetails: orderDetails,
+            billingAddress: billingAddress,
+            shippingAddress: shippingAddress,
+            shiprocketResponse: shiprocketResponse,
+            orderStatus: orderStatus,
+            productdeatils: productDetails,
+            productImages:productImages
+          },
+          isAdminLoggedIn: isAdminLoggedIn
+        });
+  
+      })
+      .catch((error) => {
+        res.status(500).json({ error: 'An error occurred while fetching order details' });
+      });
+};
+
 
 
 exports.getOrderDetails = function (req, res, next) {
@@ -507,7 +564,6 @@ exports.getOrderDetails = function (req, res, next) {
         const hubdata = await Hublist.find({ flag: 1 });
   
         const shiprocketResponse = await generateCouriresList();
-  console.log(orderDetails)
         res.render("pages/order/details", {
           status: 1,
           siteName: req.app.locals.siteName,

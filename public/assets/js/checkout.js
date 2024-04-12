@@ -49,7 +49,7 @@ $(document).ready(async function() {
                 maxlength: "You can enter maximum of 50 charecters."
             },
             state_name:{
-                required:"Please enter city.",
+                required:"Please select state.",
                 maxlength: "You can enter maximum of 50 charecters."
             },
             pin_code:{

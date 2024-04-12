@@ -101,12 +101,26 @@
                                                    <div class="col-md-6"><input type="text" class="form-control mb-3"
                                                          id="city_name" placeholder="City / Town" name="city_name">
                                                    </div>
-                                                   <div class="col-md-6"><input type="text" class="form-control mb-3"
+                                                   <!-- <div class="col-md-6"><input type="text" class="form-control mb-3"
                                                          id="state_name" placeholder="Enter State" name="state_name">
+                                                   </div> -->
+
+                                                   <div class="div-6">
+                                                      <!-- <label for="productCondition">state: <span class="required">*</span></label> -->
+                                                      <select class="form-control mb-3" name="state_name" id="state_name" required>
+                                                         <option value="" disabled selected>Select State</option>
+                                                         <% stateList.forEach(function(value) { %>
+                                                            <option value="<%= value._id %>"><%= value.name %></option>
+                                                            <% }); %>
+                                                      </select>
                                                    </div>
-                                                   <div class="col-md-6"><input type="text" class="form-control mb-3"
-                                                         id="pin_code" placeholder="Enter Pincode" name="pin_code">
+
+                                                   <div class="col-md-6">
+                                                      <input type="text" class="form-control mb-3"id="pin_code" placeholder="Enter Pincode" name="pin_code">
                                                    </div>
+
+                                                   
+
                                                    <div class="col-md-12">
                                                       <div class="button-row">
                                                          <button type="submit" class="btn liginbtn">Save & Delivery

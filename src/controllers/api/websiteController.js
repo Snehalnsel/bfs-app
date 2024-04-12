@@ -73,6 +73,7 @@ const { log, Console } = require("console");
 const { create } = require('xmlbuilder2');
 const { ConversationContextImpl } = require("twilio/lib/rest/conversations/v1/conversation");
 const shippingchrgsModel = require("../../models/api/shippingchrgsModel");
+const statesModel = require("../../models/api/statesModel");
 // const INSTANCE_URL = 'https://api.maytapi.com/api';
 // const PHONE_ID = '18710';
 // const PRODUCT_ID = 'b119f3b5-819b-46e0-ae30-0d1cf1dd8cc8';
@@ -1414,12 +1415,15 @@ exports.addAddress = async function (req, res, next) {
     }
     const address = await addressBook.findOne({ user_id: userData.userId });
     var add = address;
+    let getStates = await statesModel.find();
+
     res.render("webpages/edit-address", {
       title: "Edit Address",
       message: "Welcome to the Edit Profile page!",
       respdata: add,
       respdata1: userData,
       isLoggedIn: isLoggedIn,
+      stateList:getStates
     });
   } catch (error) {
     res.status(500).json({
@@ -1952,6 +1956,8 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
+    let stateId = req.body.state_name;
+    let getState = await statesModel.findOne({_id:mongoose.Types.ObjectId(stateId)});
     const newAddress = new addressBook({
       user_id: req.body.userId ? req.body.userId : req.session.user.userId,
       street_name: req.body.address2,
@@ -1959,7 +1965,8 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
       landmark: req.body.landmark,
       city_name: req.body.city_name,
       city_code: req.body.city_code,
-      state_name: req.body.state_name,
+      state_name: getState ? getState.name:"",
+      state_id: stateId,
       state_code: req.body.state_code,
       pin_code: req.body.pin_code,
       address_name: addr_name,
@@ -2013,6 +2020,8 @@ exports.userAddressAdd = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
+    let stateId = req.body.state_name;
+    let getState = await statesModel.findOne({_id:mongoose.Types.ObjectId(stateId)});
     const newAddress = new addressBook({
       user_id: req.body.userId,
       street_name: req.body.address2,
@@ -2020,7 +2029,8 @@ exports.userAddressAdd = async function (req, res, next) {
       landmark: req.body.landmark,
       city_name: req.body.city_name,
       city_code: req.body.city_code,
-      state_name: req.body.state_name,
+      state_name: getState ? getState.name:"",
+      state_id: stateId,
       state_code: req.body.state_code,
       pin_code: req.body.pin_code,
       address_name: addr_name,
@@ -2203,12 +2213,20 @@ exports.getAddressdetails = async function (req, res, next) {
         respdata: {},
       });
     }
+    let stateList = await statesModel.find();
+    let stateData = "";
+    if(address.state_id){
+      stateData = await statesModel.findById(address.state_id);
+    }
+
     res.render("webpages/update-address", {
       title: "My Account",
       message: "Address fetched successfully!",
       respdata: req.session.user,
       respdata1: userData,
       address: address,
+      stateList:stateList,
+      stateData:stateData,
       isLoggedIn: isLoggedIn,
     });
     // res.status(200).json({
@@ -3231,6 +3249,7 @@ exports.checkoutWeb = async function (req, res, next) {
         //const gst = parseFloat((product_price * 28) / 100).toFixed(2);
         const gst = parseFloat((shippingChargeAmount * 28) / 100).toFixed(2);
         const finalPrice = parseInt(product_price) + shippingChargeAmount + parseFloat(gst).toFixed(2);
+        let getStates = await statesModel.find();
         res.render("webpages/mycheckoutweb", {
           title: "Check Out Page",
           status: '1',
@@ -3244,6 +3263,7 @@ exports.checkoutWeb = async function (req, res, next) {
           isLoggedIn: isLoggedIn,
           user: req.session.user,
           addressUserList: addressUserList,
+          stateList:getStates
         });
       }));
     }

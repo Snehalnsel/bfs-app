@@ -27,6 +27,11 @@ const model = mongoose.Schema({
     type: String,
     required: true,
   },
+  state_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'states', 
+    required: false,
+  },
   state_code: {
     type: String,
   },

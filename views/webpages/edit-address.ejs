@@ -145,10 +145,20 @@
                          <input type="type" name="city_name" class="ds-form-control" placeholder="City" >
                       </div>
  
-                      <div class="div-6">
+                      <!-- <div class="div-6">
                          <label>State:</label>
                          <input type="type" name="state_name" class="ds-form-control" placeholder="State" >
-                      </div>
+                      </div> -->
+
+                      <div class="div-6">
+                        <label for="productCondition">state: <span class="required">*</span></label>
+                        <select class="ds-form-control" name="state_name" id="state_name" required>
+                           <option value="" disabled selected>Select State</option>
+                           <% stateList.forEach(function(value) { %>
+                              <option value="<%= value._id %>"><%= value.name %></option>
+                              <% }); %>
+                        </select>
+                     </div>
  
                       <div class="div-6">
                          <label>Zip:</label>

@@ -31,23 +31,56 @@
                             <form class="user" action="" method="">
                                 <div class="form-group row">
                                     <div class="col-sm-6 mb-3 mb-sm-0">
-                                      Product name :<%= respdata.Productdeatils ? respdata.Productdeatils.image : '' %>
+                                        <div class="col-sm-6 mb-3 mb-sm-0">
+                                            Product name :<%= respdata.productdeatils ? respdata.productdeatils[0].name : '' %>
+                                        </div>
                                     </div>
                                     <div class="col-sm-6 mb-3 mb-sm-0">
-                                       
+                                        Order Price Details: 
+                                        <% if (respdata.orderDetails.payment_method == 0) { %>
+                                            <% if (respdata.orderDetails.pay_now) { %>
+                                                <h5 class="short-title">Total Amount: <%= respdata.orderDetails.total_price %></h5>
+                                                <h5 class="short-title">Paid: <%= respdata.orderDetails.booking_amount %></h5>
+                                            <% } %>
+                                            <% if (respdata.orderDetails.remaining_amount != null) { %>
+                                                <h5 class="short-title">Remaining Amount: <%= respdata.orderDetails.remaining_amount %></h5>
+                                            <% } %>
+                                        <% } %>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-sm-6 mb-3 mb-sm-0">
-                                      
+                                        Seller Details:
+                                        <%= respdata.orderDetails.seller_id.name %>
+                                        <%= respdata.orderDetails.seller_id.email %>
+                                        <%= respdata.orderDetails.seller_id.phone_no %>
+                                        Address:
+                                        <%= respdata.orderDetails.billing_address_id.street_name %>, <%=  respdata.orderDetails.billing_address_id.address1 %>, 
+                                        <%=  respdata.orderDetails.billing_address_id.landmark %>, <%=  respdata.orderDetails.billing_address_id.state_name %>,
+                                         <%=  respdata.orderDetails.billing_address_id.pin_code %>
                                     </div>
                                     <div class="col-sm-6 mb-3 mb-sm-0">
-                                        
+                                        Buyer Details:
+                                        <%= respdata.orderDetails.user_id.name %>
+                                        <%= respdata.orderDetails.user_id.email %>
+                                        <%= respdata.orderDetails.user_id.phone_no %>
+                                        Address:
+                                        <%= respdata.orderDetails.shipping_address_id.street_name %>, <%= respdata.orderDetails.shipping_address_id.address1 %>, 
+                                        <%= respdata.orderDetails.shipping_address_id.landmark %>, <%= respdata.orderDetails.shipping_address_id.state_name %>, 
+                                        <%= respdata.orderDetails.shipping_address_id.pin_code %>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-sm-6 mb-3 mb-sm-0">
-                                       
+                                       SELLER TO HUB
+                                       Seller Pickup Address
+                                       <%= respdata.orderDetails.billing_address_id.street_name %>, <%=  respdata.orderDetails.billing_address_id.address1 %>, 
+                                       <%=  respdata.orderDetails.billing_address_id.landmark %>, <%=  respdata.orderDetails.billing_address_id.state_name %>,
+                                        <%=  respdata.orderDetails.billing_address_id.pin_code %>
+
+                                        DELIVERY HUB ADDRESS 
+
+
                                     </div>
                                     <div class="col-sm-6 mb-3 mb-sm-0">
                                        
@@ -62,23 +95,7 @@
                                     </div>
 
                                 </div>
-                                <div class="form-group row">
-                                    
-                                    <div class="col-sm-6 mb-3 mb-sm-0">
-                                        
-                                    </div>
-                                  
-                                </div>
-                                <div class="form-group row">
-                                    <div class="col-sm-6 mb-3 mb-sm-0">
-                                        
-                                    </div>
-                                    <div class="col-sm-6 mb-3 mb-sm-0">
-                                       
-                                    </div>
-                                    
-                                    
-                                </div>
+                                
                                 <!-- Repeat for other form fields with their corresponding values -->
                                 <input type="submit" class="btn btn-primary btn-user btn-block" id="btn_profile"
                                     name="btn_profile" value="Submit">

@@ -3862,7 +3862,7 @@ exports.userPlacedOrder = async function (req, res) {
   }
 };
 
-exports.Demoorder = async function (req, res) {
+exports.Demoorder_backup = async function (req, res) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     let pay_now,booking_amount,remaining_amount,packing_handling_charge,taxable_value,cash_handling_charges;
@@ -3876,6 +3876,7 @@ exports.Demoorder = async function (req, res) {
     taxable_value = formData.taxable_value;
     let product =await Userproduct.findById(product_id);
     let total_price = 0;
+    
 
     if (payment_method == 0)
     {
@@ -3942,6 +3943,172 @@ exports.Demoorder = async function (req, res) {
         order: savedOrder
       });
     }
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+exports.Demoorder = async function (req, res) {
+  try {
+    /*
+    let formData = req.body.data;
+    const user_id = req.session.user.userId;
+    const existingCart = await Cart.findOne({ user_id, status: 0 });
+
+    const cartItem = await CartDetail.findOne({ cart_id: existingCart._id, status: 0 })
+    .populate({
+      path: 'product_id',
+      model: Userproduct
+    })
+    .exec();
+  let product = cartItem.product_id;
+  const user = await Users.findById(existingCart.user_id);
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+ 
+  let shippingChargeAmount = 0;
+  if(cartItem){
+    let shippingCharges = await shippingchrgsModel.findOne({_id: mongoose.Types.ObjectId(product.shipping_charges_id)});
+    if(shippingCharges){
+      shippingChargeAmount = Number(shippingCharges.amount);
+    }
+  }
+  let product_price;
+  if(cartItem.finalBidPrice){
+    product_price = cartItem.finalBidPrice;
+  }else{
+    product_price = product.offer_price;
+  }
+ //payment_method 0=>COD 
+ let gst = 0;
+ let finalPrice =0;
+if(formData.payment_method == 0){
+
+} 
+
+if(formData.payment_method == 1){
+   gst = parseFloat((shippingChargeAmount * 28) / 100);
+  finalPrice = parseFloat(product_price + shippingChargeAmount + gst);
+
+}
+
+  console.log('gst---',gst);
+  console.log('finalPrice--',finalPrice)
+console.log(existingCart); return false;
+
+*/
+
+
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    let pay_now,booking_amount,remaining_amount,taxable_value,cash_handling_charges;
+    let formData = req.body.data;
+    let user_id = formData.user_id;
+    let seller_id = formData.seller_id;
+    //let packing_handling_charge = formData.packingHandlingChargeValue;
+    let cart_id = formData.cart_id;
+    let product_id = formData.product_id;
+    let payment_method = formData.payment_method;
+    taxable_value = formData.taxable_value;
+    let product =await Userproduct.findById(product_id);
+    let total_price = 0;
+
+    const existingCart = await Cart.findOne({ user_id, status: 0 });
+
+    const cartItem = await CartDetail.findOne({ cart_id: existingCart._id, status: 0 })
+    .populate({
+      path: 'product_id',
+      model: Userproduct
+    })
+    .exec();
+    let product_price;
+  if(typeof cartItem.finalBidPrice != "undefined" && cartItem.finalBidPrice){
+    product_price = cartItem.finalBidPrice;
+  }else{
+    product_price = product.offer_price;
+  }
+  let packing_handling_charge = 0;
+  
+  if(cartItem){
+    let shippingCharges = await shippingchrgsModel.findOne({_id: mongoose.Types.ObjectId(product.shipping_charges_id)});
+    if(shippingCharges){
+      packing_handling_charge = Number(shippingCharges.amount);
+    }
+  }
+  
+    if (payment_method == 0)
+    {
+      pay_now = parseFloat(product_price) * 0.10;
+      remaining_amount = parseFloat(product_price)-parseFloat(pay_now);
+      cash_handling_charges = parseFloat(product_price) * 0.05;
+    }
+    taxable_value = packing_handling_charge;
+    let gst =  (taxable_value * 28) / 100;
+    //let gst =  parseFloat(product_price * 28) / 100;
+    if (payment_method == 0)
+    {
+      taxable_value = packing_handling_charge + cash_handling_charges;
+      taxable_value =  parseFloat(packing_handling_charge) + parseFloat(cash_handling_charges);
+      booking_amount = parseFloat(pay_now)+parseFloat(taxable_value)+ parseFloat(gst);
+      total_price = parseFloat(booking_amount) + parseFloat(remaining_amount);
+      total_price = total_price.toFixed(2); 
+      booking_amount = booking_amount.toFixed(2); 
+
+    }
+    else if (payment_method == 1)
+    {
+      taxable_value =  parseFloat(packing_handling_charge);
+      total_price = parseFloat(product_price) + parseFloat(gst) + parseFloat(taxable_value) ;
+      total_price = total_price.toFixed(2); 
+    }
+    // console.log('booking_amount',booking_amount);
+    // console.log('total_price',total_price);
+    // return false;
+    let order_status = '0';
+    let delivery_charges = '0';
+    let discount = '0';
+    let pickup_status = '0';
+    let delivery_status = '0';
+    let shipping_address_id = formData.addressBookId;
+
+    const billingaddress = await addressBook.findOne({ user_id: seller_id });
+    if (!billingaddress) {
+      return res.status(404).json({ message: 'Seller address not found' });
+    }
+    const billing_address_id = billingaddress._id;
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || null;
+    const order = new Demoorder({
+      user_id: (typeof user_id != "undefined") ? user_id : "",
+      cart_id: (typeof cart_id != "undefined") ? cart_id : "",
+      seller_id: (typeof seller_id != "undefined") ? seller_id : "",
+      product_id: (typeof product_id != "undefined") ? product_id : "",
+      billing_address_id: (typeof billing_address_id != "undefined") ? billing_address_id : "0",
+      shipping_address_id: (typeof shipping_address_id != "undefined") ? shipping_address_id : "0",
+      total_price: (typeof total_price != "undefined") ? parseFloat(total_price) : 0,
+      payment_method: (typeof payment_method != "undefined") ? payment_method : 0,
+      order_status: (typeof order_status != "undefined") ? order_status : 0,
+      pay_now: (typeof pay_now != "undefined") ? pay_now : "",
+      remaining_amount: (typeof remaining_amount != "undefined") ? parseFloat(remaining_amount) : 0,
+      booking_amount: (typeof booking_amount != "undefined") ? parseFloat(booking_amount) : 0,
+      packing_handling_charge: (typeof packing_handling_charge != "undefined") ? parseFloat(packing_handling_charge) : 0,
+      status: 1,
+      user_ip: ip,
+      gst:(typeof gst != "undefined") ? gst : 0,
+      taxable_value:(typeof taxable_value != "undefined") ? parseFloat(taxable_value) : 0,
+      added_dtime: new Date().toISOString(),
+    });
+
+    const savedOrder = await order.save();
+
+    if (savedOrder) {
+      res.status(200).json({
+        status: "1",
+        is_orderPlaced: 1,
+        message: 'Order placed successfully',
+        order: savedOrder
+      });
+    }
+    
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error' });
   }

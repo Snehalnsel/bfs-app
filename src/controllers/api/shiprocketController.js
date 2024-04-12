@@ -26,6 +26,9 @@ const Userproduct = require("../../models/api/userproductModel");
 const Productimage = require("../../models/api/productimageModel");
 const Order = require("../../models/api/orderModel");
 const AddressBook = require("../../models/api/addressbookModel");
+const Ordertracking = require("../../models/api/ordertrackModel");
+const Track = require("../../models/api/trackingModel");
+const Orderflow = require("../../models/api/trackingdeatis");
 const nodemailer = require("nodemailer");
 // const axios = require('axios');
 // const bodyParser = require('body-parser'); 
@@ -968,7 +971,6 @@ exports.getTrackByAWB = async function (req, res, next) {
 
     const existingOrder = await Order.findById(orderId);
 
-
     if (!existingOrder) {
       return res.status(404).json({
         status: "0",
@@ -976,10 +978,62 @@ exports.getTrackByAWB = async function (req, res, next) {
         respdata: {},
       });
     }
-  
-    pickup_awb = existingOrder.pickup_awb;
 
-      const shiprocketResponse = await trackbyawbid(pickup_awb);
+    const OrderTrack1 = await Ordertracking.findOne({ order_id: existingOrder._id , status: 0});
+    const OrderTrack2 = await Ordertracking.findOne({ order_id: existingOrder._id , status: 1});
+
+    let Track1,Track2;
+
+    if(OrderTrack1)
+    {
+      Track1 = await Track.findone({_id: OrderTrack1.track_id , status :0});
+
+      pickup_awb = existingOrder.pickup_awb;
+
+      const shiprocketResponsefortrack1 = await trackbyawbid(pickup_awb);
+
+    }
+    
+    if(OrderTrack2)
+    {
+      Track2 = await Track.findone({_id: OrderTrack2.track_id , status :1});
+
+      pickup_awb = existingOrder.pickup_awb;
+
+      const shiprocketResponsefortrack2 = await trackbyawbid(pickup_awb);
+
+      if(shiprocketResponsefortrack2)
+      {
+        checkresponseexits = await Orderflow({});
+
+        if(!checkresponseexits)
+        {
+          const orderflow = Orderflow({
+            order_id: existingOrder._id,
+            track_id : OrderTrack2.track_id,
+            track_response : shiprocketResponsefortrack2,
+            track_awbno: pickup_awb,
+            status: 1,
+            added_dtime: dateTime,
+          });
+          orderflow.save();
+  
+        }
+        else
+        {
+          const updData = {
+            track_response : shiprocketResponsefortrack2,
+          };
+          const updatedorderflow = await Orderflow.findByIdAndUpdate(
+            checkresponseexits._id,
+            updData,
+            { new: true, runValidators: true }
+          );
+        }
+      
+      }
+
+    }
 
       res.status(200).json({
         status: "1",

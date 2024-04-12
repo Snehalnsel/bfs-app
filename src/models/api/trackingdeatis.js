@@ -14,8 +14,14 @@ const model = mongoose.Schema({
   track_response: {
     type: String,
   }, 
-  track_code: {
+  track_awbno: {
     type: String,
+  },
+  status:{
+    type: Number,
+    enum: [0,1,2,3,4],//0 for SBFS 1 for BFSB 2 for BBFSR 3 for BFSSR 4 for BFSSRF
+    default: 0,
+    required: true,
   },
   added_dtime: {
     type: String,
@@ -23,4 +29,4 @@ const model = mongoose.Schema({
   },
 });
 
-module.exports = new mongoose.model("order_tracking", model);
+module.exports = new mongoose.model("tracking_orderflow", model);

@@ -2229,6 +2229,7 @@ exports.getAddressdetails = async function (req, res, next) {
       stateList:stateList,
       stateData:stateData,
       isLoggedIn: isLoggedIn,
+      websiteUrl:process.env.SITE_URL
     });
     // res.status(200).json({
     //   status: "1",
@@ -2506,6 +2507,7 @@ exports.editUserWisePost = async function (req, res, next) {
   }
 };
 exports.updatePostData = async function (req, res, next) {
+  let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -2636,7 +2638,7 @@ exports.updatePostData = async function (req, res, next) {
       ...updatedProduct.toObject(),
       images: productImages,
     };
-    res.redirect('/edit-mypost/'+productId);
+    res.redirect('/my-post/' + isLoggedIn);
   } catch (error) {
     res.status(500).json({
       status: "0",

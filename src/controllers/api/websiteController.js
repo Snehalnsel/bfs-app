@@ -1902,6 +1902,8 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
     let userAllBankDetails = {
       user_id: user._id,
       accountnumber: req.body.accountnumber,
+      bankname: req.body.bankname,
+      accountname: req.body.accountname,
       branchname: req.body.branchname,
       accountname: req.body.accountname,
       accountnumber: req.body.accountnumber,
@@ -1915,6 +1917,8 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
     };
     if(typeof req.file != "undefined" && req.file.filename != "undefined") {
       userAllBankDetails.upiid_scaner = req.file.filename;
+    } else {
+      userAllBankDetails.upiid_scaner = userBankDetails.upiid_scaner;
     }
     if(!userBankDetails) {
       userAllBankDetails.created_dtime = new Date().toISOString();
@@ -2517,8 +2521,17 @@ exports.updatePostData = async function (req, res, next) {
     });
   }
   try {
+    let originalInvoice = 0;
+    let originalPackageing = 0;
+    if(typeof req.body.original_invoice != "undefined") {
+      originalInvoice = 1;
+    }
+    if(typeof req.body.original_packaging != "undefined") {
+      originalPackageing = 1;
+    }
     const productId = req.body.productid;
-    const existingProduct = await Userproduct.findById(productId);
+    let existingProduct = await Userproduct.findById(productId);
+    console.log("product id ",productId);
     if (!existingProduct) {
       return res.status(404).json({
         status: "0",
@@ -2543,62 +2556,17 @@ exports.updatePostData = async function (req, res, next) {
     existingProduct.offer_price = req.body.offer_price || existingProduct.offer_price;
     existingProduct.percentage = req.body.percentage || existingProduct.percentage;
     existingProduct.gender_id = req.body.gender || existingProduct.gender_id;
-    const newProduct = new Userproduct({
-      category_id: req.body.category_id,
-      user_id: req.body.user_id,
-      brand: req.body.brand,
-      size: req.body.size,
-      name: req.body.name,
-      description: req.body.description,
-      status: req.body.status,
-      price: req.body.price,
-      offer_price: req.body.offerprice,
-      reseller_price: req.body.reseller_price,
-      percentage: req.body.percentage,
-      original_invoice: req.body.original_invoice,
-      original_packaging: req.body.original_packaging,
-      added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
-    });
+    existingProduct.original_invoice = originalInvoice;
+    existingProduct.original_packaging = originalPackageing;
     existingProduct.updated_dtime = moment().format("YYYY-MM-DD HH:mm:ss");
-    // if (req.files && req.files.length > 0) {
 
-    //   // await Productimage.deleteMany({ product_id: existingProduct._id });
-
-    //   const imageUrls = [];
-    //   const requrl = url.format({
-    //     protocol: req.protocol,
-    //     host: req.get("host"),
-    //   });
-
-    //   for (const file of req.files) {
-    //     const imageUrl = requrl + "/public/images/" + file.filename;
-
-    //     const productImageDetail = new Productimage({
-    //       product_id: existingProduct._id,
-    //       category_id: existingProduct.category_id,
-    //       user_id: existingProduct.user_id,
-    //       brand_id: existingProduct.brand_id,
-    //       image: imageUrl,
-    //       added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
-    //     });
-
-    //     const savedImage = await productImageDetail.save();
-    //   }
-    // }
-
+    const  updatedProduct = await Userproduct.findByIdAndUpdate(
+      productId,
+      existingProduct,
+      { new: true, runValidators: true }
+    );
+   
     const previousImages = await Productimage.find({ product_id: existingProduct._id });
-    //for (const image of previousImages) {
-    //  const imagePath = path.resolve(__dirname,'../../../public/compress_images/'+image.image);
-    //  const imagePathreal = path.resolve(__dirname,'../../../public/images/'+image.image);
-    //     if (fs.existsSync(imagePath)) {
-    //         fs.unlinkSync(imagePath);
-    //     }
-    //     if (fs.existsSync(imagePathreal)) {
-    //         fs.unlinkSync(imagePathreal);
-    //     }
-    //   await Productimage.findByIdAndDelete(image._id);
-    // }
-
     if (req.files && Object.keys(req.files).length > 0) {
       const requrl = url.format({
         protocol: req.protocol,
@@ -2632,7 +2600,6 @@ exports.updatePostData = async function (req, res, next) {
         }
       }
     }
-    const updatedProduct = await existingProduct.save();
     const productImages = await Productimage.find({ product_id: updatedProduct._id });
     const productDetails = {
       ...updatedProduct.toObject(),

@@ -194,7 +194,7 @@
                         <div class="div-6">
                            <label>Original Invoice</label>
                            <label class="switch">
-                              <input type="checkbox" <%= respdata.original_invoice == 1 ? 'checked' : '' %> name="original_invoice" value="<%= respdata.original_invoice %>">
+                              <input type="checkbox" class="changeToggle" <%= respdata.original_invoice == 1 ? 'checked' : '' %> name="original_invoice" value="<%= respdata.original_invoice %>">
                               <span class="tg-slider round"></span>
                            </label>
                         </div>
@@ -202,7 +202,7 @@
                         <div class="div-6">
                            <label>Original Packaging</label>
                            <label class="switch ">
-                              <input type="checkbox" <%= respdata.original_package == 1 ? 'checked' : '' %> name="original_package" value="<%=respdata.original_package%>">
+                              <input type="checkbox" class="changeToggle" <%= respdata.original_packaging == 1 ? 'checked' : '' %> name="original_packaging" value="<%=respdata.original_packaging%>">
                               <span class="tg-slider round"></span>
                            </label>
                         </div>
@@ -268,4 +268,13 @@
 
    <%- include('../../public/assets/include/newsletter'); %>
       <%- include('../../public/assets/include/footer'); %>
+      <script>
+         $(document).on("change",".changeToggle",function(){
+            if($(this).is(":checked")){
+               $(this).val(1)
+            } else {
+               $(this).val(0)
+            }
+         })
+      </script>
          </body>

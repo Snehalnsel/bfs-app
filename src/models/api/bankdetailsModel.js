@@ -12,6 +12,12 @@ const model = mongoose.Schema({
   bankname: {
     type: String,
   },
+  accountname: {
+    type: String,
+  },
+  branchname: {
+    type: String,
+  },
   ifsccode: {
     type: String,
   },

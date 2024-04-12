@@ -103,14 +103,14 @@ const model = mongoose.Schema({
     default: 0,
   },
   original_invoice: {
-    type: Number,
-    enum: [0,1],
-    default: 0,
+    type: String,
+    //enum: [0,1],
+    //default: 0,
   },
   original_packaging: {
-    type: Number,
-    enum: [0,1],
-    default: 0,
+    type: String,
+    //enum: [0,1],
+    //default: 0,
   },
   hitCount: {
     type: Number,

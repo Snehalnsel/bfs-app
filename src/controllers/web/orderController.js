@@ -487,7 +487,7 @@ exports.getOrderAllDetails = function (req, res, next) {
   if (!mongoose.Types.ObjectId.isValid(orderId)) {
     return res.status(400).json({ error: 'Invalid order ID' });
   }
-  
+
   Order.findOne({ _id: orderId })
     .populate('user_id', 'name phone_no email')
     .populate('seller_id', 'name phone_no email')
@@ -499,7 +499,6 @@ exports.getOrderAllDetails = function (req, res, next) {
         return res.status(404).json({ error: 'Order not found' });
       }
       const productDetails = await Userproduct.find({ _id: orderDetails.product_id });
-      console.log(orderDetails);
       res.render("pages/order/alldeatils", {
         status: 1,
         siteName: req.app.locals.siteName,

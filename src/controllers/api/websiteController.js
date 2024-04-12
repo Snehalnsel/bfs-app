@@ -1367,7 +1367,8 @@ exports.editProfile = async function (req, res, next) {
       respdata: req.session.user,
       bankDetails: (typeof bankDetails != "undefined" || bankDetails != null) ? bankDetails : [],
       isLoggedIn: isLoggedIn,
-      userData: userData
+      userData: userData,
+      websiteUrl: process.env.SITE_URL
     });
   } catch (error) {
     res.status(500).json({

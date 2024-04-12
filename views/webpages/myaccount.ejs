@@ -5,7 +5,7 @@
        <div class="dashboard-sidbar">        
          <div class="sidbar-box user-profile">
             <div class="user-icon">
-               <img src="<%=websiteUrl%>/public/compress_images/<%= respdata.image && respdata.image !== 'na' ? respdata.image : websiteUrl + '/public/compress_images/nouser.png' %>" alt="user-image">
+               <img src="<%=websiteUrl%>/public/compress_images/<%= respdata.image && respdata.image !== 'na' ? respdata.image : 'nouser.png' %>" alt="user-image">
 
             </div>
             <div class="user-info">
@@ -21,7 +21,7 @@
                          Edit
                         </a>
                     </label>
-                 </div>
+               </div>
             </div>
             <!-- Profile Image Modal Start -->   
    
@@ -37,7 +37,7 @@
                              <div class="inner-formbox">
                                 <div class="profile-chnage-box">
                                    <div class="user-icon">
-                                      <img src="<%= respdata.image && respdata.image !== 'na' ? respdata.image : websiteUrl + '/public/compress_images/nouser.png' %>" alt="user-image" id="output">                      
+                                      <img src="<%=websiteUrl%>/public/compress_images/<%= respdata.image && respdata.image !== 'na' ? respdata.image : 'nouser.png' %>" alt="user-image" id="output">                      
                                    </div>
                                    <input id="file" class="" name="image" type="file"/>
                                    <input id="user_id" class="" name="user_id" type="hidden" value="<%=respdata.userId%>"/>

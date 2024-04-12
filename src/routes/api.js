@@ -1186,7 +1186,14 @@ router.post("/adduseraddress",[
 ],WebsiteController.userAddressAdd);
 
 router.get("/edituseraddress/:id",[],WebsiteController.getAddressdetails);
-router.post("/updateuseraddress",[],WebsiteController.updateuserAddressAdd);
+router.post("/updateuseraddress",[
+  check("address1", "This is a required field!").isLength({max: 120 }),
+    check("address2", "This is a required field!").isLength({max: 120 }),
+    check("landmark", "This is a required field!").isLength({max: 50 }),
+    check("city_name", "This is a required field!").isLength({max:30}),
+    check("state_name", "This is a required field!").isLength({max:30}),
+    check("pin_code", "This is a required field!").isLength({max:30})
+],WebsiteController.updateuserAddressAdd);
 
 router.get("/delete-address/:id",[],WebsiteController.deleteUserAddress);
 
@@ -1212,7 +1219,20 @@ router.post("/addnewpost",[
 
 router.get("/edit-mypost/:id",[],WebsiteController.editUserWisePost);
 
-router.post("/updatepostdata",[],upload.fields([{
+router.post("/updatepostdata",[
+  check("name", "This is a required field!").isLength({max: 50 }),
+    check("description", "This is a required field!").optional({nullable: true}).isLength({max: 120 }),
+    check("product_cate", "This is a required field!").optional({nullable: true}).isLength({max: 120 }),
+    check("brand", "This is a required field!").isLength({max:30}),
+    check("product_condition", "This is a required field!").optional({nullable: true}).isLength({max: 120 }),
+    check("size", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),
+    check("height", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),
+    check("weight", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),
+    check("length", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),
+    check("breath", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),
+    check("price", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),
+    check("offer_price", "This is a required field!").optional({nullable: true}).isLength({max: 12 })
+],upload.fields([{
   name: 'img0', maxCount: 1
 }, {
   name: 'img1', maxCount: 1

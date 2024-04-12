@@ -1069,7 +1069,6 @@ router.post(
   ShiprocketController.getGenerateInvoice
 );
 
-
 router.post(
   "/all-sublist",
   [],
@@ -1388,7 +1387,6 @@ PaymentController.getPaymentData
 router.get("/checkapp-payment",cors(),
 PaymentController.checkPaymentData
 );
-
 
 router.post("/getshipmentvalue",cors(),
 OrderController.shipmentvalue

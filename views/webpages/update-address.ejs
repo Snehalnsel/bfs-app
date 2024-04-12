@@ -5,7 +5,8 @@
          <div class="dashboard-sidbar">
             <div class="sidbar-box user-profile">
                <div class="user-icon">
-                  <img src="<%=respdata1.image%>" alt="user-image">
+                  <img src="<%=websiteUrl%>/public/compress_images/<%= respdata.image && respdata.image !== 'na' ? respdata.image : 'nouser.png' %>" alt="user-image" id="output">
+                  <!-- <img src="<%=respdata1.image%>" alt="user-image"> -->
                </div>
                <div class="user-info">
                   <div class="sht-ui">Hello</div>
@@ -34,7 +35,8 @@
                               <div class="inner-formbox">
                                  <div class="profile-chnage-box">
                                     <div class="user-icon">
-                                       <img src="<%=respdata1.image%>" alt="user-image" id="output">
+                                       <img src="<%=websiteUrl%>/public/compress_images/<%= respdata1.image && respdata1.image !== 'na' ? respdata1.image : 'nouser.png' %>" alt="user-image" id="output">
+                                       <!-- <img src="<%=respdata1.image%>" alt="user-image" id="output"> -->
                                     </div>
                                     <input id="file" class="" name="pro_img" type="file" />
                                     <input id="user_id" class="" name="user_id" type="hidden"
@@ -154,9 +156,11 @@
                            <label for="productCondition">state: <span class="required">*</span></label>
                            <select class="ds-form-control" name="state_name" id="state_name" required>
                               <option value="" disabled selected>Select State</option>
-                              <% stateList.forEach(function(value) { %>
-                                 <option value="<%= value._id %>" <%=(respdata && address.state_id.equals(value._id))
-                                    ? 'selected' : '' %>><%= value.name %>
+                              <% stateList.forEach(function(value) { 
+                                 let setStateId = (typeof address.state_id != "undefined" && value._id == address.state_id )  ? "selected" : "";
+                                 
+                                 %>
+                                 <option value="<%= value._id %>" <%=setStateId%> %>><%= value.name %>
                                  <% }); %>
                            </select>
                         </div>

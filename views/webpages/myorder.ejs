@@ -6,7 +6,7 @@
             <div class="dashboard-sidbar">
                <div class="sidbar-box user-profile">
                   <div class="user-icon">
-                     <img src="<%=websiteUrl%>/public/compress_images/<%= respdata.image && respdata.image !== 'na' ? respdata.image : websiteUrl + '/public/compress_images/nouser.png' %>" alt="user-image">
+                     <img src="<%=websiteUrl%>/public/compress_images/<%= respdata.image && respdata.image !== 'na' ? respdata.image : 'nouser.png' %>" alt="user-image">
                   </div>
                   <div class="user-info">
                      <div class="sht-ui">Hello</div>
@@ -16,8 +16,42 @@
                               <%=respdata.name%>
                         </div>
                         <% } %>
+                        <div class="userimage-edit">
+                           <!--  <a href="javascript:void(0)" data-toggle="modal" data-target="#profile-change-modal"><i class="fa fa-pencil" aria-hidden="true"></i></a> -->
+                             <!--<label for="file"><i class="fa fa-pencil" aria-hidden="true"></i></label>-->
+                             <!--<input id="file" class="file-line" type="file" onchange="loadFile(event)">-->
+                             <label>
+                                 <a href="javascript:void(0)" data-toggle="modal" data-target="#upload-profile-modal" class="edit_link">
+                                  Edit
+                                 </a>
+                             </label>
+                        </div>
                   </div>
                </div>
+               <!-- Profile Image Modal Start -->   
+               <div class="modal theme_modal short-modal change-profile-update" id="upload-profile-modal">
+                  <div class="modal-dialog">
+                     <button type="button" class="close" data-dismiss="modal">&times;</button>
+                     <div class="modal-content">
+                        <div class="loginform-box short-box">
+                           <h5 class="box-title">Change Profile Picture</h5>
+                           <form action="/change-profile-image-web" method="POST" enctype="multipart/form-data">
+                              <div class="inner-formbox">
+                                 <div class="profile-chnage-box">
+                                    <div class="user-icon">
+                                       <img src="<%=websiteUrl%>/public/compress_images/<%= respdata.image && respdata.image !== 'na' ? respdata.image : 'nouser.png' %>" alt="user-image" id="output">                      
+                                    </div>
+                                    <input id="file" class="" name="image" type="file"/>
+                                    <input id="user_id" class="" name="user_id" type="hidden" value="<%=respdata.userId%>"/>
+                                    <input class="update-btn" type="submit" value="Update Profile" />
+                                 </div>
+                              </div>
+                           </form>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            <!-- Profile Image Modal End -->   
                <div class="sidbar-box sidbar-nav">
                   <ul class="nav d-flex flex-column mb-2 ">
                      <li class="nav-item">

@@ -3480,8 +3480,18 @@ exports.getWhatsHotProductsweb = async function (req, res) {
     const whatsHotProducts = [];
 
     for (const product of hotProducts) {
-
-      const productImage = await Productimage.findOne({ product_id: product._id });
+      const productImage = await Productimage.aggregate([
+        {
+          $match: {
+            product_id: product._id,
+            $or: [
+              { image_order: 1 },
+              { image_order: 0 }
+            ]
+          }
+        }
+      ]).exec();
+      
 
       if (productImage) {
 
@@ -3579,7 +3589,18 @@ exports.getJustSoldProductsweb = async function (req, res) {
 
     const justSoldProducts = [];
     for (const product of solditems) {
-      const productImage = await Productimage.findOne({ product_id: product._id });
+      const productImage = await Productimage.aggregate([
+        {
+          $match: {
+            product_id: product._id,
+            $or: [
+              { image_order: 1 },
+              { image_order: 0 }
+            ]
+          }
+        }
+      ]).exec();
+      
       if (productImage) {
         const productCondition = await Productcondition.findById(product.status);
         justSoldProducts.push({
@@ -3651,7 +3672,7 @@ exports.getBestDealProductsweb = async function (req, res) {
       flag: 0
     });
 
-    const products = await Userproduct.find({ percentage: { $gte: percentageFilter }, approval_status: 1, flag: 0 }); // Adding approval_status filter
+    const products = await Userproduct.find({ percentage: { $gte: percentageFilter }, approval_status: 1, flag: 0 }); 
 
     let brandIds = [], sizeIds = [], statusIds = [], genderIds = [];
     let brandList = [], sizeList = [], conditionList = [], genderList = [];
@@ -3683,7 +3704,19 @@ exports.getBestDealProductsweb = async function (req, res) {
     const bestDealProducts = [];
 
     for (const product of products) {
-      const productImage = await Productimage.findOne({ product_id: product._id });
+      //const productImage = await Productimage.findOne({ product_id: product._id });
+      const productImage = await Productimage.aggregate([
+        {
+          $match: {
+            product_id: product._id,
+            $or: [
+              { image_order: 1 },
+              { image_order: 0 }
+            ]
+          }
+        }
+      ]).exec();
+      
       if (productImage) {
 
         const productCondition = await Productcondition.findById(product.status);

@@ -987,7 +987,19 @@ exports.userFilter = async function (req, res, next) {
     .limit(pageSize);
   const formattedUserProducts = [];
   for (const userproduct of allProductData) {
-    const productImages = await Productimage.find({ product_id: userproduct._id });
+    // const productImages = await Productimage.find({ product_id: userproduct._id });
+    const productImages = await Productimage.aggregate([
+      {
+        $match: {
+          product_id: userproduct._id,
+          $or: [
+            { image_order: 1 },
+            { image_order: 0 }
+          ]
+        }
+      }
+    ]).exec();
+    
     const productCondition = await Productcondition.findById(userproduct.status);
     const formattedUserProduct = {
       _id: userproduct._id,

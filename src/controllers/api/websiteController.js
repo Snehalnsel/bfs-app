@@ -988,18 +988,14 @@ exports.userFilter = async function (req, res, next) {
   const formattedUserProducts = [];
   for (const userproduct of allProductData) {
     // const productImages = await Productimage.find({ product_id: userproduct._id });
-    const productImages = await Productimage.aggregate([
-      {
-        $match: {
-          product_id: userproduct._id,
-          $or: [
-            { image_order: 1 },
-            { image_order: 0 }
-          ]
-        }
-      }
-    ]).exec();
-    
+    const productImages = await Productimage.findOne({ 
+      product_id: product._id,
+      $or: [
+        { image_order: 1 },
+        { image_order: 0 }
+      ]
+    });
+        
     const productCondition = await Productcondition.findById(userproduct.status);
     const formattedUserProduct = {
       _id: userproduct._id,
@@ -1658,18 +1654,14 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
     const formattedUserProducts = [];
     for (const userproduct of userproducts) {
       //const productImages = await Productimage.find({ product_id: userproduct._id });
-      const productImages = await Productimage.aggregate([
-        {
-          $match: {
-            product_id: userproduct._id,
-            $or: [
-              { image_order: 1 },
-              { image_order: 0 }
-            ]
-          }
-        }
-      ]).exec();
-      
+      const productImages = await Productimage.findOne({ 
+        product_id: product._id,
+        $or: [
+          { image_order: 1 },
+          { image_order: 0 }
+        ]
+      });
+    
       const productCondition = await Productcondition.findById(userproduct.status);
       const formattedUserProduct = {
         _id: userproduct._id,
@@ -3504,19 +3496,14 @@ exports.getWhatsHotProductsweb = async function (req, res) {
     const whatsHotProducts = [];
 
     for (const product of hotProducts) {
-      const productImage = await Productimage.aggregate([
-        {
-          $match: {
-            product_id: product._id,
-            $or: [
-              { image_order: 1 },
-              { image_order: 0 }
-            ]
-          }
-        }
-      ]).exec();
-      
-
+      const productImage = await Productimage.findOne({ 
+        product_id: product._id,
+        $or: [
+          { image_order: 1 },
+          { image_order: 0 }
+        ]
+      });
+    
       if (productImage) {
 
         const productCondition = await Productcondition.findById(product.status);
@@ -3613,17 +3600,13 @@ exports.getJustSoldProductsweb = async function (req, res) {
 
     const justSoldProducts = [];
     for (const product of solditems) {
-      const productImage = await Productimage.aggregate([
-        {
-          $match: {
-            product_id: product._id,
-            $or: [
-              { image_order: 1 },
-              { image_order: 0 }
-            ]
-          }
-        }
-      ]).exec();
+      const productImage = await Productimage.findOne({ 
+        product_id: product._id,
+        $or: [
+          { image_order: 1 },
+          { image_order: 0 }
+        ]
+      });
       
       if (productImage) {
         const productCondition = await Productcondition.findById(product.status);
@@ -3729,17 +3712,14 @@ exports.getBestDealProductsweb = async function (req, res) {
 
     for (const product of products) {
       //const productImage = await Productimage.findOne({ product_id: product._id });
-      const productImage = await Productimage.aggregate([
-        {
-          $match: {
-            product_id: product._id,
-            $or: [
-              { image_order: 1 },
-              { image_order: 0 }
-            ]
-          }
-        }
-      ]).exec();
+      const productImage = await Productimage.findOne({ 
+        product_id: product._id,
+        $or: [
+          { image_order: 1 },
+          { image_order: 0 }
+        ]
+      });
+          
       
       if (productImage) {
 

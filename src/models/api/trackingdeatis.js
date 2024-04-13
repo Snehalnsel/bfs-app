@@ -13,7 +13,13 @@ const model = mongoose.Schema({
   },
   track_response: {
     type: String,
-  }, 
+  },
+  curent_status: {
+    type: String,
+  },  
+  status_check: {
+    type: String,
+  },  
   track_awbno: {
     type: String,
   },

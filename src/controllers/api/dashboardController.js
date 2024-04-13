@@ -154,6 +154,14 @@ exports.webHomeDetails = async function (req, res) {
         $unwind: "$productImage" 
       },
       {
+        $match: {
+          $or: [
+            { "productImage.image_order": 1 },
+            { "productImage.image_order": 0 }
+          ]
+        }
+      },
+      {
         $lookup: {
           from: "mt_productconditions",
           localField: "status",
@@ -221,6 +229,14 @@ exports.webHomeDetails = async function (req, res) {
         $unwind: {
           path: "$productImage",
           preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $match: {
+          $or: [
+            { "productImage.image_order": 1 },
+            { "productImage.image_order": 0 }
+          ]
         }
       },
       {
@@ -293,6 +309,14 @@ exports.webHomeDetails = async function (req, res) {
         }
       },
       {
+        $match: {
+          $or: [
+            { "productImage.image_order": 1 },
+            { "productImage.image_order": 0 }
+          ]
+        }
+      },
+      {
         $lookup: {
           from: "mt_productconditions",
           localField: "status",
@@ -352,7 +376,7 @@ exports.webHomeDetails = async function (req, res) {
       fs: fs
     });
   } catch (error) {
-    
+    console.log(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };

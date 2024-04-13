@@ -966,11 +966,8 @@ exports.getTrackByAWB = async function (req, res, next) {
   }
 
   try {
-
     const orderId = req.body.order_id;
-
     const existingOrder = await Order.findById(orderId);
-
     if (!existingOrder) {
       return res.status(404).json({
         status: "0",
@@ -978,7 +975,6 @@ exports.getTrackByAWB = async function (req, res, next) {
         respdata: {},
       });
     }
-
     const OrderTrack1 = await Ordertracking.findOne({ order_id: existingOrder._id , status: 0});
     const OrderTrack2 = await Ordertracking.findOne({ order_id: existingOrder._id , status: 1});
 
@@ -1004,7 +1000,7 @@ exports.getTrackByAWB = async function (req, res, next) {
 
       if(shiprocketResponsefortrack2)
       {
-        checkresponseexits = await Orderflow({});
+        checkresponseexits = await Orderflow({ });
 
         if(!checkresponseexits)
         {
@@ -1017,7 +1013,6 @@ exports.getTrackByAWB = async function (req, res, next) {
             added_dtime: dateTime,
           });
           orderflow.save();
-  
         }
         else
         {
@@ -1030,11 +1025,8 @@ exports.getTrackByAWB = async function (req, res, next) {
             { new: true, runValidators: true }
           );
         }
-      
       }
-
     }
-
       res.status(200).json({
         status: "1",
         message: "Details fetched successfully!",

@@ -68,10 +68,10 @@ exports.getPaymentData = async function (req, res, next) {
     const temporder = await Demoorder.findById(tempOrderId);
     let amount;
     if(temporder.booking_amount == 0) {
-      amount= parseInt(temporder.total_price);
+      amount= parseFloat(temporder.total_price);
     } else
     {
-      amount = parseInt(temporder.booking_amount);
+      amount = parseFloat(temporder.booking_amount);
     }
    // amount = temporder.booking_amount !== 0 ? temporder.booking_amount : temporder.total_price;
 

@@ -74,6 +74,7 @@ const { create } = require('xmlbuilder2');
 const { ConversationContextImpl } = require("twilio/lib/rest/conversations/v1/conversation");
 const shippingchrgsModel = require("../../models/api/shippingchrgsModel");
 const statesModel = require("../../models/api/statesModel");
+const { toFormData } = require("axios");
 // const INSTANCE_URL = 'https://api.maytapi.com/api';
 // const PHONE_ID = '18710';
 // const PRODUCT_ID = 'b119f3b5-819b-46e0-ae30-0d1cf1dd8cc8';
@@ -1653,14 +1654,14 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
     }
     const formattedUserProducts = [];
     for (const userproduct of userproducts) {
-      //const productImages = await Productimage.find({ product_id: userproduct._id });
-      const productImages = await Productimage.findOne({ 
-        product_id: product._id,
-        $or: [
-          { image_order: 1 },
-          { image_order: 0 }
-        ]
-      });
+      const productImages = await Productimage.find({ product_id: userproduct._id }).sort( { image_order : 1 } );
+      // const productImages = await Productimage.findOne({ 
+      //   product_id: product._id,
+      //   $or: [
+      //     { image_order: 1 },
+      //     { image_order: 0 }
+      //   ]
+      // });
     
       const productCondition = await Productcondition.findById(userproduct.status);
       const formattedUserProduct = {
@@ -3987,55 +3988,6 @@ exports.Demoorder_backup = async function (req, res) {
 
 exports.Demoorder = async function (req, res) {
   try {
-    /*
-    let formData = req.body.data;
-    const user_id = req.session.user.userId;
-    const existingCart = await Cart.findOne({ user_id, status: 0 });
-
-    const cartItem = await CartDetail.findOne({ cart_id: existingCart._id, status: 0 })
-    .populate({
-      path: 'product_id',
-      model: Userproduct
-    })
-    .exec();
-  let product = cartItem.product_id;
-  const user = await Users.findById(existingCart.user_id);
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
-  }
- 
-  let shippingChargeAmount = 0;
-  if(cartItem){
-    let shippingCharges = await shippingchrgsModel.findOne({_id: mongoose.Types.ObjectId(product.shipping_charges_id)});
-    if(shippingCharges){
-      shippingChargeAmount = Number(shippingCharges.amount);
-    }
-  }
-  let product_price;
-  if(cartItem.finalBidPrice){
-    product_price = cartItem.finalBidPrice;
-  }else{
-    product_price = product.offer_price;
-  }
- //payment_method 0=>COD 
- let gst = 0;
- let finalPrice =0;
-if(formData.payment_method == 0){
-
-} 
-
-if(formData.payment_method == 1){
-   gst = parseFloat((shippingChargeAmount * 28) / 100);
-  finalPrice = parseFloat(product_price + shippingChargeAmount + gst);
-
-}
-
-  console.log('gst---',gst);
-  console.log('finalPrice--',finalPrice)
-console.log(existingCart); return false;
-
-*/
-
 
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     let pay_now,booking_amount,remaining_amount,taxable_value,cash_handling_charges;
@@ -4072,7 +4024,7 @@ console.log(existingCart); return false;
       packing_handling_charge = Number(shippingCharges.amount);
     }
   }
-  
+  console.log('payment_method--',payment_method);
     if (payment_method == 0)
     {
       pay_now = parseFloat(product_price) * 0.10;
@@ -4084,8 +4036,10 @@ console.log(existingCart); return false;
     //let gst =  parseFloat(product_price * 28) / 100;
     if (payment_method == 0)
     {
-      taxable_value = packing_handling_charge + cash_handling_charges;
+      
       taxable_value =  parseFloat(packing_handling_charge) + parseFloat(cash_handling_charges);
+      gst =  (taxable_value * 28) / 100;
+      gst = gst.toFixed(2);
       booking_amount = parseFloat(pay_now)+parseFloat(taxable_value)+ parseFloat(gst);
       total_price = parseFloat(booking_amount) + parseFloat(remaining_amount);
       total_price = total_price.toFixed(2); 
@@ -4098,9 +4052,9 @@ console.log(existingCart); return false;
       total_price = parseFloat(product_price) + parseFloat(gst) + parseFloat(taxable_value) ;
       total_price = total_price.toFixed(2); 
     }
-    // console.log('booking_amount',booking_amount);
-    // console.log('total_price',total_price);
-    // return false;
+    //console.log('booking_amount',booking_amount);
+    //console.log('total_price',total_price);
+     //return false;
     let order_status = '0';
     let delivery_charges = '0';
     let discount = '0';

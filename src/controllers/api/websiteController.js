@@ -1934,10 +1934,12 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
       default_status: 1,
       //created_dtime: new Date().toISOString(),
     };
-    if(typeof req.file != "undefined" && req.file.filename != "undefined") {
+    if(typeof req.file != "undefined" && typeof req.file.filename != "undefined") {
       userAllBankDetails.upiid_scaner = req.file.filename;
-    } else {
+    } else if(typeof userBankDetails != "undefined" && userBankDetails != null && typeof userBankDetails.upiid_scaner != "undefined") {
       userAllBankDetails.upiid_scaner = userBankDetails.upiid_scaner;
+    } else {
+      userAllBankDetails.upiid_scaner = "";
     }
     if(!userBankDetails) {
       userAllBankDetails.created_dtime = new Date().toISOString();
@@ -1957,6 +1959,7 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
     });
     //res.redirect("/bank-details");
   } catch (error) {
+    console.log('error--',error)
     return res.json({
       status:"error",
       message:"Something went wrong please try later."
@@ -2310,6 +2313,10 @@ exports.userWisePost = async function (req, res, next) {
       .populate('size_id', 'name', { optional: true })
       .exec();
     const formattedUserProducts = [];
+    let userBankStatus = await Bankdetails.countDocuments({
+      user_id: mongoose.Types.ObjectId(isLoggedIn)
+    });
+    console.log('userBankStatus--',userBankStatus)
     for (const userproduct of userproducts) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
       if (productImages) {
@@ -2345,6 +2352,7 @@ exports.userWisePost = async function (req, res, next) {
         respdata: formattedUserProducts,
         userData: req.session.user,
         isLoggedIn: isLoggedIn,
+        userBankStatus:userBankStatus,
         websiteUrl: process.env.SITE_URL,
       });
     }

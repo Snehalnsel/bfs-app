@@ -86,6 +86,7 @@
       </div>
       <div class="dashboard-content">
          <div class="dashboard-infobox">
+            <% if(userBankStatus != 0){ %>
             <div class="dashboard-title-arrow mb-25">
                <h4 class="di-title mr-25">My Product</h4>
                <!--<div class="edit-link"><a href="/my-account">Back </a></div>&nbsp;&nbsp;-->
@@ -139,30 +140,12 @@
                <% }); %>
                <%}%>
             </div>
-            <!-- <div class="dsh-shortbox">
-               <form>
-                  <div class="div-row">
-                     <div class="div-12">
-                        <label>Name:</label>
-                        <input type="type" name="" class="ds-form-control" placeholder="Enter Name">
-                     </div>
-               
-                     <div class="div-6">
-                        <label>Email:</label>
-                        <input type="email" name="" class="ds-form-control" placeholder="Enter Email">
-                     </div>
-               
-                     <div class="div-6">
-                        <label>Phone Number:</label>
-                        <input type="type" name="" class="ds-form-control" placeholder="Phone Numberl">
-                     </div>
-                     <div class="div-12">
-                        <input type="submit" name="" class="ds-form-control" value="Save">
-                     </div>
-                  </div>
-               </form>
-               
-               </div> -->
+            <% } else { %>
+               <div class="">
+                  <p>Please add Bank Details</p>
+                  <a href="/bank-details">Add Bank Details</a>
+               </div>
+               <% } %>
          </div>
       </div>
    </div>

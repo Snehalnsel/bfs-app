@@ -987,15 +987,8 @@ exports.userFilter = async function (req, res, next) {
     .limit(pageSize);
   const formattedUserProducts = [];
   for (const userproduct of allProductData) {
-    // const productImages = await Productimage.find({ product_id: userproduct._id });
-    const productImages = await Productimage.findOne({ 
-      product_id: product._id,
-      $or: [
-        { image_order: 1 },
-        { image_order: 0 }
-      ]
-    });
-        
+    const productImages = await Productimage.find({ product_id: userproduct._id }).sort( { image_order: 1} );
+      
     const productCondition = await Productcondition.findById(userproduct.status);
     const formattedUserProduct = {
       _id: userproduct._id,
@@ -1653,14 +1646,14 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
     }
     const formattedUserProducts = [];
     for (const userproduct of userproducts) {
-      //const productImages = await Productimage.find({ product_id: userproduct._id });
-      const productImages = await Productimage.findOne({ 
-        product_id: product._id,
-        $or: [
-          { image_order: 1 },
-          { image_order: 0 }
-        ]
-      });
+      const productImages = await Productimage.find({ product_id: userproduct._id }).sort( { image_order : 1 } );
+      // const productImages = await Productimage.findOne({ 
+      //   product_id: userproduct._id,
+      //   $or: [
+      //     { image_order: 1 },
+      //     { image_order: 0 }
+      //   ]
+      // });
     
       const productCondition = await Productcondition.findById(userproduct.status);
       const formattedUserProduct = {
@@ -1771,6 +1764,8 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
       colorList = await Color.find({ _id: { $in: colorIds } });
     }
 
+
+    console.log(formattedUserProducts);
     res.render("webpages/subcategoryproduct", {
       title: "Product Sub Categories",
       message: "Welcome to the Product Sub Categories!",

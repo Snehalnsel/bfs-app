@@ -252,6 +252,55 @@ exports.getStatus = async function (req, res, next) {
               { $set: { flag: 1 } }, 
               { new: true }
             );
+
+      const user = await Users.findById(savedOrder.user_id);
+
+      const product = await Userproduct.findById(savedOrder.product_id);
+
+      const address = await AddressBook.findById(savedOrder.billing_address_id);
+
+      const billingaddress = address.street_name + ', ' + address.address1 + ', ' + address.landmark + ', ' + address.city_name + ', ' + address.state_name + ', ' + address.pin_code;
+
+      const loginHtmlPath = 'views/webpages/order-confirmed.html';
+      let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+
+      loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+      loginHtmlContent = loginHtmlContent.replace('{{ordernumber}}', orderCode);
+      loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
+      loginHtmlContent = loginHtmlContent.replace('{{productimages}}', orderCode);
+      loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
+      loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.price);
+      loginHtmlContent = loginHtmlContent.replace('{{shippingaddress}}', billingaddress);
+    
+      const mailData = {
+        from: "Bid For Sale! <" + smtpUser + ">",
+        to: user.email,
+        subject: "Order Placed - Bid For Sale!",
+        name: "Bid For Sale!",
+        text: "order placed",
+        html: loginHtmlContent
+      };
+
+      transporter.sendMail(mailData, function (err, info) {
+        // if (err) console.log("err", err);
+        // else console.log("info", info);
+      });
+         let smsData = {
+          textId: "test",
+          toMobile: "91" +user.phone_no,
+          text: "Order placed successfully! Thank you for shopping with Bid For Sale. Your "+ product.name +" having Order ID "+ orderCode +"  is on its way to you. For any inquiries, feel free to reach out to us. Happy shopping!-BFS RETAIL SERVICES PRIVATE LIMITED",
+        };
+        let returnData;
+        returnData = await sendSms(smsData);
+        const historyData = new ApiCallHistory({
+          userId: user._id,
+          called_for: "Order Placed",
+          api_link: process.env.SITE_URL,
+          api_param: smsData,
+          api_response: returnData,
+          send_status: 'send',
+        });
+        await historyData.save();
             if(updatedProduct)
             {
               const cleanedCartId =  mongoose.Types.ObjectId(temporder.cart_id); 
@@ -346,6 +395,56 @@ exports.checkPaymentData = async function (req, res, next) {
           { $set: { flag: 1 } },
           { new: true }
         );
+
+        const user = await Users.findById(savedOrder.user_id);
+
+        const product = await Userproduct.findById(savedOrder.product_id);
+  
+        const address = await AddressBook.findById(savedOrder.billing_address_id);
+  
+        const billingaddress = address.street_name + ', ' + address.address1 + ', ' + address.landmark + ', ' + address.city_name + ', ' + address.state_name + ', ' + address.pin_code;
+  
+        const loginHtmlPath = 'views/webpages/order-confirmed.html';
+        let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+  
+        loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+        loginHtmlContent = loginHtmlContent.replace('{{ordernumber}}', orderCode);
+        loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
+        loginHtmlContent = loginHtmlContent.replace('{{productimages}}', orderCode);
+        loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
+        loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.price);
+        loginHtmlContent = loginHtmlContent.replace('{{shippingaddress}}', billingaddress);
+      
+        const mailData = {
+          from: "Bid For Sale! <" + smtpUser + ">",
+          to: user.email,
+          subject: "Order Placed - Bid For Sale!",
+          name: "Bid For Sale!",
+          text: "order placed",
+          html: loginHtmlContent
+        };
+  
+        transporter.sendMail(mailData, function (err, info) {
+          // if (err) console.log("err", err);
+          // else console.log("info", info);
+        });
+           let smsData = {
+            textId: "test",
+            toMobile: "91" +user.phone_no,
+            text: "Order placed successfully! Thank you for shopping with Bid For Sale. Your "+ product.name +" having Order ID "+ orderCode +"  is on its way to you. For any inquiries, feel free to reach out to us. Happy shopping!-BFS RETAIL SERVICES PRIVATE LIMITED",
+          };
+          let returnData;
+          returnData = await sendSms(smsData);
+          const historyData = new ApiCallHistory({
+            userId: user._id,
+            called_for: "Order Placed",
+            api_link: process.env.SITE_URL,
+            api_param: smsData,
+            api_response: returnData,
+            send_status: 'send',
+          });
+          await historyData.save();
+          
         if (updatedProduct) {
           const cleanedCartId = mongoose.Types.ObjectId(temporder.cart_id);
           const cartDetail = await CartDetail.findOne({ cart_id: cleanedCartId });
@@ -359,7 +458,6 @@ exports.checkPaymentData = async function (req, res, next) {
           }
         }
       }
-      
       res.status(200).json({
         status: "1",
         is_orderPlaced: 1,

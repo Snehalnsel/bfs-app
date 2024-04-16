@@ -691,7 +691,7 @@ exports.getAllSubcategoriesWithProducts = async function (req, res, next) {
           name: { $first: '$matchedCategories.name' },
           description: { $first: '$matchedCategories.description' },
           images: { $first: '$matchedCategories.image' },
-          product_ids: { $push: '$_id' }, // Collect product IDs in an array
+          product_ids: { $push: '$_id' }, 
         },
       },
       {
@@ -699,12 +699,12 @@ exports.getAllSubcategoriesWithProducts = async function (req, res, next) {
           _id: 1,
           name: 1,
           description: 1,
-          images: 1, // Include the 'images' field
+          images: 1, 
           product_ids: 1,
         },
       },
       {
-        $sort: { name: 1 } // Sort by name in ascending order
+        $sort: { name: 1 } 
       }
     ]);
 

@@ -672,6 +672,8 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
                 respdata: err,
               });
             } else {
+
+              
               // let smsData = {
               //   textId: "test",
               //   toMobile: "91" + user.phone_no,

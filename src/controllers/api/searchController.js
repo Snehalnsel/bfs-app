@@ -659,32 +659,24 @@ exports.filterByOfferPrice = async function (req, res, next) {
         data: []
       });
     }
-
     //const sanitizedMaxPrice = parseFloat(maxPrice.replace(/,/g, ''));
-
     // const filteredProducts = await Userproduct.find({
     //   approval_status: 1,
     //   flag: 0
     // });
-
     const filteredProducts = await Userproduct.find({
       approval_status: 1,
       flag: 0,
       offer_price: { $lt: parseInt(maxPrice) }
     });
-
-
     // const filteredProducts = allProducts.filter(product => {
     //   const offerPrice = parseFloat(product.offer_price.replace(/,/g, ''));
     //   return offerPrice <= sanitizedMaxPrice;
     // });
-
     const totalItems = filteredProducts.length;
     const totalPages = Math.ceil(totalItems / pageSize);
     const skip = (page - 1) * pageSize;
-
     const paginatedProducts = filteredProducts.slice(skip, skip + pageSize);
-
     if (!paginatedProducts || paginatedProducts.length === 0) {
       return res.status(200).json({
         respdata: {
@@ -694,7 +686,6 @@ exports.filterByOfferPrice = async function (req, res, next) {
         }
       });
     }
-
     const bestDealProducts = [];
     for (const product of paginatedProducts) {
       const productImage = await Productimage.findOne({ product_id: product._id });

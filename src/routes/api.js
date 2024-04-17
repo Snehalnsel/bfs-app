@@ -1119,7 +1119,13 @@ router.get(
   DashboardController.getTopCategoriesweb
 );
 
-router.get("/bestdeal",[],WebsiteController.getBestDealProductsweb);
+router.get("/bestdealBackup",[],WebsiteController.getBestDealProductsweb);
+
+router.get("/bestdeal/:id", cors(), (req, res) => {
+  const page = req.query.page;
+  WebsiteController.getBestDealProductswebNew(page, req, res);
+});
+
 router.get("/whatshot",[],WebsiteController.getWhatsHotProductsweb);
 router.get("/justsold",[],WebsiteController.getJustSoldProductsweb);
 router.get("/productdeatils/:id",[],WebsiteController.productData);

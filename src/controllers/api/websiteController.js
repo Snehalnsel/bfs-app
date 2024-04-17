@@ -1050,7 +1050,7 @@ exports.userFilterForOthers = async function (req, res, next) {
     optionId = 1;
   }
   const page = pageNo || 1;
-  const pageSize = 8;
+  const pageSize = 16;
   const skip = (page - 1) * pageSize;
   let concatVar = {};
   let objConditionList = [];
@@ -1570,31 +1570,34 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
     let userproducts = [];
     let count = [];
     if (id === "whatshot") {
+
       userproducts = await Userproduct.find({
         approval_status: 1,
         flag: 0
       })
-        .populate('brand_id', 'name')
-        .populate('category_id', 'name')
-        .populate('user_id', 'name')
-        .populate('size_id', 'name')
-        .sort([sortCriteria, { hitCount: -1 }])
-        .exec();
+      .populate('brand_id','name _id')
+      .populate('category_id', 'name _id')
+      .populate('user_id', 'name')
+      .populate('size_id', 'name _id')
+      .populate('gender_id','_id')
+      //.sort([sortCriteria, { hitCount: -1 }])
+      .sort(sortCriteria)
+      .exec();
 
       count = await Userproduct.countDocuments({
         approval_status: 1,
         flag: 0
       });
-
     } else if (id === "justsold") {
       userproducts = await Userproduct.find({
         approval_status: 1,
         flag: 1
       })
-        .populate('brand_id', 'name')
-        .populate('category_id', 'name')
-        .populate('user_id', 'name')
-        .populate('size_id', 'name')
+      .populate('brand_id','name _id')
+      .populate('category_id', 'name _id')
+      .populate('user_id', 'name')
+      .populate('size_id', 'name _id')
+      .populate('gender_id','_id')
         .sort(sortCriteria)
         .exec();
 
@@ -1612,10 +1615,11 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
         approval_status: 1,
         flag: 0
       })
-        .populate('brand_id', 'name')
-        .populate('category_id', 'name')
+        .populate('brand_id','name _id')
+        .populate('category_id', 'name _id')
         .populate('user_id', 'name')
-        .populate('size_id', 'name')
+        .populate('size_id', 'name _id')
+        .populate('gender_id','_id')
         .sort(sortCriteria)
         .exec();
 
@@ -1624,7 +1628,6 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
         approval_status: 1,
         flag: 0
       });
-
     } else {
       categoryId = id;
 
@@ -1633,10 +1636,11 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
         approval_status: 1,
         flag: 0
       })
-        .populate('brand_id', 'name')
-        .populate('category_id', 'name')
-        .populate('user_id', 'name')
-        .populate('size_id', 'name')
+      .populate('brand_id','name _id')
+      .populate('category_id', 'name _id')
+      .populate('user_id', 'name')
+      .populate('size_id', 'name _id')
+      .populate('gender_id','_id')
         .sort(sortCriteria)
         .exec();
 
@@ -1664,9 +1668,12 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
         description: userproduct.description,
         category: userproduct.category_id ? userproduct.category_id.name : '',
         brand: userproduct.brand_id ? userproduct.brand_id.name : '',
+        brand_id: userproduct.brand_id ? userproduct.brand_id._id : '',
         user_id: userproduct.user_id ? userproduct.user_id._id : '',
         user_name: userproduct.user_id ? userproduct.user_id.name : '',
         size_id: userproduct.size_id ? userproduct.size_id.name : '',
+        size_set_id: userproduct.size_id ? userproduct.size_id._id : '',
+        gender_id: userproduct.gender_id ? userproduct.gender_id._id : '',
         price: userproduct.price,
         offer_price: userproduct.offer_price,
         percentage: userproduct.percentage,
@@ -1719,7 +1726,7 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
     // console.log(req.query);
     // return false;
     const pageno = page || 1;
-    const pageSize = 8;
+    const pageSize = 16;
     const sortid = req.params.sortid || 0;
     const data = await getProductDataWithSort(id, sortid, pageno, pageSize);
     const productCount = data.count;
@@ -1806,7 +1813,7 @@ exports.getSubCategoriesProductswithSort = async function (page, req, res, next)
   const id = req.params.id;
   const sortid = req.params.sortid || 0;
   const pageno = page || 1;
-  const pageSize = 8;
+  const pageSize = 16;
   const data = await getProductDataWithSort(id, sortid, pageno, pageSize);
   const formattedUserProducts = data.respdata;
   const productCount = formattedUserProducts.length;
@@ -1928,10 +1935,12 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
       default_status: 1,
       //created_dtime: new Date().toISOString(),
     };
-    if(typeof req.file != "undefined" && req.file.filename != "undefined") {
+    if(typeof req.file != "undefined" && typeof req.file.filename != "undefined") {
       userAllBankDetails.upiid_scaner = req.file.filename;
-    } else {
+    } else if(typeof userBankDetails != "undefined" && userBankDetails != null && typeof userBankDetails.upiid_scaner != "undefined") {
       userAllBankDetails.upiid_scaner = userBankDetails.upiid_scaner;
+    } else {
+      userAllBankDetails.upiid_scaner = "";
     }
     if(!userBankDetails) {
       userAllBankDetails.created_dtime = new Date().toISOString();
@@ -1951,6 +1960,7 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
     });
     //res.redirect("/bank-details");
   } catch (error) {
+    console.log('error--',error)
     return res.json({
       status:"error",
       message:"Something went wrong please try later."
@@ -2304,6 +2314,10 @@ exports.userWisePost = async function (req, res, next) {
       .populate('size_id', 'name', { optional: true })
       .exec();
     const formattedUserProducts = [];
+    let userBankStatus = await Bankdetails.countDocuments({
+      user_id: mongoose.Types.ObjectId(isLoggedIn)
+    });
+    console.log('userBankStatus--',userBankStatus)
     for (const userproduct of userproducts) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
       if (productImages) {
@@ -2339,6 +2353,7 @@ exports.userWisePost = async function (req, res, next) {
         respdata: formattedUserProducts,
         userData: req.session.user,
         isLoggedIn: isLoggedIn,
+        userBankStatus:userBankStatus,
         websiteUrl: process.env.SITE_URL,
       });
     }
@@ -3758,6 +3773,116 @@ exports.getBestDealProductsweb = async function (req, res) {
 
   }
 
+};
+
+exports.getBestDealProductswebNew = async function (page, req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    let brandIds = [];
+    let sizeIds = [];
+    let statusIds = [];
+    let genderIds = [];
+    let brandList = [];
+    let sizeList = [];
+    let result;
+    let conditionList = [];
+    let genderList = [];
+    let id = req.params.id;
+    const filterGenderId = (typeof req.query.catid != 'undefined' && req.query.catid != "") ? req.query.catid : '';
+   
+    const pageno = page || 1;
+    const pageSize = 16;
+    const sortid = req.params.sortid || 0;
+    const data = await getProductDataWithSort(id, sortid, pageno, pageSize);
+    const productCount = data.count;
+    const formattedUserProducts = data.respdata;
+    const filterproductCount = formattedUserProducts.length;
+    const totalPages = data.totalPages;
+    const currentPage = data.currentPage;
+
+    let appSettings = await Appsettings.findOne();
+    let percentageFilter = parseInt(appSettings.best_deal);
+    
+    result = await Userproduct.aggregate([
+      //{ "$match": { "percentage": { "$gte": percentageFilter } } },  
+      // {
+      //   $match: {
+      //     $gte: percentageFilter,
+      //     approval_status: 1,
+      //     flag: 0
+      //   }
+      // },
+      {
+        $group: {
+          _id: id,
+          maxPrice: { $max: "$offer_price" },
+          minPrice: { $min: "$offer_price" }
+        }
+      }
+    ]);
+
+    let product = []
+
+    if (id === "whatshot") {
+      product = await Userproduct.find({
+        approval_status: 1,
+        flag: 0
+      });
+    } else if (id === "justsold") {
+      product = await Userproduct.find({
+        approval_status: 1,
+        flag: 1
+      });
+    } else if (id === "bestDeal") {
+      product = await Userproduct.find({
+        percentage: { $gte: percentageFilter },
+        approval_status: 1,
+        flag: 0
+      });
+    }
+      
+    
+    brandIds = product.map(product => product.brand_id).filter(Boolean);
+    sizeIds = product.map(product => product.size_set_id).filter(Boolean);
+    statusIds = product.map(product => product.status).filter(Boolean);
+    genderIds = product.map(product => product.gender_id).filter(Boolean);
+
+    brandList = await Brand.find({ _id: { $in: brandIds } });
+    sizeList = await Size.find({ _id: { $in: sizeIds } });
+    conditionList = await Productcondition.find({ _id: { $in: statusIds } });
+    genderList = await Gender.find({ _id: { $in: genderIds } });
+
+    res.render("webpages/allhomeproductNew", {
+      title: "Product Sub Categories",
+      message: "Welcome to the Product Sub Categories!",
+      websiteUrl: process.env.SITE_URL,
+      isLoggedIn: isLoggedIn,
+      //categoryName: categoryName,
+      brandList: typeof brandList != "undefined" ? brandList : [],
+      sizeList: typeof sizeList != "undefined" ? sizeList : [],
+      conditionList: typeof conditionList != "undefined" ? conditionList : [],
+      colorList:  [],
+      genderList: typeof genderList != "undefined" ? genderList : [],
+      maxvalue: typeof result != "undefined" ? result[0].maxPrice : "0",
+      minvalue: typeof result != "undefined" ? result[0].minPrice : "0",
+      filterproductCount: typeof filterproductCount != "undefined" ? filterproductCount : "0",
+      productCount: typeof productCount != "undefined" ? productCount : "",
+      respdata: typeof formattedUserProducts != "undefined" ? formattedUserProducts : "",
+      product_category_id: id,
+      totalPages: totalPages,
+      currentPage: currentPage,
+      pageSize: pageSize,
+      filterGenderId: filterGenderId,
+    });
+
+  }
+  catch (error) {
+    return {
+      status: '0',
+      message: 'An error occurred while fetching products with matching parent_id.',
+      error: error.message,
+    };
+  }
 };
 
 exports.userPlacedOrder = async function (req, res) {

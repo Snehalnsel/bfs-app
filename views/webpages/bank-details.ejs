@@ -121,6 +121,7 @@
                                  <div class="div-6">
                                     <label>Account Type:</label>
                                     <select name="accounttype" id="accounttype" class="ds-form-control">
+                                       <option value="">Select Account Type</option>
                                        <option value="savings" <% if(bankDetails != null && bankDetails.accounttype == 'savings'){ %>selected<% } %> >Savings Account</option>
                                        <option value="current" <% if(bankDetails != null && bankDetails.accounttype == 'current'){ %>selected<% } %>>Current Account</option>
                                     </select>

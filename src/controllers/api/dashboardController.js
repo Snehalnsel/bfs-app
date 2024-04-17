@@ -179,6 +179,7 @@ exports.webHomeDetails = async function (req, res) {
         $project: {
           _id: 1,
           name: 1,
+          user_id:1,
           flag: { $ifNull: ["$flag", 0] },
           price: 1,
           offer_price: 1,
@@ -193,6 +194,7 @@ exports.webHomeDetails = async function (req, res) {
         $group: {
           _id: "$_id", 
           name: { $first: "$name" },
+          user_id: { $first: "$user_id" },
           flag: { $first: "$flag" }, 
           price: { $first: "$price" }, 
           offer_price: { $first: "$offer_price" }, 
@@ -257,6 +259,7 @@ exports.webHomeDetails = async function (req, res) {
         $project: {
           _id: 1,
           name: 1,
+          user_id:1,
           flag: { $ifNull: ["$flag", 0] },
           price: 1,
           offer_price: 1,
@@ -272,6 +275,7 @@ exports.webHomeDetails = async function (req, res) {
         $group: {
           _id: "$_id", 
           name: { $first: "$name" },
+          user_id: { $first: "$user_id" },
           flag: { $first: "$flag" }, 
           price: { $first: "$price" },
           offer_price: { $first: "$offer_price" },
@@ -334,6 +338,7 @@ exports.webHomeDetails = async function (req, res) {
         $project: {
           _id: 1,
           name: 1,
+          user_id:1,
           flag: { $ifNull: ["$flag", 0] },
           price: 1,
           offer_price: 1,
@@ -347,7 +352,8 @@ exports.webHomeDetails = async function (req, res) {
       {
         $group: {
           _id: "$_id", 
-          name: { $first: "$name" }, 
+          name: { $first: "$name" },
+          user_id: { $first: "$user_id" },
           flag: { $first: "$flag" }, 
           price: { $first: "$price" }, 
           offer_price: { $first: "$offer_price" }, 

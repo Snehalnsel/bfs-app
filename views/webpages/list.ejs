@@ -186,6 +186,7 @@
    }
 
    async function populateSlider(sliderElement, data, isLoggedIn = "") {
+      let userReloggedIn = $('#userReloggedIn').val();
          data.forEach(async item => {
          const sliderItem = document.createElement('div');
          sliderItem.classList.add('slider-item');
@@ -205,10 +206,11 @@
             </div>
             <div class="prd-button-group">`;
             if(item.flag == 0) {
-               html += `<a href="javascript:void(0)" class="prd-btn buy-btn" data-id="${item._id}">Buy Now</a>`;
-               //if(isLoggedIn != "") {
+               if(userReloggedIn != item.user_id) {
+                  html += `<a href="javascript:void(0)" class="prd-btn buy-btn" data-id="${item._id}">Buy Now</a>`;
                   html += `<a href="javascript:void(0)" class="prd-btn orng-btn bidButton">Bid Now</a>`;
-               //}
+                  
+               }
             }
            
           html += `</div> <div class="prd-batch">${item.status}</div>`;

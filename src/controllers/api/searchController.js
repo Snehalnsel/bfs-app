@@ -387,116 +387,245 @@ exports.getProductListByValue = async function (reqBody, res) {
 };
 
 
-exports.filterData = async function (req, res, next) {
-  const { id, type, min, max } = req.body;
-  try {
-    let filterQuery = {
-      approval_status: 1,
-      flag: 0
-    };
+// exports.filterData = async function (req, res, next) {
+//   const { id, type, min, max } = req.body;
+//   try {
+//     let filterQuery = {
+//       approval_status: 1,
+//       flag: 0
+//     };
 
-    const types = type.split(',');
-    // var ids = (typeof id !== "undefined") ? (id.length > 1) ? id.split(',') : id : "";
-    var ids = (typeof id !== "undefined" && id !== null) ? (id.length > 1) ? id.split(',') : id : [];
-    for (let i = 0; i < types.length; i++) {
-      let condID = (ids.length >= 1) ? ids[i] : "";
-      switch (types[i]) {
-        case 'brand':
-          filterQuery = { ...filterQuery };
-          if (condID.length > 0) filterQuery.brand_id = condID;
-          break;
-        case 'size':
-          filterQuery = { ...filterQuery };
-          if (condID.length > 0) filterQuery.size_id = condID;
-          break;
-        case 'condition':
-          filterQuery = { ...filterQuery };
-          if (condID.length > 0) filterQuery.status = condID;
-          break;
-        case 'gender':
-          filterQuery = { ...filterQuery };
-          if (condID.length > 0) filterQuery.gender_id = condID;
-          break;
-        case 'price':
-          if (min && max) {
-            filterQuery = {
-              ...filterQuery,
-                "offer_price": {
-                  "$gte": min,
-                  "$lte": max
-                }
-              ,
-            };
-          }
-          break;
-        default:
-          return res.status(400).json({ status: '0', message: 'Invalid type' });
-      }
-    }
+//     const types = type.split(',');
+//     // var ids = (typeof id !== "undefined") ? (id.length > 1) ? id.split(',') : id : "";
+//     var ids = (typeof id !== "undefined" && id !== null) ? (id.length > 1) ? id.split(',') : id : [];
+//     for (let i = 0; i < types.length; i++) {
+//       let condID = (ids.length >= 1) ? ids[i] : "";
+//       switch (types[i]) {
+//         case 'brand':
+//           filterQuery = { ...filterQuery };
+//           if (condID.length > 0) filterQuery.brand_id = condID;
+//           break;
+//         case 'size':
+//           filterQuery = { ...filterQuery };
+//           if (condID.length > 0) filterQuery.size_id = condID;
+//           break;
+//         case 'condition':
+//           filterQuery = { ...filterQuery };
+//           if (condID.length > 0) filterQuery.status = condID;
+//           break;
+//         case 'gender':
+//           filterQuery = { ...filterQuery };
+//           if (condID.length > 0) filterQuery.gender_id = condID;
+//           break;
+//         case 'price':
+//           if (min && max) {
+//             filterQuery = {
+//               ...filterQuery,
+//                 "offer_price": {
+//                   "$gte": min,
+//                   "$lte": max
+//                 }
+//               ,
+//             };
+//           }
+//           break;
+//         default:
+//           return res.status(400).json({ status: '0', message: 'Invalid type' });
+//       }
+//     }
 
-    const products = await Userproduct.find(filterQuery);
+//     const products = await Userproduct.find(filterQuery);
 
 
-    if (!products || products.length === 0) {
-      return res.status(200).json({
-        respdata: {
-          status: '0',
-          message: 'No products found for the specified filter',
-          type,
-          data: [],
-        },
-      });
-    }
+//     if (!products || products.length === 0) {
+//       return res.status(200).json({
+//         respdata: {
+//           status: '0',
+//           message: 'No products found for the specified filter',
+//           type,
+//           data: [],
+//         },
+//       });
+//     }
 
-    const productsWithImages = [];
-    const maxVal = typeof max !== "undefined" ? parseInt(max) : 0;
-    const minVal = typeof min !== "undefined" ? parseInt(min) : 0;
+//     const productsWithImages = [];
+//     const maxVal = typeof max !== "undefined" ? parseInt(max) : 0;
+//     const minVal = typeof min !== "undefined" ? parseInt(min) : 0;
 
-    for (const product of products) {
-      let offerPrice = parseInt(product.offer_price);
-      if (max > 0 && min > 0) {
-        if (offerPrice <= maxVal && offerPrice >= minVal) {
+//     for (const product of products) {
+//       let offerPrice = parseInt(product.offer_price);
+//       if (max > 0 && min > 0) {
+//         if (offerPrice <= maxVal && offerPrice >= minVal) {
 
-          const productImage = await Productimage.findOne({ product_id: product._id });
+//           const productImage = await Productimage.findOne({ product_id: product._id });
 
-          var productWithImage = {
-            ...product.toObject(),
-            image: productImage,
-          };
-          productsWithImages.push(productWithImage);
-        }
-      } else {
-        const productImage = await Productimage.findOne({ product_id: product._id });
+//           var productWithImage = {
+//             ...product.toObject(),
+//             image: productImage,
+//           };
+//           productsWithImages.push(productWithImage);
+//         }
+//       } else {
+//         const productImage = await Productimage.findOne({ product_id: product._id });
 
-        var productWithImage = {
-          ...product.toObject(),
-          image: productImage,
-        };
+//         var productWithImage = {
+//           ...product.toObject(),
+//           image: productImage,
+//         };
 
-        productsWithImages.push(productWithImage);
-      }
+//         productsWithImages.push(productWithImage);
+//       }
 
      
+//     }
+
+//     return res.status(200).json({
+//       respdata: {
+//         status: '1',
+//         message: 'Products found!',
+//         type,
+//         data: productsWithImages,
+//       },
+//     });
+
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).json({
+//       status: '0',
+//       message: 'An error occurred while filtering products',
+//       data: [],
+//     });
+//   }
+// };
+
+
+exports.filterData = async function (req, res, next) {
+  let { brandList, sizeList, conditionList, priceList, genderList,colorList, optionId, productcategoryId, pageNo } = req.body;
+  console.log(req.body.productcategoryId);
+ 
+  if (typeof optionId != "undefined") {
+    if ((optionId == 0)) {
+      optionId = 1;
+    } else {
+      optionId = -1;
     }
+  } else {
+    optionId = 1;
+  }
+  const page = pageNo || 1;
+  const pageSize = 8;
+  const skip = (page - 1) * pageSize;
+  let concatVar = {};
+  let objConditionList = [];
+  // if ((typeof conditionList != "undefined") && (conditionList.length > 0)) {
+  //   conditionList.forEach(function (item) {
+  //     objConditionList.push(mongoose.Types.ObjectId(item));
+  //   });
+  // }
+  if (typeof brandList !== "undefined") {
+    const brandIds = brandList.split(',').map(id => mongoose.Types.ObjectId(id.trim()));
+    concatVar["brand_id"] = { "$in": brandIds };
+  }
+  if (typeof sizeList != "undefined") {
+    const sizeIds = sizeList.split(',').map(id => mongoose.Types.ObjectId(id.trim()));
+    concatVar["size_id"] = { "$in": sizeIds };
+  }
+  if (typeof productcategoryId != "undefined" && (productcategoryId == "bestDeal" || productcategoryId == "whatshot" ||     productcategoryId == "justsold")) {
+    
+  }
+  else if((typeof productcategoryId != "undefined")){
+    concatVar["category_id"] = { "$in": mongoose.Types.ObjectId(productcategoryId) };
+  }
+  if ((typeof conditionList != "undefined")) {
+    const conditionIds = conditionList.split(',').map(id => mongoose.Types.ObjectId(id.trim()));
+    concatVar["status"] = { "$in": conditionIds };
+  }
+  if ((typeof genderList != "undefined")) {
+    const genderIds = genderList.split(',').map(id => mongoose.Types.ObjectId(id.trim()));
+    concatVar["gender_id"] = { "$in": genderIds };
+  }
+  if ((typeof colorList != "undefined")) {
+    const colorIds = colorList.split(',').map(id => mongoose.Types.ObjectId(id.trim()));
+    concatVar["color_id"] = { "$in": colorIds };
+  }
 
-    return res.status(200).json({
-      respdata: {
-        status: '1',
-        message: 'Products found!',
-        type,
-        data: productsWithImages,
-      },
+  if (priceList && typeof priceList !== "undefined" && priceList !== '') {
+    let [min, max] = priceList.split('-').map(Number);
+    const priceConditions = {
+      offer_price: {
+        $gte: parseFloat(min),
+        $lte: parseFloat(max)
+      }
+    };
+
+    if (concatVar.$and) {
+      concatVar.$and.push(priceConditions);
+    } else {
+      concatVar.$and = [priceConditions];
+    }
+  }
+  
+  const query = {
+    ...concatVar,
+    approval_status: 1,
+    flag: 0
+  };
+  console.log(query);
+  let totalProduct = await Userproduct.countDocuments(query);
+  let allProductData = await Userproduct.find(query)
+    .sort({ offer_price: optionId })
+    .skip(skip)
+    .limit(pageSize);
+  const formattedUserProducts = [];
+  for (const userproduct of allProductData) {
+    const productImages = await Productimage.find({ product_id: userproduct._id }).sort( { image_order: 1} );
+      
+    const productCondition = await Productcondition.findById(userproduct.status);
+    const formattedUserProduct = {
+      _id: userproduct._id,
+      name: userproduct.name,
+      description: userproduct.description,
+      category: (typeof userproduct.category_id != "undefined") ? userproduct.category_id.name : "",
+      brand: (typeof userproduct.brand_id != "undefined") ? userproduct.brand_id.name : "",
+      user_id: (typeof userproduct.user_id != "undefined") ? userproduct.user_id._id : "",
+      user_name: (typeof userproduct.user_id != "undefined") ? userproduct.user_id.name : "",
+      size_id: (typeof userproduct.size_id != "undefined") ? userproduct.size_id.name : "",
+      price: (typeof userproduct.price != "undefined") ? userproduct.price : "",
+      offer_price: (typeof userproduct.offer_price != "undefined") ? userproduct.offer_price : "",
+      percentage: (typeof userproduct.percentage != "undefined") ? userproduct.percentage : "",
+      status: (typeof userproduct.status != "undefined") ? userproduct.status : "",
+      flag: (typeof userproduct.flag != "undefined") ? userproduct.flag : "",
+      approval_status: (typeof userproduct.approval_status != "undefined") ? userproduct.approval_status : "",
+      added_dtime: (typeof userproduct.added_dtime != "undefined") ? userproduct.added_dtime : "",
+      __v: (typeof userproduct.__v != "undefined") ? userproduct.__v : "",
+      product_images: productImages,
+      status_name: productCondition.name
+    };
+    formattedUserProducts.push(formattedUserProduct);
+  }
+  const totalPages = Math.ceil(totalProduct / pageSize);
+  const userProductsCount = formattedUserProducts.length;
+  if (formattedUserProducts.length > 0) {
+    return res.json({
+      status: 'success',
+      message: 'Success search result',
+      respdata: formattedUserProducts,
+      productCount: userProductsCount,
+      totalPages: totalPages,
+      currentPage: page,
+      pageSize: pageSize,
+      webUrl: 'user-filter',
+      websiteUrl: process.env.SITE_URL,
+      totalProduct: totalProduct
     });
-
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      status: '0',
-      message: 'An error occurred while filtering products',
-      data: [],
+  } else {
+    res.status(200).json({
+      status: "error",
+      message: "No Reccords Found for this search..",
     });
   }
 };
+
 
 exports.getBestDealList = async function (req, res, next) {
   try {

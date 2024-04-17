@@ -27,6 +27,7 @@ const Userproduct = require("../../models/api/userproductModel");
 const Productimage = require("../../models/api/productimageModel");
 const Productcondition = require("../../models/api/productconditionModel");
 const Gender = require("../../models/api/genderModel");
+const Color = require("../../models/api/colorModel");
 const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 const multer = require("multer");
 const upload = multer({ dest: 'public/images/' }); 
@@ -117,7 +118,7 @@ exports.getGenderdData = async function (req, res, next) {
     if (!genderList || genderList.length === 0) {
       return res.status(404).json({
         status: "0",
-        message: "Brands not found",
+        message: "Gender not found",
         respdata: {},
       });
     }
@@ -132,6 +133,27 @@ exports.getGenderdData = async function (req, res, next) {
   }
 };
 
+exports.getColorData = async function (req, res, next) {
+  try {
+    colorList = await Color.find();
+
+    if (!colorList || colorList.length === 0) {
+      return res.status(404).json({
+        status: "0",
+        message: "Color not found",
+        respdata: {},
+      });
+    }
+
+    res.status(200).json({ status: "1", colorList: colorList });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "Internal server error",
+      respdata: error,
+    });
+  }
+};
 // exports.addData = async function (req, res, next) {
 //   const errors = validationResult(req);
 //   if (!errors.isEmpty()) {

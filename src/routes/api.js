@@ -464,6 +464,13 @@ router.post(
   SearchController.filterData
 );
 
+
+// router.post(
+//   "/demo-search",
+//   [],
+//   SearchController.demoFilter
+// );
+
 router.post("/filter-bestdeal",   [],SearchController.filterByOfferPrice );
 
 router.post(
@@ -698,6 +705,7 @@ router.post(
 
 router.post("/brandlist",[],UserproductController.getBrandData);
 router.post("/genderlist",[], UserproductController.getGenderdData);
+router.post("/colorlist",[], UserproductController.getColorData);
 router.post("/myproductlist",[],UserproductController.getProductData);
 router.post("/productlistbyid",[],UserproductController.getProductDataById);
 router.post("/productdetailsbyid",[check("product_id", "This is a required field!").not().isEmpty().trim().escape(),],UserproductController.getDetailsById);

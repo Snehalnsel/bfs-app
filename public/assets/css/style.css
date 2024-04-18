@@ -4718,6 +4718,7 @@ button.btn.liginbtn.resetpass.pd-resetpass {
     background-color: #e7e7e7;
     border-radius: 6px;
     padding: 5px;
+    margin-top: 5px;
 }
 
 .otb-hoverbox:hover .order-tooltip-box {

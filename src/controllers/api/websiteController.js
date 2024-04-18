@@ -1895,6 +1895,93 @@ exports.userUpdate = async function (req, res, next) {
     });
   }
 };
+
+
+exports.getbankDetails = async function (req, res, next) {
+  try {
+    const bankDetails = await Bankdetails.findOne({ user_id: req.body.user_id });
+    if (!bankDetails || bankDetails.length === 0) {
+      return res.status(404).json({
+        status: "0",
+        message: "Bank Details not found",
+        respdata: {},
+      });
+    }
+    res.status(200).json({ status: "1", bankDetails: bankDetails });
+  } catch (error) {
+    //console.error(error);
+    res.status(500).json({
+      status: "0",
+      message: "Internal server error",
+      respdata: error,
+    });
+  }
+};
+
+exports.usersBankDetailsUpdate = async function (req, res, next) {
+  try {
+    const user = await Users.findOne({ _id: mongoose.Types.ObjectId(req.body.user_id) });
+    const userBankDetails = await Bankdetails.findOne({ user_id: mongoose.Types.ObjectId(req.body.user_id) });
+    if (!user) {
+      return res.status(404).json({
+        status: "0",
+        message: "Not found!",
+        respdata: {},
+      });
+    }   
+    let userAllBankDetails = {
+      user_id: user._id,
+      accountnumber: req.body.accountnumber,
+      bankname: req.body.bankname,
+      accountname: req.body.accountname,
+      branchname: req.body.branchname,
+      // accountname: req.body.accountname,
+      // accountnumber: req.body.accountnumber,
+      ifsccode: req.body.ifsccode,
+      accounttype: req.body.accounttype,
+      upiid: req.body.upiid,
+      upiid_scaner:"",
+      // upiid_scaner: imagePath || '',
+      default_status: 1,
+      //created_dtime: new Date().toISOString(),
+    };
+    if(typeof req.file != "undefined" && typeof req.file.filename != "undefined") {
+      userAllBankDetails.upiid_scaner = req.file.filename;
+    } else if(typeof userBankDetails != "undefined" && userBankDetails != null && typeof userBankDetails.upiid_scaner != "undefined") {
+      userAllBankDetails.upiid_scaner = userBankDetails.upiid_scaner;
+    } else {
+      userAllBankDetails.upiid_scaner = "";
+    }
+    if(!userBankDetails) {
+      userAllBankDetails.created_dtime = new Date().toISOString();
+      const bankDetails = new Bankdetails(userAllBankDetails);
+      await bankDetails.save();
+    } else {
+      userAllBankDetails.updated_dtime = new Date().toISOString();
+      await Bankdetails.findOneAndUpdate(
+        { user_id: mongoose.Types.ObjectId(req.body.user_id) },
+        { $set: userAllBankDetails },
+        { new: true }
+      );
+    }
+    return res.json({
+      status:"success",
+      message:"Successfully updated your details."
+    });
+    //res.redirect("/bank-details");
+  } catch (error) {
+    return res.json({
+      status:"error",
+      message:"Something went wrong please try later."
+    });
+    /*res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the Edit Bank Details.",
+      error: error.message,
+    });*/
+  }
+};
+
 exports.userBankDetailsUpdate = async function (req, res, next) {
   try {
     const errors = validationResult(req);
@@ -1927,8 +2014,8 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
       bankname: req.body.bankname,
       accountname: req.body.accountname,
       branchname: req.body.branchname,
-      accountname: req.body.accountname,
-      accountnumber: req.body.accountnumber,
+      // accountname: req.body.accountname,
+      // accountnumber: req.body.accountnumber,
       ifsccode: req.body.ifsccode,
       accounttype: req.body.accounttype,
       upiid: req.body.upiid,
@@ -1962,7 +2049,6 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
     });
     //res.redirect("/bank-details");
   } catch (error) {
-    console.log('error--',error)
     return res.json({
       status:"error",
       message:"Something went wrong please try later."

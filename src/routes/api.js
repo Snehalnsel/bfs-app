@@ -156,10 +156,18 @@ router.post(
   UserController.editProfile
 );
 
+router.post("/getbankdetails",auth.isAuthorized,[],WebsiteController.getbankDetails);
+
+router.post(
+  "/update-bank-details",
+  auth.isAuthorized,
+  [],
+  upload.single('image'),
+  WebsiteController.usersBankDetailsUpdate
+);
 
 router.post(
   "/edit-bank-details",
-  //auth.isAuthorized,
   [],
   upload.single('image'),
   WebsiteController.userBankDetailsUpdate

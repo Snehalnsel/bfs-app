@@ -513,9 +513,8 @@ exports.getStatus = async function (req, res, next) {
                 await cartDetail.remove();
               }
               const cartDetailsCount = await CartDetail.countDocuments({ cart_id: savedOrder.cart_id });
-             
               const existingCart = await Cart.findById(temporder.cart_id);
-              if (cartDetailsCount != 0) {
+              if (existingCart) {
                 await existingCart.remove();
               }
             } 

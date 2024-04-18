@@ -895,7 +895,16 @@ exports.getOrderListByUser = async (req, res) => {
     }
     const ordersWithProductDetails = [];
     for (const order of orders) {
-      const orderCreationTime = moment(order.createdAt); 
+      var currentDate = moment().format();
+       let startTime = moment(order.added_dtime).format();
+       currentDate = moment(currentDate);
+       startTime = moment(startTime);
+      let timeDiff = currentDate.diff(startTime, 'hours');
+      let isActionShow = 0;
+      if(timeDiff < 24){
+        isActionShow = 1;
+      }
+      const orderCreationTime = moment(order.added_dtime); 
       const isOrderWithin24Hours = moment(new Date().toISOString()).diff(orderCreationTime, 'hours') < 24;
       const is_deletedtime = isOrderWithin24Hours ? 0 : 1;
       await Order.updateOne({ _id: order._id }, { is_deletedtime });
@@ -919,6 +928,7 @@ exports.getOrderListByUser = async (req, res) => {
         delete_status: order.delete_status,
         is_return: order.is_return,
         is_deletedtime: is_deletedtime,
+        isActionShow:isActionShow,
         product: {
           name: productDetails.length ? productDetails[0].name : 'Unknown Product',
           image: productImage.length ? productImage[0].image : 'No Image',

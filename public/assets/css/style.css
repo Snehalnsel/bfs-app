@@ -4687,3 +4687,50 @@ button.btn.liginbtn.resetpass.pd-resetpass {
     height: 100%;
     padding: 15px;
 }
+
+.hover-box {
+    visibility: hidden;
+    position: absolute;
+    z-index: 1;
+    width: 150px;
+    color: #010101;
+    font-size: 14px;
+    line-height: 23px;
+    background-color: #e7e7e7;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.hover-text:hover .hover-box {
+  visibility: visible;
+}
+
+
+
+.order-tooltip-box{
+    visibility: hidden;
+    position: absolute;
+    z-index: 1;
+    width: 140px;
+    color: #010101;
+    font-size: 12px;
+    line-height: 19px;
+    background-color: #e7e7e7;
+    border-radius: 6px;
+    padding: 5px;
+}
+
+.otb-hoverbox:hover .order-tooltip-box {
+  visibility: visible;
+}
+
+button.grey-btn {
+    background: #eeeeee;
+    color: #484848;
+    font-weight: 500;
+    border: solid 1px #eeeeee;
+    padding: 5px 12px;
+    border-radius: 3px;
+    font-size: 12px;
+}
+

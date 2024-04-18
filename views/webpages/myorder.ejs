@@ -173,14 +173,23 @@
                                     <a href="/web-myorder-details/${item._id}" class="prd-btn"
                                        data-id=""><i class="fa fa-eye" aria-hidden="true"></i></a>
                                  </div>`;
-                  if (item.delete_status == 0 && item.is_return == 0 && item.isActionShow == 1) {
-
-                     hTml += `
+                  if (item.delete_status == 0 && item.is_return == 0 ) {
+                     if(item.isActionShow == 1){
+                        hTml += `
                                        <div class="remove-cart">
                                           <a href="#" class="prd-btn remove-order"
                                              data-id="${item._id}" ><i class="fa fa-trash-o"
                                                 aria-hidden="true"></i></a>
                                        </div>`;
+                     }else {
+                        hTml += `
+                                       <div class="remove-cart">
+                                          <a href="javascript:void(0)" class="prd-btn"><i class="fa fa-trash-o"
+                                                aria-hidden="true"></i></a>
+                                       </div>`;
+                     }
+
+                     
                   }
                   else if (item.delete_status == 1) {
                      if (item.delete_by == 1) {
@@ -209,9 +218,15 @@
                   if (item.is_return == 1) {
                      hTml += `
                   <span style="color: green;">Return placed successfully</span>`;
-                  } else if (item.is_return == 0  && item.isActionShow == 1) {
-                     hTml += `
-                  <button class="prd-btn return-order" data-id="${item._id}">Return Order</button>`;
+                  } else if (item.is_return == 0) {
+                     if(item.isActionShow == 1){
+                           hTml += `
+                     <button class="prd-btn return-order" data-id="${item._id}">Return Order</button>`;
+                     } else{
+                        hTml += `
+                  <button class="prd-btn">Return Order</button>`;
+                     }
+                     
                   }
                   hTml += `
               </div> 

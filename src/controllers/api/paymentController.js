@@ -84,7 +84,6 @@ exports.getPaymentData = async function (req, res, next) {
     {
       amount = parseFloat(temporder.booking_amount);
     }
-    amount = 1;
    // amount = temporder.booking_amount !== 0 ? temporder.booking_amount : temporder.total_price;
 
     let userId = temporder.user_id;

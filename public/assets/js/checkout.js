@@ -6,14 +6,12 @@ $(document).ready(async function() {
         rules:{
             address1:{
                 required:true,
-                maxlength: 70
+                maxlength: 150
             },
             address2:{
-                required:true,
-                maxlength: 70
+                maxlength: 150
             },
             landmark:{
-                required:true,
                 maxlength: 70
             },
             city_name:{
@@ -34,14 +32,12 @@ $(document).ready(async function() {
         messages:{
             address1:{
                 required:"Please enter your address.",
-                maxlength: "You can enter maximum of 70 charecters."
+                maxlength: "You can enter maximum of 150 charecters."
             },
             address2:{
-                required:"Please enter your address.",
-                maxlength: "You can enter maximum of 70 charecters."
+                maxlength: "You can enter maximum of 150 charecters."
             },
             landmark:{
-                required:"Please enter landmark.",
                 maxlength: "You can enter maximum of 70 charecters."
             },
             city_name:{

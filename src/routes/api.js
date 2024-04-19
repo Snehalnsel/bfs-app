@@ -1239,7 +1239,6 @@ router.post("/addnewpost",[
     check("breath", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),
     check("price", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),
     check("offer_price", "This is a required field!").optional({nullable: true}).isLength({max: 12 })
-
 ], upload.array('image', 5),WebsiteController.addNewPost);
 
 router.get("/edit-mypost/:id",[],WebsiteController.editUserWisePost);

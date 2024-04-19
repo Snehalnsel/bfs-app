@@ -1138,6 +1138,10 @@ router.get("/whatshot",[],WebsiteController.getWhatsHotProductsweb);
 router.get("/justsold",[],WebsiteController.getJustSoldProductsweb);
 router.get("/productdeatils/:id",[],WebsiteController.productData);
 router.get("/privacy-policy",[],WebsiteController.privacypolicyData);
+router.get("/about-us",[],WebsiteController.aboutusData);
+router.get("/contract-us",[],WebsiteController.contractusData);
+router.get("/payment-policy",[],WebsiteController.paymentpolicyData);
+router.get("/faq",[],WebsiteController.faqData);
 router.get("/returns-shipping",[],WebsiteController.returnShipping);
 router.get("/terms",[],WebsiteController.tremsandconditionData);
 router.get("/registration",[],WebsiteController.registration);
@@ -1264,25 +1268,21 @@ router.post("/updatepostdata",[
 },{
   name: 'img4', maxCount: 1
 },]),WebsiteController.updatePostData);
-
-// Add To cart 
+ 
 router.post("/addtocart/:id",[],WebsiteController.addToCart);
 
-// Show Cart Details
 router.get("/show-cart-details",[],WebsiteController.viewCartListByUserId);
 
-router.get("/delete-cart/:id",[],WebsiteController.deleteCart); //auth.isAuthorized
+router.get("/delete-cart/:id",[],WebsiteController.deleteCart); 
 
-// Wishlist Web Start
+
 router.post("/add-to-wishlist-web/:id",[],WebsiteController.addToWishlistWeb);
 
 router.get("/show-wishlist-details",[],WebsiteController.viewWishListByUserId);
 
 router.get("/remove-wishlist-web/:id",[],WebsiteController.removeWishlistWeb);
 
-// Wishlist Web End
 
-// Web Order List
 
 router.get("/web-my-order",WebsiteController.myOrderWeb);
 

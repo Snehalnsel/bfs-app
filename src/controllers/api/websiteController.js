@@ -322,6 +322,74 @@ exports.privacypolicyData = async function (req, res, next) {
   }
 };
 
+
+exports.aboutusData = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    res.render("webpages/aboutus", {
+      title: "About Us",
+      message: "Welcome to the about us page!",
+      isLoggedIn: isLoggedIn,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the about us.",
+      error: error.message,
+    });
+  }
+};
+
+exports.contractusData = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    res.render("webpages/contractus", {
+      title: "About Us",
+      message: "Welcome to the about us page!",
+      isLoggedIn: isLoggedIn,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the about us.",
+      error: error.message,
+    });
+  }
+};
+
+exports.paymentpolicyData = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    res.render("webpages/paymentpolicy", {
+      title: "About Us",
+      message: "Welcome to the about us page!",
+      isLoggedIn: isLoggedIn,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the about us.",
+      error: error.message,
+    });
+  }
+};
+
+exports.faqData = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    res.render("webpages/faq", {
+      title: "FAQ",
+      message: "Welcome to the FAQ page!",
+      isLoggedIn: isLoggedIn,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the about us.",
+      error: error.message,
+    });
+  }
+};
 exports.returnShipping = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";

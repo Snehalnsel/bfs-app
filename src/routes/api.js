@@ -1202,9 +1202,9 @@ router.post("/useredit",upload.array('image', 1),WebsiteController.userUpdate);
 router.post("/user-new-checkout-address",[],WebsiteController.userNewCheckOutAddressAdd);
 
 router.post("/adduseraddress",[
-  check("address1", "This is a required field!").isLength({max: 120 }),
-    check("address2", "This is a required field!").isLength({max: 120 }),
-    check("landmark", "This is a required field!").isLength({max: 50 }),
+  check("address1", "This is a required field!").isLength({max: 150 }),
+    check("address2", "This is a required field!").isLength({max: 150 }),
+    check("landmark", "This is a required field!").isLength({max: 70 }),
     check("city_name", "This is a required field!").isLength({max:30}),
     check("state_name", "This is a required field!").isLength({max:30}),
     check("pin_code", "This is a required field!").isLength({max:30})
@@ -1212,9 +1212,9 @@ router.post("/adduseraddress",[
 
 router.get("/edituseraddress/:id",[],WebsiteController.getAddressdetails);
 router.post("/updateuseraddress",[
-  check("address1", "This is a required field!").isLength({max: 120 }),
-    check("address2", "This is a required field!").isLength({max: 120 }),
-    check("landmark", "This is a required field!").isLength({max: 50 }),
+  check("address1", "This is a required field!").isLength({max: 150 }),
+    check("address2", "This is a required field!").isLength({max: 150 }),
+    check("landmark", "This is a required field!").isLength({max: 70 }),
     check("city_name", "This is a required field!").isLength({max:30}),
     check("state_name", "This is a required field!").isLength({max:30}),
     check("pin_code", "This is a required field!").isLength({max:30})
@@ -1228,8 +1228,8 @@ router.get("/add-post",[],WebsiteController.addPostView);
 
 router.post("/addnewpost",[
   check("name", "This is a required field!").isLength({max: 50 }),
-    check("description", "This is a required field!").optional({nullable: true}).isLength({max: 120 }),
-    check("product_cate", "This is a required field!").optional({nullable: true}).isLength({max: 120 }),
+    check("description", "This is a required field!").optional({nullable: true}).isLength({max: 150 }),
+    check("product_cate", "This is a required field!").optional({nullable: true}).isLength({max: 150 }),
     check("brand", "This is a required field!").isLength({max:30}),
     check("product_condition", "This is a required field!").optional({nullable: true}).isLength({max: 120 }),
     check("size", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),
@@ -1246,8 +1246,8 @@ router.get("/edit-mypost/:id",[],WebsiteController.editUserWisePost);
 
 router.post("/updatepostdata",[
   check("name", "This is a required field!").isLength({max: 50 }),
-    check("description", "This is a required field!").optional({nullable: true}).isLength({max: 120 }),
-    check("product_cate", "This is a required field!").optional({nullable: true}).isLength({max: 120 }),
+    check("description", "This is a required field!").optional({nullable: true}).isLength({max: 150 }),
+    check("product_cate", "This is a required field!").optional({nullable: true}).isLength({max: 150 }),
     check("brand", "This is a required field!").isLength({max:30}),
     check("product_condition", "This is a required field!").optional({nullable: true}).isLength({max: 120 }),
     check("size", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),

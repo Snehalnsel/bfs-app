@@ -12,6 +12,7 @@ const mime = require("mime");
 const PDFDocument = require('pdfkit');
 const nodemailer = require('nodemailer');
 const rp = require('request-promise-native');
+const puppeteer = require('puppeteer');
 const request = require('request');
 const Category = require("../../models/api/categoryModel");
 const Brand = require("../../models/api/brandModel");
@@ -2579,28 +2580,24 @@ exports.downloadOrderPDF = function (req, res, next) {
       res.status(500).json({ error: 'An error occurred' });
     } else {
       try {
+          const loginHtmlPath = 'views/webpages/invoice1.html';
+          const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
 
-        // const loginHtmlPath = 'views/webpages/demoinvoice.html';
-        const loginHtmlPath = 'views/webpages/invoice1.html';
-        const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
 
-        // Replace dynamic content in the HTML template
-        const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
+         const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
 
-        // PDF options
-        const options = { format: 'Letter' };
+          const browser = await puppeteer.launch();
+          const page = await browser.newPage();
 
-        // Convert HTML to PDF
-        pdf.create(renderedHtml, options).toStream((err, stream) => {
-          if (err) return res.status(500).send('An error occurred while generating PDF');
+          await page.setContent(renderedHtml);
 
-          // Set headers for file download
+          const pdfBuffer = await page.pdf({ format: 'A4' });
+
           res.setHeader('Content-Type', 'application/pdf');
           res.setHeader('Content-Disposition', 'attachment; filename=Invoice.pdf');
 
-          // Pipe the stream to the response
-          stream.pipe(res);
-        });
+          res.send(pdfBuffer);
+          await browser.close();
       } catch (err) {
         //console.error('Error generating PDF:', err);
         return res.render("pages/error-msg", {
@@ -2694,13 +2691,19 @@ exports.downloadOrdesecondrPDF = function (req, res, next) {
         const loginHtmlPath = 'views/webpages/invoice2.html';
         const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
         const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
-        const options = { format: 'Letter' };
-        pdf.create(renderedHtml, options).toStream((err, stream) => {
-          if (err) return res.status(500).send('An error occurred while generating PDF');
-          res.setHeader('Content-Type', 'application/pdf');
-          res.setHeader('Content-Disposition', 'attachment; filename=InvoiceBFStoBuyer.pdf');
-          stream.pipe(res);
-        });
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+    
+        await page.setContent(renderedHtml);
+  
+        const pdfBuffer = await page.pdf({ format: 'Letter' });
+    
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=InvoiceBFStoBuyer.pdf');
+    
+        res.send(pdfBuffer);
+
+        await browser.close();
       } catch (err) {
         res.status(500).json({ error: 'An error occurred while generating PDF' });
       }
@@ -2791,13 +2794,17 @@ exports.returninvoicebb = function (req, res, next) {
         const loginHtmlPath = 'views/webpages/returnInvoiceBBR.html';
         const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
         const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
-        const options = { format: 'Letter' };
-        pdf.create(renderedHtml, options).toStream((err, stream) => {
-          if (err) return res.status(500).send('An error occurred while generating PDF');
-          res.setHeader('Content-Type', 'application/pdf');
-          res.setHeader('Content-Disposition', 'attachment; filename=InvoiceBFStoBuyer.pdf');
-          stream.pipe(res);
-        });
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+    
+        await page.setContent(renderedHtml);
+       
+        const pdfBuffer = await page.pdf({ format: 'Letter' });
+  
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=InvoiceReturnBuyertoBfs.pdf');
+        res.send(pdfBuffer);
+        await browser.close();
       } catch (err) {
         res.status(500).json({ error: 'An error occurred while generating PDF' });
       }
@@ -2887,13 +2894,19 @@ exports.returninvoicesbr = function (req, res, next) {
         const loginHtmlPath = 'views/webpages/returnInvoiceSBR.html';
         const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
         const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
-        const options = { format: 'Letter' };
-        pdf.create(renderedHtml, options).toStream((err, stream) => {
-          if (err) return res.status(500).send('An error occurred while generating PDF');
-          res.setHeader('Content-Type', 'application/pdf');
-          res.setHeader('Content-Disposition', 'attachment; filename=InvoiceBFStoBuyer.pdf');
-          stream.pipe(res);
-        });
+        
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+    
+        await page.setContent(renderedHtml);
+       
+        const pdfBuffer = await page.pdf({ format: 'Letter' });
+  
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=InvoiceBFStoSeller.pdf');
+      
+        res.send(pdfBuffer);
+        await browser.close();
       } catch (err) {
         res.status(500).json({ error: 'An error occurred while generating PDF' });
       }

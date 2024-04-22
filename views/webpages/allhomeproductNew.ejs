@@ -269,7 +269,7 @@
                            <% if (totalPages){ %>
                               <div class="pagination custome-pagination">
                                  <% for (let i=1; i <=totalPages; i++) { %>
-                                    <a href="/bestdeal/<%= product_category_id %>?page=<%= i %>"
+                                    <a href="/<%= product_category_id %>?page=<%= i %>"
                                        class="<%= (i === currentPage) ? 'active' : '' %>">
                                        <%= i %>
                                     </a>

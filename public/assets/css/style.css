@@ -4735,3 +4735,50 @@ button.grey-btn {
     font-size: 12px;
 }
 
+/*////*/
+
+.cms-text-mainblock{
+    width: 100%;
+    padding: 40px 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    text-decoration: none;
+}
+
+.cms-text-mainblock .text-box{
+    width: 100%;
+    padding: 0 0 15px 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    text-decoration: none;
+    font-size: 14px;
+    color: #000;
+    line-height: 24px;
+    font-weight: 400;
+}
+
+.cms-text-mainblock .text-box h6 {
+    color: var(--black-color);
+    font-weight: 600;
+    font-size: 18px;
+    text-transform: capitalize;
+    line-height: 25px;
+    margin-bottom: 5px;
+}
+.cms-text-mainblock .text-box p {
+    width: 100%;
+    text-align: left;
+    padding: 0 0 20px 0;
+    font-size: 14px;
+    color: #000;
+    line-height: 1.5;
+    font-weight: 400;
+}
+.cms-text-mainblock a{
+    text-decoration: none;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    color: #cb3805;
+}

@@ -3943,7 +3943,15 @@ exports.getBestDealProductswebNew = async function (page, req, res, next) {
     let result;
     let conditionList = [];
     let genderList = [];
-    let id = req.params.id;
+    //let id = req.params.id;
+    let getUrl = req.url;
+    getUrl = getUrl.split('/');
+    getUrl = getUrl.pop();
+    let getUrlNew = getUrl.split('?');
+    if(getUrlNew.length > 0){
+      getUrl = getUrlNew[0];
+    } 
+    let id = getUrl;
     const filterGenderId = (typeof req.query.catid != 'undefined' && req.query.catid != "") ? req.query.catid : '';
    
     const pageno = page || 1;

@@ -1129,10 +1129,24 @@ router.get(
 
 router.get("/bestdealBackup",[],WebsiteController.getBestDealProductsweb);
 
-router.get("/bestdeal/:id", cors(), (req, res) => {
+// router.get("/bestdeal/:id", cors(), (req, res) => {
+//   const page = req.query.page;
+//   WebsiteController.getBestDealProductswebNew(page, req, res);
+// });
+
+router.get("/bestDeal", cors(), (req, res) => {
   const page = req.query.page;
   WebsiteController.getBestDealProductswebNew(page, req, res);
 });
+router.get("/whatshot", cors(), (req, res) => {
+  const page = req.query.page;
+  WebsiteController.getBestDealProductswebNew(page, req, res);
+});
+router.get("/justsold", cors(), (req, res) => {
+  const page = req.query.page;
+  WebsiteController.getBestDealProductswebNew(page, req, res);
+});
+
 
 router.get("/whatshot",[],WebsiteController.getWhatsHotProductsweb);
 router.get("/justsold",[],WebsiteController.getJustSoldProductsweb);

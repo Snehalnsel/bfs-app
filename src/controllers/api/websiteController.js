@@ -4329,9 +4329,6 @@ exports.Demoorder = async function (req, res) {
       total_price = parseFloat(product_price) + parseFloat(gst) + parseFloat(taxable_value) ;
       total_price = total_price.toFixed(2); 
     }
-    //console.log('booking_amount',booking_amount);
-    //console.log('total_price',total_price);
-     //return false;
     let order_status = '0';
     let delivery_charges = '0';
     let discount = '0';

@@ -52,6 +52,10 @@ const model = mongoose.Schema({
     type: Number,
     default: 0,
   },
+  cash_handling_charges: {
+    type: Number,
+    default: 0,
+  },
   gst: {
     type: Number,
     required: true,

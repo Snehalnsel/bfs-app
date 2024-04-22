@@ -102,10 +102,14 @@
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
-
-                           <td align="right" style="border-right:solid 1px #000;">
-                            <%= order.total_price %>
-                           </td>
+                           <td align="right" style="border-right: solid 1px #000;">
+                              <% if (order.payment_method == 1) { %>
+                                <%= order.total_price %>
+                              <% } else { %>
+                                <%= order.pay_now %>
+                              <% } %>
+                            </td>
+                            
                         </tr>
                         <tr>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
@@ -117,7 +121,7 @@
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
-                           <td align="right" style="border-right:solid 1px #000;"><%= order.total_price %></td>
+                           <td align="right" style="border-right:solid 1px #000;"><%= order.packing_handling_charge %></td>
                         </tr>
                         <tr>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
@@ -129,7 +133,15 @@
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
-                           <td align="right" style="border-right:solid 1px #000;"><%= order.total_price %></td>
+                           <td align="right" style="border-right: solid 1px #000;">
+                              <% if (order.booking_amount != null && !isNaN(order.booking_amount)) { %>
+                                <%= order.taxable_value - order.booking_amount %>
+                              <% } else { %>
+                                <%= order.taxable_value %>
+                              <% } %>
+                            </td>
+                            
+                            
                         </tr>
                         <tr>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
@@ -140,7 +152,14 @@
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
-                           <td style="border-right:solid 1px #000;"><%= order.total_price %></td>
+                           <td align="right" style="border-right: solid 1px #000;">
+                              <% if (order.booking_amount != null && !isNaN(order.booking_amount)) { %>
+                                <%= order.taxable_value %>
+                              <% } else { %>
+                                <%= taxable_value %>
+                              <% } %>
+                            </td>
+                            
                            <td align="right" style="border-right:solid 1px #000;">&nbsp;</td>
                         </tr>
                         <tr>
@@ -189,9 +208,7 @@
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
-                           <td align="right" style="border-right:solid 1px #000;">
-                            <%= order.total_price %>
-                           </td>
+                           <td style="border-right:solid 1px #000;">&nbsp;</td>
                         </tr>
                         <tr>
                            <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
@@ -203,9 +220,7 @@
                            <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
-                           <td align="right" style="border-right:solid 1px #000; border-bottom: 1px solid #000;">
-                            <%= order.total_price %>
-                           </td>
+                           <td align="right" style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
                         </tr>
                         <tr>
                            <td colspan="2" style="border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
@@ -219,7 +234,12 @@
                               <h1 style="text-align: right; font-size:16px;">Total</h1>
                            </td>
                            <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">
-                              <h1 style="text-align: right; font-size:16px;"><%= order.total_price %></h1>
+                             
+                                 <% if (order.payment_method == 0) { %>
+                                    <h1 style="text-align: right; font-size:16px;"> <%= order.total_price %> </h1>
+                                 <% } else { %>
+                                    <h1 style="text-align: right; font-size:16px;"> <%= order.booking_amount %> </h1>
+                                 <% } %>
                            </td>
                         </tr>
                         <tr>

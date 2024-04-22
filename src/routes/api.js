@@ -1143,6 +1143,7 @@ router.get("/contract-us",[],WebsiteController.contractusData);
 router.get("/payment-policy",[],WebsiteController.paymentpolicyData);
 router.get("/faq",[],WebsiteController.faqData);
 router.get("/returns-shipping",[],WebsiteController.returnShipping);
+router.get("/returns-shipping",[],WebsiteController.returnShipping);
 router.get("/terms",[],WebsiteController.tremsandconditionData);
 router.get("/registration",[],WebsiteController.registration);
 

@@ -80,10 +80,6 @@ const model = mongoose.Schema({
     type: Number,
     required: true,
   },
-  taxable_value: {
-    type: String,
-    required: true,
-  },
   delivery_charges: {
     type: Number,
     required: true,

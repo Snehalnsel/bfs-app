@@ -80,7 +80,6 @@
                                                 <tr>
                                                     <th>Sl No</th>
                                                     <th>Order Id</th>
-                                                    <th>Product Image</th>
                                                     <th>Product name</th>
                                                     <th>Product Sold Price</th>
                                                     <th>Shipment Kit Status</th>
@@ -124,13 +123,13 @@
                                                                 <% } %>
                                                             </td>
                                                             
-                                                            <td>
+                                                            <!-- <td>
                                                                 <% if (value.productImage && value.productImage.image) { %>
                                                                     <img src="<%= value.productImage.image %>" alt="Product Image" style="max-width: 100px; max-height: 100px;">
                                                                 <% } else { %>
                                                                     <span style="color: red;">No Image Available</span>
                                                                 <% } %>
-                                                            </td>
+                                                            </td> -->
                                                             <td>
                                                                 <% if (value.total_price) { %>
                                                                         <%= value.total_price %>
@@ -238,12 +237,8 @@
                                                                         <span style="color: rgb(45, 144, 226);">Canceled By Buyer</span>
                                                                     <% } %>   
                                                                 <% } %>  
-                                                                <!-- <a href="/admin/brand-statu-change/<%= value._id %>"
-                                                                    class="btn btn-success btn-circle btn-sm"
-                                                                    title="Status change">
-                                                                    <i class="fa fa-solid fa-refresh"></i>
-                                                                </a> -->
-                                                                
+                                                  
+                                
                                                                 <%
                                                                 if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0){
 
@@ -291,8 +286,6 @@
                                                                 %>
 
                                                             </td>
-                                                            
-
                                                             <td>
                                                                 <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 ) { %>
                                                     

@@ -551,8 +551,8 @@ exports.getOrderDetails = function (req, res, next) {
         return res.status(404).json({ error: 'Order not found' });
       }
 
-      const billingAddress = await AddressBook.find({ user_id: orderDetails.seller_id });
-      const shippingAddress = await AddressBook.find({ user_id: orderDetails.user_id });
+      const billingAddress = await AddressBook.find({ user_id: orderDetails.seller_id ,default_status :0 });
+      const shippingAddress = await AddressBook.find({ user_id: orderDetails.user_id ,default_status :0 });
 
       const hubdata = await Hublist.find({ flag: 1 });
 
@@ -2705,12 +2705,12 @@ exports.downloadOrdesecondrPDF = function (req, res, next) {
 
         await browser.close();
       } catch (err) {
+        console.log(err);
         res.status(500).json({ error: 'An error occurred while generating PDF' });
       }
     }
   });
 };
-
 
 exports.returninvoicebb = function (req, res, next) {
   var pageName = "Order List";

@@ -3541,7 +3541,8 @@ exports.myOrderDetailsWeb = async (req, res) => {
       },
       shippingKitData: shippingKitData || null,
       shippingkit_details: shippingkit_details || null,
-      shipping_user_details: shipping_user_details || null
+      shipping_user_details: shipping_user_details || null,
+      order_date: order.added_dtime,
     };
     res.render("webpages/myorderdetails", {
       title: "Wish List Page",

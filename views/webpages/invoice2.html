@@ -127,8 +127,7 @@
                               <% order.product.forEach(product => { %>
                               <td style="border-right:solid 1px #333333;">
                                  <b><%= product.name %></b>
-                              </td>
-                              <% }); %>
+                              </td>   
                               <td style="border-right:solid 1px #333333;">&nbsp;</td>
                               <td style="border-right:solid 1px #333333;">&nbsp;</td>
                               <td style="border-right:solid 1px #333333;">&nbsp;</td>
@@ -136,14 +135,14 @@
                               <td style="border-right:solid 1px #333333;">&nbsp;</td>
                               <td style="border-right:solid 1px #333333;">&nbsp;</td>
                               <td style="border-right:solid 1px #333333;">&nbsp;</td>
-                              <td align="right" style="border-right: solid 1px #333333;">
+                              <td align="right" style="border-right: solid 1px #752020;">
                                  <% if (order.payment_method == 1) { %>
-                                 <%= order.total_price %>
+                                    <%= product.price %>
                                  <% } else { %>
-                                 <%= order.pay_now %>
+                                    <%= product.price  * 0.10 %>
                                  <% } %>
                               </td>
-                              
+                              <% }); %>
                            </tr>
                            <tr>
                               <td style="border-right:solid 1px #333333;">&nbsp;</td>
@@ -169,17 +168,15 @@
                               <td style="border-right:solid 1px #333333;">&nbsp;</td>
                               <td align="right" style="border-right: solid 1px #333333;">
                                  <% if (order.booking_amount != null && !isNaN(order.booking_amount)) { %>
-                                 <%= order.taxable_value - order.booking_amount %>
+                                 <%= order.taxable_value - order.packing_handling_charge %>
                                  <% } else { %>
                                  <%= order.taxable_value %>
                                  <% } %>
                               </td>
-                              
-                              
                            </tr>
                            <tr>
                               <td style="border-right:solid 1px #333333;">&nbsp;</td>
-                              <td style="border-right:solid 1px #333333;">&nbsp;</td>
+                              <td style="border-right:solid 1px #333333;"><b>GST</b></td>
                               <td style="border-right:solid 1px #333333;">&nbsp;</td>
                               <td style="border-right:solid 1px #333333;">&nbsp;</td>
                               <td style="border-right:solid 1px #333333;">&nbsp;</td>
@@ -187,11 +184,7 @@
                               <td style="border-right:solid 1px #333333;">&nbsp;</td>
                               <td style="border-right:solid 1px #333333;">&nbsp;</td>
                               <td align="right" style="border-right: solid 1px #333333;">
-                                 <% if (order.booking_amount != null && !isNaN(order.booking_amount)) { %>
-                                 <%= order.taxable_value %>
-                                 <% } else { %>
-                                 <%= taxable_value %>
-                                 <% } %>
+                                    <%= order.gst %>
                               </td>
                               
                               <td align="right" style="border-right:solid 1px #333333;">&nbsp;</td>
@@ -234,7 +227,7 @@
                               </td>
                               <td style="border-right:solid 1px #333333; border-bottom: 1px solid #333333;">
                               
-                                    <% if (order.payment_method == 0) { %>
+                                    <% if (order.payment_method == 1) { %>
                                        <h3 style="text-align: right; font-size:16px;"> <%= order.total_price %> </h3>
                                     <% } else { %>
                                        <h3 style="text-align: right; font-size:16px;"> <%= order.booking_amount %> </h3>

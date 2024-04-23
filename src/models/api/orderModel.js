@@ -60,6 +60,10 @@ const model = mongoose.Schema({
     type: Number,
     default: 0,
   },
+  cash_handling_charges: {
+    type: Number,
+    default: 0,
+  },
   payment_method: {
     type: Number,
     enum: [0, 1],

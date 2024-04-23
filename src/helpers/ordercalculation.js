@@ -9,7 +9,21 @@ exports.ordercalculte = async (productid,userid, paymentmethod) => {
     let remaining_amount = 0;
     let cash_handling_charges = 0;
     const productdata = await Userproduct.findOne({ _id: productid });
-    const productprice = productdata.price;
+    //const productprice = productdata.price;
+    const existingCart = await Cart.findOne({ userid, status: 0 });
+
+    const cartItem = await CartDetail.findOne({ cart_id: existingCart._id, status: 0 })
+    .populate({
+      path: 'product_id',
+      model: Userproduct
+    })
+    .exec();
+    let productprice;
+  if(typeof cartItem.finalBidPrice != "undefined" && cartItem.finalBidPrice){
+    productprice = cartItem.finalBidPrice;
+  }else{
+    productprice =productdata.price;
+  }
     const valueofPHC = await shippingchrgsModel.findOne({ _id: productdata.productdata });
     const gst = parseFloat(productprice * 28) / 100;
     const packing_handling_charge =  parseFloat(valueofPHC.amount);
@@ -27,7 +41,7 @@ exports.ordercalculte = async (productid,userid, paymentmethod) => {
       cash_handling_charges : cash_handling_charges,
       taxable_value : taxable_value,
       pay_now: pay_now,
-      remaining_amount : remaining_amount ,
+      remaining_amount : remaining_amount,
       gst: gst,   
       booking_amount: booking_amount,
       total_price: total_price,

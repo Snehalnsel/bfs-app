@@ -1,6 +1,8 @@
 const Userproduct = require("../../models/api/userproductModel");
 const shippingchrgsModel = require("../../models/api/shippingchrgsModel");
-exports.ordercalculte = async (url, productid, paymentmethod) => {
+const Cart = require('../../models/api/cartModel');
+const CartDetail = require('../../models/api/cartdetailsModel');
+exports.ordercalculte = async (productid,userid, paymentmethod) => {
   try {
     let taxable_value = 0;
     let pay_now = 0;

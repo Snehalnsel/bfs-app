@@ -12,7 +12,7 @@ const model = mongoose.Schema({
     required: true,
   },
   track_response: {
-    type: String,
+    type: Object,
   },
   curent_status: {
     type: String,

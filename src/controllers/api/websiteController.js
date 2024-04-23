@@ -74,6 +74,7 @@ const { create } = require('xmlbuilder2');
 const { ConversationContextImpl } = require("twilio/lib/rest/conversations/v1/conversation");
 const shippingchrgsModel = require("../../models/api/shippingchrgsModel");
 const statesModel = require("../../models/api/statesModel");
+const Trackingdeatis = require("../../models/api/trackingdeatis");
 const { toFormData } = require("axios");
 // const INSTANCE_URL = 'https://api.maytapi.com/api';
 // const PHONE_ID = '18710';
@@ -3512,6 +3513,53 @@ exports.myOrderDetailsWeb = async (req, res) => {
       shippingkit_details = await addressBook.findById({ _id: shippingKitData.shipping_address_id });
       shipping_user_details = await Users.findById({ _id: shippingKitData.buyer_id });
     }
+    
+    //============Order tracking portion start=====
+   
+    if(order){
+      let getOrderId = order._id;
+      let ordertracking = await Ordertracking.findOne({order_id:getOrderId});
+      if(ordertracking){
+        let getTrackData = await Track.findOne({_id:mongoose.Types.ObjectId(ordertracking.tracking_id)});
+
+        //=== 0=>for seller_to_hub 1=>for hub_to_buyer===
+        if(getTrackData.pickup_awb){
+          let getapiTrakingData = await helper.trackbyawbid(getTrackData.pickup_awb);
+          let gettrackingData = getapiTrakingData.tracking_data.shipment_track;
+          let statusCheck = (getTrackData.order_status==1) ? 1:0;
+          const filterTrack = {
+            order_id:mongoose.Types.ObjectId(getOrderId),
+            tracking_id:mongoose.Types.ObjectId(ordertracking.tracking_id)
+          };
+          
+          const trackingdetails = await Trackingdeatis.findOne(filterTrack);
+          if(trackingdetails && trackingdetails.status== getTrackData.order_status){
+            const updateTrack = { 
+              track_response: getapiTrakingData,
+              curent_status: gettrackingData[0].current_status,
+              status_check: statusCheck,
+              track_awbno: getTrackData.pickup_awb,
+            };
+             await Trackingdeatis.findOneAndUpdate(filterTrack, updateTrack);
+          } else {
+            const createTrackindData = new Trackingdeatis({
+              order_id: getOrderId,
+              tracking_id: ordertracking.tracking_id,
+              track_response: getapiTrakingData,
+              curent_status: gettrackingData[0].current_status,
+              status_check: 0,
+              track_awbno: getTrackData.pickup_awb,
+              status: getTrackData.order_status,
+              added_dtime: dateTime,
+            });
+             await createTrackindData.save();
+          }
+          
+        }
+      }
+    }
+     //============Order tracking portion end=====
+
     const orderDetails = {
       _id: order._id,
       total_price: order.total_price,

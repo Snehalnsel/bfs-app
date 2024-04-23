@@ -1,13 +1,15 @@
-const Userproduct = require("../../models/api/userproductModel");
-const shippingchrgsModel = require("../../models/api/shippingchrgsModel");
-const Cart = require('../../models/api/cartModel');
-const CartDetail = require('../../models/api/cartdetailsModel');
+var express = require("express");
+const Userproduct = require("../models/api/userproductModel");
+const shippingchrgsModel = require("../models/api/shippingchrgsModel");
+const Cart = require('../models/api/cartModel');
+const CartDetail = require('../models/api/cartdetailsModel');
 exports.ordercalculte = async (productid,userid, paymentmethod) => {
   try {
     let taxable_value = 0;
     let pay_now = 0;
     let remaining_amount = 0;
     let cash_handling_charges = 0;
+    let bid_price = 0;
     const productdata = await Userproduct.findOne({ _id: productid });
     //const productprice = productdata.price;
     const existingCart = await Cart.findOne({ userid, status: 0 });
@@ -21,6 +23,7 @@ exports.ordercalculte = async (productid,userid, paymentmethod) => {
     let productprice;
   if(typeof cartItem.finalBidPrice != "undefined" && cartItem.finalBidPrice){
     productprice = cartItem.finalBidPrice;
+    bid_price =  cartItem.finalBidPrice;
   }else{
     productprice =productdata.price;
   }
@@ -37,6 +40,7 @@ exports.ordercalculte = async (productid,userid, paymentmethod) => {
     }
     const total_price = productprice + taxable_value + gst;
     const retValue = {
+      bid_price: bid_price,
       packing_handling_charge: packing_handling_charge,
       cash_handling_charges : cash_handling_charges,
       taxable_value : taxable_value,

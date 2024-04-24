@@ -12,6 +12,7 @@ const crypto = require('crypto');
 const path = require("path");
 const ejs = require('ejs');
 const helper = require("../../helpers/helper");
+const checkoutcal = require("../../helpers/ordercalculation");
 const rp = require('request-promise-native');
 const fs = require("fs");
 const mime = require("mime");
@@ -4335,6 +4336,8 @@ exports.Demoorder = async function (req, res) {
     taxable_value = formData.taxable_value;
     let product =await Userproduct.findById(product_id);
     let total_price = 0;
+
+    let data = await checkoutcal.ordercalculte(product_id,user_id, payment_method);
 
     const existingCart = await Cart.findOne({ user_id, status: 0 });
 

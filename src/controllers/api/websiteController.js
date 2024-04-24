@@ -3526,7 +3526,9 @@ exports.myOrderDetailsWeb = async (req, res) => {
         //=== 0=>for seller_to_hub 1=>for hub_to_buyer===
         if(getTrackData.pickup_awb){
           let getapiTrakingData = await helper.trackbyawbid(getTrackData.pickup_awb);
+          console.log("getapiTrakingData--",getapiTrakingData)
           let gettrackingData = getapiTrakingData.tracking_data.shipment_track;
+          console.log("gettrackingData--",gettrackingData)
           let statusCheck = (getTrackData.order_status==1) ? 1:0;
           const filterTrack = {
             order_id:mongoose.Types.ObjectId(getOrderId),

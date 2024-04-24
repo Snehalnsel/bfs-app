@@ -762,6 +762,118 @@ async function generateCouriresServiceability(pickup_postcode, delivery_postcode
 
 }
 
+exports.updateData_backup = async function (req, res, next) {
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: "0",
+      message: "Validation error!",
+      respdata: errors.array(),
+      isAdminLoggedIn: isAdminLoggedIn
+    });
+  }
+
+  Order.findById(req.body.order_id).then(async (order) => {
+    if (!order) {
+      res.status(404).json({
+        status: "0",
+        message: "Not found!",
+        respdata: {},
+        isAdminLoggedIn: isAdminLoggedIn
+      });
+    } else {
+      // var updData = {
+      //   billing_address_id: req.body.seller_address,
+      //   shipping_address_id: req.body.buyer_address,
+      //   hub_address_id: req.body.hub_address,
+      //   // shiprocket_delivery_partner: req.body.user_courier,
+      // };
+      const orderDetails = await Order.findById(req.body.order_id);
+      if (!orderDetails) {
+        return res.status(404).json({ message: 'Order not found' });
+      }
+      const order_id = orderDetails._id;
+      const order_code = orderDetails.order_code;
+      const user_id = orderDetails.user_id;
+      const seller_id = orderDetails.seller_id;
+      const product_id = orderDetails.product_id;
+      const billing_address_id = orderDetails.billing_address_id;
+      const shipping_address_id = req.body.hub_address;
+      const total_price = orderDetails.total_price;
+      const payment_method = orderDetails.payment_method;
+      // const order_status = orderDetails.order_status;
+      const order_status = req.body.order_status;
+      const gst = orderDetails.gst;
+      const delivery_charges = orderDetails.delivery_charges;
+      const discount = orderDetails.discount;
+      const pickup_status = orderDetails.pickup_status;
+      const delivery_status = orderDetails.delivery_status;
+      const added_dtime = orderDetails.added_dtime;
+
+
+      const now = new Date();
+      const currentHour = now.getHours().toString().padStart(2, '0');
+      const currentMinute = now.getMinutes().toString().padStart(2, '0');
+      const currentSecond = now.getSeconds().toString().padStart(2, '0');
+      const currentMillisecond = now.getMilliseconds().toString().padStart(3, '0');
+
+      // Generate the unique code using the current time components
+      const transactionCode = `BFSTRANS${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
+      const track = new Track({
+        track_code: transactionCode,
+        seller_id: seller_id,
+        product_id: product_id,
+        billing_address_id: billing_address_id,
+        hub_address_id: req.body.hub_address,
+        total_price: total_price,
+        payment_method: payment_method,
+        order_status: order_status,
+        gst: gst,
+        delivery_charges: delivery_charges,
+        discount: discount,
+        added_dtime: new Date().toISOString(),
+      });
+
+      const savedTrack = await track.save();
+
+      if (savedTrack) {
+        const track_id = savedTrack._id;
+
+        const ordertracking = new Ordertracking({
+          order_id: order_id,
+          tracking_id: track_id,
+          order_code: order_code,
+          track_code: transactionCode,
+          status: order_status,
+          type: 0,
+          added_dtime: new Date().toISOString(),
+        });
+
+        const savedOrdertrack = await ordertracking.save();
+
+        if (savedOrdertrack) {
+          return res.redirect("/admin/orderlist");
+        }
+        else {
+          return res.redirect("/admin/orderlist");
+        }
+      }
+
+      //await Order.findOneAndUpdate({ _id: req.body.order_id }, { $set: updData }, { upsert: true });
+
+      res.redirect("/admin/orderlist");
+    }
+  }).catch((err) => {
+    ;
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while updating the product.",
+      respdata: {},
+      isAdminLoggedIn: isAdminLoggedIn
+    });
+  });
+};
 exports.updateData = async function (req, res, next) {
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
@@ -874,7 +986,6 @@ exports.updateData = async function (req, res, next) {
     });
   });
 };
-
 exports.getShipmentList = function (req, res, next) {
 
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";

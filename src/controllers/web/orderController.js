@@ -2694,8 +2694,11 @@ exports.downloadOrderPDF = function (req, res, next) {
           const loginHtmlPath = 'views/webpages/invoice1.html';
           const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
 
-
-         const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
+        const orderDate = new Date(orderList[0].added_dtime);
+        const formattedDate = `${orderDate.getDate()}-${orderDate.getMonth() + 1}-${orderDate.getFullYear()}`;
+        
+        const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate });
+        //  const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
 
           const browser = await puppeteer.launch();
           const page = await browser.newPage();
@@ -2801,14 +2804,16 @@ exports.downloadOrdesecondrPDF = function (req, res, next) {
       try {
         const loginHtmlPath = 'views/webpages/invoice2.html';
         const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
-        const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
+        const orderDate = new Date(orderList[0].added_dtime);
+        const formattedDate = `${orderDate.getDate()}-${orderDate.getMonth() + 1}-${orderDate.getFullYear()}`;
+        
+        const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate });
+        // const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
     
         await page.setContent(renderedHtml);
-  
         const pdfBuffer = await page.pdf({ format: 'Letter' });
-    
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', 'attachment; filename=InvoiceBFStoBuyer.pdf');
     
@@ -2904,7 +2909,11 @@ exports.returninvoicebb = function (req, res, next) {
       try {
         const loginHtmlPath = 'views/webpages/returnInvoiceBBR.html';
         const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
-        const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
+        const orderDate = new Date(orderList[0].added_dtime);
+        const formattedDate = `${orderDate.getDate()}-${orderDate.getMonth() + 1}-${orderDate.getFullYear()}`;
+        
+        const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate });
+        // const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
     
@@ -3004,7 +3013,11 @@ exports.returninvoicesbr = function (req, res, next) {
       try {
         const loginHtmlPath = 'views/webpages/returnInvoiceSBR.html';
         const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
-        const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
+        const orderDate = new Date(orderList[0].added_dtime);
+        const formattedDate = `${orderDate.getDate()}-${orderDate.getMonth() + 1}-${orderDate.getFullYear()}`;
+        
+        const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate });
+        // const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
         
         const browser = await puppeteer.launch();
         const page = await browser.newPage();

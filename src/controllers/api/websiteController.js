@@ -4339,7 +4339,9 @@ exports.Demoorder = async function (req, res) {
     let product =await Userproduct.findById(product_id);
     let total_price = 0;
 
-    let data = await checkoutcal.ordercalculte(product_id,user_id, payment_method);
+    // let data = await checkoutcal.ordercalculte(product_id,user_id, payment_method);
+
+    // console.log("data",data);
 
     const existingCart = await Cart.findOne({ user_id, status: 0 });
 

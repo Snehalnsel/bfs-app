@@ -98,11 +98,11 @@
                         <tr style="margin-top: 30px;">
                            <td style="width: 50%; border-left: solid 1px #333333;">
                               <h3 style="font-size:16px;">Order No.: <%= order.order_code %></h3>
-                              <h3 style="font-size:16px;">Order Date:<%= order.added_dtime %>  </h3>
+                              <h3 style="font-size:16px;">Order Date:<%= formattedDate %>  </h3>
                            </td>
                            <td style="width: 50%; border-right: solid 1px #333333;">
                               <h3 style="font-size:16px;">Invoice No. SBR/000001/03-24</h3>
-                              <h3 style="font-size:16px;">Invoice Date: </h3>
+                              <h3 style="font-size:16px;">Invoice Date: <%= formattedDate %></h3>
                            </td>
                         </tr>
                      </tbody>

@@ -922,7 +922,7 @@ exports.updateData = async function (req, res, next) {
       const pickup_status = orderDetails.pickup_status;
       const delivery_status = orderDetails.delivery_status;
       const added_dtime = orderDetails.added_dtime;
-
+      
 
       const now = new Date();
       const currentHour = now.getHours().toString().padStart(2, '0');

@@ -16,6 +16,14 @@ const model = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'mt_userproducts', 
   },
+  billing_address_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'addressbook_list', 
+  },
+  shipping_address_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'addressbook_list', 
+  },
   buyer_address_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'addressbook_list', 

@@ -4273,9 +4273,9 @@ exports.Demoorder_backup = async function (req, res) {
   }
 };
 
-exports.Demoorder = async function (req, res) {
+exports.Demoorderold = async function (req, res) {
   try {
-
+    console.log("demo order");
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     let pay_now,booking_amount,remaining_amount,taxable_value,cash_handling_charges;
     let formData = req.body.data;
@@ -4289,10 +4289,9 @@ exports.Demoorder = async function (req, res) {
     let product =await Userproduct.findById(product_id);
     let total_price = 0;
 
-    // let data = await checkoutcal.ordercalculte(product_id,user_id, payment_method);
-
-    // console.log("data",data);
-
+    let data = await checkoutcal.ordercalculte(product_id,user_id, payment_method);
+  
+    console.log("data",data);
     const existingCart = await Cart.findOne({ user_id, status: 0 });
 
     const cartItem = await CartDetail.findOne({ cart_id: existingCart._id, status: 0 })
@@ -4392,6 +4391,62 @@ exports.Demoorder = async function (req, res) {
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
+exports.Demoorder = async function (req, res) {
+  try {
+    console.log("demo order");
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    let pay_now, booking_amount, remaining_amount, taxable_value, cash_handling_charges;
+    let formData = req.body.data;
+    let user_id = formData.user_id;
+    let seller_id = formData.seller_id;
+    let cart_id = formData.cart_id;
+    let product_id = formData.product_id;
+    let payment_method = formData.payment_method;
+    let shipping_address_id = formData.addressBookId;
+    let data = await checkoutcal.ordercalculte(product_id, user_id, payment_method);
+    console.log("data", data);
+    const billingaddress = await addressBook.findOne({ user_id: seller_id });
+    const billing_address_id = billingaddress._id;
+    const order = new Demoorder({
+      user_id: (typeof user_id != "undefined") ? user_id : "",
+      cart_id: (typeof cart_id != "undefined") ? cart_id : "",
+      seller_id: (typeof seller_id != "undefined") ? seller_id : "",
+      product_id: (typeof product_id != "undefined") ? product_id : "",
+      billing_address_id: (typeof billing_address_id != "undefined") ? billing_address_id : null,
+      shipping_address_id: (typeof shipping_address_id != "undefined") ? shipping_address_id : null,
+      total_price: (typeof data.total_price != "undefined") ? parseFloat(data.total_price) : 0,
+      payment_method: (typeof data.payment_method != "undefined") ? data.payment_method : 0,
+      order_status: (typeof data.order_status != "undefined") ? data.order_status : 0,
+      pay_now: (typeof data.pay_now != "undefined") ? data.pay_now : "",
+      remaining_amount: (typeof data.remaining_amount != "undefined") ? parseFloat(data.remaining_amount) : 0,
+      booking_amount: (typeof data.booking_amount != "undefined") ? parseFloat(data.booking_amount) : 0,
+      packing_handling_charge: (typeof data.packing_handling_charge != "undefined") ? parseFloat(data.packing_handling_charge) : 0,
+      status: 1,
+      user_ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress || null,
+      gst: (typeof data.gst != "undefined") ? data.gst : 0,
+      taxable_value: (typeof data.taxable_value != "undefined") ? parseFloat(data.taxable_value) : 0,
+      added_dtime: new Date().toISOString(),
+    });
+    const savedOrder = await order.save();
+    if (savedOrder) {
+      res.status(200).json({
+        status: "1",
+        is_orderPlaced: 1,
+        message: 'Order placed successfully',
+        order: savedOrder
+      });
+    } else {
+      res.status(500).json({ message: 'Error saving order' });
+    }
+    
+  } catch (error) {
+    console.error("Error in Demoorder:", error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 
 exports.forgotPassword = async function (req, res, next) {
 

@@ -717,6 +717,8 @@ async function generateRequestShipmentPickup(shipment_id) {
 
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
+      console.log("body--",body)
+      console.log("response.statusCode--",response.statusCode)
       if (error) {
         reject(error);
       } else if (response.statusCode === 200) {

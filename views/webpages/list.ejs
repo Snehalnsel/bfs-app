@@ -239,7 +239,9 @@ $(document).ready(async function(){
 
         let cartListreCookieAccessToken = await getCookieFunc(accessTokenVar);
         let cartListreCookieRefreshToken = await getCookieFunc(refreshTokenVar);
-        //await userReLogin(cartListreCookieAccessToken, cartListreCookieRefreshToken);
+        //   if((cartListreCookieRefreshToken != "") && ($("#userReloggedIn").val() == "")) {
+      //       await userReLogin(cartListreCookieAccessToken, cartListreCookieRefreshToken);
+      //    }
         
         $.ajax({
                  url: '/cart-list', 

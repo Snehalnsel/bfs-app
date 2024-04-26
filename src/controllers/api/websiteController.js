@@ -4395,7 +4395,6 @@ exports.Demoorderold = async function (req, res) {
 
 exports.Demoorder = async function (req, res) {
   try {
-    console.log("demo order");
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     let pay_now, booking_amount, remaining_amount, taxable_value, cash_handling_charges;
     let formData = req.body.data;
@@ -4632,20 +4631,7 @@ exports.sendotp = async function (req, res, next) {
         text: "OTP",
         html: loginHtmlContent
       };
-      // const mailData = {
-      //   from: "Bid For Sale! <" + smtpUser + ">",
-      //   to: "sneha.lnsel@gmail.com",
-      //   //to: user.email,
-      //   subject: "BFS - Bids For Sale - Forgot password OTP",
-      //   text: "Server Email!",
-      //   html:
-      //     "Hey " +
-      //     user.name +
-      //     ", <br> <p> Please use this OTP : <b>" +
-      //     randNumber +
-      //     "</b> to reset your password! </p>",
-      // };
-
+    
       transporter.sendMail(mailData, function (err, info) {
         // if (err) console.log("err", err);
         //else console.log("info", info);
@@ -4697,7 +4683,69 @@ exports.sendotp = async function (req, res, next) {
                   if (err) {
                     throw err;
                   } else {
-                    Users.findOne({ email: req.body.email }).then((user) => {
+                    Users.findOne({ email: req.body.email }).then(async (user) => {
+
+                      let smsData = {
+                        textId: "test",
+                        toMobile: "91" +user.phone_no,
+                        text: "Password changed successfully! Your account at Bid For Sale is now updated. If you didn't make this change, please contact support immediately. Thank you!-BFS RETAIL SERVICES PRIVATE LIMITED",
+                      };
+                      let returnData;
+                      returnData = await sendSms(smsData);
+                      const historyData = new ApiCallHistory({
+                        userId: user._id,
+                        called_for: "reset password",
+                        api_link: process.env.SITE_URL,
+                        api_param: smsData,
+                        api_response: returnData,
+                        send_status: 'send',
+                      });
+                      await historyData.save();
+
+                      const message = "Password changed successfully! Your account at Bid For Sale is now updated. If you didn't make this change, please contact support immediately. Thank you!";
+                      const to_number = "91" + user.phone_no;
+                      let response = await send_message({ type: 'text', message, to_number });
+            
+                      //SEND WHATSAPP
+                      const receiverMobileNo = "91" + user.phone_no;
+                      const root = create({ version: '1.0', encoding: "ISO-8859-1" })
+                        .ele('MESSAGE', { VER: '1.2' })
+                        .ele('USER', { USERNAME: process.env.WP_SMS_USER_NAME, PASSWORD: process.env.WP_PASSWORD })
+                        .ele('SMS', { UDH: "0", CODING: "1", TEXT: "Hi", PROPERTY: "0", ID: "1", TEMPLATE: "bfstest" })
+                        .ele('ADDRESS', { FROM: process.env.WP_SMS_SENDER_MOBILE, TO: receiverMobileNo, SEQ: "1" })
+                      //.up()
+                      //.up();
+            
+                      // convert the XML tree to string
+                      const xml = root.end({ prettyPrint: true });
+                      await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
+                        if (err) {
+                          // return {
+                          //   status:false,
+                          //   data:err
+                          // };
+                        }
+                        //let obj = JSON.parse(data);
+                        //let randNumber = Math.floor((Math.random() * 1000000) + 1);
+                        let smsData = xml;
+                        let returnData;
+                        returnData = await sendWhatsapp(smsData);
+                      });  
+                      const loginHtmlPath = 'views/webpages/reset-password.html';
+                      let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+                      loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+                      const mailData = {
+                        from: "Bid For Sale! <" + smtpUser + ">",
+                        to: user.email,
+                        subject: "Reset password successfully!",
+                        name: "Bid For Sale!",
+                        text: "reset password successfully!",
+                        html: loginHtmlContent
+                      };
+                      transporter.sendMail(mailData, function (err, info) {
+                        // if (err) console.log("err", err);
+                        // else console.log("info", info);
+                      });
                       res.status(200).json({
                         status: "1",
                         message: "Successfully updated! Please login with your new password",
@@ -4800,6 +4848,36 @@ exports.changePassword = async function (req, res, next) {
                               send_status: 'send',
                             });
                             await historyData.save();
+
+                            const message = "Password changed successfully! Your account at Bid For Sale is now updated. If you didn't make this change, please contact support immediately. Thank you!";
+                            const to_number = "91" + user.phone_no;
+                            let response = await send_message({ type: 'text', message, to_number });
+                  
+                            //SEND WHATSAPP
+                            const receiverMobileNo = "91" + user.phone_no;
+                            const root = create({ version: '1.0', encoding: "ISO-8859-1" })
+                              .ele('MESSAGE', { VER: '1.2' })
+                              .ele('USER', { USERNAME: process.env.WP_SMS_USER_NAME, PASSWORD: process.env.WP_PASSWORD })
+                              .ele('SMS', { UDH: "0", CODING: "1", TEXT: "Hi", PROPERTY: "0", ID: "1", TEMPLATE: "bfstest" })
+                              .ele('ADDRESS', { FROM: process.env.WP_SMS_SENDER_MOBILE, TO: receiverMobileNo, SEQ: "1" })
+                            //.up()
+                            //.up();
+                  
+                            // convert the XML tree to string
+                            const xml = root.end({ prettyPrint: true });
+                            await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
+                              if (err) {
+                                // return {
+                                //   status:false,
+                                //   data:err
+                                // };
+                              }
+                              //let obj = JSON.parse(data);
+                              //let randNumber = Math.floor((Math.random() * 1000000) + 1);
+                              let smsData = xml;
+                              let returnData;
+                              returnData = await sendWhatsapp(smsData);
+                            });  
                             const loginHtmlPath = 'views/webpages/reset-password.html';
                             let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
                             loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
@@ -4825,6 +4903,7 @@ exports.changePassword = async function (req, res, next) {
                         );
                       }
                     }
+  
                   );
                 });
               } else {

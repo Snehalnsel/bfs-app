@@ -86,12 +86,10 @@ $(document).ready(async function(){
         },
         messages:{
             bankname:{
-                //required:"Please enter bank name.",
                 maxlength:"Please enter valid name."
             },
             branch:{
                 required:"Please enter branch name.",
-                //maxlength:"Please enter valid name."
             },
             accountname:{
                 required:"Please enter account holder name.",
@@ -109,7 +107,6 @@ $(document).ready(async function(){
                 required:"Please select a option",
             },
             upiid:{
-                //required:"Please enter upi id.",
                 maxlength:"Please enter valid upi id.",
                 customupiid:"Please enter valid upidid"
             },
@@ -145,7 +142,6 @@ $(document).ready(async function(){
                 contentType: false,
                 cache: false,
                 success: async function(obj){
-                    // let obj = response.responseJSON;
                     let error_success = obj.status;
                     if(error_success == 'success'){
                         $('#success-bank-msg').html(obj.message);

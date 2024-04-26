@@ -25,7 +25,8 @@ router.get("/", cors(), function (req, res) {
       siteName: req.app.locals.siteName,
       pageTitle: pageTitle,
       year: moment().format("YYYY"),
-      isAdminLoggedIn:isAdminLoggedIn
+      isAdminLoggedIn:isAdminLoggedIn,
+      websiteUrl: process.env.SITE_URL,
     });
   } else {
     res.redirect("/admin/dashboard");

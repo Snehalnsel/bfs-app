@@ -229,6 +229,9 @@ function updateWishlistCount(data) {
     $(".wishlist-count").text(`(${itemCount})`);
 }
 
+
+
+
 $(document).on('click', "#share-product-icon", async function (e) {
     $(".share-linksbox").addClass("icon-show");
 });
@@ -315,16 +318,36 @@ $(document).on('click', ".address-remove-button", async function (e) {
             let wishlistCookieRefreshToken = await getCookieFunc(refreshTokenVar);
             await userReLogin(wishlistCookieAccessToken, wishlistCookieRefreshToken);
 
-            var divid = $(this).closest('.bids-row').attr('id');
-            console.log(divid);
-
             var id = $(this).data('id');
+            console.log(id);
             $.ajax({
             url: '/delete-address/' + id.trim(),
             method: 'GET',
             success: function (data) {
-                $("#" + id).remove();
-                
+                if (data.success == true) {
+                    Swal.fire({
+                        title: data.message,
+                        iconHtml: '<img src="'+ src +'">',
+                        customClass: {  
+                            icon: 'alert-logo-item',
+                            popup: "bid-alert-modal"
+                        },
+                        confirmButtonText: "OK",
+                      });
+                    //$("#" + divid).remove();
+                    window.location.reload();
+                       // location.reload();
+                } else {
+                    Swal.fire({
+                        title: data.message,
+                        iconHtml: '<img src="'+ src +'">',
+                        customClass: {  
+                            icon: 'alert-logo-item',
+                            popup: "bid-alert-modal"
+                        },
+                        confirmButtonText: "OK",
+                      });
+                }
             },
             error: function (err) {
                 console.error('Error:', err);

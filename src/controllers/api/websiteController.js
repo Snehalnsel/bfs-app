@@ -2191,6 +2191,22 @@ exports.userAddressAdd = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
+    const defaultStatus = req.body['check-address'] ? 1 : 0;
+
+    if (defaultStatus === 1) {
+      // Find any existing address with default_status as 1 for this user_id
+      const existingDefaultAddress = await addressBook.findOne({
+        user_id: req.body.userId,
+        default_status: 1,
+      });
+
+      if (existingDefaultAddress) {
+        // Update the existing default address's default_status to 0
+        await addressBook.findByIdAndUpdate(existingDefaultAddress._id, {
+          default_status: 0,
+        });
+      }
+    }
     let stateId = req.body.state_name;
     let getState = await statesModel.findOne({_id:mongoose.Types.ObjectId(stateId)});
     const newAddress = new addressBook({
@@ -2206,6 +2222,7 @@ exports.userAddressAdd = async function (req, res, next) {
       pin_code: req.body.pin_code,
       address_name: addr_name,
       flag: req.body.flag,
+      default_status:defaultStatus,
       created_dtime: dateTime,
     });
     const savedAddress = await newAddress.save();
@@ -2303,8 +2320,12 @@ exports.updateuserAddressAdd = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     addbook_id = req.body.addressid;
+    console.log(req.body);
+    
     const defaultStatus = req.body['check-address'] === '1' ? 1 : 0;
 
+    console.log(defaultStatus);
+    
     const addr_name = req.body.addrType;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -2314,44 +2335,39 @@ exports.updateuserAddressAdd = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
-    // const newAddress = new addressBook({
-    //   user_id: req.body.userId,
-    //   street_name: req.body.address2,
-    //   address1: req.body.address1,
-    //   landmark: req.body.landmark,
-    //   city_name: req.body.city_name,
-    //   city_code: req.body.city_code,
-    //   state_name: req.body.state_name,
-    //   state_code: req.body.state_code,
-    //   pin_code: req.body.pin_code,
-    //   address_name: addr_name,
-    //   flag: req.body.flag,
-    //   created_dtime: dateTime,
-    // });
-    // const savedAddress = await newAddress.save();
-
     const address = await addressBook.findById(addbook_id);
-
-    if (!address) {
-      return res.status(404).json({
-        status: "0",
-        message: "Address not found!",
-        respdata: {},
+    if (defaultStatus === 1) {
+      const existingDefaultAddress = await addressBook.findOne({
+        user_id: address.user_id,
+        default_status: 1,
       });
+
+      if (existingDefaultAddress) {
+        await addressBook.findByIdAndUpdate(existingDefaultAddress._id, {
+          default_status: 0,
+        });
+      }
     }
+    let stateId = req.body.state_name;
+    let getState = await statesModel.findOne({_id:mongoose.Types.ObjectId(stateId)});
 
     address.street_name = req.body.address2 || address.street_name;
     address.address1 = req.body.address1 || address.address1;
     address.landmark = req.body.landmark || address.landmark;
     address.city_name = req.body.city_name || address.city_name;
     address.city_code = req.body.city_code || address.city_code;
-    address.state_name = req.body.state_name || address.state_name;
+    address.address_name = addr_name || address.address_name;
+    address.state_id= stateId || address.state_id;
+    address.state_name = getState ? getState.name: address.state_name;
     address.state_code = req.body.state_code || address.state_code;
     address.pin_code = req.body.pin_code || address.pin_code;
     address.address_name = req.body.address_name || address.address_name;
     address.flag = req.body.flag || address.flag;
     address.default_status = defaultStatus;
 
+
+    console.log(address);
+    
 
     const updatedAddress = await address.save();
     const user = await Users.findById(updatedAddress.user_id);
@@ -2408,13 +2424,12 @@ exports.getAddressdetails = async function (req, res, next) {
       });
     }
     let stateList = await statesModel.find();
-    console.log("state list",stateList);
+
     let stateData = "";
     if(address.state_name){
-      stateData = await statesModel.findById(address.state_name);
+      stateData = await statesModel.findById(address.state_id);
     }
-    console.log("state data",stateData);
-
+    
     res.render("webpages/update-address", {
       title: "My Account",
       message: "Address fetched successfully!",
@@ -2439,22 +2454,53 @@ exports.getAddressdetails = async function (req, res, next) {
     });
   }
 };
+// exports.deleteUserAddress = async function (req, res, next) {
+//   try {
+//     addbook_id = req.params.id;
+
+//     const updatedAddress = await addressBook.findOneAndUpdate(
+//       { _id: addbook_id },
+//       { $set: { default_status: 1 } },
+//       { new: true }
+//     );
+//     if (!updatedAddress) {
+//       return res.status(404).json({
+//         status: "0",
+//         message: "Address not found for deletion!",
+//         respdata: {},
+//       });
+//     }
+//     res.redirect('/my-account');
+//   } catch (error) {
+//     res.status(500).json({
+//       status: "0",
+//       message: "An error occurred while rendering the Edit Profile.",
+//       error: error.message,
+//     });
+//   }
+// };
+
 exports.deleteUserAddress = async function (req, res, next) {
   try {
-    addbook_id = req.params.id;
-    const updatedAddress = await addressBook.findOneAndUpdate(
-      { _id: addbook_id },
-      { $set: { default_status: 1 } },
-      { new: true }
-    );
-    if (!updatedAddress) {
-      return res.status(404).json({
-        status: "0",
-        message: "Address not found for deletion!",
-        respdata: {},
+    const addbook_id = req.params.id;
+    const addressToDelete = await addressBook.findById(addbook_id);
+
+    if (addressToDelete.default_status === 1) {
+      return res.status(200).json({
+        message: 'Default Address cannot be deleted,PLease Set another Address default first',
+        success: false,
       });
     }
-    res.redirect('/my-account');
+
+    addressToDelete.deleted_status = 1;
+    await addressToDelete.save();
+
+    return res.status(200).json({
+      message: 'Address Deleted Successfully',
+      success: true,
+    });
+
+   // res.redirect('/my-account');
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -2463,6 +2509,7 @@ exports.deleteUserAddress = async function (req, res, next) {
     });
   }
 };
+
 exports.userWisePost = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

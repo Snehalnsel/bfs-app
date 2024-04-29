@@ -865,7 +865,7 @@ exports.updateData = async function (req, res, next) {
       res.redirect("/admin/orderlist");
     }
   }).catch((err) => {
-    ;
+    
     res.status(500).json({
       status: "0",
       message: "An error occurred while updating the product.",

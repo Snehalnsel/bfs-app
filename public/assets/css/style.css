@@ -4782,3 +4782,35 @@ button.grey-btn {
     cursor: pointer;
     color: #cb3805;
 }
+
+.justify-content-start{
+    justify-content: start !important;
+}
+
+.message-boxed-step {
+    padding: 10px 20px;
+    max-width: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.check-label-flex {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.check-label-flex label {
+    margin: 0;
+    margin-left: 5px;
+}
+
+.check-label-flex input[type=checkbox] {
+    width: 15px;
+    height: 15px;
+}
+
+.orange-text {
+    color: #e3683d !important; 
+}

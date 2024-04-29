@@ -129,7 +129,6 @@
                            <td style="border-right:solid 1px #333333;">
                               <b><%= product.name %></b>
                            </td>
-                           <% }); %>
                            <td style="border-right:solid 1px #333333;">&nbsp;</td>
                            <td style="border-right:solid 1px #333333;">&nbsp;</td>
                            <td style="border-right:solid 1px #333333;">&nbsp;</td>
@@ -139,8 +138,9 @@
                            <td style="border-right:solid 1px #333333;">&nbsp;</td>
 
                            <td style="border-right:solid 1px #333333;">
-                              <h1 style="text-align: right; font-size:16px;"><%= order.total_price %></h1>
+                              <h1 style="text-align: right; font-size:16px;"><%= product.offer_price %></h1>
                            </td>
+                           
                         </tr>
                         <tr>
                            <td style="border-right:solid 1px #333333;">&nbsp;</td>
@@ -240,9 +240,10 @@
                               <h1 style="text-align: right; font-size:16px;">Total</h1>
                            </td>
                            <td style="border-right:solid 1px #333333; border-bottom: 1px solid #333333;">
-                              <h1 style="text-align: right; font-size:16px;"><%= order.total_price %></h1>
+                              <h1 style="text-align: right; font-size:16px;"><%= product.offer_price %></h1>
                            </td>
                         </tr>
+                        <% }); %>
                         <tr>
                            <td colspan="10" style="text-align: left; border-right:solid 1px #333333; border-bottom: 1px solid #333333;"><strong>Rupees</strong> </td>
                         </tr>

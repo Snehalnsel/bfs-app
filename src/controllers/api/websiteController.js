@@ -1052,7 +1052,6 @@ exports.userFilter = async function (req, res, next) {
     approval_status: 1,
     flag: 0
   };
-  console.log(query);
   let totalProduct = await Userproduct.countDocuments(query);
   let allProductData = await Userproduct.find(query)
     .sort({ offer_price: optionId })
@@ -1168,7 +1167,6 @@ exports.userFilterForOthers = async function (req, res, next) {
   let allProductData;
 
   if (productcategoryId == "bestDeal" ) {
-    console.log("best deal");
     const appSettings = await Appsettings.findOne();
 
     const percentageFilter = parseInt(appSettings.best_deal);
@@ -1178,9 +1176,6 @@ exports.userFilterForOthers = async function (req, res, next) {
       flag: 0,
       percentage: { $gte: percentageFilter }
     };
-
-    console.log("query",query);
-
     totalProduct = await Userproduct.countDocuments(query);
     allProductData = await Userproduct.find(query)
       .sort({ offer_price: optionId })
@@ -1188,7 +1183,6 @@ exports.userFilterForOthers = async function (req, res, next) {
       .limit(pageSize);
   }
   if (productcategoryId == "whatshot") {
-    console.log("whatshot");
     const query = {
       ...concatVar,
       approval_status: 1,
@@ -1203,7 +1197,6 @@ exports.userFilterForOthers = async function (req, res, next) {
       .limit(pageSize);
   }
   if (productcategoryId == "justsold") {
-    console.log("justsold");
     const query = {
       ...concatVar,
       approval_status: 1,
@@ -1399,7 +1392,7 @@ exports.myAccount = async function (req, res, next) {
       res.redirect('/registration');
     } else {
       var userData = req.session.user;
-      const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId) });
+      const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId)});
 
       const html = await ejs.renderFile("views/webpages/myaccount.ejs", {
         helper: helper,
@@ -1515,7 +1508,6 @@ exports.thankyoupage = async function (req, res, next) {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
     const message = req.query.message;
-    console.log(message);
     res.render("webpages/message", {
       title: "Edit Address",
       message: "Welcome to the Edit Profile page!",
@@ -1793,9 +1785,6 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
     let genderList = [];
     const id = req.params.id;
     const filterGenderId = (typeof req.query.catid != 'undefined' && req.query.catid != "") ? req.query.catid : '';
-    // console.log("Filter Gender ID :");
-    // console.log(req.query);
-    // return false;
     const pageno = page || 1;
     const pageSize = 16;
     const sortid = req.params.sortid || 0;
@@ -1844,8 +1833,6 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
       colorList = await Color.find({ _id: { $in: colorIds } });
     }
 
-
-    console.log(formattedUserProducts);
     res.render("webpages/subcategoryproduct", {
       title: "Product Sub Categories",
       message: "Welcome to the Product Sub Categories!",
@@ -1978,7 +1965,6 @@ exports.getbankDetails = async function (req, res, next) {
     }
     res.status(200).json({ status: "1", bankDetails: bankDetails });
   } catch (error) {
-    //console.error(error);
     res.status(500).json({
       status: "0",
       message: "Internal server error",
@@ -2182,7 +2168,7 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
       res.redirect('/checkout-web');
     }
   } catch (error) {
-    console.log(error);
+
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
@@ -2317,11 +2303,8 @@ exports.updateuserAddressAdd = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     addbook_id = req.body.addressid;
-    const updatedAddress = await addressBook.findOneAndUpdate(
-      { _id: addbook_id },
-      { $set: { default_status: 1 } },
-      { new: true }
-    );
+    const defaultStatus = req.body['check-address'] === '1' ? 1 : 0;
+
     const addr_name = req.body.addrType;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -2331,41 +2314,66 @@ exports.updateuserAddressAdd = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
-    const newAddress = new addressBook({
-      user_id: req.body.userId,
-      street_name: req.body.address2,
-      address1: req.body.address1,
-      landmark: req.body.landmark,
-      city_name: req.body.city_name,
-      city_code: req.body.city_code,
-      state_name: req.body.state_name,
-      state_code: req.body.state_code,
-      pin_code: req.body.pin_code,
-      address_name: addr_name,
-      flag: req.body.flag,
-      created_dtime: dateTime,
-    });
-    const savedAddress = await newAddress.save();
-    const user = await Users.findById(newAddress.user_id);
+    // const newAddress = new addressBook({
+    //   user_id: req.body.userId,
+    //   street_name: req.body.address2,
+    //   address1: req.body.address1,
+    //   landmark: req.body.landmark,
+    //   city_name: req.body.city_name,
+    //   city_code: req.body.city_code,
+    //   state_name: req.body.state_name,
+    //   state_code: req.body.state_code,
+    //   pin_code: req.body.pin_code,
+    //   address_name: addr_name,
+    //   flag: req.body.flag,
+    //   created_dtime: dateTime,
+    // });
+    // const savedAddress = await newAddress.save();
+
+    const address = await addressBook.findById(addbook_id);
+
+    if (!address) {
+      return res.status(404).json({
+        status: "0",
+        message: "Address not found!",
+        respdata: {},
+      });
+    }
+
+    address.street_name = req.body.address2 || address.street_name;
+    address.address1 = req.body.address1 || address.address1;
+    address.landmark = req.body.landmark || address.landmark;
+    address.city_name = req.body.city_name || address.city_name;
+    address.city_code = req.body.city_code || address.city_code;
+    address.state_name = req.body.state_name || address.state_name;
+    address.state_code = req.body.state_code || address.state_code;
+    address.pin_code = req.body.pin_code || address.pin_code;
+    address.address_name = req.body.address_name || address.address_name;
+    address.flag = req.body.flag || address.flag;
+    address.default_status = defaultStatus;
+
+
+    const updatedAddress = await address.save();
+    const user = await Users.findById(updatedAddress.user_id);
     const randomSuffix = Math.floor(Math.random() * 1000);
-    const pickupLocation = savedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;
+    const pickupLocation = updatedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;
     const PickupData = {
       pickup_location: pickupLocation,
       name: user.name,
       email: user.email,
       phone: user.phone_no,
-      address: savedAddress.street_name + ',' + savedAddress.address1,
-      address_2: savedAddress.landmark,
-      city: savedAddress.city_name,
-      state: savedAddress.state_name,
+      address: updatedAddress.street_name + ',' + updatedAddress.address1,
+      address_2: updatedAddress.landmark,
+      city: updatedAddress.city_name,
+      state: updatedAddress.state_name,
       country: "India",
-      pin_code: savedAddress.pin_code
+      pin_code: updatedAddress.pin_code
     };
     const shiprocketResponse = await generateSellerPickup(PickupData);
     if (shiprocketResponse) {
-      savedAddress.shiprocket_address = pickupLocation;
-      savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
-      await savedAddress.save();
+      updatedAddress.shiprocket_address = pickupLocation;
+      updatedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
+      await updatedAddress.save();
       res.redirect('/my-account');
     }
   } catch (error) {
@@ -2379,6 +2387,7 @@ exports.updateuserAddressAdd = async function (req, res, next) {
 
 exports.getAddressdetails = async function (req, res, next) {
   try {
+    console.log("edit page");
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
     const errors = validationResult(req);
@@ -2399,10 +2408,12 @@ exports.getAddressdetails = async function (req, res, next) {
       });
     }
     let stateList = await statesModel.find();
+    console.log("state list",stateList);
     let stateData = "";
-    if(address.state_id){
-      stateData = await statesModel.findById(address.state_id);
+    if(address.state_name){
+      stateData = await statesModel.findById(address.state_name);
     }
+    console.log("state data",stateData);
 
     res.render("webpages/update-address", {
       title: "My Account",
@@ -2474,7 +2485,6 @@ exports.userWisePost = async function (req, res, next) {
     let userBankStatus = await Bankdetails.countDocuments({
       user_id: mongoose.Types.ObjectId(isLoggedIn)
     });
-    console.log('userBankStatus--',userBankStatus)
     for (const userproduct of userproducts) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
       if (productImages) {
@@ -2561,20 +2571,28 @@ exports.addNewPost = async function (req, res, next) {
     });
   }
   try {
-    let invoice;
-    let packaging;
+    // let invoice;
+    // let packaging;
     let gender;
-    if (req.body.original_invoice == 'on' || req.body.original_invoice != '') {
-      invoice = '1';
+    // if (req.body.original_invoice == 'on' || req.body.original_invoice != '') {
+    //   invoice = '1';
+    // }
+    // else {
+    //   invoice = '0';
+    // }
+    // if (req.body.original_packaging == 'on' || req.body.original_packaging != '') {
+    //   packaging = '1';
+    // }
+    // else {
+    //   packaging = '0';
+    // }
+    let originalInvoice = 0;
+    let originalPackageing = 0;
+    if(typeof req.body.original_invoice != "undefined") {
+      originalInvoice = 1;
     }
-    else {
-      invoice = '0';
-    }
-    if (req.body.original_packaging == 'on' || req.body.original_packaging != '') {
-      packaging = '1';
-    }
-    else {
-      packaging = '0';
+    if(typeof req.body.original_packaging != "undefined") {
+      originalPackageing = 1;
     }
     if (req.body.gender) {
       gender = req.body.gender;
@@ -2598,8 +2616,8 @@ exports.addNewPost = async function (req, res, next) {
       offer_price: req.body.offer_price,
       reseller_price: req.body.reseller_price,
       percentage: req.body.percentage,
-      original_invoice: invoice,
-      original_packaging: packaging,
+      original_invoice: originalInvoice,
+      original_packaging: originalPackageing,
       gender_id: gender,
       added_dtime: moment().tz('Asia/Kolkata').format("YYYY-MM-DD HH:mm:ss"),
     });
@@ -2716,7 +2734,6 @@ exports.updatePostData = async function (req, res, next) {
     }
     const productId = req.body.productid;
     let existingProduct = await Userproduct.findById(productId);
-    console.log("product id ",productId);
     if (!existingProduct) {
       return res.status(404).json({
         status: "0",
@@ -3818,7 +3835,6 @@ exports.getJustSoldProductsweb = async function (req, res) {
       });
 
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 
@@ -4273,9 +4289,8 @@ exports.Demoorder_backup = async function (req, res) {
   }
 };
 
-exports.Demoorderold = async function (req, res) {
+exports.Demoorder = async function (req, res) {
   try {
-    console.log("demo order");
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     let pay_now,booking_amount,remaining_amount,taxable_value,cash_handling_charges;
     let formData = req.body.data;
@@ -4289,9 +4304,6 @@ exports.Demoorderold = async function (req, res) {
     let product =await Userproduct.findById(product_id);
     let total_price = 0;
 
-    let data = await checkoutcal.ordercalculte(product_id,user_id, payment_method);
-  
-    console.log("data",data);
     const existingCart = await Cart.findOne({ user_id, status: 0 });
 
     const cartItem = await CartDetail.findOne({ cart_id: existingCart._id, status: 0 })
@@ -4349,7 +4361,7 @@ exports.Demoorderold = async function (req, res) {
     let delivery_status = '0';
     let shipping_address_id = formData.addressBookId;
 
-    const billingaddress = await addressBook.findOne({ user_id: seller_id });
+    const billingaddress = await addressBook.findOne({ user_id: seller_id, default_status :1 });
     if (!billingaddress) {
       return res.status(404).json({ message: 'Seller address not found' });
     }
@@ -4393,7 +4405,7 @@ exports.Demoorderold = async function (req, res) {
 };
 
 
-exports.Demoorder = async function (req, res) {
+exports.Demoorderold = async function (req, res) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     let pay_now, booking_amount, remaining_amount, taxable_value, cash_handling_charges;
@@ -4441,7 +4453,6 @@ exports.Demoorder = async function (req, res) {
     }
     
   } catch (error) {
-    console.error("Error in Demoorder:", error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };

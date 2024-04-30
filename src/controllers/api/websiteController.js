@@ -2191,9 +2191,15 @@ exports.userAddressAdd = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
-    const defaultStatus = req.body['check-address'] ? 1 : 0;
+    let defaultStatus = req.body['check-address'] ? 1 : 0;
 
-    if (defaultStatus === 1) {
+    const existingUserAddresses = await addressBook.find({
+      user_id: req.body.userId,
+      deleted_status: 0,
+    });
+
+
+    if (defaultStatus === 1 && existingUserAddresses.length > 0) {
       const existingDefaultAddress = await addressBook.findOne({
         user_id: req.body.userId,
         default_status: 1,
@@ -2204,6 +2210,10 @@ exports.userAddressAdd = async function (req, res, next) {
           default_status: 0,
         });
       }
+    }
+    if(existingUserAddresses.length === 0)
+    {
+      defaultStatus = 1;
     }
     let stateId = req.body.state_name;
     let getState = await statesModel.findOne({_id:mongoose.Types.ObjectId(stateId)});

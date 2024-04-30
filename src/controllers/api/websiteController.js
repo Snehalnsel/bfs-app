@@ -2194,14 +2194,12 @@ exports.userAddressAdd = async function (req, res, next) {
     const defaultStatus = req.body['check-address'] ? 1 : 0;
 
     if (defaultStatus === 1) {
-      // Find any existing address with default_status as 1 for this user_id
       const existingDefaultAddress = await addressBook.findOne({
         user_id: req.body.userId,
         default_status: 1,
       });
 
       if (existingDefaultAddress) {
-        // Update the existing default address's default_status to 0
         await addressBook.findByIdAndUpdate(existingDefaultAddress._id, {
           default_status: 0,
         });
@@ -2322,7 +2320,7 @@ exports.updateuserAddressAdd = async function (req, res, next) {
     addbook_id = req.body.addressid;
     console.log(req.body);
     
-    const defaultStatus = req.body['check-address'] === '1' ? 1 : 0;
+    const defaultStatus = req.body['check-address'] == '1' ? 1 : 0;
 
     console.log(defaultStatus);
     
@@ -2336,13 +2334,13 @@ exports.updateuserAddressAdd = async function (req, res, next) {
       });
     }
     const address = await addressBook.findById(addbook_id);
-    if (defaultStatus === 1) {
+    if (defaultStatus == 1) {
       const existingDefaultAddress = await addressBook.findOne({
         user_id: address.user_id,
         default_status: 1,
       });
 
-      if (existingDefaultAddress) {
+      if (existingDefaultAddress && existingDefaultAddress._id.toString() !== addbook_id) {
         await addressBook.findByIdAndUpdate(existingDefaultAddress._id, {
           default_status: 0,
         });

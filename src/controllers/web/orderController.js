@@ -521,16 +521,20 @@ exports.getOrderAllDetails = function (req, res, next) {
 
     })
     .catch((error) => {
-      console.log(error);
-      res.status(500).json({ error: 'An error occurred while fetching order details' });
-    });
+      return res.render("pages/error-msg", {
+        errorMsg: error.msg
+      });
+    //   console.log(error);
+    //   res.status(500).json({ error: 'An error occurred while fetching order details' });
+     });
 };
 
 
 
 exports.getOrderDetails = function (req, res, next) {
   let id = req.params.id
-  let orderStatus = req.params.order_status
+  //let orderStatus = req.params.order_status
+  let orderStatus = req.params.flowid;
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Order Details";
   var pageTitle = req.app.locals.siteName + " - " + pageName;
@@ -551,8 +555,8 @@ exports.getOrderDetails = function (req, res, next) {
         return res.status(404).json({ error: 'Order not found' });
       }
 
-      const billingAddress = await AddressBook.find({ user_id: orderDetails.seller_id ,default_status :0 });
-      const shippingAddress = await AddressBook.find({ user_id: orderDetails.user_id ,default_status :0 });
+      const billingAddress = await AddressBook.find({ user_id: orderDetails.seller_id ,deleted_status :0});
+      const shippingAddress = await AddressBook.find({ user_id: orderDetails.user_id ,deleted_status :0 });
 
       const hubdata = await Hublist.find({ flag: 1 });
 
@@ -578,10 +582,12 @@ exports.getOrderDetails = function (req, res, next) {
         },
         isAdminLoggedIn: isAdminLoggedIn
       });
-
     })
     .catch((error) => {
-      res.status(500).json({ error: 'An error occurred while fetching order details' });
+      console.log(error);
+      return res.render("pages/error-msg", {
+        errorMsg: error._message
+      });
     });
 };
 
@@ -864,13 +870,10 @@ exports.updateData = async function (req, res, next) {
 
       res.redirect("/admin/orderlist");
     }
-  }).catch((err) => {
-    
-    res.status(500).json({
-      status: "0",
-      message: "An error occurred while updating the product.",
-      respdata: {},
-      isAdminLoggedIn: isAdminLoggedIn
+  }).catch((error) => {
+    console.log(error);
+    return res.render("pages/error-msg", {
+      errorMsg: error._message
     });
   });
 };
@@ -1218,10 +1221,10 @@ exports.orderplaced = async (req, res) => {
         { $set: { status: 1 } },
         { new: true }
       );
-      //res.redirect("/admin/orderlist");
       res.redirect(`/admin/check-Couriresserviceability/${track_id}`);
     }
   } catch (error) {
+    console.log(error);
     return res.render("pages/error-msg", {
       errorMsg: "An error occurred while placing the order!"
     });

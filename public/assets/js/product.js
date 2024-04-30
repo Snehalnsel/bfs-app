@@ -314,9 +314,9 @@ $(document).on('click', ".address-remove-button", async function (e) {
       }).then(async (result) => {
         /* Read more about isConfirmed, isDenied below */
         if (result.isConfirmed) {
-            let wishlistCookieAccessToken = await getCookieFunc(accessTokenVar);
-            let wishlistCookieRefreshToken = await getCookieFunc(refreshTokenVar);
-            await userReLogin(wishlistCookieAccessToken, wishlistCookieRefreshToken);
+            let addresslistCookieAccessToken = await getCookieFunc(accessTokenVar);
+            let addresslistCookieRefreshToken = await getCookieFunc(refreshTokenVar);
+            await userReLogin(addresslistCookieAccessToken, addresslistCookieRefreshToken);
 
             var id = $(this).data('id');
             console.log(id);

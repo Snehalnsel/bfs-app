@@ -2373,11 +2373,15 @@ exports.updateuserAddressAdd = async function (req, res, next) {
     address.flag = req.body.flag || address.flag;
     address.default_status = defaultStatus;
 
-
-    console.log(address);
-    
-
     const updatedAddress = await address.save();
+    const hasDefaultAddress = await addressBook.findOne({
+      user_id: address.user_id,
+      default_status: 1,
+    });
+    if (!hasDefaultAddress) {
+      updatedAddress.default_status = 1;
+      await updatedAddress.save();
+    }
     const user = await Users.findById(updatedAddress.user_id);
     const randomSuffix = Math.floor(Math.random() * 1000);
     const pickupLocation = updatedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;
@@ -2492,22 +2496,18 @@ exports.deleteUserAddress = async function (req, res, next) {
   try {
     const addbook_id = req.params.id;
     const addressToDelete = await addressBook.findById(addbook_id);
-
     if (addressToDelete.default_status === 1) {
       return res.status(200).json({
         message: 'Default Address cannot be deleted,PLease Set another Address default first',
         success: false,
       });
     }
-
     addressToDelete.deleted_status = 1;
     await addressToDelete.save();
-
     return res.status(200).json({
       message: 'Address Deleted Successfully',
       success: true,
     });
-
    // res.redirect('/my-account');
   } catch (error) {
     res.status(500).json({
@@ -4458,6 +4458,66 @@ exports.Demoorder = async function (req, res) {
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+// exports.demoorder = async function (req, res) {
+//   try {
+//     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+//     let formData = req.body.data; // assuming formData is correctly populated
+//     let user_id = formData.user_id;
+//     let seller_id = formData.seller_id;
+//     let cart_id = formData.cart_id;
+//     let product_id = formData.product_id;
+//     let total_price = formData.total_amt;
+//     let payment_method = formData.payment_method;
+//     let gst = formData.gst;
+//     let order_status = '0';
+//     let delivery_charges = '0';
+//     let discount = '0';
+//     let pickup_status = '0';
+//     let delivery_status = '0';
+//     let shipping_address_id = formData.addressBookId;
+//     let pay_now = formData.pay_now || null;
+//     let remaining_amount = formData.remaining_amount || null;
+
+//     // Check if billing address exists
+//     const billingaddress = await addressBook.findOne({ user_id: seller_id });
+//     if (!billingaddress) {
+//       return res.status(404).json({ message: 'Seller address not found' });
+//     }
+
+//     const billing_address_id = billingaddress._id;
+
+//     const order = new Demoorder({
+//       user_id,
+//       cart_id,
+//       seller_id,
+//       product_id,
+//       billing_address_id,
+//       shipping_address_id,
+//       total_price,
+//       payment_method,
+//       order_status,
+//       pay_now,
+//       remaining_amount,
+//       status: 1,
+//       added_dtime: new Date().toISOString(),
+//     });
+
+//     const savedOrder = await order.save();
+
+//     if (savedOrder) {
+//       res.status(200).json({
+//         status: "1",
+//         is_orderPlaced: 1,
+//         message: 'Order placed successfully',
+//         order: savedOrder
+//       });
+//     }
+//   } catch (error) {
+//     console.error(error); // Log the error for debugging
+//     return res.status(500).json({ message: 'Internal server error' });
+//   }
+// };
 
 
 exports.Demoorderold = async function (req, res) {

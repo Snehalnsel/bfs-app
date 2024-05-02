@@ -4857,9 +4857,14 @@ exports.sendotp = async function (req, res, next) {
                         let returnData;
                         returnData = await sendWhatsapp(smsData);
                       });  
+                      const currentDate = new Date().toLocaleDateString();
+                      const currentTime = new Date().toLocaleTimeString();
+
                       const loginHtmlPath = 'views/webpages/reset-password.html';
                       let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
                       loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+                      loginHtmlContent = loginHtmlContent.replace('{{date}}', currentDate);
+                      loginHtmlContent = loginHtmlContent.replace('{{time}}', currentTime);
                       const mailData = {
                         from: "Bid For Sale! <" + smtpUser + ">",
                         to: user.email,

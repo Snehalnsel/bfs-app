@@ -127,7 +127,7 @@
                         </div>
 
                         <div class="div-6">
-                           <label>Landmark (Optional):</label>
+                           <label>Landmarksss (Optional):</label>
                            <input type="type" name="landmark" class="ds-form-control" value="<%=address.landmark%>"
                               placeholder="Enter Landmark">
                         </div>
@@ -145,19 +145,23 @@
                         <div class="div-6">
                            <label for="productCondition">state<span class="required">*</span>:</label>
                            <select class="ds-form-control" name="state_name" id="state_name" required>
-                              <option value="" disabled selected>Select State</option>
-                              <% stateList.forEach(function(value) { 
-                                 let setStateId = (typeof address.state_id != "undefined" && value._id == address.state_id )  ? "selected" : "";
-                                 %>
-                                 <option value="<%= value._id %>" <%=setStateId%> %>><%= value.name %>
-                                 <% }); %>
-                           </select>
+                              <option value="" disabled>Select State</option>
+                              <% stateList.forEach(function(value) { %>
+                                 <option value="<%= value._id %>" <%=(stateData && stateData._id.equals(value._id)) ? 'selected' : '' %>><%= value.name %></option>
+                              <% }); %>
+                           </select>                                                                                    
                         </div>
                         <div class="div-6">
                            <label>Zip<span class="required">*</span>:</label>
                            <input type="type" name="pin_code" class="ds-form-control" placeholder="Zip"
                               value="<%=address.pin_code%>">
                         </div>
+                        <div class="div-12">
+                           <div class="check-label-flex">
+                               <input type="checkbox" id="check-address" name="check-address" value="1" <% if (address.default_status == 1) { %> checked <% } %>>
+                               <label for="check-address"> Default Address </label>
+                           </div>
+                       </div>                       
                         <div class="div-12">
                            <input type="submit" name="" class="ds-form-control" value="Update">
                         </div>

@@ -12,6 +12,7 @@ const mime = require("mime");
 const PDFDocument = require('pdfkit');
 const nodemailer = require('nodemailer');
 const rp = require('request-promise-native');
+const puppeteer = require('puppeteer');
 const request = require('request');
 const Category = require("../../models/api/categoryModel");
 const Brand = require("../../models/api/brandModel");
@@ -520,16 +521,20 @@ exports.getOrderAllDetails = function (req, res, next) {
 
     })
     .catch((error) => {
-      console.log(error);
-      res.status(500).json({ error: 'An error occurred while fetching order details' });
-    });
+      return res.render("pages/error-msg", {
+        errorMsg: error.msg
+      });
+    //   console.log(error);
+    //   res.status(500).json({ error: 'An error occurred while fetching order details' });
+     });
 };
 
 
 
 exports.getOrderDetails = function (req, res, next) {
   let id = req.params.id
-  let orderStatus = req.params.order_status
+  //let orderStatus = req.params.order_status
+  let orderStatus = req.params.flowid;
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Order Details";
   var pageTitle = req.app.locals.siteName + " - " + pageName;
@@ -550,8 +555,8 @@ exports.getOrderDetails = function (req, res, next) {
         return res.status(404).json({ error: 'Order not found' });
       }
 
-      const billingAddress = await AddressBook.find({ user_id: orderDetails.seller_id });
-      const shippingAddress = await AddressBook.find({ user_id: orderDetails.user_id });
+      const billingAddress = await AddressBook.find({ user_id: orderDetails.seller_id ,deleted_status :0});
+      const shippingAddress = await AddressBook.find({ user_id: orderDetails.user_id ,deleted_status :0 });
 
       const hubdata = await Hublist.find({ flag: 1 });
 
@@ -577,10 +582,12 @@ exports.getOrderDetails = function (req, res, next) {
         },
         isAdminLoggedIn: isAdminLoggedIn
       });
-
     })
     .catch((error) => {
-      res.status(500).json({ error: 'An error occurred while fetching order details' });
+      console.log(error);
+      return res.render("pages/error-msg", {
+        errorMsg: error._message
+      });
     });
 };
 
@@ -863,13 +870,10 @@ exports.updateData = async function (req, res, next) {
 
       res.redirect("/admin/orderlist");
     }
-  }).catch((err) => {
-    ;
-    res.status(500).json({
-      status: "0",
-      message: "An error occurred while updating the product.",
-      respdata: {},
-      isAdminLoggedIn: isAdminLoggedIn
+  }).catch((error) => {
+    console.log(error);
+    return res.render("pages/error-msg", {
+      errorMsg: error._message
     });
   });
 };
@@ -1217,10 +1221,10 @@ exports.orderplaced = async (req, res) => {
         { $set: { status: 1 } },
         { new: true }
       );
-      //res.redirect("/admin/orderlist");
       res.redirect(`/admin/check-Couriresserviceability/${track_id}`);
     }
   } catch (error) {
+    console.log(error);
     return res.render("pages/error-msg", {
       errorMsg: "An error occurred while placing the order!"
     });
@@ -2579,28 +2583,27 @@ exports.downloadOrderPDF = function (req, res, next) {
       res.status(500).json({ error: 'An error occurred' });
     } else {
       try {
+          const loginHtmlPath = 'views/webpages/invoice1.html';
+          const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
 
-        // const loginHtmlPath = 'views/webpages/demoinvoice.html';
-        const loginHtmlPath = 'views/webpages/invoice1.html';
-        const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
+        const orderDate = new Date(orderList[0].added_dtime);
+        const formattedDate = `${orderDate.getDate()}-${orderDate.getMonth() + 1}-${orderDate.getFullYear()}`;
+        
+        const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate });
+        //  const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
 
-        // Replace dynamic content in the HTML template
-        const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
+          const browser = await puppeteer.launch();
+          const page = await browser.newPage();
 
-        // PDF options
-        const options = { format: 'Letter' };
+          await page.setContent(renderedHtml);
 
-        // Convert HTML to PDF
-        pdf.create(renderedHtml, options).toStream((err, stream) => {
-          if (err) return res.status(500).send('An error occurred while generating PDF');
+          const pdfBuffer = await page.pdf({ format: 'A4' });
 
-          // Set headers for file download
           res.setHeader('Content-Type', 'application/pdf');
           res.setHeader('Content-Disposition', 'attachment; filename=Invoice.pdf');
 
-          // Pipe the stream to the response
-          stream.pipe(res);
-        });
+          res.send(pdfBuffer);
+          await browser.close();
       } catch (err) {
         //console.error('Error generating PDF:', err);
         return res.render("pages/error-msg", {
@@ -2693,21 +2696,29 @@ exports.downloadOrdesecondrPDF = function (req, res, next) {
       try {
         const loginHtmlPath = 'views/webpages/invoice2.html';
         const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
-        const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
-        const options = { format: 'Letter' };
-        pdf.create(renderedHtml, options).toStream((err, stream) => {
-          if (err) return res.status(500).send('An error occurred while generating PDF');
-          res.setHeader('Content-Type', 'application/pdf');
-          res.setHeader('Content-Disposition', 'attachment; filename=InvoiceBFStoBuyer.pdf');
-          stream.pipe(res);
-        });
+        const orderDate = new Date(orderList[0].added_dtime);
+        const formattedDate = `${orderDate.getDate()}-${orderDate.getMonth() + 1}-${orderDate.getFullYear()}`;
+        
+        const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate });
+        // const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+    
+        await page.setContent(renderedHtml);
+        const pdfBuffer = await page.pdf({ format: 'Letter' });
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=InvoiceBFStoBuyer.pdf');
+    
+        res.send(pdfBuffer);
+
+        await browser.close();
       } catch (err) {
+        console.log(err);
         res.status(500).json({ error: 'An error occurred while generating PDF' });
       }
     }
   });
 };
-
 
 exports.returninvoicebb = function (req, res, next) {
   var pageName = "Order List";
@@ -2790,14 +2801,22 @@ exports.returninvoicebb = function (req, res, next) {
       try {
         const loginHtmlPath = 'views/webpages/returnInvoiceBBR.html';
         const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
-        const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
-        const options = { format: 'Letter' };
-        pdf.create(renderedHtml, options).toStream((err, stream) => {
-          if (err) return res.status(500).send('An error occurred while generating PDF');
-          res.setHeader('Content-Type', 'application/pdf');
-          res.setHeader('Content-Disposition', 'attachment; filename=InvoiceBFStoBuyer.pdf');
-          stream.pipe(res);
-        });
+        const orderDate = new Date(orderList[0].added_dtime);
+        const formattedDate = `${orderDate.getDate()}-${orderDate.getMonth() + 1}-${orderDate.getFullYear()}`;
+        
+        const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate });
+        // const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+    
+        await page.setContent(renderedHtml);
+       
+        const pdfBuffer = await page.pdf({ format: 'Letter' });
+  
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=InvoiceReturnBuyertoBfs.pdf');
+        res.send(pdfBuffer);
+        await browser.close();
       } catch (err) {
         res.status(500).json({ error: 'An error occurred while generating PDF' });
       }
@@ -2886,14 +2905,24 @@ exports.returninvoicesbr = function (req, res, next) {
       try {
         const loginHtmlPath = 'views/webpages/returnInvoiceSBR.html';
         const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
-        const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
-        const options = { format: 'Letter' };
-        pdf.create(renderedHtml, options).toStream((err, stream) => {
-          if (err) return res.status(500).send('An error occurred while generating PDF');
-          res.setHeader('Content-Type', 'application/pdf');
-          res.setHeader('Content-Disposition', 'attachment; filename=InvoiceBFStoBuyer.pdf');
-          stream.pipe(res);
-        });
+        const orderDate = new Date(orderList[0].added_dtime);
+        const formattedDate = `${orderDate.getDate()}-${orderDate.getMonth() + 1}-${orderDate.getFullYear()}`;
+        
+        const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate });
+        // const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
+        
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+    
+        await page.setContent(renderedHtml);
+       
+        const pdfBuffer = await page.pdf({ format: 'Letter' });
+  
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=InvoiceBFStoSeller.pdf');
+      
+        res.send(pdfBuffer);
+        await browser.close();
       } catch (err) {
         res.status(500).json({ error: 'An error occurred while generating PDF' });
       }

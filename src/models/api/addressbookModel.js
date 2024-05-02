@@ -61,6 +61,12 @@ const model = mongoose.Schema({
     default: 0,
     required: true,
   },
+  deleted_status: {
+    type: Number,
+    enum: [0,1],
+    default: 0,
+    required: true,
+  },
   created_dtime: {
     type: String,
     required: true,

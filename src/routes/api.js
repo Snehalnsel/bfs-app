@@ -156,10 +156,18 @@ router.post(
   UserController.editProfile
 );
 
+router.post("/getbankdetails",auth.isAuthorized,[],WebsiteController.getbankDetails);
+
+router.post(
+  "/update-bank-details",
+  auth.isAuthorized,
+  [],
+  upload.single('image'),
+  WebsiteController.usersBankDetailsUpdate
+);
 
 router.post(
   "/edit-bank-details",
-  //auth.isAuthorized,
   [],
   upload.single('image'),
   WebsiteController.userBankDetailsUpdate
@@ -1121,15 +1129,34 @@ router.get(
 
 router.get("/bestdealBackup",[],WebsiteController.getBestDealProductsweb);
 
-router.get("/bestdeal/:id", cors(), (req, res) => {
+// router.get("/bestdeal/:id", cors(), (req, res) => {
+//   const page = req.query.page;
+//   WebsiteController.getBestDealProductswebNew(page, req, res);
+// });
+
+router.get("/bestDeal", cors(), (req, res) => {
   const page = req.query.page;
   WebsiteController.getBestDealProductswebNew(page, req, res);
 });
+router.get("/whatshot", cors(), (req, res) => {
+  const page = req.query.page;
+  WebsiteController.getBestDealProductswebNew(page, req, res);
+});
+router.get("/justsold", cors(), (req, res) => {
+  const page = req.query.page;
+  WebsiteController.getBestDealProductswebNew(page, req, res);
+});
+
 
 router.get("/whatshot",[],WebsiteController.getWhatsHotProductsweb);
 router.get("/justsold",[],WebsiteController.getJustSoldProductsweb);
 router.get("/productdeatils/:id",[],WebsiteController.productData);
 router.get("/privacy-policy",[],WebsiteController.privacypolicyData);
+router.get("/about-us",[],WebsiteController.aboutusData);
+router.get("/contract-us",[],WebsiteController.contractusData);
+router.get("/payment-policy",[],WebsiteController.paymentpolicyData);
+router.get("/faq",[],WebsiteController.faqData);
+router.get("/returns-shipping",[],WebsiteController.returnShipping);
 router.get("/returns-shipping",[],WebsiteController.returnShipping);
 router.get("/terms",[],WebsiteController.tremsandconditionData);
 router.get("/registration",[],WebsiteController.registration);
@@ -1190,9 +1217,9 @@ router.post("/useredit",upload.array('image', 1),WebsiteController.userUpdate);
 router.post("/user-new-checkout-address",[],WebsiteController.userNewCheckOutAddressAdd);
 
 router.post("/adduseraddress",[
-  check("address1", "This is a required field!").isLength({max: 120 }),
-    check("address2", "This is a required field!").isLength({max: 120 }),
-    check("landmark", "This is a required field!").isLength({max: 50 }),
+  check("address1", "This is a required field!").isLength({max: 150 }),
+    check("address2", "This is a required field!").isLength({max: 150 }),
+    check("landmark", "This is a required field!").isLength({max: 70 }),
     check("city_name", "This is a required field!").isLength({max:30}),
     check("state_name", "This is a required field!").isLength({max:30}),
     check("pin_code", "This is a required field!").isLength({max:30})
@@ -1200,9 +1227,9 @@ router.post("/adduseraddress",[
 
 router.get("/edituseraddress/:id",[],WebsiteController.getAddressdetails);
 router.post("/updateuseraddress",[
-  check("address1", "This is a required field!").isLength({max: 120 }),
-    check("address2", "This is a required field!").isLength({max: 120 }),
-    check("landmark", "This is a required field!").isLength({max: 50 }),
+  check("address1", "This is a required field!").isLength({max: 150 }),
+    check("address2", "This is a required field!").isLength({max: 150 }),
+    check("landmark", "This is a required field!").isLength({max: 70 }),
     check("city_name", "This is a required field!").isLength({max:30}),
     check("state_name", "This is a required field!").isLength({max:30}),
     check("pin_code", "This is a required field!").isLength({max:30})
@@ -1216,8 +1243,8 @@ router.get("/add-post",[],WebsiteController.addPostView);
 
 router.post("/addnewpost",[
   check("name", "This is a required field!").isLength({max: 50 }),
-    check("description", "This is a required field!").optional({nullable: true}).isLength({max: 120 }),
-    check("product_cate", "This is a required field!").optional({nullable: true}).isLength({max: 120 }),
+    check("description", "This is a required field!").optional({nullable: true}).isLength({max: 150 }),
+    check("product_cate", "This is a required field!").optional({nullable: true}).isLength({max: 150 }),
     check("brand", "This is a required field!").isLength({max:30}),
     check("product_condition", "This is a required field!").optional({nullable: true}).isLength({max: 120 }),
     check("size", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),
@@ -1227,15 +1254,14 @@ router.post("/addnewpost",[
     check("breath", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),
     check("price", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),
     check("offer_price", "This is a required field!").optional({nullable: true}).isLength({max: 12 })
-
 ], upload.array('image', 5),WebsiteController.addNewPost);
 
 router.get("/edit-mypost/:id",[],WebsiteController.editUserWisePost);
 
 router.post("/updatepostdata",[
   check("name", "This is a required field!").isLength({max: 50 }),
-    check("description", "This is a required field!").optional({nullable: true}).isLength({max: 120 }),
-    check("product_cate", "This is a required field!").optional({nullable: true}).isLength({max: 120 }),
+    check("description", "This is a required field!").optional({nullable: true}).isLength({max: 150 }),
+    check("product_cate", "This is a required field!").optional({nullable: true}).isLength({max: 150 }),
     check("brand", "This is a required field!").isLength({max:30}),
     check("product_condition", "This is a required field!").optional({nullable: true}).isLength({max: 120 }),
     check("size", "This is a required field!").optional({nullable: true}).isLength({max: 12 }),
@@ -1256,25 +1282,21 @@ router.post("/updatepostdata",[
 },{
   name: 'img4', maxCount: 1
 },]),WebsiteController.updatePostData);
-
-// Add To cart 
+ 
 router.post("/addtocart/:id",[],WebsiteController.addToCart);
 
-// Show Cart Details
 router.get("/show-cart-details",[],WebsiteController.viewCartListByUserId);
 
-router.get("/delete-cart/:id",[],WebsiteController.deleteCart); //auth.isAuthorized
+router.get("/delete-cart/:id",[],WebsiteController.deleteCart); 
 
-// Wishlist Web Start
+
 router.post("/add-to-wishlist-web/:id",[],WebsiteController.addToWishlistWeb);
 
 router.get("/show-wishlist-details",[],WebsiteController.viewWishListByUserId);
 
 router.get("/remove-wishlist-web/:id",[],WebsiteController.removeWishlistWeb);
 
-// Wishlist Web End
 
-// Web Order List
 
 router.get("/web-my-order",WebsiteController.myOrderWeb);
 

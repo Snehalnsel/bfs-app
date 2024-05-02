@@ -46,6 +46,7 @@
     "nodemailer": "^6.8.0",
     "pdfkit": "^0.14.0",
     "pngquant-bin": "^6.0.1",
+    "puppeteer": "^22.6.5",
     "redis": "^4.3.0",
     "request": "^2.88.2",
     "request-promise-native": "^1.0.9",

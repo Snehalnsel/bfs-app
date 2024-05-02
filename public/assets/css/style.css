@@ -4687,3 +4687,130 @@ button.btn.liginbtn.resetpass.pd-resetpass {
     height: 100%;
     padding: 15px;
 }
+
+.hover-box {
+    visibility: hidden;
+    position: absolute;
+    z-index: 1;
+    width: 150px;
+    color: #010101;
+    font-size: 14px;
+    line-height: 23px;
+    background-color: #e7e7e7;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.hover-text:hover .hover-box {
+  visibility: visible;
+}
+
+
+
+.order-tooltip-box{
+    visibility: hidden;
+    position: absolute;
+    z-index: 1;
+    width: 140px;
+    color: #010101;
+    font-size: 12px;
+    line-height: 19px;
+    background-color: #e7e7e7;
+    border-radius: 6px;
+    padding: 5px;
+    margin-top: 5px;
+}
+
+.otb-hoverbox:hover .order-tooltip-box {
+  visibility: visible;
+}
+
+button.grey-btn {
+    background: #eeeeee;
+    color: #484848;
+    font-weight: 500;
+    border: solid 1px #eeeeee;
+    padding: 5px 12px;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+/*////*/
+
+.cms-text-mainblock{
+    width: 100%;
+    padding: 40px 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    text-decoration: none;
+}
+
+.cms-text-mainblock .text-box{
+    width: 100%;
+    padding: 0 0 15px 0;
+    margin: 0;
+    border: none;
+    outline: none;
+    text-decoration: none;
+    font-size: 14px;
+    color: #000;
+    line-height: 24px;
+    font-weight: 400;
+}
+
+.cms-text-mainblock .text-box h6 {
+    color: var(--black-color);
+    font-weight: 600;
+    font-size: 18px;
+    text-transform: capitalize;
+    line-height: 25px;
+    margin-bottom: 5px;
+}
+.cms-text-mainblock .text-box p {
+    width: 100%;
+    text-align: left;
+    padding: 0 0 20px 0;
+    font-size: 14px;
+    color: #000;
+    line-height: 1.5;
+    font-weight: 400;
+}
+.cms-text-mainblock a{
+    text-decoration: none;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    color: #cb3805;
+}
+
+.justify-content-start{
+    justify-content: start !important;
+}
+
+.message-boxed-step {
+    padding: 10px 20px;
+    max-width: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.check-label-flex {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.check-label-flex label {
+    margin: 0;
+    margin-left: 5px;
+}
+
+.check-label-flex input[type=checkbox] {
+    width: 15px;
+    height: 15px;
+}
+
+.orange-text {
+    color: #e3683d !important; 
+}

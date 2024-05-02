@@ -158,7 +158,7 @@
                       <div class="div-6">
                          <label>Original Invoice</label>
                          <label class="switch ">
-                           <input type="checkbox" name="original_invoice">
+                           <input type="checkbox" class="changeToggle" name="original_invoice">
                              <span class="tg-slider round"></span>
                          </label>
                          
@@ -167,7 +167,7 @@
                       <div class="div-6">
                         <label>Original Packaging</label>
                         <label class="switch ">
-                           <input type="checkbox" name="original_package">
+                           <input type="checkbox" class="changeToggle" name="original_package">
                              <span class="tg-slider round"></span>
                          </label>
                       </div>
@@ -233,5 +233,14 @@
 
 <%- include('../../public/assets/include/newsletter'); %>
 <%- include('../../public/assets/include/footer'); %>
+<script>
+   $(document).on("change",".changeToggle",function(){
+      if($(this).is(":checked")){
+         $(this).val(1)
+      } else {
+         $(this).val(0)
+      }
+   })
+</script>
 </body>
 <script src="/public/assets/js/myaccount.js"></script>

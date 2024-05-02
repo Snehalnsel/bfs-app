@@ -84,8 +84,7 @@ exports.getPaymentData = async function (req, res, next) {
     {
       amount = parseFloat(temporder.booking_amount);
     }
-    //amount = 1;
-      amount = temporder.booking_amount !== 0 ? temporder.booking_amount : temporder.total_price;
+   // amount = temporder.booking_amount !== 0 ? temporder.booking_amount : temporder.total_price;
 
     let userId = temporder.user_id;
     let merchantTransactionId = uniqid();
@@ -370,9 +369,7 @@ exports.getStatus = async function (req, res, next) {
         SALT_KEY;
       let sha256_val = sha256(string);
       let xVerifyChecksum = sha256_val + "###" + SALT_INDEX;
-
       try {
-
 /*
         const response = await axios.get(statusUrl, {
           headers: {
@@ -422,7 +419,6 @@ exports.getStatus = async function (req, res, next) {
           let discount = '0';
           let pickup_status = '0';
           let delivery_status = '0';          
-          
           const lastOrderIndex = await getLastOrderIndex();
           const nextIncrementingPart = lastOrderIndex + 1;
           const orderCode = `BFSORD${currentMonth}${currentYear}-${nextIncrementingPart}`;
@@ -450,9 +446,7 @@ exports.getStatus = async function (req, res, next) {
             remaining_amount: temporder.remaining_amount || '',
             added_dtime: new Date().toISOString(),
           });
-
           const savedOrder = await order.save();
-
           if(savedOrder)
           {
             const updatedProduct = await Userproduct.findOneAndUpdate(
@@ -513,9 +507,8 @@ exports.getStatus = async function (req, res, next) {
                 await cartDetail.remove();
               }
               const cartDetailsCount = await CartDetail.countDocuments({ cart_id: savedOrder.cart_id });
-             
               const existingCart = await Cart.findById(temporder.cart_id);
-              if (cartDetailsCount != 0) {
+              if (existingCart) {
                 await existingCart.remove();
               }
             } 

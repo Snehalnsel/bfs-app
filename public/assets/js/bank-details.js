@@ -1,3 +1,8 @@
+jQuery.validator.addMethod("customupiid", function (value, element, params) {
+    var re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9-]+$/i;
+    return re.test(value);
+}, "Please enter a valid upiid address.");
+
 $(document).ready(async function(){
     $('#editBankDetails').validate({
         debug:false,
@@ -6,7 +11,7 @@ $(document).ready(async function(){
         rules:{
             bankname:{
                 //required:true,
-                maxlength:100
+                maxlength:150
             },
             branch:{
                 required:{
@@ -29,7 +34,7 @@ $(document).ready(async function(){
                       }
                     }
                 },
-                maxlength:100
+                maxlength:160
             },
             accountnumber:{
                 required:{
@@ -53,7 +58,7 @@ $(document).ready(async function(){
                       }
                     }
                 },
-                maxlength:100
+                maxlength:150
             },
             accounttype:{
                 required:{
@@ -67,21 +72,24 @@ $(document).ready(async function(){
                 },
             },
             upiid:{
-                //required: required,
-                maxlength:100
+                required:function() {
+                    return $('#bankname').val() == '' && $('#upiscaner').val() == '';
+                },
+                maxlength:100,
+                customupiid: true,
             },
             upiscaner:{
-                //required:true,
+                required:function() {
+                    return $('#bankname').val() == '' && $('#upiid').val() != '';
+                }
             },
         },
         messages:{
             bankname:{
-                //required:"Please enter bank name.",
                 maxlength:"Please enter valid name."
             },
             branch:{
                 required:"Please enter branch name.",
-                //maxlength:"Please enter valid name."
             },
             accountname:{
                 required:"Please enter account holder name.",
@@ -99,11 +107,11 @@ $(document).ready(async function(){
                 required:"Please select a option",
             },
             upiid:{
-                //required:"Please enter upi id.",
-                maxlength:"Please enter valid upi id."
+                maxlength:"Please enter valid upi id.",
+                customupiid:"Please enter valid upidid"
             },
             upiscaner:{
-                //required:"Please enter a upi ",
+                required:"Please enter a upi scanner",
             },
         },
         submitHandler: function() {
@@ -134,7 +142,6 @@ $(document).ready(async function(){
                 contentType: false,
                 cache: false,
                 success: async function(obj){
-                    // let obj = response.responseJSON;
                     let error_success = obj.status;
                     if(error_success == 'success'){
                         $('#success-bank-msg').html(obj.message);

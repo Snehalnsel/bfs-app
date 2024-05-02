@@ -80,8 +80,9 @@
                                                 <tr>
                                                     <th>Sl No</th>
                                                     <th>Order Id</th>
-                                                    <th>Product Image</th>
                                                     <th>Product name</th>
+                                                    <th>Invoice</th>
+                                                    <th>Return Invoice</th>
                                                     <th>Product Sold Price</th>
                                                     <th>Shipment Kit Status</th>
                                                     <th>Status(Won Bid / Buy Now)</th>
@@ -89,7 +90,6 @@
                                                     <th>Seller Details</th>
                                                     <th>Buyer Details</th>
                                                     <th>Order Date</th>
-                                                    <!-- <th>Order Status</th> -->
                                                     <th>Seller to Hub</th>
                                                     <th>Hub to Buyer</th>
                                                     <th>Buyer to Hub</th>
@@ -106,12 +106,6 @@
                                                             <td>
                                                                 <% if (value.order_code) { %>
                                                                     <a href="/admin/shipmentdetails/<%= value._id %>" target="_blank"><%= value.order_code %></a>
-                                                                    <a href="/admin/download-orderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download PDF</button></a><br>
-                                                                    <a href="/admin/download-orderbfspdf/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download Second PDF</button></a><br>
-                                                                    <button id="showOptionsBtn" class="btn btn-primary">Show Options</button>
-                                                                    <div id="optionsContainer" style="display: none;">                                                                      <button id="emailOption" class="btn btn-secondary" onclick="sendViaEmail('<%= value._id %>')">Send via Email</button>
-                                                                      <button id="whatsappOption" class="btn btn-secondary" onclick="sendViaWhatsApp('<%= value._id %>')">Send via WhatsApp</button>
-                                                                    </div>
                                                                 <% } else { %>
                                                                     <span style="color: red;">No Order Code is Found</span>
                                                                 <% } %>
@@ -123,14 +117,25 @@
                                                                     <span style="color: red;">Product name not available</span>
                                                                 <% } %>
                                                             </td>
-                                                            
                                                             <td>
+                                                                <a href="/admin/download-orderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download Invoice 1</button></a><br>
+                                                                <a href="/admin/download-orderbfspdf/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download Invoice 2</button></a><br>
+                                                                <button id="showOptionsBtn" class="btn btn-primary">Show Options</button>
+                                                                <div id="optionsContainer" style="display: none;">                                                                      <button id="emailOption" class="btn btn-secondary" onclick="sendViaEmail('<%= value._id %>')">Send via Email</button>
+                                                                  <button id="whatsappOption" class="btn btn-secondary" onclick="sendViaWhatsApp('<%= value._id %>')">Send via WhatsApp</button>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <a href="/admin/download-returnorderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download Invoice 3</button></a><br>
+                                                                <a href="/admin/download-returnorderpdfseller/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download Invoice 4</button></a><br>
+                                                            </td>
+                                                            <!-- <td>
                                                                 <% if (value.productImage && value.productImage.image) { %>
                                                                     <img src="<%= value.productImage.image %>" alt="Product Image" style="max-width: 100px; max-height: 100px;">
                                                                 <% } else { %>
                                                                     <span style="color: red;">No Image Available</span>
                                                                 <% } %>
-                                                            </td>
+                                                            </td> -->
                                                             <td>
                                                                 <% if (value.total_price) { %>
                                                                         <%= value.total_price %>
@@ -238,12 +243,8 @@
                                                                         <span style="color: rgb(45, 144, 226);">Canceled By Buyer</span>
                                                                     <% } %>   
                                                                 <% } %>  
-                                                                <!-- <a href="/admin/brand-statu-change/<%= value._id %>"
-                                                                    class="btn btn-success btn-circle btn-sm"
-                                                                    title="Status change">
-                                                                    <i class="fa fa-solid fa-refresh"></i>
-                                                                </a> -->
-                                                                
+                                                  
+                                
                                                                 <%
                                                                 if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0){
 
@@ -291,8 +292,6 @@
                                                                 %>
 
                                                             </td>
-                                                            
-
                                                             <td>
                                                                 <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 ) { %>
                                                     

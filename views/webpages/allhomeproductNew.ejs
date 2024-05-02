@@ -258,20 +258,18 @@
                               <div class="rtl-price"><span>Est. Retail:</span>
                                  <%=item.price%>
                               </div>
-                              <!-- <% if (item.status_name==='Gently Used' ) { %>
-
-                                 <% } else { %> -->
+                        
                                     <div class="prd-batch">
                                        <%=item.status_name%>
                                     </div>
-                                    <!-- <% } %> -->
+               
                            </div>
                         </div>
                         <% }); %>
                            <% if (totalPages){ %>
                               <div class="pagination custome-pagination">
                                  <% for (let i=1; i <=totalPages; i++) { %>
-                                    <a href="/bestdeal/<%= product_category_id %>?page=<%= i %>"
+                                    <a href="/<%= product_category_id %>?page=<%= i %>"
                                        class="<%= (i === currentPage) ? 'active' : '' %>">
                                        <%= i %>
                                     </a>

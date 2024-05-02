@@ -173,13 +173,24 @@
                                     <a href="/web-myorder-details/${item._id}" class="prd-btn"
                                        data-id=""><i class="fa fa-eye" aria-hidden="true"></i></a>
                                  </div>`;
-                  if (item.delete_status == 0 && item.is_return == 0 && item.is_deletedtime == 0) {
-                     hTml += `
-                                       <div class="remove-cart">
+                  if (item.delete_status == 0 && item.is_return == 0 ) {
+                     if(item.isActionShow == 1){
+                        hTml += `
+                                       <div class="remove-cart ">
                                           <a href="#" class="prd-btn remove-order"
                                              data-id="${item._id}" ><i class="fa fa-trash-o"
-                                                aria-hidden="true"></i></a>
+                                                aria-hidden="true"></i></a>  
                                        </div>`;
+                     }else {
+                        hTml += `
+                                       <div class="remove-cart otb-hoverbox">
+                                          <a href="javascript:void(0)" class="prd-btn"><i class="fa fa-trash-o"
+                                                aria-hidden="true"></i></a>
+                                                <div class="order-tooltip-box">Lorem Ipsum has been the industry's standard dummy.</div>
+                                       </div>`;
+                     }
+
+                     
                   }
                   else if (item.delete_status == 1) {
                      if (item.delete_by == 1) {
@@ -208,9 +219,17 @@
                   if (item.is_return == 1) {
                      hTml += `
                   <span style="color: green;">Return placed successfully</span>`;
-                  } else if (item.is_return == 0  ) {
-                     hTml += `
-                  <button class="prd-btn return-order" data-id="${item._id}">Return Order</button>`;
+                  } else if (item.is_return == 0) {
+                     if(item.isActionShow == 1){
+                           hTml += `
+                     <button class="prd-btn return-order" data-id="${item._id}">Return Order</button>`;
+                     } else{
+                        hTml += `<div class="otb-hoverbox">
+                             <button class="prd-btn grey-btn">Return Order</button>
+                           <div class="order-tooltip-box">Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown</div>
+                        </div>`;
+                     }
+                     
                   }
                   hTml += `
               </div> 

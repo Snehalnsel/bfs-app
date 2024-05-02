@@ -12,6 +12,7 @@ const crypto = require('crypto');
 const path = require("path");
 const ejs = require('ejs');
 const helper = require("../../helpers/helper");
+const checkoutcal = require("../../helpers/ordercalculation");
 const rp = require('request-promise-native');
 const fs = require("fs");
 const mime = require("mime");
@@ -322,6 +323,74 @@ exports.privacypolicyData = async function (req, res, next) {
   }
 };
 
+
+exports.aboutusData = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    res.render("webpages/aboutus", {
+      title: "About Us",
+      message: "Welcome to the about us page!",
+      isLoggedIn: isLoggedIn,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the about us.",
+      error: error.message,
+    });
+  }
+};
+
+exports.contractusData = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    res.render("webpages/contractus", {
+      title: "About Us",
+      message: "Welcome to the about us page!",
+      isLoggedIn: isLoggedIn,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the about us.",
+      error: error.message,
+    });
+  }
+};
+
+exports.paymentpolicyData = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    res.render("webpages/paymentpolicy", {
+      title: "About Us",
+      message: "Welcome to the about us page!",
+      isLoggedIn: isLoggedIn,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the about us.",
+      error: error.message,
+    });
+  }
+};
+
+exports.faqData = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    res.render("webpages/faq", {
+      title: "FAQ",
+      message: "Welcome to the FAQ page!",
+      isLoggedIn: isLoggedIn,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the about us.",
+      error: error.message,
+    });
+  }
+};
 exports.returnShipping = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -983,7 +1052,6 @@ exports.userFilter = async function (req, res, next) {
     approval_status: 1,
     flag: 0
   };
-  console.log(query);
   let totalProduct = await Userproduct.countDocuments(query);
   let allProductData = await Userproduct.find(query)
     .sort({ offer_price: optionId })
@@ -1099,7 +1167,6 @@ exports.userFilterForOthers = async function (req, res, next) {
   let allProductData;
 
   if (productcategoryId == "bestDeal" ) {
-    console.log("best deal");
     const appSettings = await Appsettings.findOne();
 
     const percentageFilter = parseInt(appSettings.best_deal);
@@ -1109,9 +1176,6 @@ exports.userFilterForOthers = async function (req, res, next) {
       flag: 0,
       percentage: { $gte: percentageFilter }
     };
-
-    console.log("query",query);
-
     totalProduct = await Userproduct.countDocuments(query);
     allProductData = await Userproduct.find(query)
       .sort({ offer_price: optionId })
@@ -1119,7 +1183,6 @@ exports.userFilterForOthers = async function (req, res, next) {
       .limit(pageSize);
   }
   if (productcategoryId == "whatshot") {
-    console.log("whatshot");
     const query = {
       ...concatVar,
       approval_status: 1,
@@ -1134,7 +1197,6 @@ exports.userFilterForOthers = async function (req, res, next) {
       .limit(pageSize);
   }
   if (productcategoryId == "justsold") {
-    console.log("justsold");
     const query = {
       ...concatVar,
       approval_status: 1,
@@ -1330,7 +1392,7 @@ exports.myAccount = async function (req, res, next) {
       res.redirect('/registration');
     } else {
       var userData = req.session.user;
-      const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId) });
+      const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId)});
 
       const html = await ejs.renderFile("views/webpages/myaccount.ejs", {
         helper: helper,
@@ -1446,7 +1508,6 @@ exports.thankyoupage = async function (req, res, next) {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
     const message = req.query.message;
-    console.log(message);
     res.render("webpages/message", {
       title: "Edit Address",
       message: "Welcome to the Edit Profile page!",
@@ -1724,9 +1785,6 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
     let genderList = [];
     const id = req.params.id;
     const filterGenderId = (typeof req.query.catid != 'undefined' && req.query.catid != "") ? req.query.catid : '';
-    // console.log("Filter Gender ID :");
-    // console.log(req.query);
-    // return false;
     const pageno = page || 1;
     const pageSize = 16;
     const sortid = req.params.sortid || 0;
@@ -1775,8 +1833,6 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
       colorList = await Color.find({ _id: { $in: colorIds } });
     }
 
-
-    console.log(formattedUserProducts);
     res.render("webpages/subcategoryproduct", {
       title: "Product Sub Categories",
       message: "Welcome to the Product Sub Categories!",
@@ -1895,6 +1951,92 @@ exports.userUpdate = async function (req, res, next) {
     });
   }
 };
+
+
+exports.getbankDetails = async function (req, res, next) {
+  try {
+    const bankDetails = await Bankdetails.findOne({ user_id: req.body.user_id });
+    if (!bankDetails || bankDetails.length === 0) {
+      return res.status(404).json({
+        status: "0",
+        message: "Bank Details not found",
+        respdata: {},
+      });
+    }
+    res.status(200).json({ status: "1", bankDetails: bankDetails });
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "Internal server error",
+      respdata: error,
+    });
+  }
+};
+
+exports.usersBankDetailsUpdate = async function (req, res, next) {
+  try {
+    const user = await Users.findOne({ _id: mongoose.Types.ObjectId(req.body.user_id) });
+    const userBankDetails = await Bankdetails.findOne({ user_id: mongoose.Types.ObjectId(req.body.user_id) });
+    if (!user) {
+      return res.status(404).json({
+        status: "0",
+        message: "Not found!",
+        respdata: {},
+      });
+    }   
+    let userAllBankDetails = {
+      user_id: user._id,
+      accountnumber: req.body.accountnumber,
+      bankname: req.body.bankname,
+      accountname: req.body.accountname,
+      branchname: req.body.branchname,
+      // accountname: req.body.accountname,
+      // accountnumber: req.body.accountnumber,
+      ifsccode: req.body.ifsccode,
+      accounttype: req.body.accounttype,
+      upiid: req.body.upiid,
+      upiid_scaner:"",
+      // upiid_scaner: imagePath || '',
+      default_status: 1,
+      //created_dtime: new Date().toISOString(),
+    };
+    if(typeof req.file != "undefined" && typeof req.file.filename != "undefined") {
+      userAllBankDetails.upiid_scaner = req.file.filename;
+    } else if(typeof userBankDetails != "undefined" && userBankDetails != null && typeof userBankDetails.upiid_scaner != "undefined") {
+      userAllBankDetails.upiid_scaner = userBankDetails.upiid_scaner;
+    } else {
+      userAllBankDetails.upiid_scaner = "";
+    }
+    if(!userBankDetails) {
+      userAllBankDetails.created_dtime = new Date().toISOString();
+      const bankDetails = new Bankdetails(userAllBankDetails);
+      await bankDetails.save();
+    } else {
+      userAllBankDetails.updated_dtime = new Date().toISOString();
+      await Bankdetails.findOneAndUpdate(
+        { user_id: mongoose.Types.ObjectId(req.body.user_id) },
+        { $set: userAllBankDetails },
+        { new: true }
+      );
+    }
+    return res.json({
+      status:"success",
+      message:"Successfully updated your details."
+    });
+    //res.redirect("/bank-details");
+  } catch (error) {
+    return res.json({
+      status:"error",
+      message:"Something went wrong please try later."
+    });
+    /*res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the Edit Bank Details.",
+      error: error.message,
+    });*/
+  }
+};
+
 exports.userBankDetailsUpdate = async function (req, res, next) {
   try {
     const errors = validationResult(req);
@@ -1927,8 +2069,8 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
       bankname: req.body.bankname,
       accountname: req.body.accountname,
       branchname: req.body.branchname,
-      accountname: req.body.accountname,
-      accountnumber: req.body.accountnumber,
+      // accountname: req.body.accountname,
+      // accountnumber: req.body.accountnumber,
       ifsccode: req.body.ifsccode,
       accounttype: req.body.accounttype,
       upiid: req.body.upiid,
@@ -1962,7 +2104,6 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
     });
     //res.redirect("/bank-details");
   } catch (error) {
-    console.log('error--',error)
     return res.json({
       status:"error",
       message:"Something went wrong please try later."
@@ -2027,7 +2168,7 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
       res.redirect('/checkout-web');
     }
   } catch (error) {
-    console.log(error);
+
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the Edit Profile.",
@@ -2050,6 +2191,30 @@ exports.userAddressAdd = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
+    let defaultStatus = req.body['check-address'] ? 1 : 0;
+
+    const existingUserAddresses = await addressBook.find({
+      user_id: req.body.userId,
+      deleted_status: 0,
+    });
+
+
+    if (defaultStatus === 1 && existingUserAddresses.length > 0) {
+      const existingDefaultAddress = await addressBook.findOne({
+        user_id: req.body.userId,
+        default_status: 1,
+      });
+
+      if (existingDefaultAddress) {
+        await addressBook.findByIdAndUpdate(existingDefaultAddress._id, {
+          default_status: 0,
+        });
+      }
+    }
+    if(existingUserAddresses.length === 0)
+    {
+      defaultStatus = 1;
+    }
     let stateId = req.body.state_name;
     let getState = await statesModel.findOne({_id:mongoose.Types.ObjectId(stateId)});
     const newAddress = new addressBook({
@@ -2065,6 +2230,7 @@ exports.userAddressAdd = async function (req, res, next) {
       pin_code: req.body.pin_code,
       address_name: addr_name,
       flag: req.body.flag,
+      default_status:defaultStatus,
       created_dtime: dateTime,
     });
     const savedAddress = await newAddress.save();
@@ -2162,11 +2328,12 @@ exports.updateuserAddressAdd = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     addbook_id = req.body.addressid;
-    const updatedAddress = await addressBook.findOneAndUpdate(
-      { _id: addbook_id },
-      { $set: { default_status: 1 } },
-      { new: true }
-    );
+    console.log(req.body);
+    
+    const defaultStatus = req.body['check-address'] == '1' ? 1 : 0;
+
+    console.log(defaultStatus);
+    
     const addr_name = req.body.addrType;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -2176,41 +2343,65 @@ exports.updateuserAddressAdd = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
-    const newAddress = new addressBook({
-      user_id: req.body.userId,
-      street_name: req.body.address2,
-      address1: req.body.address1,
-      landmark: req.body.landmark,
-      city_name: req.body.city_name,
-      city_code: req.body.city_code,
-      state_name: req.body.state_name,
-      state_code: req.body.state_code,
-      pin_code: req.body.pin_code,
-      address_name: addr_name,
-      flag: req.body.flag,
-      created_dtime: dateTime,
+    const address = await addressBook.findById(addbook_id);
+    if (defaultStatus == 1) {
+      const existingDefaultAddress = await addressBook.findOne({
+        user_id: address.user_id,
+        default_status: 1,
+      });
+
+      if (existingDefaultAddress && existingDefaultAddress._id.toString() !== addbook_id) {
+        await addressBook.findByIdAndUpdate(existingDefaultAddress._id, {
+          default_status: 0,
+        });
+      }
+    }
+    let stateId = req.body.state_name;
+    let getState = await statesModel.findOne({_id:mongoose.Types.ObjectId(stateId)});
+
+    address.street_name = req.body.address2 || address.street_name;
+    address.address1 = req.body.address1 || address.address1;
+    address.landmark = req.body.landmark || address.landmark;
+    address.city_name = req.body.city_name || address.city_name;
+    address.city_code = req.body.city_code || address.city_code;
+    address.address_name = addr_name || address.address_name;
+    address.state_id= stateId || address.state_id;
+    address.state_name = getState ? getState.name: address.state_name;
+    address.state_code = req.body.state_code || address.state_code;
+    address.pin_code = req.body.pin_code || address.pin_code;
+    address.address_name = req.body.address_name || address.address_name;
+    address.flag = req.body.flag || address.flag;
+    address.default_status = defaultStatus;
+
+    const updatedAddress = await address.save();
+    const hasDefaultAddress = await addressBook.findOne({
+      user_id: address.user_id,
+      default_status: 1,
     });
-    const savedAddress = await newAddress.save();
-    const user = await Users.findById(newAddress.user_id);
+    if (!hasDefaultAddress) {
+      updatedAddress.default_status = 1;
+      await updatedAddress.save();
+    }
+    const user = await Users.findById(updatedAddress.user_id);
     const randomSuffix = Math.floor(Math.random() * 1000);
-    const pickupLocation = savedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;
+    const pickupLocation = updatedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;
     const PickupData = {
       pickup_location: pickupLocation,
       name: user.name,
       email: user.email,
       phone: user.phone_no,
-      address: savedAddress.street_name + ',' + savedAddress.address1,
-      address_2: savedAddress.landmark,
-      city: savedAddress.city_name,
-      state: savedAddress.state_name,
+      address: updatedAddress.street_name + ',' + updatedAddress.address1,
+      address_2: updatedAddress.landmark,
+      city: updatedAddress.city_name,
+      state: updatedAddress.state_name,
       country: "India",
-      pin_code: savedAddress.pin_code
+      pin_code: updatedAddress.pin_code
     };
     const shiprocketResponse = await generateSellerPickup(PickupData);
     if (shiprocketResponse) {
-      savedAddress.shiprocket_address = pickupLocation;
-      savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
-      await savedAddress.save();
+      updatedAddress.shiprocket_address = pickupLocation;
+      updatedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
+      await updatedAddress.save();
       res.redirect('/my-account');
     }
   } catch (error) {
@@ -2224,6 +2415,7 @@ exports.updateuserAddressAdd = async function (req, res, next) {
 
 exports.getAddressdetails = async function (req, res, next) {
   try {
+    console.log("edit page");
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
     const errors = validationResult(req);
@@ -2244,11 +2436,12 @@ exports.getAddressdetails = async function (req, res, next) {
       });
     }
     let stateList = await statesModel.find();
+
     let stateData = "";
-    if(address.state_id){
+    if(address.state_name){
       stateData = await statesModel.findById(address.state_id);
     }
-
+    
     res.render("webpages/update-address", {
       title: "My Account",
       message: "Address fetched successfully!",
@@ -2273,22 +2466,49 @@ exports.getAddressdetails = async function (req, res, next) {
     });
   }
 };
+// exports.deleteUserAddress = async function (req, res, next) {
+//   try {
+//     addbook_id = req.params.id;
+
+//     const updatedAddress = await addressBook.findOneAndUpdate(
+//       { _id: addbook_id },
+//       { $set: { default_status: 1 } },
+//       { new: true }
+//     );
+//     if (!updatedAddress) {
+//       return res.status(404).json({
+//         status: "0",
+//         message: "Address not found for deletion!",
+//         respdata: {},
+//       });
+//     }
+//     res.redirect('/my-account');
+//   } catch (error) {
+//     res.status(500).json({
+//       status: "0",
+//       message: "An error occurred while rendering the Edit Profile.",
+//       error: error.message,
+//     });
+//   }
+// };
+
 exports.deleteUserAddress = async function (req, res, next) {
   try {
-    addbook_id = req.params.id;
-    const updatedAddress = await addressBook.findOneAndUpdate(
-      { _id: addbook_id },
-      { $set: { default_status: 1 } },
-      { new: true }
-    );
-    if (!updatedAddress) {
-      return res.status(404).json({
-        status: "0",
-        message: "Address not found for deletion!",
-        respdata: {},
+    const addbook_id = req.params.id;
+    const addressToDelete = await addressBook.findById(addbook_id);
+    if (addressToDelete.default_status === 1) {
+      return res.status(200).json({
+        message: 'Default Address cannot be deleted,PLease Set another Address default first',
+        success: false,
       });
     }
-    res.redirect('/my-account');
+    addressToDelete.deleted_status = 1;
+    await addressToDelete.save();
+    return res.status(200).json({
+      message: 'Address Deleted Successfully',
+      success: true,
+    });
+   // res.redirect('/my-account');
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -2297,6 +2517,7 @@ exports.deleteUserAddress = async function (req, res, next) {
     });
   }
 };
+
 exports.userWisePost = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -2319,7 +2540,6 @@ exports.userWisePost = async function (req, res, next) {
     let userBankStatus = await Bankdetails.countDocuments({
       user_id: mongoose.Types.ObjectId(isLoggedIn)
     });
-    console.log('userBankStatus--',userBankStatus)
     for (const userproduct of userproducts) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
       if (productImages) {
@@ -2406,20 +2626,28 @@ exports.addNewPost = async function (req, res, next) {
     });
   }
   try {
-    let invoice;
-    let packaging;
+    // let invoice;
+    // let packaging;
     let gender;
-    if (req.body.original_invoice == 'on' || req.body.original_invoice != '') {
-      invoice = '1';
+    // if (req.body.original_invoice == 'on' || req.body.original_invoice != '') {
+    //   invoice = '1';
+    // }
+    // else {
+    //   invoice = '0';
+    // }
+    // if (req.body.original_packaging == 'on' || req.body.original_packaging != '') {
+    //   packaging = '1';
+    // }
+    // else {
+    //   packaging = '0';
+    // }
+    let originalInvoice = 0;
+    let originalPackageing = 0;
+    if(typeof req.body.original_invoice != "undefined") {
+      originalInvoice = 1;
     }
-    else {
-      invoice = '0';
-    }
-    if (req.body.original_packaging == 'on' || req.body.original_packaging != '') {
-      packaging = '1';
-    }
-    else {
-      packaging = '0';
+    if(typeof req.body.original_packaging != "undefined") {
+      originalPackageing = 1;
     }
     if (req.body.gender) {
       gender = req.body.gender;
@@ -2443,8 +2671,8 @@ exports.addNewPost = async function (req, res, next) {
       offer_price: req.body.offer_price,
       reseller_price: req.body.reseller_price,
       percentage: req.body.percentage,
-      original_invoice: invoice,
-      original_packaging: packaging,
+      original_invoice: originalInvoice,
+      original_packaging: originalPackageing,
       gender_id: gender,
       added_dtime: moment().tz('Asia/Kolkata').format("YYYY-MM-DD HH:mm:ss"),
     });
@@ -2561,7 +2789,6 @@ exports.updatePostData = async function (req, res, next) {
     }
     const productId = req.body.productid;
     let existingProduct = await Userproduct.findById(productId);
-    console.log("product id ",productId);
     if (!existingProduct) {
       return res.status(404).json({
         status: "0",
@@ -3387,7 +3614,8 @@ exports.myOrderDetailsWeb = async (req, res) => {
       },
       shippingKitData: shippingKitData || null,
       shippingkit_details: shippingkit_details || null,
-      shipping_user_details: shipping_user_details || null
+      shipping_user_details: shipping_user_details || null,
+      order_date: moment(order.added_dtime).format("ddd, Do MMM"),
     };
     res.render("webpages/myorderdetails", {
       title: "Wish List Page",
@@ -3662,7 +3890,6 @@ exports.getJustSoldProductsweb = async function (req, res) {
       });
 
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 
@@ -3789,7 +4016,15 @@ exports.getBestDealProductswebNew = async function (page, req, res, next) {
     let result;
     let conditionList = [];
     let genderList = [];
-    let id = req.params.id;
+    //let id = req.params.id;
+    let getUrl = req.url;
+    getUrl = getUrl.split('/');
+    getUrl = getUrl.pop();
+    let getUrlNew = getUrl.split('?');
+    if(getUrlNew.length > 0){
+      getUrl = getUrlNew[0];
+    } 
+    let id = getUrl;
     const filterGenderId = (typeof req.query.catid != 'undefined' && req.query.catid != "") ? req.query.catid : '';
    
     const pageno = page || 1;
@@ -4111,7 +4346,6 @@ exports.Demoorder_backup = async function (req, res) {
 
 exports.Demoorder = async function (req, res) {
   try {
-
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     let pay_now,booking_amount,remaining_amount,taxable_value,cash_handling_charges;
     let formData = req.body.data;
@@ -4175,9 +4409,6 @@ exports.Demoorder = async function (req, res) {
       total_price = parseFloat(product_price) + parseFloat(gst) + parseFloat(taxable_value) ;
       total_price = total_price.toFixed(2); 
     }
-    //console.log('booking_amount',booking_amount);
-    //console.log('total_price',total_price);
-     //return false;
     let order_status = '0';
     let delivery_charges = '0';
     let discount = '0';
@@ -4185,7 +4416,7 @@ exports.Demoorder = async function (req, res) {
     let delivery_status = '0';
     let shipping_address_id = formData.addressBookId;
 
-    const billingaddress = await addressBook.findOne({ user_id: seller_id });
+    const billingaddress = await addressBook.findOne({ user_id: seller_id, default_status :1 });
     if (!billingaddress) {
       return res.status(404).json({ message: 'Seller address not found' });
     }
@@ -4227,6 +4458,120 @@ exports.Demoorder = async function (req, res) {
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+// exports.demoorder = async function (req, res) {
+//   try {
+//     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+//     let formData = req.body.data; // assuming formData is correctly populated
+//     let user_id = formData.user_id;
+//     let seller_id = formData.seller_id;
+//     let cart_id = formData.cart_id;
+//     let product_id = formData.product_id;
+//     let total_price = formData.total_amt;
+//     let payment_method = formData.payment_method;
+//     let gst = formData.gst;
+//     let order_status = '0';
+//     let delivery_charges = '0';
+//     let discount = '0';
+//     let pickup_status = '0';
+//     let delivery_status = '0';
+//     let shipping_address_id = formData.addressBookId;
+//     let pay_now = formData.pay_now || null;
+//     let remaining_amount = formData.remaining_amount || null;
+
+//     // Check if billing address exists
+//     const billingaddress = await addressBook.findOne({ user_id: seller_id });
+//     if (!billingaddress) {
+//       return res.status(404).json({ message: 'Seller address not found' });
+//     }
+
+//     const billing_address_id = billingaddress._id;
+
+//     const order = new Demoorder({
+//       user_id,
+//       cart_id,
+//       seller_id,
+//       product_id,
+//       billing_address_id,
+//       shipping_address_id,
+//       total_price,
+//       payment_method,
+//       order_status,
+//       pay_now,
+//       remaining_amount,
+//       status: 1,
+//       added_dtime: new Date().toISOString(),
+//     });
+
+//     const savedOrder = await order.save();
+
+//     if (savedOrder) {
+//       res.status(200).json({
+//         status: "1",
+//         is_orderPlaced: 1,
+//         message: 'Order placed successfully',
+//         order: savedOrder
+//       });
+//     }
+//   } catch (error) {
+//     console.error(error); // Log the error for debugging
+//     return res.status(500).json({ message: 'Internal server error' });
+//   }
+// };
+
+
+exports.Demoorderold = async function (req, res) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    let pay_now, booking_amount, remaining_amount, taxable_value, cash_handling_charges;
+    let formData = req.body.data;
+    let user_id = formData.user_id;
+    let seller_id = formData.seller_id;
+    let cart_id = formData.cart_id;
+    let product_id = formData.product_id;
+    let payment_method = formData.payment_method;
+    let shipping_address_id = formData.addressBookId;
+    let data = await checkoutcal.ordercalculte(product_id, user_id, payment_method);
+    console.log("data", data);
+    const billingaddress = await addressBook.findOne({ user_id: seller_id });
+    const billing_address_id = billingaddress._id;
+    const order = new Demoorder({
+      user_id: (typeof user_id != "undefined") ? user_id : "",
+      cart_id: (typeof cart_id != "undefined") ? cart_id : "",
+      seller_id: (typeof seller_id != "undefined") ? seller_id : "",
+      product_id: (typeof product_id != "undefined") ? product_id : "",
+      billing_address_id: (typeof billing_address_id != "undefined") ? billing_address_id : null,
+      shipping_address_id: (typeof shipping_address_id != "undefined") ? shipping_address_id : null,
+      total_price: (typeof data.total_price != "undefined") ? parseFloat(data.total_price) : 0,
+      payment_method: (typeof data.payment_method != "undefined") ? data.payment_method : 0,
+      order_status: (typeof data.order_status != "undefined") ? data.order_status : 0,
+      pay_now: (typeof data.pay_now != "undefined") ? data.pay_now : "",
+      remaining_amount: (typeof data.remaining_amount != "undefined") ? parseFloat(data.remaining_amount) : 0,
+      booking_amount: (typeof data.booking_amount != "undefined") ? parseFloat(data.booking_amount) : 0,
+      packing_handling_charge: (typeof data.packing_handling_charge != "undefined") ? parseFloat(data.packing_handling_charge) : 0,
+      status: 1,
+      user_ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress || null,
+      gst: (typeof data.gst != "undefined") ? data.gst : 0,
+      taxable_value: (typeof data.taxable_value != "undefined") ? parseFloat(data.taxable_value) : 0,
+      added_dtime: new Date().toISOString(),
+    });
+    const savedOrder = await order.save();
+    if (savedOrder) {
+      res.status(200).json({
+        status: "1",
+        is_orderPlaced: 1,
+        message: 'Order placed successfully',
+        order: savedOrder
+      });
+    } else {
+      res.status(500).json({ message: 'Error saving order' });
+    }
+    
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 
 exports.forgotPassword = async function (req, res, next) {
 
@@ -4412,20 +4757,7 @@ exports.sendotp = async function (req, res, next) {
         text: "OTP",
         html: loginHtmlContent
       };
-      // const mailData = {
-      //   from: "Bid For Sale! <" + smtpUser + ">",
-      //   to: "sneha.lnsel@gmail.com",
-      //   //to: user.email,
-      //   subject: "BFS - Bids For Sale - Forgot password OTP",
-      //   text: "Server Email!",
-      //   html:
-      //     "Hey " +
-      //     user.name +
-      //     ", <br> <p> Please use this OTP : <b>" +
-      //     randNumber +
-      //     "</b> to reset your password! </p>",
-      // };
-
+    
       transporter.sendMail(mailData, function (err, info) {
         // if (err) console.log("err", err);
         //else console.log("info", info);
@@ -4477,7 +4809,69 @@ exports.sendotp = async function (req, res, next) {
                   if (err) {
                     throw err;
                   } else {
-                    Users.findOne({ email: req.body.email }).then((user) => {
+                    Users.findOne({ email: req.body.email }).then(async (user) => {
+
+                      let smsData = {
+                        textId: "test",
+                        toMobile: "91" +user.phone_no,
+                        text: "Password changed successfully! Your account at Bid For Sale is now updated. If you didn't make this change, please contact support immediately. Thank you!-BFS RETAIL SERVICES PRIVATE LIMITED",
+                      };
+                      let returnData;
+                      returnData = await sendSms(smsData);
+                      const historyData = new ApiCallHistory({
+                        userId: user._id,
+                        called_for: "reset password",
+                        api_link: process.env.SITE_URL,
+                        api_param: smsData,
+                        api_response: returnData,
+                        send_status: 'send',
+                      });
+                      await historyData.save();
+
+                      const message = "Password changed successfully! Your account at Bid For Sale is now updated. If you didn't make this change, please contact support immediately. Thank you!";
+                      const to_number = "91" + user.phone_no;
+                      let response = await send_message({ type: 'text', message, to_number });
+            
+                      //SEND WHATSAPP
+                      const receiverMobileNo = "91" + user.phone_no;
+                      const root = create({ version: '1.0', encoding: "ISO-8859-1" })
+                        .ele('MESSAGE', { VER: '1.2' })
+                        .ele('USER', { USERNAME: process.env.WP_SMS_USER_NAME, PASSWORD: process.env.WP_PASSWORD })
+                        .ele('SMS', { UDH: "0", CODING: "1", TEXT: "Hi", PROPERTY: "0", ID: "1", TEMPLATE: "bfstest" })
+                        .ele('ADDRESS', { FROM: process.env.WP_SMS_SENDER_MOBILE, TO: receiverMobileNo, SEQ: "1" })
+                      //.up()
+                      //.up();
+            
+                      // convert the XML tree to string
+                      const xml = root.end({ prettyPrint: true });
+                      await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
+                        if (err) {
+                          // return {
+                          //   status:false,
+                          //   data:err
+                          // };
+                        }
+                        //let obj = JSON.parse(data);
+                        //let randNumber = Math.floor((Math.random() * 1000000) + 1);
+                        let smsData = xml;
+                        let returnData;
+                        returnData = await sendWhatsapp(smsData);
+                      });  
+                      const loginHtmlPath = 'views/webpages/reset-password.html';
+                      let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+                      loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+                      const mailData = {
+                        from: "Bid For Sale! <" + smtpUser + ">",
+                        to: user.email,
+                        subject: "Reset password successfully!",
+                        name: "Bid For Sale!",
+                        text: "reset password successfully!",
+                        html: loginHtmlContent
+                      };
+                      transporter.sendMail(mailData, function (err, info) {
+                        // if (err) console.log("err", err);
+                        // else console.log("info", info);
+                      });
                       res.status(200).json({
                         status: "1",
                         message: "Successfully updated! Please login with your new password",
@@ -4580,6 +4974,36 @@ exports.changePassword = async function (req, res, next) {
                               send_status: 'send',
                             });
                             await historyData.save();
+
+                            const message = "Password changed successfully! Your account at Bid For Sale is now updated. If you didn't make this change, please contact support immediately. Thank you!";
+                            const to_number = "91" + user.phone_no;
+                            let response = await send_message({ type: 'text', message, to_number });
+                  
+                            //SEND WHATSAPP
+                            const receiverMobileNo = "91" + user.phone_no;
+                            const root = create({ version: '1.0', encoding: "ISO-8859-1" })
+                              .ele('MESSAGE', { VER: '1.2' })
+                              .ele('USER', { USERNAME: process.env.WP_SMS_USER_NAME, PASSWORD: process.env.WP_PASSWORD })
+                              .ele('SMS', { UDH: "0", CODING: "1", TEXT: "Hi", PROPERTY: "0", ID: "1", TEMPLATE: "bfstest" })
+                              .ele('ADDRESS', { FROM: process.env.WP_SMS_SENDER_MOBILE, TO: receiverMobileNo, SEQ: "1" })
+                            //.up()
+                            //.up();
+                  
+                            // convert the XML tree to string
+                            const xml = root.end({ prettyPrint: true });
+                            await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
+                              if (err) {
+                                // return {
+                                //   status:false,
+                                //   data:err
+                                // };
+                              }
+                              //let obj = JSON.parse(data);
+                              //let randNumber = Math.floor((Math.random() * 1000000) + 1);
+                              let smsData = xml;
+                              let returnData;
+                              returnData = await sendWhatsapp(smsData);
+                            });  
                             const loginHtmlPath = 'views/webpages/reset-password.html';
                             let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
                             loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
@@ -4605,6 +5029,7 @@ exports.changePassword = async function (req, res, next) {
                         );
                       }
                     }
+  
                   );
                 });
               } else {

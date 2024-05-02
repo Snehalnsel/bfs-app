@@ -15,7 +15,6 @@
                         <%=respdata1.name%>
                   </div>
                </div>
-
                <div class="userimage-edit">
                   <label>
                      <a href="javascript:void(0)" data-toggle="modal" data-target="#upload-profile-modal"
@@ -24,7 +23,6 @@
                      </a>
                   </label>
                </div>
-
                <div class="modal theme_modal short-modal change-profile-update" id="upload-profile-modal">
                   <div class="modal-dialog">
                      <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -49,10 +47,6 @@
                      </div>
                   </div>
                </div>
-
-
-
-
             </div>
             <div class="sidbar-box sidbar-nav">
                <ul class="nav d-flex flex-column mb-2 ">
@@ -119,7 +113,7 @@
                         <input type="hidden" name="addrType" id="addrType">
 
                         <div class="div-12">
-                           <label>Address 1:</label>
+                           <label>Address 1<span class="required">*</span>:</label>
                            <textarea class="ds-form-control" name="address1"
                               placeholder="Enter Address"><%=address.address1%></textarea>
                            <input type="hidden" name="userId" class="ds-form-control" value="<%=respdata1.userId%>">
@@ -133,43 +127,41 @@
                         </div>
 
                         <div class="div-6">
-                           <label>Landmark (Optional):</label>
+                           <label>Landmarksss (Optional):</label>
                            <input type="type" name="landmark" class="ds-form-control" value="<%=address.landmark%>"
                               placeholder="Enter Landmark">
                         </div>
 
                         <div class="div-6">
-                           <label>City:</label>
+                           <label>City<span class="required">*</span>:</label>
                            <input type="type" name="city_name" class="ds-form-control" placeholder="City"
                               value="<%=address.city_name%>">
                         </div>
-
                         <!-- <div class="div-6">
                            <label>State:</label>
                            <input type="type" name="state_name" class="ds-form-control" placeholder="State"
                               value="<%=address.state_name%>">
                         </div> -->
-
-                        
-
                         <div class="div-6">
-                           <label for="productCondition">state: <span class="required">*</span></label>
+                           <label for="productCondition">state<span class="required">*</span>:</label>
                            <select class="ds-form-control" name="state_name" id="state_name" required>
-                              <option value="" disabled selected>Select State</option>
-                              <% stateList.forEach(function(value) { 
-                                 let setStateId = (typeof address.state_id != "undefined" && value._id == address.state_id )  ? "selected" : "";
-                                 
-                                 %>
-                                 <option value="<%= value._id %>" <%=setStateId%> %>><%= value.name %>
-                                 <% }); %>
-                           </select>
+                              <option value="" disabled>Select State</option>
+                              <% stateList.forEach(function(value) { %>
+                                 <option value="<%= value._id %>" <%=(stateData && stateData._id.equals(value._id)) ? 'selected' : '' %>><%= value.name %></option>
+                              <% }); %>
+                           </select>                                                                                    
                         </div>
-
                         <div class="div-6">
-                           <label>Zip:</label>
+                           <label>Zip<span class="required">*</span>:</label>
                            <input type="type" name="pin_code" class="ds-form-control" placeholder="Zip"
                               value="<%=address.pin_code%>">
                         </div>
+                        <div class="div-12">
+                           <div class="check-label-flex">
+                               <input type="checkbox" id="check-address" name="check-address" value="1" <% if (address.default_status == 1) { %> checked <% } %>>
+                               <label for="check-address"> Default Address </label>
+                           </div>
+                       </div>                       
                         <div class="div-12">
                            <input type="submit" name="" class="ds-form-control" value="Update">
                         </div>

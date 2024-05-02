@@ -26,6 +26,7 @@ const Productsize = require("../../models/api/catsizeModel");
 const Userproduct = require("../../models/api/userproductModel");
 const Productimage = require("../../models/api/productimageModel");
 const Productcondition = require("../../models/api/productconditionModel");
+const Bankdetails = require("../../models/api/bankdetailsModel");
 const Gender = require("../../models/api/genderModel");
 const Color = require("../../models/api/colorModel");
 const CompressImage = require("../../models/thirdPartyApi/CompressImage");
@@ -399,17 +400,20 @@ exports.getProductData = async function (req, res, next) {
 
   const page = req.body.page ? parseInt(req.body.page) : 1;
   const limit = req.body.limit ? parseInt(req.body.limit) : 10;
-
-    let query = {};
-    // let query = {
-    //   approval_status: 1, 
-    // };
-
+  const bankDetails = await Bankdetails.findOne({ user_id: req.body.user_id });
+  if(!bankDetails)
+  {
+    return res.status(404).json({
+      status: "0",
+      message: "Bank Details Not Found!,Please insert the bank details first",
+      respdata: [],
+    });
+  }
+  let query = {};
     if (req.body.user_id) {
       query.user_id = req.body.user_id;
     }
     const count = await Userproduct.countDocuments(query);
-
     const userproducts = await Userproduct.find(query)
     .populate('brand_id', 'name', { optional: true })
     .populate('category_id', 'name', { optional: true })
@@ -425,9 +429,7 @@ exports.getProductData = async function (req, res, next) {
         respdata: [],
       });
     }
-
     const formattedUserProducts = [];
- 
     for (const userproduct of userproducts) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
       const formattedUserProduct = {

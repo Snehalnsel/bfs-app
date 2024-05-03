@@ -8,6 +8,10 @@ const model = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'users', 
   },
+  user_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'users', 
+  },
   seller_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'users', 

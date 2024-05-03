@@ -694,9 +694,11 @@ async function getLastOrderNumber() {
 
 async function getLastOrderIndex() {
   try {
-    const result = await Order.findOne({}, {}, { sort: { order_index: -1 } }).then(()=>{
-    });
-    return typeof result != "undefined" ? result.order_index : '000';
+    // const result = await Order.findOne({}, {}, { sort: { order_index: -1 } }).then(()=>{
+    // });
+    const getCount = await Order.find().count();
+    return `000${getCount}`
+    //return typeof result != "undefined" ? result.order_index : '000';
   } catch (error) {
     return 0; // Return 0 in case of an error
   }

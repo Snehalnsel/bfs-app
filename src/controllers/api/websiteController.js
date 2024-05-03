@@ -1492,7 +1492,7 @@ exports.addAddress = async function (req, res, next) {
       respdata: add,
       respdata1: userData,
       isLoggedIn: isLoggedIn,
-      stateList:getStates
+      stateList:getStates,
     });
   } catch (error) {
     res.status(500).json({

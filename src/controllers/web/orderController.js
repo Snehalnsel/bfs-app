@@ -441,6 +441,14 @@ exports.getOrderList = function (page, searchType, searchValue, req, res, next) 
     },
     {
       $lookup: {
+        from: 'shipping_kits',
+        localField: 'shippingkit.order_id',
+        foreignField: '_id',
+        as: 'shippingkit',
+      },
+    },
+    {
+      $lookup: {
         from: 'mt_returnorders',
         localField: 'returnorder.order_id',
         foreignField: '_id',
@@ -1599,24 +1607,18 @@ exports.getAWBnoById = async function (req, res, next) {
           existingOrder.pickup_awb = shiprocketResponse.response.data.awb_code;
           existingOrder.shiprocket_delivery_partner = shiprocketResponse.response.data.courier_company_id;
           existingOrder.shiprocket_courier_name = shiprocketResponse.response.data.transporter_name;
-
           await existingOrder.save();
-
           const shiprocketlabelResponse = await generateLabel(shipment_id);
           const order_id = existingOrder.shiprocket_order_id;
           const shiprocketinvoiceResponse = await generateInvoice(order_id);
           //const shiprocketManifestResponse = await generateManifest(shipment_id);
-
           const seller_details = await Users.findById(existingOrder.seller_id);
-
           if (seller_details) {
             const receiver_email = seller_details.email;
-
             if (shiprocketlabelResponse && shiprocketlabelResponse.label_url && shiprocketinvoiceResponse && shiprocketinvoiceResponse.invoice_url) {
               const labelUrl = shiprocketlabelResponse.label_url;
               const invoiceUrl = shiprocketinvoiceResponse.invoice_url;
               //const manifestUrl = shiprocketManifestResponse.manifest_url;
-
               sendEmailWithAttachment(receiver_email, labelUrl, invoiceUrl);
             }
           }

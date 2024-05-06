@@ -234,7 +234,7 @@ exports.getOrderList = function (req, res, next) {
 
       orderList.forEach(function (order) {
         if (order.product && order.product.length > 0) {
-          const product_id = order.product[0]._id; // Assuming product_id is available in the order
+          const product_id = order.product[0]._id; 
           const imagePromise = Productimage.findOne({ product_id: product_id }).limit(1).exec();
           imagePromises.push(imagePromise);
         }

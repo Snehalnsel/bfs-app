@@ -445,6 +445,7 @@ exports.getStatus = async function (req, res, next) {
             pay_now: temporder.pay_now || '', 
             remaining_amount: temporder.remaining_amount || '',
             bid_price: (typeof temporder.bid_price != "undefined") ? temporder.bid_price:0 ,
+            original_product_price: (typeof temporder.original_product_price != "undefined") ? temporder.original_product_price:0 ,
             added_dtime: new Date().toISOString(),
           });
           const savedOrder = await order.save();

@@ -137,8 +137,11 @@
                                                                 <% } %>
                                                             </td> -->
                                                             <td>
-                                                                <% if (value.total_price) { %>
-                                                                        <%= value.total_price %>
+                                                                <%
+                                                                let originalProductPrice = (typeof value.original_product_price !='undefined' ? value.original_product_price: value.total_price)
+                                                                %>
+                                                                <% if (originalProductPrice) { %>
+                                                                        <%= originalProductPrice %>
                                                                         <a href="/admin/orderalldetails/<%= value._id %>"
                                                                             class="btn btn-info btn-circle btn-sm" title="Edit" target="blank">
                                                                             <i class='fas fa-info-circle'></i>

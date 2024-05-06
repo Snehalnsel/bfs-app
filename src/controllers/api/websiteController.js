@@ -4494,6 +4494,7 @@ exports.Demoorder = async function (req, res) {
       user_ip: ip,
       gst:(typeof gst != "undefined") ? gst : 0,
       taxable_value:(typeof taxable_value != "undefined") ? parseFloat(taxable_value) : 0,
+      original_product_price:product_price,
       added_dtime: new Date().toISOString(),
     });
 

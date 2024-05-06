@@ -56,6 +56,10 @@ const model = mongoose.Schema({
     type: Number,
     default: 0,
   },
+  original_product_price: {
+    type: Number,
+    default: 0,
+  },
   packing_handling_charge: {
     type: Number,
     default: 0,

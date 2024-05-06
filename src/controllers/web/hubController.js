@@ -177,6 +177,7 @@ exports.createData = async function (req, res, next) {
         pin_code: req.body.pincode,
         //gst_no: req.body.gst_name,
         hub_name: req.body.hub_name,
+        house_no:req.body.house_no,
         created_dtime: dateTime,
       });
       const savedAddress = await newAddress.save();
@@ -193,9 +194,10 @@ exports.createData = async function (req, res, next) {
           city: savedAddress.city_name,
           state: savedAddress.state_name,
           country: "India",
-          pin_code: savedAddress.pin_code
+          pin_code: savedAddress.pin_code,
+          house_no: savedAddress.house_no
         };
-        const shiprocketResponse = await generateSellerPickup(PickupData);  
+        const shiprocketResponse = await generateSellerPickup(PickupData); 
         if (shiprocketResponse) {
           savedAddress.shiprocket_address = "BFS" + ' - ' + savedAddress.hub_name;
           savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;

@@ -931,6 +931,7 @@ exports.getOrderListByUser = async (req, res) => {
         is_deletedtime: is_deletedtime,
         isActionShow:isActionShow,
         product: {
+          id: order.product_id,
           name: productDetails.length ? productDetails[0].name : 'Unknown Product',
           image: productImage.length ? productImage[0].image : 'No Image',
         },
@@ -982,6 +983,7 @@ exports.getOrdersBySeller = async (req, res) => {
         delete_status: order.delete_status,
         is_deletedtime: is_deletedtime,
         product: {
+          id: order.product_id,
           name: productDetails.length ? productDetails[0].name : 'Unknown Product',
           image: productImage.length ? productImage[0].image : 'No Image',
         },

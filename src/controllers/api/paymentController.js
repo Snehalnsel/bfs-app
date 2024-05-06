@@ -611,7 +611,7 @@ exports.checkPaymentData = async function (req, res, next) {
         loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
         loginHtmlContent = loginHtmlContent.replace('{{ordernumber}}', orderCode);
         loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
-        loginHtmlContent = loginHtmlContent.replace('{{productimages}}', orderCode);
+        loginHtmlContent = loginHtmlContent.replace('{{productimages}}', product.image);
         loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
         loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.price);
         loginHtmlContent = loginHtmlContent.replace('{{shippingaddress}}', billingaddress);
@@ -626,6 +626,32 @@ exports.checkPaymentData = async function (req, res, next) {
         };
   
         transporter.sendMail(mailData, function (err, info) {
+          // if (err) console.log("err", err);
+          // else console.log("info", info);
+        });
+
+        let loginHtmlPath1 = 'views/webpages/order-confirmed.html';
+        let loginHtmlContent1 = fs.readFileSync(loginHtmlPath, 'utf-8');
+  
+        loginHtmlContent1 = loginHtmlContent.replace('{{username}}', user.name);
+        loginHtmlContent1 = loginHtmlContent.replace('{{sellername}}', seller.name);
+        loginHtmlContent1 = loginHtmlContent.replace('{{ordernumber}}', orderCode);
+        loginHtmlContent1 = loginHtmlContent.replace('{{productname}}', product.name);
+        loginHtmlContent1 = loginHtmlContent.replace('{{productimages}}', orderCode);
+        loginHtmlContent1 = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
+        loginHtmlContent1 = loginHtmlContent.replace('{{productprice}}', product.price);
+        loginHtmlContent1 = loginHtmlContent.replace('{{shippingaddress}}', billingaddress);
+      
+        const mailData1 = {
+          from: "Bid For Sale! <" + smtpUser + ">",
+          to: user.email,
+          subject: "Order Placed - Bid For Sale!",
+          name: "Bid For Sale!",
+          text: "order placed",
+          html: loginHtmlContent1
+        };
+  
+        transporter.sendMail(mailData1, function (err, info) {
           // if (err) console.log("err", err);
           // else console.log("info", info);
         });

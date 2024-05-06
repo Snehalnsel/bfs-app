@@ -152,7 +152,7 @@
                                                                     <span style="color: grey;">Not Ordered Shipping Kit</span>
                                                                 <% } else if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].shippingkit_status === 1) { %>
                                                                     <% if (value.bid_status === 0) { %>
-                                                                      <span style="color: orange;">Ordered Shipping Kit<a href="/admin/shippingkitdetails/<%= value.shipment._id %>" target="_blank">(<%= value.shipment.track_code %>)</a></span>
+                                                                      <span style="color: orange;">Ordered Shipping Kit</span>
                                                                     <% } %>
                                                                 <% } else { %>  
                                                                     <span style="color: #98FB98;">Not Ordered Shipping Kit</span>

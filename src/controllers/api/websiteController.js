@@ -2541,6 +2541,9 @@ exports.userWisePost = async function (req, res, next) {
     let userBankStatus = await Bankdetails.countDocuments({
       user_id: mongoose.Types.ObjectId(isLoggedIn)
     });
+    let userAddressStatus = await addressBook.countDocuments({
+      user_id: mongoose.Types.ObjectId(isLoggedIn)
+    });
     for (const userproduct of userproducts) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
       if (productImages) {
@@ -2577,6 +2580,7 @@ exports.userWisePost = async function (req, res, next) {
         userData: req.session.user,
         isLoggedIn: isLoggedIn,
         userBankStatus:userBankStatus,
+        userAddressStatus:userAddressStatus,
         websiteUrl: process.env.SITE_URL,
       });
     }

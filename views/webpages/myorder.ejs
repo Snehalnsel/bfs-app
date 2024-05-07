@@ -155,11 +155,11 @@
         <div class="bids-row wishlist-row " >
               <div class="br-details">
                   <div class="bid-images">
-                     <img src="${(currImagesUrl.startsWith('/public/compress_images/') ? (webSiteUrl + '/public/compress_images/' + item.product.image) : webSiteUrl + currImagesUrl)}" alt="images" class="img-fluid">
+                     <a href="/productdeatils/${item.product.id}"><img src="${(currImagesUrl.startsWith('/public/compress_images/') ? (webSiteUrl + '/public/compress_images/' + item.product.image) : webSiteUrl + currImagesUrl)}" alt="images" class="img-fluid"></a>
                   </div>
                   <div class="bid-info">
                      <div class="bd-title">
-                        <a href="/web-myorder-details/${item._id}">${item.product.name}</a>
+                        <a href="/productdeatils/${item.product.id}">${item.product.name}</a>
                      </div>
                      <div class="bd-price">
                         <span><i class="fa fa-inr" aria-hidden="true"></i></span>${item.total_price}
@@ -256,16 +256,17 @@
             function populateSellerHtml(data) {
                data.orders.forEach(item => {
 
-                  let currImagesUrl = `/public/images/${item.image}`;
+                  let currImagesUrl = `/public/images/${item.product.image}`;
                   var hTml = `<div class="cart-list wishlist-list" data-orderid="${item._id}" data-userby="2">
     <div class="bids-row wishlist-row order-list">
         <div class="br-details">
             <div class="bid-images">
-               <img src="${(currImagesUrl.startsWith('/public/compress_images/') ? (webSiteUrl + '/public/compress_images/' + item.product.image) : webSiteUrl + currImagesUrl)}" alt="images" class="img-fluid">
+               <a href="/productdeatils/${item.product.id}"><img src="${(currImagesUrl.startsWith('/public/compress_images/') ? (webSiteUrl + '/public/compress_images/' + item.product.image) : webSiteUrl + currImagesUrl)}" alt="images" class="img-fluid">
+               </a>
             </div>
             <div class="bid-info bi-iconbox">
                <div class="bid-left">
-                <div class="bd-title">${item.product.name}</div>
+                <div class="bd-title"><a href="/productdeatils/${item.product.id}">${item.product.name}</a></div>
                 <div class="bd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>${item.total_price}</div>
                 <div class="cnbtn-group">`;
                   if (item.shippingkit_status == 1) {
@@ -342,6 +343,7 @@
                         });
                         $("#" + orderId).siblings("p").text("Shipping kit has already been bought");
                         $("#" + orderId).hide();
+                        $("#short-modal").modal('hide'); // Add this line to hide the modal
                      } else {
                         Swal.fire({
                            html: data.message,

@@ -2777,7 +2777,7 @@ exports.downloadOrderPDF = function (req, res, next) {
           const pdfBuffer = await page.pdf({ format: 'A4' });
 
           res.setHeader('Content-Type', 'application/pdf');
-          res.setHeader('Content-Disposition', 'attachment; filename=Invoice.pdf');
+          res.setHeader('Content-Disposition', 'attachment; filename=InvoiceSellerToBFS.pdf');
 
           res.send(pdfBuffer);
           await browser.close();

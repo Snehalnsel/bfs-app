@@ -177,6 +177,7 @@ exports.addAddress = async function (req, res, next) {
     };
 
       const shiprocketResponse = await generateSellerPickup(PickupData);
+      console.log(generateSellerPickup);
 
       if (shiprocketResponse) {
         savedAddress.shiprocket_address = savedAddress.address_name + ' - ' + user.name;

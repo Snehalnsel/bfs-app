@@ -373,17 +373,24 @@
                $.ajax({
                   url: '/get-shipmentkitweb/' + orderId.trim(),
                   method: 'GET',
-                  success: function (data) {
-                     if (data.success) {
-                        Swal.fire({
-                           html: data.message,
-                           confirmButtonText: "OK",
-                           customClass: { confirmButton: 'alert-box-button' }
-                        });
-                        $("#" + orderId).siblings("p").text("Shipping kit has already been bought");
-                        $("#" + orderId).hide();
-                        $("#short-modal").modal('hide'); 
-                     } else {
+                  // success: function (data) {
+                  //    if (data.success) {
+                  //       Swal.fire({
+                  //          html: data.message,
+                  //          confirmButtonText: "OK",
+                  //          customClass: { confirmButton: 'alert-box-button' }
+                  //       });
+                  //       $("#" + orderId).siblings("p").text("Shipping kit has already been bought");
+                  //       $("#" + orderId).hide();
+                  //       $("#short-modal").modal('hide'); 
+                  //    } 
+                  success: function (response) {
+                     if (response.is_orderPlaced == 1) {
+                        const tempOrderId = response.order._id;
+                        //window.location.href = '/pay?temp=' + tempOrderId;
+                        //window.open('/pay?temp=' + tempOrderId, '_blank');
+                     }
+                     else {
                         Swal.fire({
                            html: data.message,
                            confirmButtonText: "OK",

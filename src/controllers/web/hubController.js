@@ -241,52 +241,30 @@ exports.createData = async function (req, res, next) {
 
 exports.updateStatusData = async function (req, res, next) {
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-  const hubId = req.params.id;
-  Hub.findById(hubId)
-    .then((hub) => {
-      if (!hub) {
-        return res.status(404).json({
-          status: "0",
-          message: "Size not found!",
-          respdata: {},
-          isAdminLoggedIn:isAdminLoggedIn
-        });
-      }
+   const hubId = mongoose.Types.ObjectId(req.params.id);
+  let getData = await Hub.findById(hubId);
+ if(!getData){
+  return res.status(404).json({
+    status: "0",
+    message: "Hub not found!",
+    respdata: {},
+    isAdminLoggedIn:isAdminLoggedIn
+  });
+ }
+ let flag = getData.flag === 0 ? 1 : 0;
+ let filter = { _id: hubId };
+ let update = { flag: flag };
+let updateData = await Hub.findOneAndUpdate(filter, update);
 
-      // Toggle the status between 0 and 1
-      hub.flag = hub.flag === 0 ? 1 : 0;
-
-      // Save the updated size
-      hub.save()
-        .then((updatedHub) => {
-          if (!updatedHub) {
-            return res.status(404).json({
-              status: "0",
-              message: "Size status not updated!",
-              respdata: {},
-              isAdminLoggedIn:isAdminLoggedIn
-            });
-          }
-
-          res.redirect("/admin/hublist");
-        })
-        .catch((error) => {
-          return res.status(500).json({
-            status: "0",
-            message: "An error occurred while updating the size status.",
-            respdata: {},
-            isAdminLoggedIn:isAdminLoggedIn
-          });
-        });
-    })
-    .catch((error) => {
-      return res.status(500).json({
-        status: "0",
-        message: "An error occurred while finding the size.",
-        respdata: {},
-        isAdminLoggedIn:isAdminLoggedIn
-      });
-    });
+if (!updateData) {
+  return res.status(404).json({
+    status: "0",
+    message: "flag status not updated!",
+    respdata: {},
+    isAdminLoggedIn:isAdminLoggedIn
+  });
+}
+res.redirect("/admin/hublist");
 };
 
 

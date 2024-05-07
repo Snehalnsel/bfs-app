@@ -1114,7 +1114,7 @@ router.post("/markNotificationAsRead",[],NotificationsController.markNotificatio
 // generate 
 router.post("/get-shipmentkit", auth.isAuthorized,[],ShippingkitController.addShipmentData);
 
-router.get("/get-shipmentkitweb/:id",[],WebsiteController.addShipmentData);
+router.get("/get-shipmentkitweb/:id",[],ShippingkitController.addShipmentDataWeb);
 
 
 // WEBSITE API'S

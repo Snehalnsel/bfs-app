@@ -3688,69 +3688,6 @@ exports.myOrderDetailsWeb = async (req, res) => {
     });
   }
 };
-exports.addShipmentData = async (req, res) => {
-  try {
-    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-    const order_id = req.params.id;
-    const price = 350;
-    const gst = (price * 18) / 100;
-    const final_price = price + gst;
-    const track = await Ordertracking.findOne({ order_id: order_id }).exec();
-    if (track == null) {
-      return res.status(200).json({
-        status: "0",
-        message: 'Order Delivery Partner Not chosse yet',
-        is_shippingkit: false,
-      });
-    }
-    const hubaddress = await Track.findById(track.tracking_id)
-      .populate('seller_id', 'name phone_no email')
-      .populate('billing_address_id')
-      .populate('hub_address_id');
-    if (!hubaddress) {
-      res.status(200).json({
-        status: "0",
-        message: 'Order Delivery Partnerss Not chosse yet',
-        is_shippingkit: false,
-      });
-    }
-    const orderCode = `BFSSHIPKIT${Date.now().toString()}`;
-    const shippingkit = new Shippingkit({
-      track_code: orderCode,
-      buyer_id: hubaddress.seller_id._id,
-      product_id: hubaddress.product_id,
-      shipping_address_id: hubaddress.billing_address_id._id,
-      order_id: order_id,
-      total_price: final_price,
-      payment_method: 1,
-      added_dtime: new Date().toISOString(),
-    });
-    const savedOrder = await shippingkit.save();
-    if (savedOrder) {
-      const updatedTrack = await Track.findOneAndUpdate(
-        { _id: track.tracking_id },
-        { $set: { shippingkit_status: 1 } },
-        { new: true }
-      );
-      const user = await Users.findById(savedOrder.buyer_id);
-      res.status(200).json({
-        status: "1",
-        message: 'Shipping Kit Order placed successfully',
-        success: true,
-        is_shippingkit: true,
-        order: savedOrder,
-        isLoggedIn: isLoggedIn,
-        websiteUrl: process.env.SITE_URL,
-      });
-    }
-  } catch (error) {
-    res.status(200).json({
-      status: "0",
-      message: 'Can not Order Shipping kit',
-      is_shippingkit: false,
-    });
-  }
-};
 exports.getWhatsHotProductsweb = async function (req, res) {
 
   const page = parseInt(req.body.page) || 1; 

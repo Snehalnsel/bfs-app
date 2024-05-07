@@ -216,7 +216,6 @@ exports.updateData = async function (req, res, next) {
 
   try {
     const brand = await Brand.findOne({ _id: req.body.brand_id });
-
     if (!brand) {
       return res.status(404).json({
         status: "0",
@@ -225,13 +224,11 @@ exports.updateData = async function (req, res, next) {
         isAdminLoggedIn: isAdminLoggedIn
       });
     }
-
     const updData = {
       name: req.body.name || brand.name,
       description: req.body.description || brand.description,
       status: req.body.status || brand.status,
     };
-
     if (req.file) {
       const requrl = req.protocol + '://' + req.get('host');
       const imagePath = req.file.filename;
@@ -243,7 +240,6 @@ exports.updateData = async function (req, res, next) {
       updData,
       { new: true, runValidators: true }
     );
-
     if (!updatedBrand) {
       return res.status(404).json({
         status: "0",
@@ -252,7 +248,6 @@ exports.updateData = async function (req, res, next) {
         isAdminLoggedIn: isAdminLoggedIn
       });
     }
-
     res.redirect("/admin/brand");
   } catch (error) {
     return res.status(500).json({

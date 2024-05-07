@@ -1,9 +1,6 @@
 const mongoose = require("mongoose");
 
 const model = mongoose.Schema({
-  track_code: {
-    type: String,
-  },
   order_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'mt_order', 
@@ -32,7 +29,7 @@ const model = mongoose.Schema({
     type: Number,
   },
   total_price: {
-    type: String,
+    type: Number,
   },
   payment_method: {
     type: Number,
@@ -46,12 +43,6 @@ const model = mongoose.Schema({
   },
   gst: {
     type: Number,
-  },
-  delivery_charges: {
-    type: Number,
-  },
-  discount: {
-    type: String,
   },
   pickup_status: {
     type: Number,
@@ -115,14 +106,9 @@ const model = mongoose.Schema({
     enum: [0,1],
     default: 0,
   },
-  bid_status:{
-    type: Number,
-    enum: [0,1],
-    default: 0,
-  },
   added_dtime: {
     type: String,
   },
 });
 
-module.exports = new mongoose.model("shipping_kit", model);
+module.exports = new mongoose.model("demo_shipping_kit", model);

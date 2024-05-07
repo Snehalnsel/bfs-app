@@ -29,6 +29,7 @@ const Ordertracking = require("../../models/api/ordertrackModel");
 const Track = require("../../models/api/trackingModel");
 const AddressBook = require("../../models/api/addressbookModel");
 const Shippingkit = require("../../models/api/shippingkitModel");
+const shippingchrgsModel = require("../../models/api/shippingchrgsModel");
 const insertNotification = require("../../models/api/insertNotification");
 const Iptrnsaction = require("../../models/api/ipTransactionModel");
 const nodemailer = require("nodemailer");
@@ -970,6 +971,8 @@ exports.getOrdersBySeller = async (req, res) => {
       if (typeof shipdetails !="undefined" && shipdetails.length > 0) {
           shipping_details = await Track.find({ _id: shipdetails[0].tracking_id });
       }
+      let productshippingkit = productDetails[0].shipping_charges_id;
+      let shippingcharges = await shippingchrgsModel.findOne({ _id: productshippingkit });
       //const shippingKitData = await Shippingkit.findOne({ order_id: order._id });
       const orderDetails = {
         _id: order._id,
@@ -987,7 +990,8 @@ exports.getOrdersBySeller = async (req, res) => {
           name: productDetails.length ? productDetails[0].name : 'Unknown Product',
           image: productImage.length ? productImage[0].image : 'No Image',
         },
-        shippingkit_status: (Object.keys(shipping_details).length > 0) ? shipping_details[0].shippingkit_status : 2, 
+        shippingkit_status: (Object.keys(shipping_details).length > 0) ? shipping_details[0].shippingkit_status : 2,
+        shipping_charges: shippingcharges ? shippingcharges.amount : 0 
       };
       ordersWithProductDetails.push(orderDetails);
     }

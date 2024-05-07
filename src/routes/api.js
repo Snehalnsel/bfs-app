@@ -32,6 +32,7 @@ const HubController = require("../controllers/api/hubController");
 const NotificationsController = require("../controllers/api/notificationsController");
 const ShippingkitController = require("../controllers/api/shippingkitController");
 const PaymentController = require("../controllers/api/paymentController");
+const ShippingkitpaymentController = require("../controllers/api/shippingkitpaymentController");
 // const helper = require("../helpers/helper");
 //others
 const dateTime = moment().format("YYYY-MM-DD h:mm:ss");
@@ -1418,6 +1419,10 @@ router.get("/otherwise-list",cors(),
 
 router.get("/pay",cors(),
 PaymentController.getPaymentData
+);
+
+router.get("/payshippingkit",cors(),
+ShippingkitpaymentController.getPaymentDataforshippingkit
 );
 
 router.get("/checkapp-payment",cors(),

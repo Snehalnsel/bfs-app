@@ -337,25 +337,7 @@
                   $("#viewers-tab").append(hTml);
                });
             }
-            // $(document).on('click', '.buy-shipping-kit', function () {
-            //    var orderId = $(this).data('orderid');
-            //    $(".short-modal .buy-modal a.acb-btn").attr("data-orderid", orderId);
-            //    $(".cg-row").attr("id", orderId);
-            //    $('#short-modal').modal('show');
-            // });
-            // $(document).on('click', '.buy-shipping-kit', function () {
-            //    var orderId = $(this).data('orderid');
-            //    var shippingCharges = $('input[name="shipping_charges"]').val(); // Get shipping charges from hidden input
-               
-            //    // Update the modal title with the updated shipping charges
-            //    $('.short-modal .buy-modal h5.box-title').html(`Shipping Kit <span><i class="fa fa-inr" aria-hidden="true"></i>${shippingCharges} + GST</span>`);
-               
-            //    // Set data-orderid attribute for the Buy Shipping Kit button in the modal
-            //    $('.short-modal .buy-modal a.acb-btn.order-shipping-kit').attr('data-orderid', orderId);
-               
-            //    // Show the modal
-            //    $('#short-modal').modal('show');
-            // });
+            
             $(document).on('click', '.buy-shipping-kit', function () {
                var orderId = $(this).data('orderid');
                var shippingCharges = parseFloat($('input[name="shipping_charges"]').val()); 
@@ -368,7 +350,8 @@
                $('#short-modal').modal('show');
             });
             $(document).on('click', '.order-shipping-kit', function () {
-               var orderId = $(this).data('orderid');
+              // var orderId = $(this).data('orderid');
+              var orderId = $(this).attr('data-orderid');
                var cgRowElement = $(`.cg-row[data-orderid="${orderId}"]`);
                $.ajax({
                   url: '/get-shipmentkitweb/' + orderId.trim(),
@@ -385,14 +368,14 @@
                   //       $("#short-modal").modal('hide'); 
                   //    } 
                   success: function (response) {
-                     if (response.is_orderPlaced == 1) {
+                     if (response.is_shippingkit == true) {
                         const tempOrderId = response.order._id;
-                        //window.location.href = '/pay?temp=' + tempOrderId;
+                        window.location.href = '/payshippingkit?temp=' + tempOrderId;
                         //window.open('/pay?temp=' + tempOrderId, '_blank');
                      }
                      else {
                         Swal.fire({
-                           html: data.message,
+                           html: response.message,
                            confirmButtonText: "OK",
                            customClass: { confirmButton: 'alert-box-button', popup: 'swal2-popup' }
                         });

@@ -41,6 +41,8 @@ const sendWhatsapp = require("../../models/thirdPartyApi/sendWhatsapp");
 const ApiCallHistory = require("../../models/thirdPartyApi/ApiCallHistory");
 const AddressBook = require("../../models/api/addressbookModel");
 const shippingchrgsModel = require("../../models/api/shippingchrgsModel");
+const Shippingkit = require("../../models/api/shippingkitModel");
+const Demoshippingkit = require("../../models/api/demoshippingkitModel");
 const { create } = require('xmlbuilder2');
 const { log } = require("console");
 const axios = require("axios");
@@ -58,12 +60,14 @@ const transporter = nodemailer.createTransport({
   },
   secure: true,
 });
+
 /*
 //TEST Phone Pay Key
-// const MERCHANT_ID = "PGTESTPAYUAT";
-// const PHONE_PE_HOST_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox";
-// const SALT_KEY = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";
-*/
+const MERCHANT_ID = "PGTESTPAYUAT";
+const PHONE_PE_HOST_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox";
+const SALT_KEY = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";*/
+
+
 
 //Live Phone Pay Key
 const MERCHANT_ID = "M22EUQY70KVBB";
@@ -72,22 +76,15 @@ const SALT_KEY = "6e2f6cdb-392f-4a06-b2e2-a9af19a1207c";
 
 const SALT_INDEX = 1;
 const APP_BE_URL = process.env.SITE_URL;
+
 //6e2f6cdb-392f-4a06-b2e2-a9af19a1207c
 
-exports.getPaymentData = async function (req, res, next) {
+exports.getPaymentDataforshippingkit = async function (req, res, next) {
   try {
     const tempOrderId = req.query.temp;
-    const temporder = await Demoorder.findById(tempOrderId);
-    let amount;
-    if(temporder.booking_amount == 0) {
-      amount= parseFloat(temporder.total_price);
-    } else
-    {
-      amount = parseFloat(temporder.booking_amount);
-    }
-   // amount = temporder.booking_amount !== 0 ? temporder.booking_amount : temporder.total_price;
-
-    let userId = temporder.user_id;
+    const temporder = await Demoshippingkit.findById(tempOrderId);
+    let amount = parseFloat(temporder.total_price);
+    let userId = temporder.buyer_id;
     let merchantTransactionId = uniqid();
     let normalPayLoad = {
       merchantId: MERCHANT_ID,
@@ -137,7 +134,7 @@ exports.getPaymentData = async function (req, res, next) {
           pay_response: response.data,
         };
 
-        await Demoorder.findOneAndUpdate(
+        await Demoshippingkit.findOneAndUpdate(
           { _id: tempOrderId },
           { $set: updateData },
           { new: true }
@@ -145,7 +142,8 @@ exports.getPaymentData = async function (req, res, next) {
         res.redirect(response.data.data.instrumentResponse.redirectInfo.url);
       })
       .catch(function (error) {
-        //console.log("Error for payment:",error);return false;
+        console.log("Error for payment:",error);
+        //return false;
         res.status(500).json({
           status: "0",
           message: "An error occurred during payment.",
@@ -153,7 +151,8 @@ exports.getPaymentData = async function (req, res, next) {
         });
       });
   } catch (error) {
-    //console.log("Error for payment error:");return false;
+    console.log("Error for payment error:");
+    //return false;
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the dashboard.",
@@ -166,7 +165,7 @@ exports.getStatus_back = async function (req, res, next) {
   try {
     const tempId = req.query.temp;
 
-    const temporder = await Demoorder.findById(tempId);
+    const temporder = await Demoshippingkit.findById(tempId);
 
     const merchantTransactionId = temporder.merchant_transactionid;
 
@@ -221,112 +220,102 @@ exports.getStatus_back = async function (req, res, next) {
           const now = new Date();
           const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0'); 
           const currentYear = now.getFullYear().toString();
-          let order_status = '0';
-          let delivery_charges = '0';
-          let discount = '0';
-          let pickup_status = '0';
-          let delivery_status = '0';          
+     
           
           const lastOrderIndex = await getLastOrderIndex();
           const nextIncrementingPart = lastOrderIndex + 1;
-          const orderCode = `BFSORD${currentMonth}${currentYear}-${nextIncrementingPart}`;
-          const order = new Order({
-            order_code: orderCode,
-            order_index: nextIncrementingPart,
-            user_id: temporder.user_id,
-            cart_id: temporder.cart_id,
-            seller_id: temporder.seller_id,
+          const orderCode = `SHIPPINGKIT${currentMonth}${currentYear}-${nextIncrementingPart}`;
+          
+          const shippingkit = new Shippingkit({
+            track_code: orderCode,
+            buyer_id: temporder._id,
             product_id: temporder.product_id,
-            billing_address_id: temporder.billing_address_id,
-            shipping_address_id: temporder.shipping_address_id,
-            total_price: temporder.total_price,
-            booking_amount : temporder.booking_amount || 0,
-            packing_handling_charge : temporder.packing_handling_charge || 0, 
-            payment_method: temporder.payment_method,
-            order_status: order_status,
-            gst: temporder.gst || '',
-            taxable_value : temporder.taxable_value || '',
-            delivery_charges: delivery_charges,
-            discount: discount,
-            pickup_status: pickup_status,
-            delivery_status: delivery_status,
-            pay_now: temporder.pay_now || '', 
-            remaining_amount: temporder.remaining_amount || '',
+            shipping_address_id: temporder._id,
+            order_id: temporder.order_id,
+            price: temporder.price,
+            gst: temporder.gst,
+            total_price: temporder.final_price,
+            payment_method: 1,
             added_dtime: new Date().toISOString(),
           });
-
-          const savedOrder = await order.save();
+          const savedOrder = await shippingkit.save();
 
           if(savedOrder)
           {
-            const updatedProduct = await Userproduct.findOneAndUpdate(
-              { _id: temporder.product_id }, 
-              { $set: { flag: 1 } }, 
+            const updatedTrack = await Track.findOneAndUpdate(
+              { _id: track.tracking_id },
+              { $set: { shippingkit_status: 1 } },
               { new: true }
             );
+          }
+            // const updatedProduct = await Userproduct.findOneAndUpdate(
+            //   { _id: temporder.product_id }, 
+            //   { $set: { flag: 1 } }, 
+            //   { new: true }
+            // );
 
-      const user = await Users.findById(savedOrder.user_id);
+     //const user = await Users.findById(savedOrder.user_id);
 
-      const product = await Userproduct.findById(savedOrder.product_id);
+      // const product = await Userproduct.findById(savedOrder.product_id);
 
-      const address = await AddressBook.findById(savedOrder.billing_address_id);
+      // const address = await AddressBook.findById(savedOrder.billing_address_id);
 
-      const billingaddress = address.street_name + ', ' + address.address1 + ', ' + address.landmark + ', ' + address.city_name + ', ' + address.state_name + ', ' + address.pin_code;
+      // const billingaddress = address.street_name + ', ' + address.address1 + ', ' + address.landmark + ', ' + address.city_name + ', ' + address.state_name + ', ' + address.pin_code;
 
-      const loginHtmlPath = 'views/webpages/order-confirmed.html';
-      let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+      // const loginHtmlPath = 'views/webpages/order-confirmed.html';
+      // let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
 
-      loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
-      loginHtmlContent = loginHtmlContent.replace('{{ordernumber}}', orderCode);
-      loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
-      loginHtmlContent = loginHtmlContent.replace('{{productimages}}', orderCode);
-      loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
-      loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.price);
-      loginHtmlContent = loginHtmlContent.replace('{{shippingaddress}}', billingaddress);
+      // loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+      // loginHtmlContent = loginHtmlContent.replace('{{ordernumber}}', orderCode);
+      // loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
+      // loginHtmlContent = loginHtmlContent.replace('{{productimages}}', orderCode);
+      // loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
+      // loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.price);
+      // loginHtmlContent = loginHtmlContent.replace('{{shippingaddress}}', billingaddress);
     
-      const mailData = {
-        from: "Bid For Sale! <" + smtpUser + ">",
-        to: user.email,
-        subject: "Order Placed - Bid For Sale!",
-        name: "Bid For Sale!",
-        text: "order placed",
-        html: loginHtmlContent
-      };
+      // const mailData = {
+      //   from: "Bid For Sale! <" + smtpUser + ">",
+      //   to: user.email,
+      //   subject: "Order Placed - Bid For Sale!",
+      //   name: "Bid For Sale!",
+      //   text: "order placed",
+      //   html: loginHtmlContent
+      // };
 
-      transporter.sendMail(mailData, function (err, info) {
+      //transporter.sendMail(mailData, function (err, info) {
         // if (err) console.log("err", err);
         // else console.log("info", info);
-      });
-         let smsData = {
-          textId: "test",
-          toMobile: "91" +user.phone_no,
-          text: "Order placed successfully! Thank you for shopping with Bid For Sale. Your "+ product.name +" having Order ID "+ orderCode +"  is on its way to you. For any inquiries, feel free to reach out to us. Happy shopping!-BFS RETAIL SERVICES PRIVATE LIMITED",
-        };
-        let returnData;
-        returnData = await sendSms(smsData);
-        const historyData = new ApiCallHistory({
-          userId: user._id,
-          called_for: "Order Placed",
-          api_link: process.env.SITE_URL,
-          api_param: smsData,
-          api_response: returnData,
-          send_status: 'send',
-        });
-        await historyData.save();
-            if(updatedProduct)
-            {
-              const cleanedCartId =  mongoose.Types.ObjectId(temporder.cart_id); 
-              const cartDetail = await CartDetail.findOne({ cart_id: cleanedCartId });
-              if (cartDetail) {
-                await cartDetail.remove();
-              }
-              const cartDetailsCount = await CartDetail.countDocuments({ cart_id: savedOrder.cart_id });
-              const existingCart = await Cart.findById(temporder.cart_id);
-              if (cartDetailsCount === 0) {
-                await existingCart.remove();
-              }
-            } 
-          }
+      //});
+        //  let smsData = {
+        //   textId: "test",
+        //   toMobile: "91" +user.phone_no,
+        //   text: "Order placed successfully! Thank you for shopping with Bid For Sale. Your "+ product.name +" having Order ID "+ orderCode +"  is on its way to you. For any inquiries, feel free to reach out to us. Happy shopping!-BFS RETAIL SERVICES PRIVATE LIMITED",
+        // };
+        // let returnData;
+        // returnData = await sendSms(smsData);
+        // const historyData = new ApiCallHistory({
+        //   userId: user._id,
+        //   called_for: "Order Placed",
+        //   api_link: process.env.SITE_URL,
+        //   api_param: smsData,
+        //   api_response: returnData,
+        //   send_status: 'send',
+        // });
+        // await historyData.save();
+        //     if(updatedProduct)
+        //     {
+        //       const cleanedCartId =  mongoose.Types.ObjectId(temporder.cart_id); 
+        //       const cartDetail = await CartDetail.findOne({ cart_id: cleanedCartId });
+        //       if (cartDetail) {
+        //         await cartDetail.remove();
+        //       }
+        //       const cartDetailsCount = await CartDetail.countDocuments({ cart_id: savedOrder.cart_id });
+        //       const existingCart = await Cart.findById(temporder.cart_id);
+        //       if (cartDetailsCount === 0) {
+        //         await existingCart.remove();
+        //       }
+        //     } 
+        //}
           res.redirect('/message?message=success');
         } else {
           res.redirect('/message?message=failure');

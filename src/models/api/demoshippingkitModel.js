@@ -101,6 +101,18 @@ const model = mongoose.Schema({
   shiprocket_delivery_partner:{
     type: String,
   }, 
+  pay_response: {
+    type: Object,
+  },
+  checkstatus_response: {
+    type: Object,
+  },
+  merchant_transactionid: {
+    type: String,
+  },
+  checkstatus_status: {
+    type: String,
+  },
   delete_status:{
     type: Number,
     enum: [0,1],

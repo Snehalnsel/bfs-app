@@ -981,7 +981,7 @@ exports.updateData = async function (req, res, next) {
         trackObj.shipping_address_id = typeof req.body.seller_address != "undefined" ? req.body.seller_address : billingAddress._id;
         trackObj.hub_address_id = req.body.hub_address;
       }
-      console.log("trackObj---",trackObj)
+      
       const track = new Track(trackObj);
       
       const savedTrack = await track.save();
@@ -1250,7 +1250,7 @@ exports.orderplaced = async (req, res) => {
     }
 
     let orderDetails = await Track.findById({ _id: track_id });
-    let paymentMethod = orderDetails.payment_method ? 'online':'COD';
+    let paymentMethod = orderDetails.payment_method ? 'Prepaid':'COD';
     if(orderDetails.order_status==0){
       //======seller to hub====
       orderDetails = await Track.findById({ _id: track_id })
@@ -1412,7 +1412,6 @@ exports.orderplaced = async (req, res) => {
         orderData.shipping_email = orderDetails.seller_id.email;
         orderData.shipping_phone = orderDetails.seller_id.phone_no;
       }
-      
 
       let shiprocketResponse = await generateOrder(orderData).catch((err)=> {return err});
       if(shiprocketResponse.status_code != 200){

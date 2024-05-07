@@ -90,8 +90,8 @@ exports.createData = async function (req, res, next) {
     }
 
     const requrl = req.protocol + '://' + req.get('host');
-    const imagePath = requrl + '/public/images/' + req.file.filename;
-
+    const imagePath = req.file.filename;
+    await fs.promises.copyFile(filePath, path.join("./public/compress_images/", imagePath));
     const bannerExists = await Banner.findOne({ name: req.body.name });
     if (bannerExists) {
       return res.render("pages/banner/create", {
@@ -186,69 +186,64 @@ exports.updateData = async function (req, res, next) {
   var pageTitle = req.app.locals.siteName + " - Edit " + pageName;
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
+  
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
-      isAdminLoggedIn:isAdminLoggedIn
+      isAdminLoggedIn: isAdminLoggedIn
     });
   }
 
-  Banner.findOne({ _id: req.body.banner_id })
-    .then((banner) => {
-      if (!banner) {
-        return res.status(404).json({
-          status: "0",
-          message: "Brand not found!",
-          respdata: {},
-          isAdminLoggedIn:isAdminLoggedIn
-        });
-      }
+  try {
+    const banner = await Banner.findOne({ _id: req.body.banner_id });
 
-      const updData = {
-        name: req.body.name || banner.name,
-        status: req.body.status || banner.status,
-      };
-
-      if (req.file) {
-        const requrl = req.protocol + '://' + req.get('host');
-        const imagePath = requrl + '/public/images/' + req.file.filename;
-        updData.image = imagePath;
-      }
-      Banner.findByIdAndUpdate(
-        req.body.banner_id,
-        updData,
-        { new: true, runValidators: true }
-      )
-        .then((updatedBrand) => {
-          if (!updatedBrand) {
-            return res.status(404).json({
-              status: "0",
-              message: "Brand not updated!",
-              respdata: {},
-              isAdminLoggedIn:isAdminLoggedIn
-            });
-          }
-          res.redirect("/admin/banner-list");
-        })
-        .catch((error) => {
-          return res.status(500).json({
-            status: "0",
-            message: "An error occurred while updating the brand.",
-            respdata: {},
-            isAdminLoggedIn:isAdminLoggedIn
-          });
-        });
-    })
-    .catch((error) => {
-      return res.status(500).json({
+    if (!banner) {
+      return res.status(404).json({
         status: "0",
-        message: "An error occurred while finding the brand.",
+        message: "Brand not found!",
         respdata: {},
-        isAdminLoggedIn:isAdminLoggedIn
+        isAdminLoggedIn: isAdminLoggedIn
       });
+    }
+
+    const updData = {
+      name: req.body.name || banner.name,
+      status: req.body.status || banner.status,
+    };
+
+    if (req.file) {
+      const requrl = req.protocol + '://' + req.get('host');
+      const imagePath = req.file.filename;
+      await fs.copyFile(req.file.path, path.join("./public/compress_images/", imagePath));
+      updData.image = imagePath;
+    }
+
+    const updatedBrand = await Banner.findByIdAndUpdate(
+      req.body.banner_id,
+      updData,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedBrand) {
+      return res.status(404).json({
+        status: "0",
+        message: "Brand not updated!",
+        respdata: {},
+        isAdminLoggedIn: isAdminLoggedIn
+      });
+    }
+
+    res.redirect("/admin/banner-list");
+  } catch (error) {
+    return res.status(500).json({
+      status: "0",
+      message: "An error occurred while updating the brand.",
+      respdata: {},
+      isAdminLoggedIn: isAdminLoggedIn
     });
+  }
 };
 
 

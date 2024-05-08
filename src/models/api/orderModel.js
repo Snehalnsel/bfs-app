@@ -179,6 +179,11 @@ const model = mongoose.Schema({
     enum: [0,1],
     default: 0,
   },
+  is_delivered:{
+    type: Number,
+    enum: [0,1],
+    default: 0,
+  },
   is_return:{
     type: Number,
     enum: [0,1],

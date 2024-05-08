@@ -28,6 +28,9 @@ const Ordertracking = require("../../models/api/ordertrackModel");
 const Track = require("../../models/api/trackingModel");
 const Shippingkit = require("../../models/api/shippingkitModel");
 const AddressBook = require("../../models/api/addressbookModel");
+const sendSms = require("../../models/thirdPartyApi/sendSms");
+const sendWhatsapp = require("../../models/thirdPartyApi/sendWhatsapp");
+const ApiCallHistory = require("../../models/thirdPartyApi/ApiCallHistory");
 // const helper = require("../helpers/helper");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -1436,6 +1439,31 @@ exports.orderplaced = async (req, res) => {
 
         await orderDetails.save();
 
+        if(orderDetails.order_status == 1){
+
+          let getorderid = await Ordertracking.findOne({ tracking_id: track_id });
+          let orderdetails = await Order.findById(getorderid.order_id);
+          const seller = await Users.findById(orderdetails.seller_id);
+  
+          let smsDataforseller = {
+            textId: "test",
+            toMobile: "91" +seller.phone_no,
+            text: "Dear "+ seller.name +",Your product "+ productdetails.name +" has been delivered to the hub successfully. It will be processed for delivery after the quality check.- BFS Team",
+          };
+          let returnDataforseller;
+          returnDataforseller = await sendSms(smsDataforseller);
+          const historyDataforseller = new ApiCallHistory({
+            userId: user._id,
+            called_for: "Delivery to Hub",
+            api_link: process.env.SITE_URL,
+            api_param: smsData,
+            api_response: returnDataforseller,
+            send_status: 'send',
+          });
+          await historyDataforseller.save();
+  
+        }  
+
       }
     }
     else {
@@ -1608,6 +1636,29 @@ exports.getAWBnoById = async function (req, res, next) {
           existingOrder.shiprocket_delivery_partner = shiprocketResponse.response.data.courier_company_id;
           existingOrder.shiprocket_courier_name = shiprocketResponse.response.data.transporter_name;
           await existingOrder.save();
+
+          if(existingOrder.order_status == 1)
+          {
+            const user = await Users.findById(existingOrder.user_id); 
+            let buyersmsData = {
+              textId: "test",
+              toMobile: "91" +user.phone_no,
+              text: "Dear "+user.name+",Your order "+existingOrder.shiprocket_order_id+" has been shipped via "+existingOrder.shiprocket_courier_name+" with Tracking ID "+existingOrder.pickup_awb+".It will be delivered within the next 7 business days.- BFS Team",
+            };
+            let returnDataforbuyer;
+            returnDataforbuyer = await sendSms(buyersmsData);
+  
+            const historyData1 = new ApiCallHistory({
+              userId: user._id,
+              called_for: "Order Placed for Seller Product",
+              api_link: process.env.SITE_URL,
+              api_param: smsData,
+              api_response: returnDataforbuyer,
+              send_status: 'send',
+            });
+            await historyData1.save();
+   
+          }
           const shiprocketlabelResponse = await generateLabel(shipment_id);
           const order_id = existingOrder.shiprocket_order_id;
           const shiprocketinvoiceResponse = await generateInvoice(order_id);
@@ -2241,6 +2292,8 @@ exports.getShipmentPickup = async function (req, res, next) {
         existingOrder.pickup_token_number = shiprocketResponse.response.pickup_token_number;
         existingOrder.pickup_dtime = shiprocketResponse.response.pickup_scheduled_date;
         await existingOrder.save();
+
+
       }
 
       res.redirect('/admin/orderlist');

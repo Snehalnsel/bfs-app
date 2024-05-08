@@ -142,6 +142,11 @@ const model = mongoose.Schema({
     default: 0,
     required: true,
   },
+  is_delivered:{
+    type: Number,
+    enum: [0,1],
+    default: 0,
+  },
   added_dtime: {
     type: String,
     required: true,

@@ -599,6 +599,7 @@ exports.checkPaymentData = async function (req, res, next) {
         );
 
         const user = await Users.findById(savedOrder.user_id);
+        const seller = await Users.findById(savedOrder.seller_id);
 
         const product = await Userproduct.findById(savedOrder.product_id);
   
@@ -659,7 +660,7 @@ exports.checkPaymentData = async function (req, res, next) {
            let smsData = {
             textId: "test",
             toMobile: "91" +user.phone_no,
-            text: "Order placed successfully! Thank you for shopping with Bid For Sale. Your "+ product.name +" having Order ID "+ orderCode +"  is on its way to you. For any inquiries, feel free to reach out to us. Happy shopping!-BFS RETAIL SERVICES PRIVATE LIMITED",
+            text: "Order placed successfully! Congratulations! Your product  Your "+ product.name +" having Order ID "+ orderCode +"  is on its way to you. For any inquiries, feel free to reach out to us. Happy shopping!-BFS RETAIL SERVICES PRIVATE LIMITED",
           };
           let returnData;
           returnData = await sendSms(smsData);
@@ -672,6 +673,24 @@ exports.checkPaymentData = async function (req, res, next) {
             send_status: 'send',
           });
           await historyData.save();
+          
+          let sellersmsData = {
+            textId: "test",
+            toMobile: "91" +seller.phone_no,
+            text: "Dear "+ seller.name +" , Congratulations! Your product "+ product.name +" has been sold successfully. The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.-BFS RETAIL SERVICES PRIVATE LIMITED",
+          };
+          let returnDataforseller;
+          returnDataforseller = await sendSms(sellersmsData);
+
+          const historyData1 = new ApiCallHistory({
+            userId: user._id,
+            called_for: "Order Placed for Seller Product",
+            api_link: process.env.SITE_URL,
+            api_param: smsData,
+            api_response: returnDataforseller,
+            send_status: 'send',
+          });
+          await historyData1.save();
           
         if (updatedProduct) {
           const cleanedCartId = mongoose.Types.ObjectId(temporder.cart_id);

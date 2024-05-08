@@ -14,9 +14,11 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 app.use("/public", express.static(path.join(__dirname, "public")));
 require('dotenv').config();
-const axios = require("axios")
+const axios = require("axios");
+const cron = require('node-cron');
 const moment = require('moment-timezone');
 const dateTime = moment().format("YYYY-MM-DD h:mm:ss");
+const CornController = require("./src/controllers/api/cornController");
 
 //Import Bids watcher Model
 const { getFirestore, Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
@@ -478,6 +480,21 @@ io.on("connection", (socket) => {
     }
   });
 });
+
+//corn for deliver
+// app.get("/cron",async ()=>{
+//   await CornController.processOrderTracking();
+// })
+//cron.schedule('*/90 * * * *', async () => {
+  var task  = cron.schedule('* * * * *', async () => {
+  try {
+    await CornController.processOrderTracking();
+  } catch (error) {
+    console.error('Error in cron job:', error);
+  }
+});
+task.start();
+//corn for deliver
 const https_server = serv.listen(port, function(err){
     console.log(`App listening on port ${port}!`);
 });
@@ -496,3 +513,6 @@ module.exports = serv;
 // app.listen(port, () => console.log(`App listening on port ${port}!`));
  
 //Snigdho Upadhyay
+
+
+

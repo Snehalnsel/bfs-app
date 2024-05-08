@@ -997,7 +997,6 @@ exports.updateData = async function (req, res, next) {
           type: 0,
           added_dtime: new Date().toISOString(),
         });
-
         const savedOrdertrack = await ordertracking.save();
 
         if (savedOrdertrack) {
@@ -1446,11 +1445,11 @@ exports.orderplaced = async (req, res) => {
       return res.status(404).json({ error: 'Order not found' });
     }
     else {
-      const updatedOrderTracking = await Ordertracking.findOneAndUpdate(
-        { tracking_id: track_id },
-        { $set: { status: 1 } },
-        { new: true }
-      );
+      // const updatedOrderTracking = await Ordertracking.findOneAndUpdate(
+      //   { tracking_id: track_id },
+      //   { $set: { status: 1 } },
+      //   { new: true }
+      // );
       res.redirect(`/admin/check-Couriresserviceability/${track_id}`);
     }
   } catch (error) {

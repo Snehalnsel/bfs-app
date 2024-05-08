@@ -5,6 +5,10 @@ const model = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'mt_order', 
   },
+  track_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'mt_tracks', 
+  },
   buyer_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'users', 

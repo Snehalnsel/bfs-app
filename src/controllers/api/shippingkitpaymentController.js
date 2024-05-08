@@ -64,10 +64,10 @@ const transporter = nodemailer.createTransport({
 /*
 //TEST Phone Pay Key
 const MERCHANT_ID = "PGTESTPAYUAT";
-const PHONE_PE_HOST_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox";
-const SALT_KEY = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";*/
-
-
+//const PHONE_PE_HOST_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox";
+const PHONE_PE_HOST_URL = "https://api-preprod.phonepe.com/apis/hermes";
+const SALT_KEY = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";
+*/
 
 //Live Phone Pay Key
 const MERCHANT_ID = "M22EUQY70KVBB";
@@ -243,7 +243,7 @@ exports.getStatus_back = async function (req, res, next) {
           if(savedOrder)
           {
             const updatedTrack = await Track.findOneAndUpdate(
-              { _id: track.tracking_id },
+              { _id: temporder.track_id },
               { $set: { shippingkit_status: 1 } },
               { new: true }
             );

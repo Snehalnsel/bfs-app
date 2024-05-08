@@ -845,11 +845,12 @@ exports.addShipmentDataWeb = async (req, res) => {
     const productDetails = await Userproduct.find({ _id: order.product_id });
     let productshippingkit = productDetails[0].shipping_charges_id;
     let shippingcharges = await shippingchrgsModel.findOne({ _id: productshippingkit });
-    let price = shippingcharges.amount;
-   // const price = 350;
+    //let price = shippingcharges.amount;
+    const price = 350;
     const gst = (price * 28) / 100;
     const final_price = price + gst;
-    const track = await Ordertracking.findOne({ order_id: order_id }).exec();
+    const track = await Ordertracking.findOne({ order_id: order_id,status :0 }).exec();
+    //const track = await Track.findOne({ order_id: order_id }).exec();
     if (track == null) {
       return res.status(200).json({
         status: "0",
@@ -868,11 +869,13 @@ exports.addShipmentDataWeb = async (req, res) => {
         is_shippingkit: false,
       });
     }
+    console.log("hubaddress",hubaddress);
     const demoshippingkit = new Demoshippingkit({
       buyer_id: hubaddress.seller_id._id,
       product_id: hubaddress.product_id,
       shipping_address_id: hubaddress.billing_address_id._id,
       order_id: order_id,
+      track_id: track._id,
       price: price,
       gst: gst,
       total_price: final_price,

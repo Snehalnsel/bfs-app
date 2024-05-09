@@ -1039,25 +1039,9 @@ exports.getShipmentList = function (req, res, next) {
     {
       $lookup: {
         from: 'users',
-        localField: 'user_id',
+        localField: 'buyer_id',
         foreignField: '_id',
         as: 'user',
-      },
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'seller_id',
-        foreignField: '_id',
-        as: 'seller',
-      },
-    },
-    {
-      $lookup: {
-        from: 'addressbook_lists',
-        localField: 'billing_address_id',
-        foreignField: '_id',
-        as: 'billing_address',
       },
     },
     {

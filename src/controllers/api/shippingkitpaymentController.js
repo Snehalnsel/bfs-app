@@ -118,7 +118,7 @@ exports.getPaymentDataforshippingkit = async function (req, res, next) {
             merchantTransactionId: merchantTransactionId,
             merchantUserId: userId,
             amount: amount * 100,
-            redirectUrl: `${APP_BE_URL}/payment-status?temp=${tempOrderId}`,
+            redirectUrl: `${APP_BE_URL}/payment-shippingkit-status?temp=${tempOrderId}`,
             redirectMode: "REDIRECT",
             mobileNumber: "9999999999",
             paymentInstrument: {
@@ -161,7 +161,7 @@ exports.getPaymentDataforshippingkit = async function (req, res, next) {
   }
 };
 
-exports.getStatus_back = async function (req, res, next) {
+exports.getStatus = async function (req, res, next) {
   try {
     const tempId = req.query.temp;
 
@@ -178,7 +178,6 @@ exports.getStatus_back = async function (req, res, next) {
         SALT_KEY;
       let sha256_val = sha256(string);
       let xVerifyChecksum = sha256_val + "###" + SALT_INDEX;
-
       try {
         const response = await axios.get(statusUrl, {
           headers: {
@@ -210,7 +209,7 @@ exports.getStatus_back = async function (req, res, next) {
           updateData.checkstatus_status = "failure";
         }
 
-        await Demoorder.findOneAndUpdate(
+        await Demoshippingkit.findOneAndUpdate(
           { _id: tempId },
           { $set: updateData },
           { new: true }
@@ -221,20 +220,19 @@ exports.getStatus_back = async function (req, res, next) {
           const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0'); 
           const currentYear = now.getFullYear().toString();
      
-          
           const lastOrderIndex = await getLastOrderIndex();
           const nextIncrementingPart = lastOrderIndex + 1;
           const orderCode = `SHIPPINGKIT${currentMonth}${currentYear}-${nextIncrementingPart}`;
-          
           const shippingkit = new Shippingkit({
             track_code: orderCode,
-            buyer_id: temporder._id,
+            buyer_id: temporder.buyer_id,
             product_id: temporder.product_id,
-            shipping_address_id: temporder._id,
+            shipping_address_id: temporder.shipping_address_id,
             order_id: temporder.order_id,
+            track_id: tempId,
             price: temporder.price,
             gst: temporder.gst,
-            total_price: temporder.final_price,
+            total_price: temporder.total_price,
             payment_method: 1,
             added_dtime: new Date().toISOString(),
           });
@@ -342,362 +340,6 @@ exports.getStatus_back = async function (req, res, next) {
     });
   }
 };
-
-exports.getStatus = async function (req, res, next) {
-  try {
-    const tempId = req.query.temp;
-
-    const temporder = await Demoorder.findById(tempId);
-
-    const merchantTransactionId = temporder.merchant_transactionid;
-    if (merchantTransactionId) {
-      let statusUrl = `${PHONE_PE_HOST_URL}/pg/v1/status/${MERCHANT_ID}/` +
-        merchantTransactionId;
-
-      let string = `/pg/v1/status/${MERCHANT_ID}/` +
-        merchantTransactionId +
-        SALT_KEY;
-      let sha256_val = sha256(string);
-      let xVerifyChecksum = sha256_val + "###" + SALT_INDEX;
-      try {
-/*
-        const response = await axios.get(statusUrl, {
-          headers: {
-            "Content-Type": "application/json",
-            "X-VERIFY": xVerifyChecksum,
-            "X-MERCHANT-ID": merchantTransactionId,
-            accept: "application/json",
-          },
-        }).then(async (res)=>{
-          if(typeof res.data.code != "undefined") {
-            return {
-              code:res.data.code,
-              data:res.data
-            };
-          } else {
-            return {
-              code:"failure",
-              data:res.data
-            };
-          }
-        });
-        
-        let updateData = {
-          checkstatus_response: response.data,
-          //checkstatus_status: response.data.code === "PAYMENT_SUCCESS" ? "success" : "failure",
-        };*/
-
-        let updateData = {};
-        if(typeof temporder.pay_response.code != "undefined" && temporder.pay_response.code == "PAYMENT_INITIATED") {
-          updateData.checkstatus_status = "success";
-        } else {
-          updateData.checkstatus_status = "failure";
-        }
-
-        await Demoorder.findOneAndUpdate(
-          { _id: tempId },
-          { $set: updateData },
-          { new: true }
-        );
-
-        if(updateData.checkstatus_status == "success") {
-          const now = new Date();
-          const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0'); 
-          const currentYear = now.getFullYear().toString();
-          let order_status = '0';
-          let delivery_charges = '0';
-          let discount = '0';
-          let pickup_status = '0';
-          let delivery_status = '0';          
-          const lastOrderIndex = await getLastOrderIndex();
-          const nextIncrementingPart = lastOrderIndex + 1;
-          const orderCode = `BFSORD${currentMonth}${currentYear}-${nextIncrementingPart}`;
-          const order = new Order({
-            order_code: orderCode,
-            order_index: nextIncrementingPart,
-            user_id: temporder.user_id,
-            cart_id: temporder.cart_id,
-            seller_id: temporder.seller_id,
-            product_id: temporder.product_id,
-            billing_address_id: temporder.billing_address_id,
-            shipping_address_id: temporder.shipping_address_id,
-            total_price: temporder.total_price,
-            booking_amount : temporder.booking_amount || 0,
-            packing_handling_charge : temporder.packing_handling_charge || 0, 
-            payment_method: temporder.payment_method,
-            order_status: order_status,
-            gst: temporder.gst || '',
-            taxable_value : temporder.taxable_value || '',
-            delivery_charges: delivery_charges,
-            discount: discount,
-            pickup_status: pickup_status,
-            delivery_status: delivery_status,
-            pay_now: temporder.pay_now || '', 
-            remaining_amount: temporder.remaining_amount || '',
-            bid_price: (typeof temporder.bid_price != "undefined") ? temporder.bid_price:0 ,
-            original_product_price: (typeof temporder.original_product_price != "undefined") ? temporder.original_product_price:0 ,
-            added_dtime: new Date().toISOString(),
-          });
-          const savedOrder = await order.save();
-          if(savedOrder)
-          {
-            const updatedProduct = await Userproduct.findOneAndUpdate(
-              { _id: temporder.product_id }, 
-              { $set: { flag: 1 } }, 
-              { new: true }
-            );
-
-      const user = await Users.findById(savedOrder.user_id);
-
-      const product = await Userproduct.findById(savedOrder.product_id);
-
-      const address = await AddressBook.findById(savedOrder.billing_address_id);
-
-      const billingaddress = address.street_name + ', ' + address.address1 + ', ' + address.landmark + ', ' + address.city_name + ', ' + address.state_name + ', ' + address.pin_code;
-
-      const loginHtmlPath = 'views/webpages/order-confirmed.html';
-      let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
-
-      loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
-      loginHtmlContent = loginHtmlContent.replace('{{ordernumber}}', orderCode);
-      loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
-      loginHtmlContent = loginHtmlContent.replace('{{productimages}}', orderCode);
-      loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
-      loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.price);
-      loginHtmlContent = loginHtmlContent.replace('{{shippingaddress}}', billingaddress);
-      const mailData = {
-        from: "Bid For Sale! <" + smtpUser + ">",
-        to: user.email,
-        subject: "Order Placed - Bid For Sale!",
-        name: "Bid For Sale!",
-        text: "order placed",
-        html: loginHtmlContent
-      };
-
-      transporter.sendMail(mailData, function (err, info) {});
-         let smsData = {
-          textId: "test",
-          toMobile: "91" +user.phone_no,
-          text: "Order placed successfully! Thank you for shopping with Bid For Sale. Your "+ product.name +" having Order ID "+ orderCode +"  is on its way to you. For any inquiries, feel free to reach out to us. Happy shopping!-BFS RETAIL SERVICES PRIVATE LIMITED",
-        };
-        let returnData;
-        returnData = await sendSms(smsData);
-        const historyData = new ApiCallHistory({
-          userId: user._id,
-          called_for: "Order Placed",
-          api_link: process.env.SITE_URL,
-          api_param: smsData,
-          api_response: returnData,
-          send_status: 'send',
-        });
-        await historyData.save();
-            if(updatedProduct)
-            {
-              const cleanedCartId =  mongoose.Types.ObjectId(temporder.cart_id);
-              const cartDetail = await CartDetail.findOne({ cart_id: cleanedCartId });
-              if (cartDetail) {
-                await cartDetail.remove();
-              }
-              const cartDetailsCount = await CartDetail.countDocuments({ cart_id: savedOrder.cart_id });
-              const existingCart = await Cart.findById(temporder.cart_id);
-              if (existingCart) {
-                await existingCart.remove();
-              }
-            } 
-          }
-          res.redirect('/message?message=success');
-        } else {
-          res.redirect('/message?message=failure');
-        }
-      } catch (error) {
-        console.log("Error for payment error status:",error);
-        res.redirect('/message?message=failure');
-
-        // res.status(500).json({
-        //   status: '0',
-        //   message: 'Error in axios request.',
-        //   error: error.message,
-        // });
-
-      }
-    } else {
-      //res.send("Sorry!! Error");
-      res.redirect('/message?message=failure');
-    }
-  } catch (error) {
-    console.log("Error for payment error status console:",error);
-    res.status(500).json({
-      status: "0",
-      message: "An error occurred while rendering the dashboard.",
-      error: error.message,
-    });
-  }
-};
-
-
-exports.checkPaymentData = async function (req, res, next) {
-  try {
-    const tempId = req.query.temp;
-    const status = req.query.status;
-    const temporder = await Demoorder.findById(tempId);
-
-    if (status === "success") {
-      const now = new Date();
-      const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0');
-      const currentYear = now.getFullYear().toString();
-      let order_status = '0';
-      let delivery_charges = '0';
-      let discount = '0';
-      let pickup_status = '0';
-      let delivery_status = '0';
-
-      const lastOrderIndex = await getLastOrderIndex();
-      const nextIncrementingPart = lastOrderIndex + 1;
-      const orderCode = `BFSORD${currentMonth}${currentYear}-${nextIncrementingPart}`;
-      const order = new Order({
-        order_code: orderCode,
-        order_index: nextIncrementingPart,
-        user_id: temporder.user_id,
-        cart_id: temporder.cart_id,
-        seller_id: temporder.seller_id,
-        product_id: temporder.product_id,
-        billing_address_id: temporder.billing_address_id,
-        shipping_address_id: temporder.shipping_address_id,
-        total_price: temporder.total_price,
-        booking_amount: temporder.booking_amount || 0,
-        packing_handling_charge: temporder.packing_handling_charge || 0,
-        payment_method: temporder.payment_method,
-        order_status: order_status,
-        gst: temporder.gst || '',
-        taxable_value: temporder.taxable_value || '',
-        delivery_charges: delivery_charges,
-        discount: discount,
-        pickup_status: pickup_status,
-        delivery_status: delivery_status,
-        pay_now: temporder.pay_now || '',
-        remaining_amount: temporder.remaining_amount || '',
-        added_dtime: new Date().toISOString(),
-      });
-
-      const savedOrder = await order.save();
-
-      if (savedOrder) {
-        const updatedProduct = await Userproduct.findOneAndUpdate(
-          { _id: temporder.product_id },
-          { $set: { flag: 1 } },
-          { new: true }
-        );
-
-        const user = await Users.findById(savedOrder.user_id);
-
-        const product = await Userproduct.findById(savedOrder.product_id);
-  
-        const address = await AddressBook.findById(savedOrder.billing_address_id);
-  
-        const billingaddress = address.street_name + ', ' + address.address1 + ', ' + address.landmark + ', ' + address.city_name + ', ' + address.state_name + ', ' + address.pin_code;
-  
-        const loginHtmlPath = 'views/webpages/order-confirmed.html';
-        let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
-  
-        loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
-        loginHtmlContent = loginHtmlContent.replace('{{ordernumber}}', orderCode);
-        loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
-        loginHtmlContent = loginHtmlContent.replace('{{productimages}}', product.image);
-        loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
-        loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.price);
-        loginHtmlContent = loginHtmlContent.replace('{{shippingaddress}}', billingaddress);
-      
-        const mailData = {
-          from: "Bid For Sale! <" + smtpUser + ">",
-          to: user.email,
-          subject: "Order Placed - Bid For Sale!",
-          name: "Bid For Sale!",
-          text: "order placed",
-          html: loginHtmlContent
-        };
-  
-        transporter.sendMail(mailData, function (err, info) {
-          // if (err) console.log("err", err);
-          // else console.log("info", info);
-        });
-
-        let loginHtmlPath1 = 'views/webpages/order-confirmed.html';
-        let loginHtmlContent1 = fs.readFileSync(loginHtmlPath, 'utf-8');
-  
-        loginHtmlContent1 = loginHtmlContent.replace('{{username}}', user.name);
-        loginHtmlContent1 = loginHtmlContent.replace('{{sellername}}', seller.name);
-        loginHtmlContent1 = loginHtmlContent.replace('{{ordernumber}}', orderCode);
-        loginHtmlContent1 = loginHtmlContent.replace('{{productname}}', product.name);
-        loginHtmlContent1 = loginHtmlContent.replace('{{productimages}}', orderCode);
-        loginHtmlContent1 = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
-        loginHtmlContent1 = loginHtmlContent.replace('{{productprice}}', product.price);
-        loginHtmlContent1 = loginHtmlContent.replace('{{shippingaddress}}', billingaddress);
-      
-        const mailData1 = {
-          from: "Bid For Sale! <" + smtpUser + ">",
-          to: user.email,
-          subject: "Order Placed - Bid For Sale!",
-          name: "Bid For Sale!",
-          text: "order placed",
-          html: loginHtmlContent1
-        };
-  
-        transporter.sendMail(mailData1, function (err, info) {
-          // if (err) console.log("err", err);
-          // else console.log("info", info);
-        });
-           let smsData = {
-            textId: "test",
-            toMobile: "91" +user.phone_no,
-            text: "Order placed successfully! Thank you for shopping with Bid For Sale. Your "+ product.name +" having Order ID "+ orderCode +"  is on its way to you. For any inquiries, feel free to reach out to us. Happy shopping!-BFS RETAIL SERVICES PRIVATE LIMITED",
-          };
-          let returnData;
-          returnData = await sendSms(smsData);
-          const historyData = new ApiCallHistory({
-            userId: user._id,
-            called_for: "Order Placed",
-            api_link: process.env.SITE_URL,
-            api_param: smsData,
-            api_response: returnData,
-            send_status: 'send',
-          });
-          await historyData.save();
-          
-        if (updatedProduct) {
-          const cleanedCartId = mongoose.Types.ObjectId(temporder.cart_id);
-          const cartDetail = await CartDetail.findOne({ cart_id: cleanedCartId });
-          if (cartDetail) {
-            await cartDetail.remove();
-          }
-          const cartDetailsCount = await CartDetail.countDocuments({ cart_id: savedOrder.cart_id });
-          const existingCart = await Cart.findById(temporder.cart_id);
-          if (cartDetailsCount === 0) {
-            await existingCart.remove();
-          }
-        }
-      }
-      res.status(200).json({
-        status: "1",
-        is_orderPlaced: 1,
-        message: 'Order placed successfully',
-        order: savedOrder
-      });
-    } else {
-      res.status(400).json({
-        status: "0",
-        is_orderPlaced: 0,
-        message: 'Their is a an error in your oder',
-      });
-    }
-  } catch (error) {
-    res.status(500).json({
-      status: "0",
-      message: "An error occurred while rendering the dashboard.",
-      error: error.message,
-    });
-  }
-};
-
 
 async function getLastOrderNumber() {
   try {

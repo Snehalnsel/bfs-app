@@ -992,7 +992,7 @@ exports.getOrdersBySeller = async (req, res) => {
         },
         shippingkit_status: (Object.keys(shipping_details).length > 0) ? shipping_details[0].shippingkit_status : 2,
         //shipping_charges: shippingcharges ? shippingcharges.amount : 0 
-        shipping_charges: 350
+        shipping_charges: 1
       };
       ordersWithProductDetails.push(orderDetails);
     }

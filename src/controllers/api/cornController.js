@@ -342,6 +342,7 @@ exports.processOrderTracking = async function (req, res, next) {
         if(newOrderDelivered)
         {
           const user = await Users.findById(orderdetails.user_id);
+          const product = await Userproduct.findById(orderdetails.product_id);
           let smsData = {
             textId: "test",
             toMobile: "91" +user.phone_no,
@@ -363,7 +364,7 @@ exports.processOrderTracking = async function (req, res, next) {
           let smsDataforseller = {
             textId: "test",
             toMobile: "91" +seller.phone_no,
-            text: ": Dear "+seller.name+",Your product "+product.name+" has been delivered and accepted by the buyer.Your payment of Rs. [Amount] will be initiated within the next 5 business days.- BFS Team",
+            text: ": Dear "+seller.name+",Your product "+product.name+" has been delivered and accepted by the buyer.Your payment of Rs."+product.offer_price+" will be initiated within the next 5 business days.- BFS Team",
           };
           let returnDataforSeller;
           returnDataforSeller = await sendSms(smsDataforseller);
@@ -376,9 +377,7 @@ exports.processOrderTracking = async function (req, res, next) {
             send_status: 'send',
           });
           await historyDataforseller.save();
-
         }
-
       } else {
         console.log("Shipment is not delivered.");
         console.log("Shipment ID:", track._id, "is not delivered.");

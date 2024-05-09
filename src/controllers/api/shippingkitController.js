@@ -869,7 +869,6 @@ exports.addShipmentDataWeb = async (req, res) => {
         is_shippingkit: false,
       });
     }
-    console.log("hubaddress",hubaddress);
     const demoshippingkit = new Demoshippingkit({
       buyer_id: hubaddress.seller_id._id,
       product_id: hubaddress.product_id,

@@ -43,6 +43,7 @@ const AddressBook = require("../../models/api/addressbookModel");
 const shippingchrgsModel = require("../../models/api/shippingchrgsModel");
 const Shippingkit = require("../../models/api/shippingkitModel");
 const Demoshippingkit = require("../../models/api/demoshippingkitModel");
+const Track = require("../../models/api/trackingModel");
 const { create } = require('xmlbuilder2');
 const { log } = require("console");
 const axios = require("axios");
@@ -91,7 +92,7 @@ exports.getPaymentDataforshippingkit = async function (req, res, next) {
       merchantTransactionId: merchantTransactionId,
       merchantUserId: userId,
       amount: amount * 100,
-      redirectUrl: `${APP_BE_URL}/payment-status?temp=${tempOrderId}`,
+      redirectUrl: `${APP_BE_URL}/payment-shippingkit-status?temp=${tempOrderId}`,
       redirectMode: "REDIRECT",
       mobileNumber: "9999999999",
       paymentInstrument: {
@@ -128,7 +129,6 @@ exports.getPaymentDataforshippingkit = async function (req, res, next) {
         },
       )
       .then(async function (response) {
-        //console.log("Response for paymenteeeee:", response.data);return false;
         const updateData = {
           merchant_transactionid:merchantTransactionId,
           pay_response: response.data,
@@ -161,14 +161,15 @@ exports.getPaymentDataforshippingkit = async function (req, res, next) {
   }
 };
 
-exports.getStatus = async function (req, res, next) {
+exports.getShippingKitStatus = async function (req, res, next) {
   try {
+   
     const tempId = req.query.temp;
-
+ 
     const temporder = await Demoshippingkit.findById(tempId);
-
+  
     const merchantTransactionId = temporder.merchant_transactionid;
-
+    console.log("merchantTransactionId",merchantTransactionId);
     if (merchantTransactionId) {
       let statusUrl = `${PHONE_PE_HOST_URL}/pg/v1/status/${MERCHANT_ID}/` +
         merchantTransactionId;
@@ -178,8 +179,11 @@ exports.getStatus = async function (req, res, next) {
         SALT_KEY;
       let sha256_val = sha256(string);
       let xVerifyChecksum = sha256_val + "###" + SALT_INDEX;
+      console.log("test1");
+      console.log("xVerifyChecksum",xVerifyChecksum)
+      console.log("statusUrl",statusUrl)
       try {
-        const response = await axios.get(statusUrl, {
+        /*const response = await axios.get(statusUrl, {
           headers: {
             "Content-Type": "application/json",
             "X-VERIFY": xVerifyChecksum,
@@ -187,6 +191,7 @@ exports.getStatus = async function (req, res, next) {
             accept: "application/json",
           },
         }).then(async (res)=>{
+          console.log(res);
           if(typeof res.data.code != "undefined") {
             return {
               code:res.data.code,
@@ -199,11 +204,19 @@ exports.getStatus = async function (req, res, next) {
             };
           }
         });
+
+             console.log("test 1",response);
         let updateData = {
           checkstatus_response: response.data,
-          //checkstatus_status: response.data.code === "PAYMENT_SUCCESS" ? "success" : "failure",
         };
         if(typeof response.data.code != "undefined" && response.data.code == "PAYMENT_SUCCESS") {
+          updateData.checkstatus_status = "success";
+        } else {
+          updateData.checkstatus_status = "failure";
+        }
+        */
+        let updateData = {};
+        if(typeof temporder.pay_response.code != "undefined" && temporder.pay_response.code == "PAYMENT_INITIATED") {
           updateData.checkstatus_status = "success";
         } else {
           updateData.checkstatus_status = "failure";
@@ -214,7 +227,7 @@ exports.getStatus = async function (req, res, next) {
           { $set: updateData },
           { new: true }
         );
-
+        console.log("updateData.checkstatus_status ",updateData.checkstatus_status );
         if(updateData.checkstatus_status == "success") {
           const now = new Date();
           const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0'); 
@@ -236,6 +249,7 @@ exports.getStatus = async function (req, res, next) {
             payment_method: 1,
             added_dtime: new Date().toISOString(),
           });
+          console.log("shippingkit",shippingkit);
           const savedOrder = await shippingkit.save();
 
           if(savedOrder)
@@ -246,74 +260,7 @@ exports.getStatus = async function (req, res, next) {
               { new: true }
             );
           }
-            // const updatedProduct = await Userproduct.findOneAndUpdate(
-            //   { _id: temporder.product_id }, 
-            //   { $set: { flag: 1 } }, 
-            //   { new: true }
-            // );
-
-     //const user = await Users.findById(savedOrder.user_id);
-
-      // const product = await Userproduct.findById(savedOrder.product_id);
-
-      // const address = await AddressBook.findById(savedOrder.billing_address_id);
-
-      // const billingaddress = address.street_name + ', ' + address.address1 + ', ' + address.landmark + ', ' + address.city_name + ', ' + address.state_name + ', ' + address.pin_code;
-
-      // const loginHtmlPath = 'views/webpages/order-confirmed.html';
-      // let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
-
-      // loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
-      // loginHtmlContent = loginHtmlContent.replace('{{ordernumber}}', orderCode);
-      // loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
-      // loginHtmlContent = loginHtmlContent.replace('{{productimages}}', orderCode);
-      // loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
-      // loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.price);
-      // loginHtmlContent = loginHtmlContent.replace('{{shippingaddress}}', billingaddress);
-    
-      // const mailData = {
-      //   from: "Bid For Sale! <" + smtpUser + ">",
-      //   to: user.email,
-      //   subject: "Order Placed - Bid For Sale!",
-      //   name: "Bid For Sale!",
-      //   text: "order placed",
-      //   html: loginHtmlContent
-      // };
-
-      //transporter.sendMail(mailData, function (err, info) {
-        // if (err) console.log("err", err);
-        // else console.log("info", info);
-      //});
-        //  let smsData = {
-        //   textId: "test",
-        //   toMobile: "91" +user.phone_no,
-        //   text: "Order placed successfully! Thank you for shopping with Bid For Sale. Your "+ product.name +" having Order ID "+ orderCode +"  is on its way to you. For any inquiries, feel free to reach out to us. Happy shopping!-BFS RETAIL SERVICES PRIVATE LIMITED",
-        // };
-        // let returnData;
-        // returnData = await sendSms(smsData);
-        // const historyData = new ApiCallHistory({
-        //   userId: user._id,
-        //   called_for: "Order Placed",
-        //   api_link: process.env.SITE_URL,
-        //   api_param: smsData,
-        //   api_response: returnData,
-        //   send_status: 'send',
-        // });
-        // await historyData.save();
-        //     if(updatedProduct)
-        //     {
-        //       const cleanedCartId =  mongoose.Types.ObjectId(temporder.cart_id); 
-        //       const cartDetail = await CartDetail.findOne({ cart_id: cleanedCartId });
-        //       if (cartDetail) {
-        //         await cartDetail.remove();
-        //       }
-        //       const cartDetailsCount = await CartDetail.countDocuments({ cart_id: savedOrder.cart_id });
-        //       const existingCart = await Cart.findById(temporder.cart_id);
-        //       if (cartDetailsCount === 0) {
-        //         await existingCart.remove();
-        //       }
-        //     } 
-        //}
+       
           res.redirect('/message?message=success');
         } else {
           res.redirect('/message?message=failure');

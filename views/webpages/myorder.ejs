@@ -371,7 +371,6 @@
                      if (response.is_shippingkit == true) {
                         const tempOrderId = response.order._id;
                         window.location.href = '/payshippingkit?temp=' + tempOrderId;
-                        //window.open('/pay?temp=' + tempOrderId, '_blank');
                      }
                      else {
                         Swal.fire({

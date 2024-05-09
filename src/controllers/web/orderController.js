@@ -1052,6 +1052,30 @@ exports.getShipmentList = function (req, res, next) {
         as: 'shipping_address',
       },
     },
+    {
+      $lookup: {
+        from: 'order_trackings',
+        localField: '_id',
+        foreignField: 'order_id',
+        as: 'trackingDetails',
+      },
+    },
+    {
+      $lookup: {
+        from: 'mt_tracks',
+        localField: 'trackingDetails.tracking_id',
+        foreignField: '_id',
+        as: 'trackDetails',
+      },
+    },
+    {
+      $lookup: {
+        from: 'shipping_kits',
+        localField: 'shippingkit.order_id',
+        foreignField: '_id',
+        as: 'shippingkit',
+      },
+    },
   ]).exec(function (error, orderList) {
     if (error) {
       res.status(500).json({ error: 'An error occurred' });

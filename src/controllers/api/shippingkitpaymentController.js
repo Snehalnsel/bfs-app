@@ -79,7 +79,6 @@ const SALT_INDEX = 1;
 const APP_BE_URL = process.env.SITE_URL;
 
 //6e2f6cdb-392f-4a06-b2e2-a9af19a1207c
-
 exports.getPaymentDataforshippingkit = async function (req, res, next) {
   try {
     const tempOrderId = req.query.temp;
@@ -163,13 +162,9 @@ exports.getPaymentDataforshippingkit = async function (req, res, next) {
 
 exports.getShippingKitStatus = async function (req, res, next) {
   try {
-   
     const tempId = req.query.temp;
- 
     const temporder = await Demoshippingkit.findById(tempId);
-  
     const merchantTransactionId = temporder.merchant_transactionid;
-    console.log("merchantTransactionId",merchantTransactionId);
     if (merchantTransactionId) {
       let statusUrl = `${PHONE_PE_HOST_URL}/pg/v1/status/${MERCHANT_ID}/` +
         merchantTransactionId;
@@ -179,9 +174,6 @@ exports.getShippingKitStatus = async function (req, res, next) {
         SALT_KEY;
       let sha256_val = sha256(string);
       let xVerifyChecksum = sha256_val + "###" + SALT_INDEX;
-      console.log("test1");
-      console.log("xVerifyChecksum",xVerifyChecksum)
-      console.log("statusUrl",statusUrl)
       try {
         /*const response = await axios.get(statusUrl, {
           headers: {
@@ -191,7 +183,6 @@ exports.getShippingKitStatus = async function (req, res, next) {
             accept: "application/json",
           },
         }).then(async (res)=>{
-          console.log(res);
           if(typeof res.data.code != "undefined") {
             return {
               code:res.data.code,
@@ -204,8 +195,6 @@ exports.getShippingKitStatus = async function (req, res, next) {
             };
           }
         });
-
-             console.log("test 1",response);
         let updateData = {
           checkstatus_response: response.data,
         };
@@ -227,7 +216,6 @@ exports.getShippingKitStatus = async function (req, res, next) {
           { $set: updateData },
           { new: true }
         );
-        console.log("updateData.checkstatus_status ",updateData.checkstatus_status );
         if(updateData.checkstatus_status == "success") {
           const now = new Date();
           const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0'); 
@@ -242,16 +230,14 @@ exports.getShippingKitStatus = async function (req, res, next) {
             product_id: temporder.product_id,
             shipping_address_id: temporder.shipping_address_id,
             order_id: temporder.order_id,
-            track_id: tempId,
+            track_id: temporder.track_id,
             price: temporder.price,
             gst: temporder.gst,
             total_price: temporder.total_price,
             payment_method: 1,
             added_dtime: new Date().toISOString(),
           });
-          console.log("shippingkit",shippingkit);
           const savedOrder = await shippingkit.save();
-
           if(savedOrder)
           {
             const updatedTrack = await Track.findOneAndUpdate(
@@ -260,26 +246,17 @@ exports.getShippingKitStatus = async function (req, res, next) {
               { new: true }
             );
           }
-       
           res.redirect('/message?message=success');
         } else {
           res.redirect('/message?message=failure');
         }
       } catch (error) {
-        console.log("Error for payment error status:",error);
         res.redirect('/message?message=failure');
-        /*res.status(500).json({
-          status: '0',
-          message: 'Error in axios request.',
-          error: error.message,
-        });*/
       }
     } else {
-      //res.send("Sorry!! Error");
       res.redirect('/message?message=failure');
     }
   } catch (error) {
-    console.log("Error for payment error status console:",error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the dashboard.",
@@ -288,106 +265,12 @@ exports.getShippingKitStatus = async function (req, res, next) {
   }
 };
 
-async function getLastOrderNumber() {
+async function getLastOrderIndex() {
   try {
-    const lastOrder = await Order.findOne().sort({ _id: -1 }); 
-    return lastOrder ? lastOrder.order_code: 0;
+    const getCount = await Shippingkit.find().count();
+    return `000${getCount}`
   } catch (error) {
     return 0;
   }
 }
 
-
-async function getLastOrderIndex() {
-  try {
-    // const result = await Order.findOne({}, {}, { sort: { order_index: -1 } }).then(()=>{
-    // });
-    const getCount = await Order.find().count();
-    return `000${getCount}`
-    //return typeof result != "undefined" ? result.order_index : '000';
-  } catch (error) {
-    return 0; // Return 0 in case of an error
-  }
-}
-
-// exports.getData = async function (req, res, next) {
-//   try {
-//     //return;
-
-//     const amount = 1;
-//     let userId =  "64dc6a75cd220b2d1ed0d3db";
-//     const productId = "65802a3431a3641cccf59dbe";
-
-
-//     // const amount = req.query.total_amt;
-//     // let userId =  req.query.user_id;
-//     // const productId = req.query.product_id;
-//     let merchantTransactionId = uniqid();
-
-//     let normalPayLoad = {
-//       merchantId: MERCHANT_ID,
-//       merchantTransactionId: merchantTransactionId,
-//       merchantUserId: userId,
-//       amount: amount,
-//      //redirectUrl: APP_BE_URL+'/payment-status',
-//      redirectUrl: `${APP_BE_URL}/payment-status`,
-//       redirectMode: "REDIRECT",
-//       mobileNumber: "9999999999",
-//       paymentInstrument: {
-//         type: "PAY_PAGE",
-//       },
-//     };
-//     let bufferObj = Buffer.from(JSON.stringify(normalPayLoad), "utf8");
-//     let base64EncodedPayload = bufferObj.toString("base64");
-//     let string = base64EncodedPayload + "/pg/v1/pay" + SALT_KEY;
-//     let sha256_val = sha256(string);
-//     let xVerifyChecksum = sha256_val + "###" + SALT_INDEX;
-
-//     axios
-//       .post(
-//         `${PHONE_PE_HOST_URL}/pg/v1/pay`,
-//         { request: base64EncodedPayload },
-//         {
-//           headers: {
-//             "Content-Type": "application/json",
-//             "X-VERIFY": xVerifyChecksum,
-//             accept: "application/json",
-//           },
-//         }
-//       )
-//       .then(function (response) {
-      
-       
-//         const newOrder = new DemoOrder({
-//           marchanttransactionId: merchantTransactionId,
-//           user_id: userId,
-//           total_price: amount,
-//           product_id: productId,
-//           status: 1, 
-//           pay_response: response.data, 
-//           added_dtime: new Date().toISOString(),
-//         });
-      
-//         newOrder.save()
-//           .then(savedOrder => {
-            
-//             const redirectWithTransactionId = `${APP_BE_URL}/payment-status?merchantTransactionId=${merchantTransactionId}`;
-//             res.redirect(redirectWithTransactionId);
-//           })
-//           .catch(saveError => {
-//             res.status(500).json({
-//               status: "0",
-//               message: "An error occurred while saving the order.",
-//               error: saveError.message,
-//             });
-//           });
-//       })
-      
-//   } catch (error) {
-//     res.status(500).json({
-//       status: "0",
-//       message: "An error occurred while rendering the dashboard.",
-//       error: error.message,
-//     });
-//   }
-// };

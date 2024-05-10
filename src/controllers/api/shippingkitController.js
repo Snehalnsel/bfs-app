@@ -850,7 +850,6 @@ exports.addShipmentDataWeb = async (req, res) => {
     const gst = (price * 28) / 100;
     const final_price = price + gst;
     const track = await Ordertracking.findOne({ order_id: order_id,status :0 }).exec();
-    //const track = await Track.findOne({ order_id: order_id }).exec();
     if (track == null) {
       return res.status(200).json({
         status: "0",
@@ -862,6 +861,7 @@ exports.addShipmentDataWeb = async (req, res) => {
       .populate('seller_id', 'name phone_no email')
       .populate('billing_address_id')
       .populate('hub_address_id');
+    console.log(hubaddress);
     if (!hubaddress) {
       res.status(200).json({
         status: "0",
@@ -871,10 +871,10 @@ exports.addShipmentDataWeb = async (req, res) => {
     }
     const demoshippingkit = new Demoshippingkit({
       buyer_id: hubaddress.seller_id._id,
-      product_id: hubaddress.product_id,
+      product_id: order.product_id,
       shipping_address_id: hubaddress.billing_address_id._id,
       order_id: order_id,
-      track_id: track._id,
+      track_id: track.tracking_id,
       price: price,
       gst: gst,
       total_price: final_price,
@@ -883,12 +883,6 @@ exports.addShipmentDataWeb = async (req, res) => {
     });
     const savedOrder = await demoshippingkit.save();
     if (savedOrder) {
-      // const updatedTrack = await Track.findOneAndUpdate(
-      //   { _id: track.tracking_id },
-      //   { $set: { shippingkit_status: 1 } },
-      //   { new: true }
-      // );
-      // const user = await Users.findById(savedOrder.buyer_id);
       res.status(200).json({
         status: "1",
         message: 'Shipping Kit Order placed successfully',

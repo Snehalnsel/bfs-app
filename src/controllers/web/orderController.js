@@ -1023,82 +1023,119 @@ exports.updateData = async function (req, res, next) {
     });
   });
 };
-exports.getShipmentList = function (req, res, next) {
 
-  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-  var pageName = "Shipment List";
-  var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+exports.getShipmentList = async function (req, res, next) {
+  try {
+    let isAdminLoggedIn = req.session.admin ? req.session.admin.userId : "";
+    var pageName = "Shipment List";
+    var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
 
-  var orderId = req.params.id;
-  Order.aggregate([
-    {
-      $match: {
-        _id: mongoose.Types.ObjectId(orderId),
+    var orderId = req.params.id;
+    const shippingKitData = await Shippingkit.findOne({ order_id: orderId })
+      .populate("order_id", "order_code")
+      .populate("track_id", "seller_id billing_address_id hub_address_id")
+      .populate("buyer_id", "name phone_no email")
+      .populate("product_id", "name")
+      .populate("hub_address_id")
+      .populate("shipping_address_id")
+      .exec();
+    console.log(shippingKitData);
+    res.render("pages/order/shipmentlist", {
+      siteName: req.app.locals.siteName,
+      pageName: pageName,
+      pageTitle: pageTitle,
+      userFullName: req.session.admin.name,
+      userImage: req.session.admin.image_url,
+      userEmail: req.session.admin.email,
+      year: moment().format("YYYY"),
+      requrl: req.app.locals.requrl,
+      status: 0,
+      message: "Found!",
+      respdata: {
+        list: shippingKitData ? [shippingKitData] : [], 
       },
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'buyer_id',
-        foreignField: '_id',
-        as: 'user',
-      },
-    },
-    {
-      $lookup: {
-        from: 'addressbook_lists',
-        localField: 'shipping_address_id',
-        foreignField: '_id',
-        as: 'shipping_address',
-      },
-    },
-    {
-      $lookup: {
-        from: 'order_trackings',
-        localField: '_id',
-        foreignField: 'order_id',
-        as: 'trackingDetails',
-      },
-    },
-    {
-      $lookup: {
-        from: 'mt_tracks',
-        localField: 'trackingDetails.tracking_id',
-        foreignField: '_id',
-        as: 'trackDetails',
-      },
-    },
-    {
-      $lookup: {
-        from: 'shipping_kits',
-        localField: 'shippingkit.order_id',
-        foreignField: '_id',
-        as: 'shippingkit',
-      },
-    },
-  ]).exec(function (error, orderList) {
-    if (error) {
-      res.status(500).json({ error: 'An error occurred' });
-    } else {
-      res.render("pages/order/shipmentlist", {
-        siteName: req.app.locals.siteName,
-        pageName: pageName,
-        pageTitle: pageTitle,
-        userFullName: req.session.admin.name,
-        userImage: req.session.admin.image_url,
-        userEmail: req.session.admin.email,
-        year: moment().format("YYYY"),
-        requrl: req.app.locals.requrl,
-        status: 0,
-        message: "Found!",
-        respdata: {
-          list: orderList
-        },
-        isAdminLoggedIn: isAdminLoggedIn
-      });
-    }
-  });
+      isAdminLoggedIn: isAdminLoggedIn
+    });
+  } catch (error) {
+    console.error("Error fetching shipping kit data with joins:", error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
 };
+// exports.getShipmentList = function (req, res, next) {
+//   let isAdminLoggedIn = req.session.admin ? req.session.admin.userId : "";
+//   var pageName = "Shipment List";
+//   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+
+//   var orderId = req.params.id;
+//   Order.aggregate([
+//     {
+//       $match: {
+//         _id: mongoose.Types.ObjectId(orderId),
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'users',
+//         localField: 'buyer_id',
+//         foreignField: '_id',
+//         as: 'user',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'addressbook_lists',
+//         localField: 'shipping_address_id',
+//         foreignField: '_id',
+//         as: 'shipping_address',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'order_trackings',
+//         localField: '_id',
+//         foreignField: 'order_id',
+//         as: 'trackingDetails',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'mt_tracks',
+//         localField: 'trackingDetails.tracking_id',
+//         foreignField: '_id',
+//         as: 'trackDetails',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'shipping_kits',
+//         localField: '_id', 
+//         foreignField: 'order_id',
+//         as: 'shippingkit',
+//       },
+//     },
+//   ]).exec(function (error, orderList) {
+//     if (error) {
+//       res.status(500).json({ error: 'An error occurred' });
+//     } else {
+//       res.render("pages/order/shipmentlist", {
+//         siteName: req.app.locals.siteName,
+//         pageName: pageName,
+//         pageTitle: pageTitle,
+//         userFullName: req.session.admin.name,
+//         userImage: req.session.admin.image_url,
+//         userEmail: req.session.admin.email,
+//         year: moment().format("YYYY"),
+//         requrl: req.app.locals.requrl,
+//         status: 0,
+//         message: "Found!",
+//         respdata: {
+//           list: orderList
+//         },
+//         isAdminLoggedIn: isAdminLoggedIn
+//       });
+//     }
+//   });
+// };
 
 
 // exports.deleteData = async function (req, res, next) {

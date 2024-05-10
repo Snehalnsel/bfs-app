@@ -599,6 +599,7 @@ exports.checkPaymentData = async function (req, res, next) {
         );
 
         const user = await Users.findById(savedOrder.user_id);
+        const seller = await Users.findById(savedOrder.seller_id);
 
         const product = await Userproduct.findById(savedOrder.product_id);
   
@@ -659,7 +660,7 @@ exports.checkPaymentData = async function (req, res, next) {
            let smsData = {
             textId: "test",
             toMobile: "91" +user.phone_no,
-            text: "Order placed successfully! Thank you for shopping with Bid For Sale. Your "+ product.name +" having Order ID "+ orderCode +"  is on its way to you. For any inquiries, feel free to reach out to us. Happy shopping!-BFS RETAIL SERVICES PRIVATE LIMITED",
+            text: "Order placed successfully! Congratulations! Your product  Your "+ product.name +" having Order ID "+ orderCode +"  is on its way to you. For any inquiries, feel free to reach out to us. Happy shopping!-BFS RETAIL SERVICES PRIVATE LIMITED",
           };
           let returnData;
           returnData = await sendSms(smsData);
@@ -672,6 +673,24 @@ exports.checkPaymentData = async function (req, res, next) {
             send_status: 'send',
           });
           await historyData.save();
+          
+          let sellersmsData = {
+            textId: "test",
+            toMobile: "91" +seller.phone_no,
+            text: "Dear "+ seller.name +" , Congratulations! Your product "+ product.name +" has been sold successfully. The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.-BFS RETAIL SERVICES PRIVATE LIMITED",
+          };
+          let returnDataforseller;
+          returnDataforseller = await sendSms(sellersmsData);
+
+          const historyData1 = new ApiCallHistory({
+            userId: user._id,
+            called_for: "Order Placed for Seller Product",
+            api_link: process.env.SITE_URL,
+            api_param: smsData,
+            api_response: returnDataforseller,
+            send_status: 'send',
+          });
+          await historyData1.save();
           
         if (updatedProduct) {
           const cleanedCartId = mongoose.Types.ObjectId(temporder.cart_id);
@@ -708,107 +727,14 @@ exports.checkPaymentData = async function (req, res, next) {
   }
 };
 
-
-async function getLastOrderNumber() {
-  try {
-    const lastOrder = await Order.findOne().sort({ _id: -1 }); 
-    return lastOrder ? lastOrder.order_code: 0;
-  } catch (error) {
-    return 0;
-  }
-}
-
-
 async function getLastOrderIndex() {
   try {
-    // const result = await Order.findOne({}, {}, { sort: { order_index: -1 } }).then(()=>{
-    // });
+    
     const getCount = await Order.find().count();
     return `000${getCount}`
-    //return typeof result != "undefined" ? result.order_index : '000';
+    
   } catch (error) {
-    return 0; // Return 0 in case of an error
+    return 0; 
   }
 }
 
-// exports.getData = async function (req, res, next) {
-//   try {
-//     //return;
-
-//     const amount = 1;
-//     let userId =  "64dc6a75cd220b2d1ed0d3db";
-//     const productId = "65802a3431a3641cccf59dbe";
-
-
-//     // const amount = req.query.total_amt;
-//     // let userId =  req.query.user_id;
-//     // const productId = req.query.product_id;
-//     let merchantTransactionId = uniqid();
-
-//     let normalPayLoad = {
-//       merchantId: MERCHANT_ID,
-//       merchantTransactionId: merchantTransactionId,
-//       merchantUserId: userId,
-//       amount: amount,
-//      //redirectUrl: APP_BE_URL+'/payment-status',
-//      redirectUrl: `${APP_BE_URL}/payment-status`,
-//       redirectMode: "REDIRECT",
-//       mobileNumber: "9999999999",
-//       paymentInstrument: {
-//         type: "PAY_PAGE",
-//       },
-//     };
-//     let bufferObj = Buffer.from(JSON.stringify(normalPayLoad), "utf8");
-//     let base64EncodedPayload = bufferObj.toString("base64");
-//     let string = base64EncodedPayload + "/pg/v1/pay" + SALT_KEY;
-//     let sha256_val = sha256(string);
-//     let xVerifyChecksum = sha256_val + "###" + SALT_INDEX;
-
-//     axios
-//       .post(
-//         `${PHONE_PE_HOST_URL}/pg/v1/pay`,
-//         { request: base64EncodedPayload },
-//         {
-//           headers: {
-//             "Content-Type": "application/json",
-//             "X-VERIFY": xVerifyChecksum,
-//             accept: "application/json",
-//           },
-//         }
-//       )
-//       .then(function (response) {
-      
-       
-//         const newOrder = new DemoOrder({
-//           marchanttransactionId: merchantTransactionId,
-//           user_id: userId,
-//           total_price: amount,
-//           product_id: productId,
-//           status: 1, 
-//           pay_response: response.data, 
-//           added_dtime: new Date().toISOString(),
-//         });
-      
-//         newOrder.save()
-//           .then(savedOrder => {
-            
-//             const redirectWithTransactionId = `${APP_BE_URL}/payment-status?merchantTransactionId=${merchantTransactionId}`;
-//             res.redirect(redirectWithTransactionId);
-//           })
-//           .catch(saveError => {
-//             res.status(500).json({
-//               status: "0",
-//               message: "An error occurred while saving the order.",
-//               error: saveError.message,
-//             });
-//           });
-//       })
-      
-//   } catch (error) {
-//     res.status(500).json({
-//       status: "0",
-//       message: "An error occurred while rendering the dashboard.",
-//       error: error.message,
-//     });
-//   }
-// };

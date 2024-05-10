@@ -28,6 +28,9 @@ const Ordertracking = require("../../models/api/ordertrackModel");
 const Track = require("../../models/api/trackingModel");
 const Shippingkit = require("../../models/api/shippingkitModel");
 const AddressBook = require("../../models/api/addressbookModel");
+const sendSms = require("../../models/thirdPartyApi/sendSms");
+const sendWhatsapp = require("../../models/thirdPartyApi/sendWhatsapp");
+const ApiCallHistory = require("../../models/thirdPartyApi/ApiCallHistory");
 // const helper = require("../helpers/helper");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -1020,74 +1023,119 @@ exports.updateData = async function (req, res, next) {
     });
   });
 };
-exports.getShipmentList = function (req, res, next) {
 
-  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-  var pageName = "Shipment List";
-  var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+exports.getShipmentList = async function (req, res, next) {
+  try {
+    let isAdminLoggedIn = req.session.admin ? req.session.admin.userId : "";
+    var pageName = "Shipment List";
+    var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
 
-  var orderId = req.params.id;
-  Order.aggregate([
-    {
-      $match: {
-        _id: mongoose.Types.ObjectId(orderId),
+    var orderId = req.params.id;
+    const shippingKitData = await Shippingkit.findOne({ order_id: orderId })
+      .populate("order_id", "order_code")
+      .populate("track_id", "seller_id billing_address_id hub_address_id")
+      .populate("buyer_id", "name phone_no email")
+      .populate("product_id", "name")
+      .populate("hub_address_id")
+      .populate("shipping_address_id")
+      .exec();
+    console.log(shippingKitData);
+    res.render("pages/order/shipmentlist", {
+      siteName: req.app.locals.siteName,
+      pageName: pageName,
+      pageTitle: pageTitle,
+      userFullName: req.session.admin.name,
+      userImage: req.session.admin.image_url,
+      userEmail: req.session.admin.email,
+      year: moment().format("YYYY"),
+      requrl: req.app.locals.requrl,
+      status: 0,
+      message: "Found!",
+      respdata: {
+        list: shippingKitData ? [shippingKitData] : [], 
       },
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'user_id',
-        foreignField: '_id',
-        as: 'user',
-      },
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'seller_id',
-        foreignField: '_id',
-        as: 'seller',
-      },
-    },
-    {
-      $lookup: {
-        from: 'addressbook_lists',
-        localField: 'billing_address_id',
-        foreignField: '_id',
-        as: 'billing_address',
-      },
-    },
-    {
-      $lookup: {
-        from: 'addressbook_lists',
-        localField: 'shipping_address_id',
-        foreignField: '_id',
-        as: 'shipping_address',
-      },
-    },
-  ]).exec(function (error, orderList) {
-    if (error) {
-      res.status(500).json({ error: 'An error occurred' });
-    } else {
-      res.render("pages/order/shipmentlist", {
-        siteName: req.app.locals.siteName,
-        pageName: pageName,
-        pageTitle: pageTitle,
-        userFullName: req.session.admin.name,
-        userImage: req.session.admin.image_url,
-        userEmail: req.session.admin.email,
-        year: moment().format("YYYY"),
-        requrl: req.app.locals.requrl,
-        status: 0,
-        message: "Found!",
-        respdata: {
-          list: orderList
-        },
-        isAdminLoggedIn: isAdminLoggedIn
-      });
-    }
-  });
+      isAdminLoggedIn: isAdminLoggedIn
+    });
+  } catch (error) {
+    console.error("Error fetching shipping kit data with joins:", error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
 };
+// exports.getShipmentList = function (req, res, next) {
+//   let isAdminLoggedIn = req.session.admin ? req.session.admin.userId : "";
+//   var pageName = "Shipment List";
+//   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+
+//   var orderId = req.params.id;
+//   Order.aggregate([
+//     {
+//       $match: {
+//         _id: mongoose.Types.ObjectId(orderId),
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'users',
+//         localField: 'buyer_id',
+//         foreignField: '_id',
+//         as: 'user',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'addressbook_lists',
+//         localField: 'shipping_address_id',
+//         foreignField: '_id',
+//         as: 'shipping_address',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'order_trackings',
+//         localField: '_id',
+//         foreignField: 'order_id',
+//         as: 'trackingDetails',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'mt_tracks',
+//         localField: 'trackingDetails.tracking_id',
+//         foreignField: '_id',
+//         as: 'trackDetails',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'shipping_kits',
+//         localField: '_id', 
+//         foreignField: 'order_id',
+//         as: 'shippingkit',
+//       },
+//     },
+//   ]).exec(function (error, orderList) {
+//     if (error) {
+//       res.status(500).json({ error: 'An error occurred' });
+//     } else {
+//       res.render("pages/order/shipmentlist", {
+//         siteName: req.app.locals.siteName,
+//         pageName: pageName,
+//         pageTitle: pageTitle,
+//         userFullName: req.session.admin.name,
+//         userImage: req.session.admin.image_url,
+//         userEmail: req.session.admin.email,
+//         year: moment().format("YYYY"),
+//         requrl: req.app.locals.requrl,
+//         status: 0,
+//         message: "Found!",
+//         respdata: {
+//           list: orderList
+//         },
+//         isAdminLoggedIn: isAdminLoggedIn
+//       });
+//     }
+//   });
+// };
 
 
 // exports.deleteData = async function (req, res, next) {
@@ -1436,6 +1484,31 @@ exports.orderplaced = async (req, res) => {
 
         await orderDetails.save();
 
+        if(orderDetails.order_status == 1){
+
+          let getorderid = await Ordertracking.findOne({ tracking_id: track_id });
+          let orderdetails = await Order.findById(getorderid.order_id);
+          const seller = await Users.findById(orderdetails.seller_id);
+  
+          let smsDataforseller = {
+            textId: "test",
+            toMobile: "91" +seller.phone_no,
+            text: "Dear "+ seller.name +",Your product "+ productdetails.name +" has been delivered to the hub successfully. It will be processed for delivery after the quality check.- BFS Team",
+          };
+          let returnDataforseller;
+          returnDataforseller = await sendSms(smsDataforseller);
+          const historyDataforseller = new ApiCallHistory({
+            userId: user._id,
+            called_for: "Delivery to Hub",
+            api_link: process.env.SITE_URL,
+            api_param: smsData,
+            api_response: returnDataforseller,
+            send_status: 'send',
+          });
+          await historyDataforseller.save();
+  
+        }  
+
       }
     }
     else {
@@ -1608,6 +1681,29 @@ exports.getAWBnoById = async function (req, res, next) {
           existingOrder.shiprocket_delivery_partner = shiprocketResponse.response.data.courier_company_id;
           existingOrder.shiprocket_courier_name = shiprocketResponse.response.data.transporter_name;
           await existingOrder.save();
+
+          if(existingOrder.order_status == 1)
+          {
+            const user = await Users.findById(existingOrder.user_id); 
+            let buyersmsData = {
+              textId: "test",
+              toMobile: "91" +user.phone_no,
+              text: "Dear "+user.name+",Your order "+existingOrder.shiprocket_order_id+" has been shipped via "+existingOrder.shiprocket_courier_name+" with Tracking ID "+existingOrder.pickup_awb+".It will be delivered within the next 7 business days.- BFS Team",
+            };
+            let returnDataforbuyer;
+            returnDataforbuyer = await sendSms(buyersmsData);
+  
+            const historyData1 = new ApiCallHistory({
+              userId: user._id,
+              called_for: "Order Placed for Seller Product",
+              api_link: process.env.SITE_URL,
+              api_param: smsData,
+              api_response: returnDataforbuyer,
+              send_status: 'send',
+            });
+            await historyData1.save();
+   
+          }
           const shiprocketlabelResponse = await generateLabel(shipment_id);
           const order_id = existingOrder.shiprocket_order_id;
           const shiprocketinvoiceResponse = await generateInvoice(order_id);
@@ -2241,6 +2337,8 @@ exports.getShipmentPickup = async function (req, res, next) {
         existingOrder.pickup_token_number = shiprocketResponse.response.pickup_token_number;
         existingOrder.pickup_dtime = shiprocketResponse.response.pickup_scheduled_date;
         await existingOrder.save();
+
+
       }
 
       res.redirect('/admin/orderlist');

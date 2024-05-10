@@ -30,6 +30,7 @@ const Ordertracking = require("../../models/api/ordertrackModel");
 const Track = require("../../models/api/trackingModel");
 const Orderflow = require("../../models/api/trackingdeatis");
 const nodemailer = require("nodemailer");
+
 // const axios = require('axios');
 // const bodyParser = require('body-parser'); 
 const smtpUser = "sneha.lnsel@gmail.com";
@@ -1380,12 +1381,8 @@ exports.getGenerateInvoice = async function (req, res, next) {
   }
 
   try {
-
     const orderId = req.body.order_id;
-
     const existingOrder = await Order.findById(orderId);
-
-
     if (!existingOrder) {
       return res.status(404).json({
         status: "0",
@@ -1395,16 +1392,11 @@ exports.getGenerateInvoice = async function (req, res, next) {
     }
   
     order_id = existingOrder.shiprocket_order_id;
-
       const shiprocketResponse = await generateInvoice(order_id);
-
       if(shiprocketResponse)
       {
-     
           // existingOrder.pickup_awb = shiprocketResponse.response.data.awb_code; 
-          
           // await existingOrder.save();
-      
         res.status(200).json({
           status: "1",
           message: "Specific Shipment Details fetched successfully!",
@@ -1412,7 +1404,6 @@ exports.getGenerateInvoice = async function (req, res, next) {
           shiprocketResponse: shiprocketResponse
         });
       }
-    
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -1562,3 +1553,5 @@ exports.ReturnToBuyer = async function (req, res, next) {
     });
   }
 };
+
+

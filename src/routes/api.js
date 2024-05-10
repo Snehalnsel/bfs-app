@@ -1425,6 +1425,10 @@ router.get("/payshippingkit",cors(),
 ShippingkitpaymentController.getPaymentDataforshippingkit
 );
 
+router.get("/payment-shippingkit-status",
+ShippingkitpaymentController.getShippingKitStatus
+);
+
 router.get("/checkapp-payment",cors(),
 PaymentController.checkPaymentData
 );

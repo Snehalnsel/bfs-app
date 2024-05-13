@@ -592,9 +592,9 @@ exports.signin = async function (req, res, next) {
           const mailData = {
             from: "Bid For Sale! <" + smtpUser + ">",
             to: newUser.email,
-            subject: "Order Placed - Bid For Sale!",
+            subject: "Welcome - Bid For Sale!",
             name: "Bid For Sale!",
-            text: "order placed",
+            text: "Welcome",
             html: loginHtmlContent
           };
     

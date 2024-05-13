@@ -632,7 +632,7 @@ exports.checkPaymentData = async function (req, res, next) {
           // else console.log("info", info);
         });
 
-        let loginHtmlPath1 = 'views/webpages/order-confirmed.html';
+        let loginHtmlPath1 = 'views/webpages/seller.html';
         let loginHtmlContent1 = fs.readFileSync(loginHtmlPath, 'utf-8');
   
         loginHtmlContent1 = loginHtmlContent.replace('{{username}}', user.name);

@@ -4814,3 +4814,11 @@ button.grey-btn {
 .orange-text {
     color: #e3683d !important; 
 }
+
+.mobile-filterview{
+    display: none;
+}
+
+.filter-footer {
+    display: none;
+}

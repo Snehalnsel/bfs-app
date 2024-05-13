@@ -555,9 +555,10 @@ exports.getOrderDetails = function (req, res, next) {
         return res.status(404).json({ error: 'Order not found' });
       }
 
-      const billingAddress = await AddressBook.find({ user_id: orderDetails.seller_id ,deleted_status :0});
-      const shippingAddress = await AddressBook.find({ user_id: orderDetails.user_id ,deleted_status :0 });
-
+      const billingAddress = await AddressBook.find({ user_id: orderDetails.seller_id._id ,deleted_status :0});
+      const shippingAddress = await AddressBook.find({ user_id: orderDetails.user_id._id ,deleted_status :0 });
+      console.log("seller id",orderDetails.seller_id.email);
+      console.log("user id",orderDetails.user_id);
       const hubdata = await Hublist.find({ flag: 1 });
 
       const shiprocketResponse = await generateCouriresList();

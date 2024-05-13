@@ -32,6 +32,7 @@ const HubController = require("../controllers/api/hubController");
 const NotificationsController = require("../controllers/api/notificationsController");
 const ShippingkitController = require("../controllers/api/shippingkitController");
 const PaymentController = require("../controllers/api/paymentController");
+const ShippingkitpaymentController = require("../controllers/api/shippingkitpaymentController");
 // const helper = require("../helpers/helper");
 //others
 const dateTime = moment().format("YYYY-MM-DD h:mm:ss");
@@ -1114,7 +1115,7 @@ router.post("/markNotificationAsRead",[],NotificationsController.markNotificatio
 // generate 
 router.post("/get-shipmentkit", auth.isAuthorized,[],ShippingkitController.addShipmentData);
 
-router.get("/get-shipmentkitweb/:id",[],WebsiteController.addShipmentData);
+router.get("/get-shipmentkitweb/:id",[],ShippingkitController.addShipmentDataWeb);
 
 
 // WEBSITE API'S
@@ -1157,7 +1158,7 @@ router.get("/contract-us",[],WebsiteController.contractusData);
 router.get("/payment-policy",[],WebsiteController.paymentpolicyData);
 router.get("/faq",[],WebsiteController.faqData);
 router.get("/returns-shipping",[],WebsiteController.returnShipping);
-router.get("/returns-shipping",[],WebsiteController.returnShipping);
+// router.get("/returns-shipping",[],WebsiteController.returnShipping);
 router.get("/terms",[],WebsiteController.tremsandconditionData);
 router.get("/registration",[],WebsiteController.registration);
 
@@ -1418,6 +1419,14 @@ router.get("/otherwise-list",cors(),
 
 router.get("/pay",cors(),
 PaymentController.getPaymentData
+);
+
+router.get("/payshippingkit",cors(),
+ShippingkitpaymentController.getPaymentDataforshippingkit
+);
+
+router.get("/payment-shippingkit-status",
+ShippingkitpaymentController.getShippingKitStatus
 );
 
 router.get("/checkapp-payment",cors(),

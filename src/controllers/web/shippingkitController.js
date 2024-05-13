@@ -234,7 +234,7 @@ exports.getOrderList = function (req, res, next) {
 
       orderList.forEach(function (order) {
         if (order.product && order.product.length > 0) {
-          const product_id = order.product[0]._id; // Assuming product_id is available in the order
+          const product_id = order.product[0]._id; 
           const imagePromise = Productimage.findOne({ product_id: product_id }).limit(1).exec();
           imagePromises.push(imagePromise);
         }
@@ -284,7 +284,7 @@ exports.getShipmentKit = function (req, res, next) {
   Shippingkit.aggregate([
     {
       $match: {
-        _id: mongoose.Types.ObjectId(shipmentId) // Filtering based on the shipment ID
+        _id: mongoose.Types.ObjectId(shipmentId) 
       }
     },
     {
@@ -333,21 +333,16 @@ exports.getShipmentKit = function (req, res, next) {
 
       orderList.forEach(function (order) {
         if (order.product && order.product.length > 0) {
-          const product_id = order.product[0]._id; // Assuming product_id is available in the order
+          const product_id = order.product[0]._id;
           const imagePromise = Productimage.findOne({ product_id: product_id }).limit(1).exec();
           imagePromises.push(imagePromise);
         }
       });
-
-
       Promise.all(imagePromises)
         .then((productImages) => {
-
           orderList.forEach((order, index) => {
             order.productImage = productImages[index];
           });
-
-
           res.render("pages/shippingkit/shipmentpage", {
             siteName: req.app.locals.siteName,
             pageName: pageName,
@@ -378,20 +373,15 @@ exports.getHublist = async function (req, res, next) {
   const pageName = "Select Hub List";
   const pageTitle = req.app.locals.siteName + " - " + pageName;
   const orderId = req.params.id;
-
   if (!mongoose.Types.ObjectId.isValid(orderId)) {
     return res.status(400).json({ error: 'Invalid order ID' });
   }
-
   try {
     const hubdata = await Hublist.find({ flag: 1 });
-
     const hubaddress = await Shippingkit.findById(orderId)
     .populate('buyer_id', 'name phone_no email')
     .populate('shipping_address_id') 
     .populate('hub_address_id');
-  
-   
     res.render("pages/shippingkit/details", {
       status: 1,
       siteName: req.app.locals.siteName,

@@ -412,7 +412,7 @@ router.get("/orderlist", cors(), (req, res) => {
   OrderController.getOrderList(page, searchType, searchValue, req, res);
 });
 router.get("/orderalldetails/:id", cors(), OrderController.getOrderAllDetails);
-router.get("/orderdetails/:id/:flowid", cors(), OrderController.getOrderDetails);
+router.get("/orderdetails/:id/:order_status", cors(), OrderController.getOrderDetails);
 router.post("/update-orderdetails", cors(), [], OrderController.updateData);
 router.get("/shipmentdetails/:id", cors(), OrderController.getShipmentList);
 router.get("/delete-orderdetails/:id", cors(), OrderController.deleteData);

@@ -5,7 +5,8 @@
        <div class="dashboard-sidbar">
          <div class="sidbar-box user-profile">
             <div class="user-icon">
-               <img src="<%=respdata1.image%>" alt="user-image">
+               <!-- <img src="<%=respdata1.image%>" alt="user-image"> -->
+               <img src="/public/compress_images/<%= respdata1.image && respdata1.image !== 'na' ? respdata1.image : 'nouser.png' %>" alt="user-image">
             </div>
             <div class="user-info">
                <div class="sht-ui">Hello</div>

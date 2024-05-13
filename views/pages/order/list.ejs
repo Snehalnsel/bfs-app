@@ -137,8 +137,11 @@
                                                                 <% } %>
                                                             </td> -->
                                                             <td>
-                                                                <% if (value.total_price) { %>
-                                                                        <%= value.total_price %>
+                                                                <%
+                                                                let originalProductPrice = (typeof value.original_product_price !='undefined' ? value.original_product_price: value.total_price)
+                                                                %>
+                                                                <% if (originalProductPrice) { %>
+                                                                        <%= originalProductPrice %>
                                                                         <a href="/admin/orderalldetails/<%= value._id %>"
                                                                             class="btn btn-info btn-circle btn-sm" title="Edit" target="blank">
                                                                             <i class='fas fa-info-circle'></i>
@@ -148,15 +151,15 @@
                                                                 <% } %>
                                                             </td>
                                                             <td>
-                                                                <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].shippingkit_status === 0) { %>
+                                                                <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].shippingkit_status == 0) { %>
                                                                     <span style="color: grey;">Not Ordered Shipping Kit</span>
-                                                                <% } else if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].shippingkit_status === 1) { %>
+                                                                <% } else if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].shippingkit_status == 1) { %>
                                                                     <% if (value.bid_status === 0) { %>
-                                                                      <span style="color: orange;">Ordered Shipping Kit<a href="/admin/shippingkitdetails/<%= value.shipment._id %>" target="_blank">(<%= value.shipment.track_code %>)</a></span>
+                                                                        <a href="/admin/shipmentdetails/<%= value._id %>" target="_blank"><span style="color: orange;">Ordered Shipping Kit</span></a> 
                                                                     <% } %>
                                                                 <% } else { %>  
-                                                                    <span style="color: #98FB98;">Not Ordered Shipping Kit</span>
-                                                                <% } %>                                                              
+                                                                    <span style="color: #18ca18;">Not Ordered Shipping Kit</span>
+                                                                <% } %>                                                           
                                                             </td>
                                                             <td>
                                                                 <% if (value.bid_status === 0) { %>
@@ -339,8 +342,6 @@
                                                                 <% } %>
                                                     
                                                             </td>
-                                                    
-                                                    
                                                             <td>
                                                                 <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 1 ) { %>
                                                                     <% for(let trackDataVal of value.trackDetails) { 
@@ -394,8 +395,6 @@
                                                                 <% } %>
                                                                 
                                                             </td>
-                                                            
-
                                                             <td>
                                                                 <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 ) { %>
                                                                     
@@ -447,8 +446,6 @@
                                                                 <% } %>
                                                                 
                                                             </td>
-
-
                                                         </tr>
                                                         <% }); %>
                                                             <% } %>

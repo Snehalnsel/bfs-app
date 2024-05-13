@@ -28,6 +28,9 @@ const Ordertracking = require("../../models/api/ordertrackModel");
 const Track = require("../../models/api/trackingModel");
 const Shippingkit = require("../../models/api/shippingkitModel");
 const AddressBook = require("../../models/api/addressbookModel");
+const sendSms = require("../../models/thirdPartyApi/sendSms");
+const sendWhatsapp = require("../../models/thirdPartyApi/sendWhatsapp");
+const ApiCallHistory = require("../../models/thirdPartyApi/ApiCallHistory");
 // const helper = require("../helpers/helper");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -175,14 +178,19 @@ async function generateOrder(data) {
 
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
+      //console.log("body--",body)
+      //console.log("statusCode--",response.statusCode)
       if (error) {
-        reject(error);
+        //reject(error);
+        reject({msg:body,status_code:response.statusCode});
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
         const token = responseBody;
-        resolve(token);
+        //resolve(token);
+        resolve({token_data:token,status_code:200});
       } else {
-        reject(new Error(`Error: ${response.statusCode}`));
+        //reject(new Error(`Error: ${response.statusCode}`));
+        reject({msg:body,status_code:response.statusCode});
       }
     });
   });
@@ -436,6 +444,14 @@ exports.getOrderList = function (page, searchType, searchValue, req, res, next) 
     },
     {
       $lookup: {
+        from: 'shipping_kits',
+        localField: 'shippingkit.order_id',
+        foreignField: '_id',
+        as: 'shippingkit',
+      },
+    },
+    {
+      $lookup: {
         from: 'mt_returnorders',
         localField: 'returnorder.order_id',
         foreignField: '_id',
@@ -533,8 +549,7 @@ exports.getOrderAllDetails = function (req, res, next) {
 
 exports.getOrderDetails = function (req, res, next) {
   let id = req.params.id
-  //let orderStatus = req.params.order_status
-  let orderStatus = req.params.flowid;
+  let orderStatus = req.params.order_status;
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Order Details";
   var pageTitle = req.app.locals.siteName + " - " + pageName;
@@ -724,14 +739,17 @@ async function generateRequestShipmentPickup(shipment_id) {
 
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
+      // console.log("body--",body)
+      // console.log("response.statusCode--",response.statusCode)
       if (error) {
-        reject(error);
+        reject({msg:body,status_code:response.statusCode});
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
         const token = responseBody;
-        resolve(token);
+        resolve({token_data:token,status_code:200});
       } else {
-        reject(new Error(`Error: ${response.statusCode}`));
+        reject({msg:body,status_code:response.statusCode});
+        //reject(new Error(`Error: ${response.statusCode}`));
       }
     });
   });
@@ -769,7 +787,7 @@ async function generateCouriresServiceability(pickup_postcode, delivery_postcode
 
 }
 
-exports.updateData = async function (req, res, next) {
+exports.updateData_backup = async function (req, res, next) {
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -878,75 +896,247 @@ exports.updateData = async function (req, res, next) {
     });
   });
 };
-
-exports.getShipmentList = function (req, res, next) {
-
+exports.updateData = async function (req, res, next) {
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-  var pageName = "Shipment List";
-  var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: "0",
+      message: "Validation error!",
+      respdata: errors.array(),
+      isAdminLoggedIn: isAdminLoggedIn
+    });
+  }
 
-  var orderId = req.params.id;
-  Order.aggregate([
-    {
-      $match: {
-        _id: mongoose.Types.ObjectId(orderId),
-      },
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'user_id',
-        foreignField: '_id',
-        as: 'user',
-      },
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'seller_id',
-        foreignField: '_id',
-        as: 'seller',
-      },
-    },
-    {
-      $lookup: {
-        from: 'addressbook_lists',
-        localField: 'billing_address_id',
-        foreignField: '_id',
-        as: 'billing_address',
-      },
-    },
-    {
-      $lookup: {
-        from: 'addressbook_lists',
-        localField: 'shipping_address_id',
-        foreignField: '_id',
-        as: 'shipping_address',
-      },
-    },
-  ]).exec(function (error, orderList) {
-    if (error) {
-      res.status(500).json({ error: 'An error occurred' });
-    } else {
-      res.render("pages/order/shipmentlist", {
-        siteName: req.app.locals.siteName,
-        pageName: pageName,
-        pageTitle: pageTitle,
-        userFullName: req.session.admin.name,
-        userImage: req.session.admin.image_url,
-        userEmail: req.session.admin.email,
-        year: moment().format("YYYY"),
-        requrl: req.app.locals.requrl,
-        status: 0,
-        message: "Found!",
-        respdata: {
-          list: orderList
-        },
+  Order.findById(req.body.order_id).then(async (order) => {
+    if (!order) {
+      res.status(404).json({
+        status: "0",
+        message: "Not found!",
+        respdata: {},
         isAdminLoggedIn: isAdminLoggedIn
       });
+    } else {
+      // var updData = {
+      //   billing_address_id: req.body.seller_address,
+      //   shipping_address_id: req.body.buyer_address,
+      //   hub_address_id: req.body.hub_address,
+      //   // shiprocket_delivery_partner: req.body.user_courier,
+      // };
+      const orderDetails = await Order.findById(req.body.order_id);
+      if (!orderDetails) {
+        return res.status(404).json({ message: 'Order not found' });
+      }
+      const order_id = orderDetails._id;
+      const order_code = orderDetails.order_code;
+      const user_id = orderDetails.user_id;
+      const seller_id = orderDetails.seller_id;
+      const product_id = orderDetails.product_id;
+      const billing_address_id = orderDetails.billing_address_id;
+      const shipping_address_id = req.body.hub_address;
+      const total_price = orderDetails.total_price;
+      const payment_method = orderDetails.payment_method;
+      // const order_status = orderDetails.order_status;
+      const order_status = req.body.order_status;
+      const gst = orderDetails.gst;
+      const delivery_charges = orderDetails.delivery_charges;
+      const discount = orderDetails.discount;
+      const pickup_status = orderDetails.pickup_status;
+      const delivery_status = orderDetails.delivery_status;
+      const added_dtime = orderDetails.added_dtime;
+     
+      const now = new Date();
+      const currentHour = now.getHours().toString().padStart(2, '0');
+      const currentMinute = now.getMinutes().toString().padStart(2, '0');
+      const currentSecond = now.getSeconds().toString().padStart(2, '0');
+      const currentMillisecond = now.getMilliseconds().toString().padStart(3, '0');
+
+      // Generate the unique code using the current time components
+      const transactionCode = `BFSTRANS${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
+
+     const billingAddress = await AddressBook.find({ user_id: orderDetails.seller_id ,default_status :1});
+      const shippingAddress = await AddressBook.find({ user_id: orderDetails.user_id ,default_status :1 });
+
+      let trackObj = {
+        track_code: transactionCode,
+        product_id: product_id,
+        total_price: total_price,
+        payment_method: payment_method,
+        order_status: order_status,
+        gst: gst,
+        delivery_charges: delivery_charges,
+        discount: discount,
+        added_dtime: new Date().toISOString(),
+      }
+      if(order_status == 0){
+        trackObj.seller_id = seller_id;
+        trackObj.billing_address_id = typeof req.body.seller_address != "undefined" ? req.body.seller_address : billingAddress._id;
+        trackObj.hub_address_id = req.body.hub_address
+      } else if(order_status == 1){
+        trackObj.user_id = user_id;
+        trackObj.shipping_address_id = typeof req.body.buyer_address != "undefined" ? req.body.buyer_address : shippingAddress._id;
+        trackObj.hub_address_id = req.body.hub_address;
+      } else if(order_status == 2){
+        trackObj.user_id = user_id;
+        trackObj.billing_address_id = typeof req.body.buyer_address != "undefined" ? req.body.buyer_address : shippingAddress._id;
+        trackObj.hub_address_id = req.body.hub_address;
+      } else if(order_status == 3){
+        trackObj.seller_id = seller_id;
+        trackObj.shipping_address_id = typeof req.body.seller_address != "undefined" ? req.body.seller_address : billingAddress._id;
+        trackObj.hub_address_id = req.body.hub_address;
+      }
+      
+      const track = new Track(trackObj);
+      
+      const savedTrack = await track.save();
+      if (savedTrack) {
+        const track_id = savedTrack._id;
+
+        const ordertracking = new Ordertracking({
+          order_id: order_id,
+          tracking_id: track_id,
+          order_code: order_code,
+          track_code: transactionCode,
+          status: order_status,
+          type: 0,
+          added_dtime: new Date().toISOString(),
+        });
+        const savedOrdertrack = await ordertracking.save();
+
+        if (savedOrdertrack) {
+          return res.redirect("/admin/orderlist");
+        }
+        else {
+          return res.redirect("/admin/orderlist");
+        }
+      }
+
+      //await Order.findOneAndUpdate({ _id: req.body.order_id }, { $set: updData }, { upsert: true });
+
+      res.redirect("/admin/orderlist");
     }
+  }).catch((err) => {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while updating the product.",
+      respdata: {},
+      isAdminLoggedIn: isAdminLoggedIn
+    });
   });
 };
+
+exports.getShipmentList = async function (req, res, next) {
+  try {
+    let isAdminLoggedIn = req.session.admin ? req.session.admin.userId : "";
+    var pageName = "Shipment List";
+    var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+
+    var orderId = req.params.id;
+    const shippingKitData = await Shippingkit.findOne({ order_id: orderId })
+      .populate("order_id", "order_code")
+      .populate("track_id", "seller_id billing_address_id hub_address_id")
+      .populate("buyer_id", "name phone_no email")
+      .populate("product_id", "name")
+      .populate("hub_address_id")
+      .populate("shipping_address_id")
+      .exec();
+    console.log(shippingKitData);
+    res.render("pages/order/shipmentlist", {
+      siteName: req.app.locals.siteName,
+      pageName: pageName,
+      pageTitle: pageTitle,
+      userFullName: req.session.admin.name,
+      userImage: req.session.admin.image_url,
+      userEmail: req.session.admin.email,
+      year: moment().format("YYYY"),
+      requrl: req.app.locals.requrl,
+      status: 0,
+      message: "Found!",
+      respdata: {
+        list: shippingKitData ? [shippingKitData] : [], 
+      },
+      isAdminLoggedIn: isAdminLoggedIn
+    });
+  } catch (error) {
+    console.error("Error fetching shipping kit data with joins:", error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+};
+// exports.getShipmentList = function (req, res, next) {
+//   let isAdminLoggedIn = req.session.admin ? req.session.admin.userId : "";
+//   var pageName = "Shipment List";
+//   var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
+
+//   var orderId = req.params.id;
+//   Order.aggregate([
+//     {
+//       $match: {
+//         _id: mongoose.Types.ObjectId(orderId),
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'users',
+//         localField: 'buyer_id',
+//         foreignField: '_id',
+//         as: 'user',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'addressbook_lists',
+//         localField: 'shipping_address_id',
+//         foreignField: '_id',
+//         as: 'shipping_address',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'order_trackings',
+//         localField: '_id',
+//         foreignField: 'order_id',
+//         as: 'trackingDetails',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'mt_tracks',
+//         localField: 'trackingDetails.tracking_id',
+//         foreignField: '_id',
+//         as: 'trackDetails',
+//       },
+//     },
+//     {
+//       $lookup: {
+//         from: 'shipping_kits',
+//         localField: '_id', 
+//         foreignField: 'order_id',
+//         as: 'shippingkit',
+//       },
+//     },
+//   ]).exec(function (error, orderList) {
+//     if (error) {
+//       res.status(500).json({ error: 'An error occurred' });
+//     } else {
+//       res.render("pages/order/shipmentlist", {
+//         siteName: req.app.locals.siteName,
+//         pageName: pageName,
+//         pageTitle: pageTitle,
+//         userFullName: req.session.admin.name,
+//         userImage: req.session.admin.image_url,
+//         userEmail: req.session.admin.email,
+//         year: moment().format("YYYY"),
+//         requrl: req.app.locals.requrl,
+//         status: 0,
+//         message: "Found!",
+//         respdata: {
+//           list: orderList
+//         },
+//         isAdminLoggedIn: isAdminLoggedIn
+//       });
+//     }
+//   });
+// };
 
 
 // exports.deleteData = async function (req, res, next) {
@@ -1107,67 +1297,44 @@ exports.orderplaced = async (req, res) => {
       return res.status(400).json({ error: 'Invalid order ID' });
     }
 
-    // const orderDetails = await Order.findById({ _id: order_id })
-    //   .populate('user_id', 'name phone_no email') 
-    //   .populate('seller_id', 'name phone_no email')
-    //   .populate('billing_address_id') 
-    //   .populate('shipping_address_id') 
-    //   .populate('hub_address_id');
-
-    //   const orderDetails = await Order.findById({ _id: order_id })
-    // .populate('user_id', 'name phone_no email') 
-    // .populate('seller_id', 'name phone_no email')
-    // .populate('billing_address_id') 
-    // .populate('shipping_address_id') 
-    // .populate({
-    //   path: 'mt_track', // Assuming this is the field that refers to mt_track
-    //   populate: {
-    //     path: 'order_tracking', // Assuming this is the field that refers to order_tracking in mt_track
-    //     model: 'order_tracking', // Replace 'order_tracking' with the actual model name if different
-    //     populate: [
-    //       { path: 'buyer_id', select: 'name phone_no email' },
-    //       { path: 'seller_id', select: 'name phone_no email' },
-    //       // Add more populate calls as needed for other fields in order_tracking
-    //     ]
-    //   }
-    // });
-
-
-    const orderDetails = await Track.findById({ _id: track_id })
+    let orderDetails = await Track.findById({ _id: track_id });
+    let paymentMethod = orderDetails.payment_method ? 'Prepaid':'COD';
+    if(orderDetails.order_status==0){
+      //======seller to hub====
+      orderDetails = await Track.findById({ _id: track_id })
       .populate('seller_id', 'name phone_no email')
       .populate('billing_address_id')
       .populate('hub_address_id');
+    } else if(orderDetails.order_status==1){
+      //=====hub to buyer====
+      orderDetails = await Track.findById({ _id: track_id })
+      .populate('user_id', 'name phone_no email') 
+      .populate('shipping_address_id') 
+      .populate('hub_address_id');
+    } else if(orderDetails.order_status==2){
+      //======buyer to hub=====
+      orderDetails = await Track.findById({ _id: track_id })
+      .populate('user_id', 'name phone_no email')
+      .populate('billing_address_id')
+      .populate('hub_address_id');
+    } else if(orderDetails.order_status==3){
+      //=====hub to seller====
+      orderDetails = await Track.findById({ _id: track_id })
+      .populate('seller_id', 'name phone_no email')
+      .populate('shipping_address_id')
+      .populate('hub_address_id');
+    }
+
 
     const productdetails = await Userproduct.findById(orderDetails.product_id);
 
+
     if (productdetails) {
-      const orderData = {
+      let orderData = {
         order_id: orderDetails.track_code,
         order_date: new Date().toISOString(),
-        pickup_location: orderDetails.billing_address_id.shiprocket_address,
-        channel_id: "",
-        comment: "BFS - Bid For Sale",
-        billing_customer_name: orderDetails.seller_id.name,
-        billing_last_name: "",
-        billing_address: orderDetails.billing_address_id.street_name,
-        billing_address_2: orderDetails.billing_address_id.address1,
-        billing_city: orderDetails.billing_address_id.city_name,
-        billing_pincode: orderDetails.billing_address_id.pin_code,
         billing_state: "West Benagal",
         billing_country: "India",
-        billing_email: orderDetails.seller_id.email,
-        billing_phone: orderDetails.seller_id.phone_no,
-        shipping_is_billing: false,
-        shipping_customer_name: orderDetails.hub_address_id.name,
-        shipping_last_name: "",
-        shipping_address: orderDetails.hub_address_id.street_name,
-        shipping_address_2: orderDetails.hub_address_id.address1,
-        shipping_city: orderDetails.hub_address_id.city_name,
-        shipping_pincode: orderDetails.hub_address_id.pin_code,
-        shipping_country: "India",
-        shipping_state: "West Benagal",
-        shipping_email: orderDetails.hub_address_id.email,
-        shipping_phone: orderDetails.hub_address_id.phone_no,
         order_items: [
           {
             name: productdetails.name,
@@ -1179,7 +1346,7 @@ exports.orderplaced = async (req, res) => {
             hsn: 12345678
           }
         ],
-        payment_method: "COD",
+        payment_method: paymentMethod,
         shipping_charges: 0,
         giftwrap_charges: 0,
         transaction_charges: 0,
@@ -1190,10 +1357,120 @@ exports.orderplaced = async (req, res) => {
         height: productdetails.height,
         weight: productdetails.weight,
       };
-      const shiprocketResponse = await generateOrder(orderData);
-      if (shiprocketResponse) {
 
-        const payment_status = '0';
+      if(orderDetails.order_status==0 ){
+         //======seller to hub====
+        orderData.pickup_location = orderDetails.billing_address_id.shiprocket_address;
+        orderData.channel_id = "";
+        orderData.comment = "BFS - Bid For Sale";
+        orderData.billing_customer_name = orderDetails.seller_id.name;
+        orderData.billing_last_name = "";
+        orderData.billing_address = orderDetails.billing_address_id.street_name;
+        orderData.billing_address_2 = orderDetails.billing_address_id.address1;
+        orderData.billing_city = orderDetails.billing_address_id.city_name;
+        orderData.billing_pincode = orderDetails.billing_address_id.pin_code;
+
+        orderData.billing_email = orderDetails.seller_id.email;
+        orderData.billing_phone = orderDetails.seller_id.phone_no;
+        orderData.shipping_is_billing = false;
+        orderData.shipping_customer_name = orderDetails.hub_address_id.name;
+        orderData.shipping_last_name = "";
+        orderData.shipping_address = orderDetails.hub_address_id.street_name;
+        orderData.shipping_address_2 = orderDetails.hub_address_id.address1;
+        orderData.shipping_city = orderDetails.hub_address_id.city_name;
+        orderData.shipping_pincode = orderDetails.hub_address_id.pin_code;
+        orderData.shipping_country = "India";
+        orderData.shipping_state = "West Benagal";
+        orderData.shipping_email = orderDetails.hub_address_id.email;
+        orderData.shipping_phone = orderDetails.hub_address_id.phone_no;
+      } else if(orderDetails.order_status == 1){
+        //=====hub to buyer====
+        orderData.pickup_location = orderDetails.hub_address_id.shiprocket_address;
+        orderData.channel_id = "";
+        orderData.comment = "BFS - Bid For Sale";
+        orderData.billing_customer_name = orderDetails.hub_address_id.hub_name;
+        orderData.billing_last_name = "";
+        orderData.billing_address = orderDetails.hub_address_id.street_name;
+        orderData.billing_address_2 = orderDetails.hub_address_id.address1;
+        orderData.billing_city = orderDetails.hub_address_id.city_name;
+        orderData.billing_pincode = orderDetails.hub_address_id.pin_code;
+
+        orderData.billing_email = orderDetails.hub_address_id.email;
+        orderData.billing_phone = orderDetails.hub_address_id.phone_no;
+        orderData.shipping_is_billing = false;
+        orderData.shipping_customer_name = orderDetails.user_id.name;
+        orderData.shipping_last_name = "";
+        orderData.shipping_address = orderDetails.shipping_address_id.street_name;
+        orderData.shipping_address_2 = orderDetails.shipping_address_id.address1;
+        orderData.shipping_city = orderDetails.shipping_address_id.city_name;
+        orderData.shipping_pincode = orderDetails.shipping_address_id.pin_code;
+        orderData.shipping_country = "India";
+        orderData.shipping_state = "West Benagal";
+        orderData.shipping_email = orderDetails.user_id.email;
+        orderData.shipping_phone = orderDetails.user_id.phone_no;
+
+      } else if(orderDetails.order_status == 2){
+        //======buyer to hub=====
+        orderData.pickup_location = orderDetails.billing_address_id.shiprocket_address;
+        orderData.channel_id = "";
+        orderData.comment = "BFS - Bid For Sale";
+        orderData.billing_customer_name = orderDetails.user_id.name;
+        orderData.billing_last_name = "";
+        orderData.billing_address = orderDetails.billing_address_id.street_name;
+        orderData.billing_address_2 = orderDetails.billing_address_id.address1;
+        orderData.billing_city = orderDetails.billing_address_id.city_name;
+        orderData.billing_pincode = orderDetails.billing_address_id.pin_code;
+
+        orderData.billing_email = orderDetails.user_id.email;
+        orderData.billing_phone = orderDetails.user_id.phone_no;
+        orderData.shipping_is_billing = false;
+        orderData.shipping_customer_name = orderDetails.hub_address_id.name;
+        orderData.shipping_last_name = "";
+        orderData.shipping_address = orderDetails.hub_address_id.street_name;
+        orderData.shipping_address_2 = orderDetails.hub_address_id.address1;
+        orderData.shipping_city = orderDetails.hub_address_id.city_name;
+        orderData.shipping_pincode = orderDetails.hub_address_id.pin_code;
+        orderData.shipping_country = "India";
+        orderData.shipping_state = "West Benagal";
+        orderData.shipping_email = orderDetails.hub_address_id.email;
+        orderData.shipping_phone = orderDetails.hub_address_id.phone_no;
+      } else if(orderDetails.order_status == 3){
+        //=====hub to seller====
+        orderData.pickup_location = orderDetails.hub_address_id.shiprocket_address;
+        orderData.channel_id = "";
+        orderData.comment = "BFS - Bid For Sale";
+        orderData.billing_customer_name = orderDetails.seller_id.name;
+        orderData.billing_last_name = "";
+        orderData.billing_address = orderDetails.hub_address_id.street_name;
+        orderData.billing_address_2 = orderDetails.hub_address_id.address1;
+        orderData.billing_city = orderDetails.hub_address_id.city_name;
+        orderData.billing_pincode = orderDetails.hub_address_id.pin_code;
+
+        orderData.billing_email = orderDetails.hub_address_id.email;
+        orderData.billing_phone = orderDetails.hub_address_id.phone_no;
+        orderData.shipping_is_billing = false;
+        orderData.shipping_customer_name = orderDetails.seller_id.name;
+        orderData.shipping_last_name = "";
+        orderData.shipping_address = orderDetails.shipping_address_id.street_name;
+        orderData.shipping_address_2 = orderDetails.shipping_address_id.address1;
+        orderData.shipping_city = orderDetails.shipping_address_id.city_name;
+        orderData.shipping_pincode = orderDetails.shipping_address_id.pin_code;
+        orderData.shipping_country = "India";
+        orderData.shipping_state = "West Benagal";
+        orderData.shipping_email = orderDetails.seller_id.email;
+        orderData.shipping_phone = orderDetails.seller_id.phone_no;
+      }
+
+      let shiprocketResponse = await generateOrder(orderData).catch((err)=> {return err});
+      if(shiprocketResponse.status_code != 200){
+        return res.render("pages/error-msg", {
+          errorMsg: shiprocketResponse.msg
+        });
+      }
+      shiprocketResponse = shiprocketResponse.token_data;
+
+      if (shiprocketResponse) {
+        let payment_status = '0';
 
         shiprocket_payment_status = payment_status;
         shiprocket_order_id = shiprocketResponse.order_id;
@@ -1208,6 +1485,31 @@ exports.orderplaced = async (req, res) => {
 
         await orderDetails.save();
 
+        if(orderDetails.order_status == 1){
+
+          let getorderid = await Ordertracking.findOne({ tracking_id: track_id });
+          let orderdetails = await Order.findById(getorderid.order_id);
+          const seller = await Users.findById(orderdetails.seller_id);
+  
+          let smsDataforseller = {
+            textId: "test",
+            toMobile: "91" +seller.phone_no,
+            text: "Dear "+ seller.name +",Your product "+ productdetails.name +" has been delivered to the hub successfully. It will be processed for delivery after the quality check.- BFS Team",
+          };
+          let returnDataforseller;
+          returnDataforseller = await sendSms(smsDataforseller);
+          const historyDataforseller = new ApiCallHistory({
+            userId: user._id,
+            called_for: "Delivery to Hub",
+            api_link: process.env.SITE_URL,
+            api_param: smsData,
+            api_response: returnDataforseller,
+            send_status: 'send',
+          });
+          await historyDataforseller.save();
+  
+        }  
+
       }
     }
     else {
@@ -1217,11 +1519,11 @@ exports.orderplaced = async (req, res) => {
       return res.status(404).json({ error: 'Order not found' });
     }
     else {
-      const updatedOrderTracking = await Ordertracking.findOneAndUpdate(
-        { tracking_id: track_id },
-        { $set: { status: 1 } },
-        { new: true }
-      );
+      // const updatedOrderTracking = await Ordertracking.findOneAndUpdate(
+      //   { tracking_id: track_id },
+      //   { $set: { status: 1 } },
+      //   { new: true }
+      // );
       res.redirect(`/admin/check-Couriresserviceability/${track_id}`);
     }
   } catch (error) {
@@ -1379,24 +1681,41 @@ exports.getAWBnoById = async function (req, res, next) {
           existingOrder.pickup_awb = shiprocketResponse.response.data.awb_code;
           existingOrder.shiprocket_delivery_partner = shiprocketResponse.response.data.courier_company_id;
           existingOrder.shiprocket_courier_name = shiprocketResponse.response.data.transporter_name;
-
           await existingOrder.save();
 
+          if(existingOrder.order_status == 1)
+          {
+            const user = await Users.findById(existingOrder.user_id); 
+            let buyersmsData = {
+              textId: "test",
+              toMobile: "91" +user.phone_no,
+              text: "Dear "+user.name+",Your order "+existingOrder.shiprocket_order_id+" has been shipped via "+existingOrder.shiprocket_courier_name+" with Tracking ID "+existingOrder.pickup_awb+".It will be delivered within the next 7 business days.- BFS Team",
+            };
+            let returnDataforbuyer;
+            returnDataforbuyer = await sendSms(buyersmsData);
+  
+            const historyData1 = new ApiCallHistory({
+              userId: user._id,
+              called_for: "Order Placed for Seller Product",
+              api_link: process.env.SITE_URL,
+              api_param: smsData,
+              api_response: returnDataforbuyer,
+              send_status: 'send',
+            });
+            await historyData1.save();
+   
+          }
           const shiprocketlabelResponse = await generateLabel(shipment_id);
           const order_id = existingOrder.shiprocket_order_id;
           const shiprocketinvoiceResponse = await generateInvoice(order_id);
           //const shiprocketManifestResponse = await generateManifest(shipment_id);
-
           const seller_details = await Users.findById(existingOrder.seller_id);
-
           if (seller_details) {
             const receiver_email = seller_details.email;
-
             if (shiprocketlabelResponse && shiprocketlabelResponse.label_url && shiprocketinvoiceResponse && shiprocketinvoiceResponse.invoice_url) {
               const labelUrl = shiprocketlabelResponse.label_url;
               const invoiceUrl = shiprocketinvoiceResponse.invoice_url;
               //const manifestUrl = shiprocketManifestResponse.manifest_url;
-
               sendEmailWithAttachment(receiver_email, labelUrl, invoiceUrl);
             }
           }
@@ -1993,83 +2312,37 @@ exports.getShipmentPickup = async function (req, res, next) {
     return res.render("pages/error-msg", {
       errorMsg: "Validation error!"
     });
-    /*return res.status(400).json({
-      status: "0",
-      message: "Validation error!",
-      respdata: errors.array(),
-      isAdminLoggedIn: isAdminLoggedIn
-    });*/
   }
 
   try {
-    const trackId = req.params.id;
+    let trackId = req.params.id;
 
-    const existingOrder = await Track.findById(trackId);
+    let existingOrder = await Track.findById(trackId);
     if (!existingOrder) {
       return res.render("pages/error-msg", {
         errorMsg: "Order not found!"
       });
-      /*return res.status(404).json({
-        status: "0",
-        message: "Order not found!",
-        respdata: {},
-        isAdminLoggedIn: isAdminLoggedIn
-      });*/
     }
 
     if (existingOrder) {
-      const shipment_id = existingOrder.shiprocket_shipment_id;
-      const shiprocketResponse = await generateRequestShipmentPickup(shipment_id);
+      let shipment_id = existingOrder.shiprocket_shipment_id;
+      let shiprocketResponse = await generateRequestShipmentPickup(shipment_id).catch((err)=> {return err});
+      console.log("shiprocketResponse--",shiprocketResponse)
+      if(shiprocketResponse.status_code != 200){
+        return res.render("pages/error-msg", {
+          errorMsg: shiprocketResponse.msg
+        });
+      }
+      shiprocketResponse = shiprocketResponse.token_data;
       if (shiprocketResponse) {
         existingOrder.pickup_token_number = shiprocketResponse.response.pickup_token_number;
         existingOrder.pickup_dtime = shiprocketResponse.response.pickup_scheduled_date;
-
         await existingOrder.save();
+
+
       }
 
-      // res.status(200).json({
-      //   status: "1",
-      //   message: "Order canceled successfully!",
-      //   respdata: existingOrder,
-      //   shiprocketResponse: shiprocketResponse
-      // });
-
-      if (shiprocketResponse.error) {
-        return res.render("pages/order/list", {
-          status: "0",
-          message: "Order canceled successfully!",
-          siteName: req.app.locals.siteName,
-          pageName: pageName,
-          pageTitle: pageTitle,
-          userFullName: req.session.admin.name,
-          userImage: req.session.admin.image_url,
-          userEmail: req.session.admin.email,
-          year: moment().format("YYYY"),
-          requrl: req.app.locals.requrl,
-          message: "",
-          respdata: existingOrder,
-          error: shiprocketResponse.error,
-          isAdminLoggedIn: isAdminLoggedIn
-        });
-      }
-
-      res.render("pages/order/list", {
-        status: "1",
-        message: "Order canceled successfully!",
-        siteName: req.app.locals.siteName,
-        pageName: pageName,
-        pageTitle: pageTitle,
-        userFullName: req.session.admin.name,
-        userImage: req.session.admin.image_url,
-        userEmail: req.session.admin.email,
-        year: moment().format("YYYY"),
-        requrl: req.app.locals.requrl,
-        message: "",
-        respdata: existingOrder,
-        shiprocketResponse: shiprocketResponse,
-        error: null,
-        isAdminLoggedIn: isAdminLoggedIn
-      });
+      res.redirect('/admin/orderlist');
     }
   } catch (error) {
     res.status(500).json({
@@ -2601,7 +2874,7 @@ exports.downloadOrderPDF = function (req, res, next) {
           const pdfBuffer = await page.pdf({ format: 'A4' });
 
           res.setHeader('Content-Type', 'application/pdf');
-          res.setHeader('Content-Disposition', 'attachment; filename=Invoice.pdf');
+          res.setHeader('Content-Disposition', 'attachment; filename=InvoiceSellerToBFS.pdf');
 
           res.send(pdfBuffer);
           await browser.close();

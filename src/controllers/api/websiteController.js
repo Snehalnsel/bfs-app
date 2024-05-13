@@ -75,6 +75,7 @@ const { create } = require('xmlbuilder2');
 const { ConversationContextImpl } = require("twilio/lib/rest/conversations/v1/conversation");
 const shippingchrgsModel = require("../../models/api/shippingchrgsModel");
 const statesModel = require("../../models/api/statesModel");
+const Trackingdeatis = require("../../models/api/trackingdeatis");
 const { toFormData } = require("axios");
 // const INSTANCE_URL = 'https://api.maytapi.com/api';
 // const PHONE_ID = '18710';
@@ -1491,7 +1492,7 @@ exports.addAddress = async function (req, res, next) {
       respdata: add,
       respdata1: userData,
       isLoggedIn: isLoggedIn,
-      stateList:getStates
+      stateList:getStates,
     });
   } catch (error) {
     res.status(500).json({
@@ -2540,6 +2541,9 @@ exports.userWisePost = async function (req, res, next) {
     let userBankStatus = await Bankdetails.countDocuments({
       user_id: mongoose.Types.ObjectId(isLoggedIn)
     });
+    let userAddressStatus = await addressBook.countDocuments({
+      user_id: mongoose.Types.ObjectId(isLoggedIn)
+    });
     for (const userproduct of userproducts) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
       if (productImages) {
@@ -2576,6 +2580,7 @@ exports.userWisePost = async function (req, res, next) {
         userData: req.session.user,
         isLoggedIn: isLoggedIn,
         userBankStatus:userBankStatus,
+        userAddressStatus:userAddressStatus,
         websiteUrl: process.env.SITE_URL,
       });
     }
@@ -3585,6 +3590,55 @@ exports.myOrderDetailsWeb = async (req, res) => {
       shippingkit_details = await addressBook.findById({ _id: shippingKitData.shipping_address_id });
       shipping_user_details = await Users.findById({ _id: shippingKitData.buyer_id });
     }
+    
+    //============Order tracking portion start=====
+   
+    if(order){
+      let getOrderId = order._id;
+      let ordertracking = await Ordertracking.findOne({order_id:getOrderId});
+      if(ordertracking){
+        let getTrackData = await Track.findOne({_id:mongoose.Types.ObjectId(ordertracking.tracking_id)});
+
+        //=== 0=>for seller_to_hub 1=>for hub_to_buyer===
+        if(getTrackData.pickup_awb){
+          let getapiTrakingData = await helper.trackbyawbid(getTrackData.pickup_awb);
+          console.log("getapiTrakingData--",getapiTrakingData)
+          let gettrackingData = getapiTrakingData.tracking_data.shipment_track;
+          console.log("gettrackingData--",gettrackingData)
+          let statusCheck = (getTrackData.order_status==1) ? 1:0;
+          const filterTrack = {
+            order_id:mongoose.Types.ObjectId(getOrderId),
+            tracking_id:mongoose.Types.ObjectId(ordertracking.tracking_id)
+          };
+          
+          const trackingdetails = await Trackingdeatis.findOne(filterTrack);
+          if(trackingdetails && trackingdetails.status== getTrackData.order_status){
+            const updateTrack = { 
+              track_response: getapiTrakingData,
+              curent_status: gettrackingData[0].current_status,
+              status_check: statusCheck,
+              track_awbno: getTrackData.pickup_awb,
+            };
+             await Trackingdeatis.findOneAndUpdate(filterTrack, updateTrack);
+          } else {
+            const createTrackindData = new Trackingdeatis({
+              order_id: getOrderId,
+              tracking_id: ordertracking.tracking_id,
+              track_response: getapiTrakingData,
+              curent_status: gettrackingData[0].current_status,
+              status_check: 0,
+              track_awbno: getTrackData.pickup_awb,
+              status: getTrackData.order_status,
+              added_dtime: dateTime,
+            });
+             await createTrackindData.save();
+          }
+          
+        }
+      }
+    }
+     //============Order tracking portion end=====
+
     const orderDetails = {
       _id: order._id,
       total_price: order.total_price,
@@ -3631,69 +3685,6 @@ exports.myOrderDetailsWeb = async (req, res) => {
       status: "0",
       message: "An error occurred My order .",
       error: error.message,
-    });
-  }
-};
-exports.addShipmentData = async (req, res) => {
-  try {
-    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-    const order_id = req.params.id;
-    const price = 350;
-    const gst = (price * 18) / 100;
-    const final_price = price + gst;
-    const track = await Ordertracking.findOne({ order_id: order_id }).exec();
-    if (track == null) {
-      return res.status(200).json({
-        status: "0",
-        message: 'Order Delivery Partner Not chosse yet',
-        is_shippingkit: false,
-      });
-    }
-    const hubaddress = await Track.findById(track.tracking_id)
-      .populate('seller_id', 'name phone_no email')
-      .populate('billing_address_id')
-      .populate('hub_address_id');
-    if (!hubaddress) {
-      res.status(200).json({
-        status: "0",
-        message: 'Order Delivery Partnerss Not chosse yet',
-        is_shippingkit: false,
-      });
-    }
-    const orderCode = `BFSSHIPKIT${Date.now().toString()}`;
-    const shippingkit = new Shippingkit({
-      track_code: orderCode,
-      buyer_id: hubaddress.seller_id._id,
-      product_id: hubaddress.product_id,
-      shipping_address_id: hubaddress.billing_address_id._id,
-      order_id: order_id,
-      total_price: final_price,
-      payment_method: 1,
-      added_dtime: new Date().toISOString(),
-    });
-    const savedOrder = await shippingkit.save();
-    if (savedOrder) {
-      const updatedTrack = await Track.findOneAndUpdate(
-        { _id: track.tracking_id },
-        { $set: { shippingkit_status: 1 } },
-        { new: true }
-      );
-      const user = await Users.findById(savedOrder.buyer_id);
-      res.status(200).json({
-        status: "1",
-        message: 'Shipping Kit Order placed successfully',
-        success: true,
-        is_shippingkit: true,
-        order: savedOrder,
-        isLoggedIn: isLoggedIn,
-        websiteUrl: process.env.SITE_URL,
-      });
-    }
-  } catch (error) {
-    res.status(200).json({
-      status: "0",
-      message: 'Can not Order Shipping kit',
-      is_shippingkit: false,
     });
   }
 };
@@ -4440,6 +4431,7 @@ exports.Demoorder = async function (req, res) {
       user_ip: ip,
       gst:(typeof gst != "undefined") ? gst : 0,
       taxable_value:(typeof taxable_value != "undefined") ? parseFloat(taxable_value) : 0,
+      original_product_price:product_price,
       added_dtime: new Date().toISOString(),
     });
 
@@ -4857,9 +4849,14 @@ exports.sendotp = async function (req, res, next) {
                         let returnData;
                         returnData = await sendWhatsapp(smsData);
                       });  
+                      const currentDate = new Date().toLocaleDateString();
+                      const currentTime = new Date().toLocaleTimeString();
+
                       const loginHtmlPath = 'views/webpages/reset-password.html';
                       let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
                       loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+                      loginHtmlContent = loginHtmlContent.replace('{{date}}', currentDate);
+                      loginHtmlContent = loginHtmlContent.replace('{{time}}', currentTime);
                       const mailData = {
                         from: "Bid For Sale! <" + smtpUser + ">",
                         to: user.email,

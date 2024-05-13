@@ -56,6 +56,10 @@ const model = mongoose.Schema({
     type: Number,
     default: 0,
   },
+  original_product_price: {
+    type: Number,
+    default: 0,
+  },
   packing_handling_charge: {
     type: Number,
     default: 0,
@@ -171,6 +175,11 @@ const model = mongoose.Schema({
     default: 0,
   },
   is_deletedtime:{
+    type: Number,
+    enum: [0,1],
+    default: 0,
+  },
+  is_delivered:{
     type: Number,
     enum: [0,1],
     default: 0,

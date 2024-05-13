@@ -8,6 +8,10 @@ const model = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'mt_order', 
   },
+  track_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'mt_tracks', 
+  },
   buyer_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'users', 
@@ -28,6 +32,9 @@ const model = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'mt_order', 
   },
+  price: {
+    type: Number,
+  },
   total_price: {
     type: String,
   },
@@ -42,7 +49,7 @@ const model = mongoose.Schema({
     default: 0,
   },
   gst: {
-    type: String,
+    type: Number,
   },
   delivery_charges: {
     type: Number,

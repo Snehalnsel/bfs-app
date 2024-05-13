@@ -17,6 +17,10 @@ const model = mongoose.Schema({
     type: String,
     required: true,
   },
+  house_no: {
+    type: String,
+    required: true,
+  },
   landmark: {
     type: String,
   },

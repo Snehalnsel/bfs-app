@@ -85,7 +85,7 @@
          </div>         
       </div>
       <div class="dashboard-content">
-         <% if(userBankStatus != 0){ %>
+         <% if(userBankStatus != 0 && userAddressStatus != 0){ %>
          <div class="dashboard-infobox">
             <div class="dashboard-title-arrow mb-25">
                <h4 class="di-title mr-25">My Product</h4>
@@ -134,7 +134,6 @@
                        </a>
                      <% } %>
                    </div>
-                   
                   </div>
                </div>
                <% }); %>
@@ -143,12 +142,16 @@
             
          </div>
          <% } else { %>
-
             <div class="ec-box dflex-box">
-               <h6>Please add Bank Details first, to add product</h6>
-               <a class="bc-btn" href="/bank-details">Add Bank Details</a>
+               <% if(userBankStatus == 0 ){ %>
+                  <h6>Please add Bank Details first, to add product</h6>
+                  <a class="bc-btn" href="/bank-details">Add Bank Details</a>
+               <% } %>
+               <% if( userAddressStatus == 0 ){ %>
+                     <h6>Please add Addresss first, to add product</h6>
+                     <a class="bc-btn" href="/add-address">Add Address</a>
+               <% } %>
             </div>
-
             <% } %>
 
       </div>

@@ -14,9 +14,11 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 app.use("/public", express.static(path.join(__dirname, "public")));
 require('dotenv').config();
-const axios = require("axios")
+const axios = require("axios");
+const cron = require('node-cron');
 const moment = require('moment-timezone');
 const dateTime = moment().format("YYYY-MM-DD h:mm:ss");
+const CornController = require("./src/controllers/api/cornController");
 
 //Import Bids watcher Model
 const { getFirestore, Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
@@ -228,7 +230,7 @@ const dbFdb = getFirestore();
       if (change.type === 'added') {
         //console.log('New Doc: ', change.doc.data());
         if(typeof changeDoc.currentOffer.sellerMessage != "undefined" && typeof changeDoc.currentOffer.buyerMessage != "undefined" && changeDoc.currentOffer.sellerMessage != "" && changeDoc.currentOffer.buyerMessage != "") {
-          io.to(changeDoc.id).emit("accept_message", acceptFormatMessage(changeDoc.buyerId, changeDoc.currentOffer.buyerMessage,changeDoc.sellerId,changeDoc.currentOffer.sellerMessage,changeDoc.currentOffer.isFromBuyer, changeDoc.id));
+          //io.to(changeDoc.id).emit("accept_message", acceptFormatMessage(changeDoc.buyerId, changeDoc.currentOffer.buyerMessage,changeDoc.sellerId,changeDoc.currentOffer.sellerMessage,changeDoc.currentOffer.isFromBuyer, changeDoc.id));
           //io.to(changeDoc.id).emit("accept_message", acceptFormatMessage(currUserDetails.name, chatPrice,sendFromUserId, changeDoc.id));
         } else {
           //io.to(changeDoc.id).emit("message", formatMessage(currUserDetails.name, chatPrice,sendFromUserId,changeDoc.buyerId, changeDoc.id));
@@ -478,6 +480,21 @@ io.on("connection", (socket) => {
     }
   });
 });
+
+//corn for deliver
+// app.get("/cron",async ()=>{
+//   await CornController.processOrderTracking();
+// })
+//cron.schedule('*/90 * * * *', async () => {
+  var task  = cron.schedule('* * * * *', async () => {
+  try {
+    await CornController.processOrderTracking();
+  } catch (error) {
+    console.error('Error in cron job:', error);
+  }
+});
+task.start();
+//corn for deliver
 const https_server = serv.listen(port, function(err){
     console.log(`App listening on port ${port}!`);
 });
@@ -495,4 +512,11 @@ module.exports = serv;
 
 // app.listen(port, () => console.log(`App listening on port ${port}!`));
  
+<<<<<<< HEAD
 //Palash Samanta
+=======
+//Snigdho Upadhyay
+
+
+
+>>>>>>> e4c7f2838ce8c4c1df5ed9a84afccd072d73473b

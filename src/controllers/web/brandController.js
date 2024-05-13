@@ -20,6 +20,7 @@ const { check, validationResult } = require("express-validator");
 var ObjectId = require("mongodb").ObjectId;
 const url = require("url");
 var ObjectId = require("mongodb").ObjectId;
+const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 
 exports.getData = function (req, res, next) {
   var pageName = "Brand List";
@@ -99,79 +100,76 @@ exports.createData = async function (req, res, next) {
   var pageName = "Brand";
   var pageTitle = req.app.locals.siteName + " - Add " + pageName;
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
-  // if (!req.file) {
-    
-  //   return res.status(400).json({
-  //     status: "0",
-  //     message: "Image is required!",
-  //     respdata: []
-  //   });
-  // }
   const requrl = req.protocol + '://' + req.get('host');
-  //const imagePath = requrl + '/public/images/' + req.file.filename;
-  Brand.findOne({ name: req.body.focus_name }).then((brand) => {
+
+  Brand.findOne({ name: req.body.focus_name }).then(async (brand) => {
     if (brand) {
-      res.render("pages/body-focus/create", {
+      return res.render("pages/body-focus/create", {
         status: 0,
         siteName: req.app.locals.siteName,
-        userFullName:  req.session.admin.name,
-        userImage:  req.session.admin.image_url,
-        userEmail:  req.session.admin.email,
+        userFullName: req.session.admin.name,
+        userImage: req.session.admin.image_url,
+        userEmail: req.session.admin.email,
         pageName: pageName,
         pageTitle: pageTitle,
         year: moment().format("YYYY"),
         message: "Already exists!",
         requrl: req.app.locals.requrl,
         respdata: {},
-        isAdminLoggedIn:isAdminLoggedIn
+        isAdminLoggedIn: isAdminLoggedIn
       });
-    } else {
-      const newBrand = Brand({
+    }
+
+    try {
+      const newBrand = new Brand({
         name: req.body.focus_name,
         description: req.body.description,
-        //image: imagePath,
-        //category_id : req.body.category_id,
-        status : '1',
-        added_dtime: dateTime,
+        status: '1',
+        added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
       });
-      newBrand
-        .save()
-        .then((brand) => {
-          res.render("pages/brand/create", {
-            status: 0,
-            siteName: req.app.locals.siteName,
-            pageName: pageName,
-            pageTitle: pageTitle,
-            userFullName:  req.session.admin.name,
-            userImage:  req.session.admin.image_url,
-            userEmail:  req.session.admin.email,
-            year: moment().format("YYYY"),
-            message: "Added!",
-            requrl: req.app.locals.requrl,
-            respdata: brand,
-            isAdminLoggedIn:isAdminLoggedIn
-          });
-        })
-        .catch((error) => {
-          res.render("pages/body-focus/create", {
-            status: 0,
-            pageName: pageName,
-            siteName: req.app.locals.siteName,
-            userFullName:  req.session.admin.name,
-            userImage:  req.session.admin.image_url,
-            userEmail:  req.session.admin.email,
-            pageTitle: pageTitle,
-            year: moment().format("YYYY"),
-            requrl: req.app.locals.requrl,
-            message: "Error!",
-            respdata: error,
-            isAdminLoggedIn:isAdminLoggedIn
-          });
-        });
+
+    
+      if (req.file) {
+        const imageUrl =  req.file.filename;
+        await CompressImage("./public/images/" + imageUrl, "./public/compress_images/");
+        newBrand.image = imageUrl; 
+      }
+
+      const savedBrand = await newBrand.save();
+
+      return res.render("pages/brand/create", {
+        status: 0,
+        siteName: req.app.locals.siteName,
+        pageName: pageName,
+        pageTitle: pageTitle,
+        userFullName: req.session.admin.name,
+        userImage: req.session.admin.image_url,
+        userEmail: req.session.admin.email,
+        year: moment().format("YYYY"),
+        message: "Added!",
+        requrl: req.app.locals.requrl,
+        respdata: savedBrand,
+        isAdminLoggedIn: isAdminLoggedIn
+      });
+    } catch (error) {
+      console.log(error);
+      return res.render("pages/body-focus/create", {
+        status: 0,
+        pageName: pageName,
+        siteName: req.app.locals.siteName,
+        userFullName: req.session.admin.name,
+        userImage: req.session.admin.image_url,
+        userEmail: req.session.admin.email,
+        pageTitle: pageTitle,
+        year: moment().format("YYYY"),
+        requrl: req.app.locals.requrl,
+        message: "Error!",
+        respdata: error,
+        isAdminLoggedIn: isAdminLoggedIn
+      });
     }
   });
 };
-
 exports.editData = async function (req, res, next) {
   
   var pageName = "Brand";
@@ -189,7 +187,7 @@ exports.editData = async function (req, res, next) {
       userImage:  req.session.admin.image_url,
       userEmail:  req.session.admin.email,
       year: moment().format("YYYY"),
-      requrl: req.app.locals.requrl,
+      websiteUrl: process.env.SITE_URL,
       message: "",
       respdata: {
         brand : brand,
@@ -206,71 +204,59 @@ exports.updateData = async function (req, res, next) {
   var pageTitle = req.app.locals.siteName + " - Edit " + pageName;
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
+  
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
-      isAdminLoggedIn:isAdminLoggedIn
+      isAdminLoggedIn: isAdminLoggedIn
     });
   }
 
-  Brand.findOne({ _id: req.body.brand_id })
-    .then((brand) => {
-      if (!brand) {
-        return res.status(404).json({
-          status: "0",
-          message: "Brand not found!",
-          respdata: {},
-          isAdminLoggedIn:isAdminLoggedIn
-        });
-      }
-
-      const updData = {
-        name: req.body.name || brand.name,
-        description: req.body.description || brand.description,
-        //category_id : req.body.category_id || brand.category_id,
-        status: req.body.status || brand.status,
-      };
-
-      if (req.file) {
-        const requrl = req.protocol + '://' + req.get('host');
-        const imagePath = requrl + '/public/images/' + req.file.filename;
-        updData.image = imagePath;
-      }
-      Brand.findByIdAndUpdate(
-        req.body.brand_id,
-        updData,
-        { new: true, runValidators: true }
-      )
-        .then((updatedBrand) => {
-          if (!updatedBrand) {
-            return res.status(404).json({
-              status: "0",
-              message: "Brand not updated!",
-              respdata: {},
-              isAdminLoggedIn:isAdminLoggedIn
-            });
-          }
-          res.redirect("/admin/brand");
-        })
-        .catch((error) => {
-          return res.status(500).json({
-            status: "0",
-            message: "An error occurred while updating the brand.",
-            respdata: {},
-            isAdminLoggedIn:isAdminLoggedIn
-          });
-        });
-    })
-    .catch((error) => {
-      return res.status(500).json({
+  try {
+    const brand = await Brand.findOne({ _id: req.body.brand_id });
+    if (!brand) {
+      return res.status(404).json({
         status: "0",
-        message: "An error occurred while finding the brand.",
+        message: "Brand not found!",
         respdata: {},
-        isAdminLoggedIn:isAdminLoggedIn
+        isAdminLoggedIn: isAdminLoggedIn
       });
+    }
+    const updData = {
+      name: req.body.name || brand.name,
+      description: req.body.description || brand.description,
+      status: req.body.status || brand.status,
+    };
+    if (req.file) {
+      const requrl = req.protocol + '://' + req.get('host');
+      const imagePath = req.file.filename;
+      updData.image = imagePath;
+      await CompressImage("./public/images/" + imagePath, "./public/compress_images/");
+    }
+    const updatedBrand = await Brand.findByIdAndUpdate(
+      req.body.brand_id,
+      updData,
+      { new: true, runValidators: true }
+    );
+    if (!updatedBrand) {
+      return res.status(404).json({
+        status: "0",
+        message: "Brand not updated!",
+        respdata: {},
+        isAdminLoggedIn: isAdminLoggedIn
+      });
+    }
+    res.redirect("/admin/brand");
+  } catch (error) {
+    return res.status(500).json({
+      status: "0",
+      message: "An error occurred while updating the brand.",
+      respdata: {},
+      isAdminLoggedIn: isAdminLoggedIn
     });
+  }
 };
 
 

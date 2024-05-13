@@ -116,10 +116,26 @@
          <button type="button" class="close" data-dismiss="modal">&times;</button>
          <div class="modal-content">
             <div class="short-box buy-modal">
-               <h5 class="box-title">Shipping Kit <span><i class="fa fa-inr" aria-hidden="true"></i>350 + GST</span>
-               </h5>
+
+               <table class="table table-borderless highlight-first-td">  
+                  <tbody>
+                    <tr> 
+                        <td>Shipping Kit </td>
+                        <th><i class="fa fa-inr" aria-hidden="true"></i>12000.00</th> 
+                      </tr>
+                        <td>GST</td>
+                        <th><i class="fa fa-inr" aria-hidden="true"></i>210.00</th> 
+                      </tr>
+                      <tr class="border-top total-table">
+                        <td><strong>Total Amount</strong></td>
+                        <th><i class="fa fa-inr" aria-hidden="true"></i>12960.00</th> 
+                      </tr>
+                  </tbody>
+               </table>
+               <!-- <h5 class="box-title">Shipping Kit <span><i class="fa fa-inr" aria-hidden="true"></i>350 + GST</span>
+               </h5> -->
                <p>(Contains Manifest, Tax Invoice, Shipping Label, Bubble Insulation, Courier Bag)</p>
-               <p class="text-center"><a href="javascript:void(0)" class="acb-btn order-shipping-kit">Buy Shipping
+               <p class="text-center"><a href="javascript:void(0)" class="acb-btn order-shipping-kit  modal-short-btn">Buy Shipping
                      Kit</a></p>
             </div>
          </div>
@@ -155,11 +171,11 @@
         <div class="bids-row wishlist-row " >
               <div class="br-details">
                   <div class="bid-images">
-                     <img src="${(currImagesUrl.startsWith('/public/compress_images/') ? (webSiteUrl + '/public/compress_images/' + item.product.image) : webSiteUrl + currImagesUrl)}" alt="images" class="img-fluid">
+                     <a href="/productdeatils/${item.product.id}"><img src="${(currImagesUrl.startsWith('/public/compress_images/') ? (webSiteUrl + '/public/compress_images/' + item.product.image) : webSiteUrl + currImagesUrl)}" alt="images" class="img-fluid"></a>
                   </div>
                   <div class="bid-info">
                      <div class="bd-title">
-                        <a href="/web-myorder-details/${item._id}">${item.product.name}</a>
+                        <a href="/productdeatils/${item.product.id}">${item.product.name}</a>
                      </div>
                      <div class="bd-price">
                         <span><i class="fa fa-inr" aria-hidden="true"></i></span>${item.total_price}
@@ -256,16 +272,17 @@
             function populateSellerHtml(data) {
                data.orders.forEach(item => {
 
-                  let currImagesUrl = `/public/images/${item.image}`;
+                  let currImagesUrl = `/public/images/${item.product.image}`;
                   var hTml = `<div class="cart-list wishlist-list" data-orderid="${item._id}" data-userby="2">
     <div class="bids-row wishlist-row order-list">
         <div class="br-details">
             <div class="bid-images">
-               <img src="${(currImagesUrl.startsWith('/public/compress_images/') ? (webSiteUrl + '/public/compress_images/' + item.product.image) : webSiteUrl + currImagesUrl)}" alt="images" class="img-fluid">
+               <a href="/productdeatils/${item.product.id}"><img src="${(currImagesUrl.startsWith('/public/compress_images/') ? (webSiteUrl + '/public/compress_images/' + item.product.image) : webSiteUrl + currImagesUrl)}" alt="images" class="img-fluid">
+               </a>
             </div>
             <div class="bid-info bi-iconbox">
                <div class="bid-left">
-                <div class="bd-title">${item.product.name}</div>
+                <div class="bd-title"><a href="/productdeatils/${item.product.id}">${item.product.name}</a></div>
                 <div class="bd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>${item.total_price}</div>
                 <div class="cnbtn-group">`;
                   if (item.shippingkit_status == 1) {
@@ -274,6 +291,7 @@
                      hTml += `
                         <p>Please Choose Either Option To Confirm Your Order.</p>
                         <div class="cg-row">
+                           <input type="hidden" name="shipping_charges" value=${item.shipping_charges}>
                            <a href="javascript:void(0)" data-toggle="modal" data-target="#short-modal" class="acb-btn rv-btn buy-shipping-kit" data-orderid="${item._id}">Buy Shipping Kit</a>
                            <a href="javascript:void(0)" class="acb-btn  grey-btn">Don't Buy Shipping Kit</a>
                         </div>
@@ -319,32 +337,44 @@
                   $("#viewers-tab").append(hTml);
                });
             }
+            
             $(document).on('click', '.buy-shipping-kit', function () {
                var orderId = $(this).data('orderid');
-               $(".short-modal .buy-modal a.acb-btn").attr("data-orderid", orderId);
-               $(".cg-row").attr("id", orderId);
+               var shippingCharges = parseFloat($('input[name="shipping_charges"]').val()); 
+               $('.short-modal .buy-modal table.highlight-first-td tbody tr:eq(0) th').html(`<i class="fa fa-inr" aria-hidden="true"></i>${shippingCharges.toFixed(2)}`);
+               var gst = shippingCharges * 0.28;
+               var totalAmount = shippingCharges + gst;
+               $('.short-modal .buy-modal table.highlight-first-td tbody tr:eq(1) th').html(`<i class="fa fa-inr" aria-hidden="true"></i>${gst.toFixed(2)}`);
+               $('.short-modal .buy-modal table.highlight-first-td tbody tr.total-table th').html(`<i class="fa fa-inr" aria-hidden="true"></i>${totalAmount.toFixed(2)}`);
+               $('.short-modal .buy-modal a.acb-btn.order-shipping-kit').attr('data-orderid', orderId);
                $('#short-modal').modal('show');
             });
-
             $(document).on('click', '.order-shipping-kit', function () {
-               var orderId = $(this).data('orderid');
+              // var orderId = $(this).data('orderid');
+              var orderId = $(this).attr('data-orderid');
                var cgRowElement = $(`.cg-row[data-orderid="${orderId}"]`);
-
                $.ajax({
                   url: '/get-shipmentkitweb/' + orderId.trim(),
                   method: 'GET',
-                  success: function (data) {
-                     if (data.success) {
+                  // success: function (data) {
+                  //    if (data.success) {
+                  //       Swal.fire({
+                  //          html: data.message,
+                  //          confirmButtonText: "OK",
+                  //          customClass: { confirmButton: 'alert-box-button' }
+                  //       });
+                  //       $("#" + orderId).siblings("p").text("Shipping kit has already been bought");
+                  //       $("#" + orderId).hide();
+                  //       $("#short-modal").modal('hide'); 
+                  //    } 
+                  success: function (response) {
+                     if (response.is_shippingkit == true) {
+                        const tempOrderId = response.order._id;
+                        //window.location.href = '/payshippingkit?temp=' + tempOrderId;
+                     }
+                     else {
                         Swal.fire({
-                           html: data.message,
-                           confirmButtonText: "OK",
-                           customClass: { confirmButton: 'alert-box-button' }
-                        });
-                        $("#" + orderId).siblings("p").text("Shipping kit has already been bought");
-                        $("#" + orderId).hide();
-                     } else {
-                        Swal.fire({
-                           html: data.message,
+                           html: response.message,
                            confirmButtonText: "OK",
                            customClass: { confirmButton: 'alert-box-button', popup: 'swal2-popup' }
                         });

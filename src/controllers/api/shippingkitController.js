@@ -18,7 +18,6 @@ const auth = require("../../middlewares/auth");
 const { check, validationResult } = require("express-validator");
 var ObjectId = require("mongodb").ObjectId;
 const url = require("url");
-var ObjectId = require("mongodb").ObjectId;
 const Cart = require('../../models/api/cartModel');
 const CartDetail = require('../../models/api/cartdetailsModel');
 const Users = require("../../models/api/userModel");
@@ -28,7 +27,9 @@ const Order = require("../../models/api/orderModel");
 const Ordertracking = require("../../models/api/ordertrackModel");
 const Track = require("../../models/api/trackingModel");
 const Shippingkit = require("../../models/api/shippingkitModel");
+const Demoshippingkit = require("../../models/api/demoshippingkitModel");
 const AddressBook = require("../../models/api/addressbookModel");
+const shippingchrgsModel = require("../../models/api/shippingchrgsModel");
 const nodemailer = require("nodemailer");
 // const axios = require('axios');
 // const bodyParser = require('body-parser'); 
@@ -416,7 +417,6 @@ exports.addShipmentData = async (req, res) => {
       track_code: orderCode, 
       buyer_id : hubaddress.seller_id._id,
       product_id : hubaddress.product_id,
-      //billing_address_id : hubaddress.hub_address_id._id,
       shipping_address_id :hubaddress.billing_address_id._id,
       order_id : order_id,
       total_price,
@@ -446,7 +446,7 @@ exports.addShipmentData = async (req, res) => {
           html:
             "Hey " +
             user.name +
-            ", <br> <p>Congratulations your order is placed.please wait for some times and the delivery details you will show on the app.</p>",
+            ", <br> <p>Congratulations your order is placed for shipping kit.please wait for some times and the delivery details you will show on the app.</p>",
         };
   
         transporter.sendMail(mailData, function (err, info) {
@@ -832,6 +832,73 @@ exports.getParticularShipmentDetails = async function (req, res, next) {
       status: "0",
       message: "Error!",
       respdata: error,
+    });
+  }
+};
+
+
+exports.addShipmentDataWeb = async (req, res) => {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    const order_id = mongoose.Types.ObjectId(req.params.id); 
+    const order = await Order.findById(order_id); 
+    const productDetails = await Userproduct.find({ _id: order.product_id });
+    let productshippingkit = productDetails[0].shipping_charges_id;
+    let shippingcharges = await shippingchrgsModel.findOne({ _id: productshippingkit });
+    //let price = shippingcharges.amount;
+    const price = 1;
+    const gst = (price * 28) / 100;
+    const final_price = price + gst;
+    const track = await Ordertracking.findOne({ order_id: order_id,status :0 }).exec();
+    if (track == null) {
+      return res.status(200).json({
+        status: "0",
+        message: 'Order Delivery Partner Not chosse yet',
+        is_shippingkit: false,
+      });
+    }
+    const hubaddress = await Track.findById(track.tracking_id)
+      .populate('seller_id', 'name phone_no email')
+      .populate('billing_address_id')
+      .populate('hub_address_id');
+    console.log(hubaddress);
+    if (!hubaddress) {
+      res.status(200).json({
+        status: "0",
+        message: 'Order Delivery Partnerss Not chosse yet',
+        is_shippingkit: false,
+      });
+    }
+    const demoshippingkit = new Demoshippingkit({
+      buyer_id: hubaddress.seller_id._id,
+      product_id: order.product_id,
+      shipping_address_id: hubaddress.billing_address_id._id,
+      order_id: order_id,
+      track_id: track.tracking_id,
+      price: price,
+      gst: gst,
+      total_price: final_price,
+      payment_method: 1,
+      added_dtime: new Date().toISOString(),
+    });
+    const savedOrder = await demoshippingkit.save();
+    if (savedOrder) {
+      res.status(200).json({
+        status: "1",
+        message: 'Shipping Kit Order placed successfully',
+        success: true,
+        is_shippingkit: true,
+        order: savedOrder,
+        isLoggedIn: isLoggedIn,
+        websiteUrl: process.env.SITE_URL,
+      });
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(200).json({
+      status: "0",
+      message: 'Can not Order Shipping kit',
+      is_shippingkit: false,
     });
   }
 };

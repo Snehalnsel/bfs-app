@@ -208,6 +208,7 @@
                     <div class="menu-box">
                         <nav class="navbar navbar-expand-md navbar-light nav-link">
                             <a class="navbar-brand" href="/"><img
+                             <a href="/"><img
                                     src="/public/assets/images/bfs-logo.png" alt="images" class="mobile-logo"></a>
                             <button class="navbar-toggler" type="button" data-toggle="collapse"
                                 data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -221,6 +222,11 @@
                                         <a class="nav-link dropdown-toggle dropdown-shownow" href="javascript:void(0)" id="navbarDropdown">Categories
                                         </a>
                                         <div class="dropdown-menu mobile-dropdown" aria-labelledby="navbarDropdown">
+                                    <li class="nav-item"><a href="/">Home</a></li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="/webSubCategories" id="navbarDropdown">Categories
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                             <div class="row">
                                                 <div class="col-md-3">
                                                     <ul id="men-list" class="men-list">
@@ -249,6 +255,11 @@
                                         </div>
 
                                     </li>                                </ul>
+                                    </li>
+                                    <!--<%if(isLoggedIn != "") {%>
+                                <li class="nav-item"><a href="/my-account">My Account</a></li>
+                            <% } %>-->
+                                </ul>
                             </div>
 
                         </nav>

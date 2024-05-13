@@ -4821,4 +4821,11 @@ button.grey-btn {
 
 .filter-footer {
     display: none;
+.highlight-first-td tr td:first-child {
+    color: #e2673d;
+}
+
+.theme_modal  .modal-short-btn:hover {
+    border: solid 1px #e3683d !important;
+    color: #fff!important; 
 }

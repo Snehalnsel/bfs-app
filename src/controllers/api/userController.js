@@ -21,6 +21,7 @@ const dateTime = moment().format("YYYY-MM-DD h:mm:ss");
 const today = moment().format("YYYY-MM-DD");
 const auth = require("../../middlewares/auth");
 const { check, validationResult } = require("express-validator");
+const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 // var uuid = require("uuid");
 var crypto = require("crypto");
 var randId = crypto.randomBytes(20).toString("hex");
@@ -546,7 +547,6 @@ exports.editProfile = async function (req, res, next) {
     }
   });
 };
-
 exports.uploadImage = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -557,46 +557,54 @@ exports.uploadImage = async function (req, res, next) {
     });
   }
 
-  Users.findOne({ _id: req.body.user_id }).then((user) => {
-    if (!user)
-      res.status(404).json({
+  try {
+    const user = await Users.findOne({ _id: req.body.user_id });
+    if (!user) {
+      return res.status(404).json({
         status: "0",
         message: "User not found!",
         respdata: {},
       });
-    else {
-      const imgData = req.body.img_base64;
-      const folderPath = "./public/images/";
-      const path = Date.now() + ".png";
-    
-      fs.writeFileSync(folderPath + path, imgData, "base64", function (err) {
-      });
-
-      var image_url = req.app.locals.requrl + "/public/images/" + path;
-
-      var updData = {
-        image: image_url,
-      };
-      Users.findOneAndUpdate(
-        { _id: req.body.user_id },
-        { $set: updData },
-        { upsert: true },
-        function (err, doc) {
-          if (err) {
-            throw err;
-          } else {
-            Users.findOne({ _id: req.body.user_id }).then((user) => {
-              res.status(200).json({
-                status: "1",
-                message: "Successful!",
-                respdata: user,
-              });
-            });
-          }
-        }
-      );
     }
-  });
+
+    const imgData = req.body.img_base64;
+    const folderPath = "./public/images/";
+    const filename = Date.now() + ".png";
+    const filePath = path.join(folderPath, filename);
+
+    // Convert base64 to buffer
+    const bufferData = Buffer.from(imgData, 'base64');
+
+    // Write buffer data to file
+    fs.writeFileSync(filePath, bufferData);
+
+    var image_url = filename;
+
+    await fs.promises.copyFile(filePath, path.join("./public/compress_images/", filename));
+
+    var updData = {
+      image: image_url,
+    };
+
+    const updatedUser = await Users.findOneAndUpdate(
+      { _id: req.body.user_id },
+      { $set: updData },
+      { upsert: true, new: true }
+    );
+
+    res.status(200).json({
+      status: "1",
+      message: "Successful!",
+      respdata: updatedUser,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while uploading the image.",
+      respdata: {},
+    });
+  }
 };
 
 exports.getLogout = async function (req, res, next) {

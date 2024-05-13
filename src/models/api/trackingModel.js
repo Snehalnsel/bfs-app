@@ -8,6 +8,10 @@ const model = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'users', 
   },
+  user_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'users', 
+  },
   seller_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'users', 
@@ -15,6 +19,14 @@ const model = mongoose.Schema({
   product_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'mt_userproducts', 
+  },
+  billing_address_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'addressbook_list', 
+  },
+  shipping_address_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'addressbook_list', 
   },
   buyer_address_id: {
     type: mongoose.Schema.Types.ObjectId,
@@ -129,6 +141,11 @@ const model = mongoose.Schema({
     enum: [0,1,2,3,4],//0 for SBFS 1 for BFSB 2 for BBFSR 3 for BFSSR 4 for BFSSRF
     default: 0,
     required: true,
+  },
+  is_delivered:{
+    type: Number,
+    enum: [0,1],
+    default: 0,
   },
   added_dtime: {
     type: String,

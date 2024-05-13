@@ -43,61 +43,60 @@
                                             <thead>
                                                 <tr>
                                                     <th>Sl No</th>
+                                                    <th>Shipping Id</th>
                                                     <th>Order Id</th>
-                                                    <th>Shiprocket Order Id</th>
-                                                    <th>Shiprocket Shipment Id</th>
-                                                    <th>Shipping Details</th>
-                                                    <th>Pickup Address</th>
+                                                    <th>Product Name</th>
+                                                    <th>Buyer Details</th>
+                                                    <th>Hub Details</th>
                                                     <th>Payment Method</th>
-                                                    <th>Shipping Date</th>
-                                                    <th>Action</th>
+                                                    <th>Total Price</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <% if(respdata.list){ %>
+                                                    
                                                     <% respdata.list.forEach(function(value, index) { %>
                                                         <tr>
                                                             <td>
                                                                 <%= (index+1) %>
                                                             </td>
                                                             <td>
-                                                                <%= value._id %>
+                                                                <%= value.track_code %>
                                                             </td>
                                                             <td>
-                                                                <%= value.shiprocket_order_id%>
+                                                                <%= value.order_id.order_code %>
                                                             </td>
                                                             <td>
-                                                                <%= value.shiprocket_shipment_id%>
+                                                                <%= value.product_id.name%>
                                                             </td>
                                                             <td>
-                                                                <% if (value.pickup_awb === null || value.pickup_awb == 0) { %>
-                                                                  Shipment not started yet
-                                                                <% } else { %>
-                                                                  <%= value.pickup_awb %>
-                                                                <% } %>
-                                                              </td>
-                                                            <td>
-                                                              
-                                                                <%= value.billing_address[0].street_name %>, <%= value.billing_address[0].address1 %>, <%= value.billing_address[0].landmark %>, <%= value.billing_address[0].city_name %>, <%= value.billing_address[0].state_name %>
-                                                                Phone no=<%= value.user[0].phone_no %>
+                                                                <%= value.buyer_id.name %> 
+                                                                <%= value.buyer_id.phone_no %>
+                                                                <%= value.buyer_id.email %>
+                                                                <br>
+                                                                    <%= value.shipping_address_id.street_name %>,
+                                                                    <%= value.shipping_address_id.address1 %>,
+                                                                    <%= value.shipping_address_id.landmark %>,
+                                                                    <%= value.shipping_address_id.city_name %>,
+                                                                    <%= value.shipping_address_id.state_name %>
                                                             </td>
                                                             <td>
-                                                                <%= value.pickup_awb%>
+                                                                <%= value.hub_address_id.name %> 
+                                                                <%= value.hub_address_id.phone_no %>
+                                                                <%= value.hub_address_id.email %>
+                                                                <br>
+                                                                <%= value.hub_address_id.street_name %>,
+                                                                    <%= value.hub_address_id.address1 %>,
+                                                                    <%= value.hub_address_id.landmark %>,
+                                                                    <%= value.hub_address_id.city_name %>,
+                                                                    <%= value.hub_address_id.state_name %>
+                                  
                                                             </td>
                                                             <td>
-                                                                <%= value.shipping_address[0].street_name %>, <%= value.shipping_address[0].address1 %>, <%= value.shipping_address[0].landmark %>, <%= value.shipping_address[0].city_name %>, <%= value.shipping_address[0].state_name %>
+                                                                <span style="color: #98FB98;">Online</span>
                                                             </td>
-                                                            <td> 
-                                                                <% if ( value.pickup_awb == '0' ) { %>
-                                                                <a href="/admin/generateawb/<%= value._id %>" class="btn btn-warning" title="Order Placed">
-                                                                    Ship Now
-                                                                </a>
-                                                                <% } else if(value.pickup_awb != "0") { %>
-                                                                    <span>Shipment Placed</span>
-                                                                    <a href="/admin/generateawb/<%= value._id %>" class="btn btn-info" title="Genereate Pickup">
-                                                                        Schedule Pickup 
-                                                                    </a>
-                                                                <% } %>
+                                                            <td>
+                                                                <%= value.total_price %>
                                                             </td>
                                                         </tr>
                                                         <% }); %>

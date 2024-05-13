@@ -9,6 +9,7 @@ const path = require("path");
 const fs = require('fs-extra');
 const mime = require("mime");
 const ejs = require('ejs');
+const rp = require('request-promise-native');
 const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 const PayementFunction = require("../../models/thirdPartyApi/payment");
 const helper = require("../../helpers/helper");
@@ -456,26 +457,132 @@ exports.getStatus = async function (req, res, next) {
               { $set: { flag: 1 } }, 
               { new: true }
             );
-
-      const user = await Users.findById(savedOrder.user_id);
-
       const product = await Userproduct.findById(savedOrder.product_id);
+      const productimage = await Productimage.findOne({ product_id: savedOrder.product_id });      
+      const user = await Users.findById(savedOrder.user_id);
+      if(user)
+        {
+            let smsData = {
+              textId: "test",
+                toMobile: "91" +user.phone_no,
+                text: "Dear [Buyer Name],Your order [Order ID] has been placed successfully. Sit back and relax. We'll notify you once it's shipped.- BFS Team",
+              };
+            let returnData;
+              returnData = await sendSms(smsData);
+              const historyData = new ApiCallHistory({
+                userId: user._id,
+                called_for: "reset password",
+                api_link: process.env.SITE_URL,
+                api_param: smsData,
+                api_response: returnData,
+                send_status: 'send',
+              });
+              await historyData.save();
 
+          let message = "Dear "+user.name+", Your order "+orderCode+" has been placed successfully. Sit back and relax. We'll notify you once it's shipped.- BFS Team";
+          let to_number = "91" + user.phone_no;
+          let response = await send_message({ type: 'text', message, to_number });
+
+          //SEND WHATSAPP
+          let receiverMobileNo = "91" + user.phone_no;
+          let root = create({ version: '1.0', encoding: "ISO-8859-1" })
+            .ele('MESSAGE', { VER: '1.2' })
+            .ele('USER', { USERNAME: process.env.WP_SMS_USER_NAME, PASSWORD: process.env.WP_PASSWORD })
+            .ele('SMS', { UDH: "0", CODING: "1", TEXT: "Hi", PROPERTY: "0", ID: "1", TEMPLATE: "bfstest" })
+            .ele('ADDRESS', { FROM: process.env.WP_SMS_SENDER_MOBILE, TO: receiverMobileNo, SEQ: "1" })
+          //.up()
+          //.up();
+
+            // convert the XML tree to string
+            let xml = root.end({ prettyPrint: true });
+            await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
+              if (err) {
+                // return {
+                //   status:false,
+                //   data:err
+                // };
+              }
+              let smsData = xml;
+              let returnData;
+              returnData = await sendWhatsapp(smsData);
+          });
+        }
+      const seller = await Users.findById(savedOrder.seller_id);
+      if(seller)
+      {
+        let smsData = {
+          textId: "test",
+          toMobile: "91" +seller.phone_no,
+          text: "Dear "+seller.name+" ,Congratulations! Your product "+ product.name +" has been sold successfully.The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.- BFS Team",
+        };
+        let returnData;
+        returnData = await sendSms(smsData);
+        const historyDataforseller = new ApiCallHistory({
+          userId: seller._id,
+          called_for: "Order Placed of Seller Product",
+          api_link: process.env.SITE_URL,
+          api_param: smsData,
+          api_response: returnData,
+          send_status: 'send',
+        });
+        await historyDataforseller.save();
+
+        let message = "Dear "+seller.name+",Congratulations! Your product "+ product.name +" has been sold successfully.The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.- BFS Team";
+        let to_number = "91" + seller.phone_no;
+        let response = await send_message({ type: 'text', message, to_number });
+
+        //SEND WHATSAPP
+        const receiverMobileNo = "91" + seller.phone_no;
+        const root = create({ version: '1.0', encoding: "ISO-8859-1" })
+          .ele('MESSAGE', { VER: '1.2' })
+          .ele('USER', { USERNAME: process.env.WP_SMS_USER_NAME, PASSWORD: process.env.WP_PASSWORD })
+          .ele('SMS', { UDH: "0", CODING: "1", TEXT: "Hi", PROPERTY: "0", ID: "1", TEMPLATE: "bfstest" })
+          .ele('ADDRESS', { FROM: process.env.WP_SMS_SENDER_MOBILE, TO: receiverMobileNo, SEQ: "1" })
+        //.up()
+        //.up();
+
+        // convert the XML tree to string
+        const xml = root.end({ prettyPrint: true });
+        await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
+          if (err) {
+            // return {
+            //   status:false,
+            //   data:err
+            // };
+          }
+          //let obj = JSON.parse(data);
+          //let randNumber = Math.floor((Math.random() * 1000000) + 1);
+          let smsData = xml;
+          let returnData;
+          returnData = await sendWhatsapp(smsData);
+          const historyData = await new ApiCallHistory({
+            userId: mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"),
+            called_for: "whatsapp",
+            api_link: process.env.SITE_URL,
+            api_param: smsData,
+            api_response: returnData,
+            send_status: 'send',
+          });
+          await historyData.save();
+        });
+      }
+    
       const address = await AddressBook.findById(savedOrder.billing_address_id);
 
       const billingaddress = address.street_name + ', ' + address.address1 + ', ' + address.landmark + ', ' + address.city_name + ', ' + address.state_name + ', ' + address.pin_code;
 
+      //buyer mail,sms,whatsapp
       const loginHtmlPath = 'views/webpages/order-confirmed.html';
       let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
 
       loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
       loginHtmlContent = loginHtmlContent.replace('{{ordernumber}}', orderCode);
       loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
-      loginHtmlContent = loginHtmlContent.replace('{{productimages}}', orderCode);
+      loginHtmlContent = loginHtmlContent.replace('{{productimages}}', productimage.image);
+      loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.offer_price);
       loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
-      loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.price);
       loginHtmlContent = loginHtmlContent.replace('{{shippingaddress}}', billingaddress);
-      const mailData = {
+      const mailDataforbuyer = {
         from: "Bid For Sale! <" + smtpUser + ">",
         to: user.email,
         subject: "Order Placed - Bid For Sale!",
@@ -484,23 +591,31 @@ exports.getStatus = async function (req, res, next) {
         html: loginHtmlContent
       };
 
-      transporter.sendMail(mailData, function (err, info) {});
-         let smsData = {
-          textId: "test",
-          toMobile: "91" +user.phone_no,
-          text: "Order placed successfully! Thank you for shopping with Bid For Sale. Your "+ product.name +" having Order ID "+ orderCode +"  is on its way to you. For any inquiries, feel free to reach out to us. Happy shopping!-BFS RETAIL SERVICES PRIVATE LIMITED",
-        };
-        let returnData;
-        returnData = await sendSms(smsData);
-        const historyData = new ApiCallHistory({
-          userId: user._id,
-          called_for: "Order Placed",
-          api_link: process.env.SITE_URL,
-          api_param: smsData,
-          api_response: returnData,
-          send_status: 'send',
-        });
-        await historyData.save();
+      transporter.sendMail(mailDataforbuyer, function (err, info) {});
+      //buyer mail,sms,whatsapp
+      //seller mail,sms,whatsapp
+      const loginHtmlPathforSeller = 'views/webpages/seller-email.html';
+      let loginHtmlContentforseller = fs.readFileSync(loginHtmlPathforSeller, 'utf-8');
+
+      loginHtmlContentforseller = loginHtmlContentforseller.replace('{{sellername}}', seller.name);
+      loginHtmlContentforseller = loginHtmlContentforseller.replace('{{ordernumber}}', orderCode);
+      loginHtmlContentforseller = loginHtmlContentforseller.replace('{{productname}}', product.name);
+      loginHtmlContentforseller = loginHtmlContentforseller.replace('{{productimages}}', productimage.image);
+      loginHtmlContentforseller = loginHtmlContentforseller.replace('{{productprice}}', product.offer_price);
+      loginHtmlContentforseller = loginHtmlContentforseller.replace('{{totalprice}}', product.offer_price);
+      loginHtmlContentforseller = loginHtmlContentforseller.replace('{{buyername}}', user.name);
+      savedOrder
+      const mailDataforseller = {
+        from: "Bid For Sale! <" + smtpUser + ">",
+        to: seller.email,
+        subject: "Order Confirmation - Bid For Sale!",
+        name: "Bid For Sale!",
+        text: "order placed",
+        html: loginHtmlContentforseller
+      };
+
+      transporter.sendMail(mailDataforseller, function (err, info) {});
+        //seller mail,sms,whatsapp
             if(updatedProduct)
             {
               const cleanedCartId =  mongoose.Types.ObjectId(temporder.cart_id);
@@ -515,7 +630,7 @@ exports.getStatus = async function (req, res, next) {
               }
             } 
           }
-          res.redirect('/message?message=success');
+         res.redirect('/message?message=success');
         } else {
           res.redirect('/message?message=failure');
         }
@@ -736,5 +851,20 @@ async function getLastOrderIndex() {
   } catch (error) {
     return 0; 
   }
+}
+
+
+async function send_message(body) {
+  let url = process.env.WP_SMS_API_URL + "/" + process.env.WP_SMS_PRODUCT_ID + "/" + process.env.WP_SMS_PHONE_ID + "/" + "sendMessage";
+  let response = await rp(url, {
+    method: 'post',
+    json: true,
+    body,
+    headers: {
+      'Content-Type': 'application/json',
+      'x-maytapi-key': process.env.WP_SMS_API_TOKEN,
+    },
+  });
+  return response;
 }
 

@@ -512,11 +512,8 @@ module.exports = serv;
 
 // app.listen(port, () => console.log(`App listening on port ${port}!`));
  
-<<<<<<< HEAD
 //Palash Samanta
-=======
 //Snigdho Upadhyay
 
 
 
->>>>>>> e4c7f2838ce8c4c1df5ed9a84afccd072d73473b

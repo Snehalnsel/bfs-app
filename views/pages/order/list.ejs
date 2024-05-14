@@ -232,12 +232,11 @@
                                                                     <% } %>  
                                                                 <% } %>  
                                                                 
-                                                                <% if(value.delete_status == 0) {%>
+                                                                <% if(value.delete_status == 0 && value) {%>
                                                                     <a href="/admin/delete-orderdetails/<%= value._id %>" class="btn btn-danger btn-circle btn-sm"  title="Delete" onclick="return confirm('Are you sure you want to delete this item?')">
                                                                         <i class="fas fa-trash"></i>
                                                                     </a>
-                                                                <% }else{ %>
-                                                                 
+                                                                <% } else { %>
                                                                     <% if(value.delete_by == 1) {%>
                                                                         <span style="color: blue;">Canceled By Admin</span>
                                                                     <% } else if(value.delete_by == 2) {%>

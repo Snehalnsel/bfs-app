@@ -230,7 +230,7 @@ const dbFdb = getFirestore();
       if (change.type === 'added') {
         //console.log('New Doc: ', change.doc.data());
         if(typeof changeDoc.currentOffer.sellerMessage != "undefined" && typeof changeDoc.currentOffer.buyerMessage != "undefined" && changeDoc.currentOffer.sellerMessage != "" && changeDoc.currentOffer.buyerMessage != "") {
-          io.to(changeDoc.id).emit("accept_message", acceptFormatMessage(changeDoc.buyerId, changeDoc.currentOffer.buyerMessage,changeDoc.sellerId,changeDoc.currentOffer.sellerMessage,changeDoc.currentOffer.isFromBuyer, changeDoc.id));
+          //io.to(changeDoc.id).emit("accept_message", acceptFormatMessage(changeDoc.buyerId, changeDoc.currentOffer.buyerMessage,changeDoc.sellerId,changeDoc.currentOffer.sellerMessage,changeDoc.currentOffer.isFromBuyer, changeDoc.id));
           //io.to(changeDoc.id).emit("accept_message", acceptFormatMessage(currUserDetails.name, chatPrice,sendFromUserId, changeDoc.id));
         } else {
           //io.to(changeDoc.id).emit("message", formatMessage(currUserDetails.name, chatPrice,sendFromUserId,changeDoc.buyerId, changeDoc.id));
@@ -241,7 +241,7 @@ const dbFdb = getFirestore();
           io.to(changeDoc.id).emit("accept_message", acceptFormatMessage(changeDoc.buyerId, changeDoc.currentOffer.buyerMessage,changeDoc.sellerId,changeDoc.currentOffer.sellerMessage,changeDoc.currentOffer.isFromBuyer, changeDoc.id));
           //io.to(changeDoc.id).emit("accept_message", acceptFormatMessage(currUserDetails.name, chatPrice,sendFromUserId, changeDoc.id));
         } else {
-          io.to(changeDoc.id).emit("message", formatMessage(currUserDetails.name, chatPrice,sendFromUserId,changeDoc.buyerId, changeDoc.id));
+          //io.to(changeDoc.id).emit("message", formatMessage(currUserDetails.name, chatPrice,sendFromUserId,changeDoc.buyerId, changeDoc.id));
         }
         //console.log('Modified Doc: ', change.doc.data());
       }
@@ -512,6 +512,7 @@ module.exports = serv;
 
 // app.listen(port, () => console.log(`App listening on port ${port}!`));
  
+//Palash Samanta
 //Snigdho Upadhyay
 
 

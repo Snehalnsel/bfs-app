@@ -4815,11 +4815,10 @@ button.grey-btn {
     color: #e3683d !important; 
 }
 
-.highlight-first-td tr td:first-child {
-    color: #e2673d;
+.mobile-filterview{
+    display: none;
 }
 
-.theme_modal  .modal-short-btn:hover {
-    border: solid 1px #e3683d !important;
-    color: #fff!important; 
+.filter-footer {
+    display: none;
 }

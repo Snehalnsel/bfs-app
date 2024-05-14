@@ -229,3 +229,29 @@ function topFunction() {
 
 
 
+$(document).ready(function(){
+  $(".dropdown-shownow").click(function(){
+    $(".mobile-dropdown").toggleClass("open-dropdown");
+  });
+});
+
+// $('.mobile-filterview').click(function(e){
+//   e.stopPropagation();
+//   $('.short-sidebar').toggleClass('open-sidebar');
+// });
+
+// $('.short-sidebar').click(function(e){
+//   e.stopPropagation();
+// });
+
+// $('body,html').click(function(e){
+//  $('.short-sidebar').removeClass('open-sidebar');
+// });
+
+$('.mobile-filterview').click(function(e){
+  $('.short-sidebar').toggleClass('open-sidebar');
+});
+$('.apply-filter').click(function(e){
+   $('.short-sidebar').removeClass('open-sidebar');
+  });
+

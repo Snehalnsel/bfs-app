@@ -362,7 +362,8 @@ exports.getStatus = async function (req, res, next) {
 
     const merchantTransactionId = temporder.merchant_transactionid;
     if (merchantTransactionId) {
-      let statusUrl = `${PHONE_PE_HOST_URL}/pg/v1/status/${MERCHANT_ID}/` +
+
+     let statusUrl = `${PHONE_PE_HOST_URL}/pg/v1/status/${MERCHANT_ID}/` +
         merchantTransactionId;
 
       let string = `/pg/v1/status/${MERCHANT_ID}/` +
@@ -371,7 +372,7 @@ exports.getStatus = async function (req, res, next) {
       let sha256_val = sha256(string);
       let xVerifyChecksum = sha256_val + "###" + SALT_INDEX;
       try {
-/*
+          
         const response = await axios.get(statusUrl, {
           headers: {
             "Content-Type": "application/json",
@@ -392,26 +393,33 @@ exports.getStatus = async function (req, res, next) {
             };
           }
         });
-        
-        let updateData = {
-          checkstatus_response: response.data,
-          //checkstatus_status: response.data.code === "PAYMENT_SUCCESS" ? "success" : "failure",
-        };*/
-
+        // let updateData = {
+        //   checkstatus_response: response.data,
+        //   //checkstatus_status: response.data.code === "PAYMENT_SUCCESS" ? "success" : "failure",
+        // };
         let updateData = {};
-        if(typeof temporder.pay_response.code != "undefined" && temporder.pay_response.code == "PAYMENT_INITIATED") {
-          updateData.checkstatus_status = "success";
-        } else {
-          updateData.checkstatus_status = "failure";
+        if (typeof response.data.code !== "undefined") {
+          if (response.data.code === "PAYMENT_SUCCESS" && (response.data.code !== "PAYMENT_DECLINED" || response.data.code !== "TIMED_OUT")) {
+            if (typeof temporder.pay_response.code !== "undefined" && temporder.pay_response.code === "PAYMENT_INITIATED") {
+              updateData.checkstatus_status = "success";
+            } else {
+              updateData.checkstatus_status = "failure";
+            }
+          }
         }
+        // if(typeof temporder.pay_response.code != "undefined" && temporder.pay_response.code == "PAYMENT_INITIATED") {
+        //   updateData.checkstatus_status = "success";
+        // } else {
+        //   updateData.checkstatus_status = "failure";
+        // }
+
 
         await Demoorder.findOneAndUpdate(
           { _id: tempId },
           { $set: updateData },
           { new: true }
         );
-
-        if(updateData.checkstatus_status == "success") {
+         if(updateData.checkstatus_status == "success") {
           const now = new Date();
           const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0'); 
           const currentYear = now.getFullYear().toString();

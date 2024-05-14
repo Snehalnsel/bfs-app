@@ -145,6 +145,21 @@ exports.addAddress = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
+
+    const existingAddress = await AddressBook.findOne({
+      user_id,
+      street_name,
+      address1,
+      landmark,
+    });
+
+    if (existingAddress) {
+      return res.status(400).json({
+        status: "0",
+        message: "Address with the same details already exists for this user!",
+      });
+    }  
+    
     const newAddress = new AddressBook({
       user_id: req.body.user_id,
       street_name: req.body.street_name,

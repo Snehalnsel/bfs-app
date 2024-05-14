@@ -159,54 +159,66 @@ async function generateOrder(data) {
       }
     });
   });
-
-
 }
-
-
 async function generateSellerPickup(data) {
-  token = await generateToken(email,shipPassword);
- if (!token) {
-   return Promise.reject('Token not available. Call generateToken first.');
- }
+  try {
+    token = await generateToken(email, shipPassword);
+    if (!token) {
+      throw new Error('Token not available. Call generateToken first.');
+    }
 
+    const options = {
+      method: 'POST',
+      url: baseUrl + '/settings/company/addpickup',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(data)
+    };
 
- const options = {
-   method: 'POST',
-   url: baseUrl+'/settings/company/addpickup',
-   headers: {
-       'Content-Type': 'application/json',
-       'Authorization': `Bearer ${token}`
-   },
-   body: JSON.stringify(data)
- };
+    return new Promise((resolve, reject) => {
+      request(options, function (error, response, body) {
+        if (error) {
+          reject({msg:body,status_code:response.statusCode});
+        } else if (response.statusCode === 200) {
+          const responseBody = JSON.parse(body);
+          const token = responseBody;
+          resolve({token_data:token,status_code:200});
+        } else {
+          reject({msg:body,status_code:response.statusCode});
+        }
+      });
+    });
 
- return new Promise((resolve, reject) => {
-   request(options, function (error, response, body) {
-     if (error) {
-       reject(error);
-     } else if (response.statusCode === 200) {
-       const responseBody = JSON.parse(body);
-       const token = responseBody;
-       resolve(token);
-     } else {
-       reject(new Error(`Error: ${response.statusCode}`));
-     }
-   });
- });
+    // const response = await new Promise((resolve, reject) => {
+    //   request(options, function (error, response, body) {
+    //     if (error) {
+    //       reject(error);
+    //     } else {
+    //       resolve({ response, body });
+    //     }
+    //   });
+    // });
 
-
+    // if (response.response.statusCode === 200) {
+    //   const responseBody = JSON.parse(response.body);
+    //   const token = responseBody;
+    //   return token;
+    // } else {
+    //   console.log("Ship rocket error:", response.body);
+    //   throw new Error(`Error: ${response.response.statusCode}`);
+    // }
+  } catch (err) {
+    console.error('Error in generateSellerPickup:', err);
+    throw err; // Rethrow the error for higher-level handling if needed
+  }
 }
-
-
-
 async function generateLabel(shipment_id) {
   token = await generateToken(email,shipPassword);
  if (!token) {
    return Promise.reject('Token not available. Call generateToken first.');
  }
-
-
  const options = {
    method: 'POST',
    url: baseUrl+'/courier/generate/label',
@@ -510,8 +522,6 @@ exports.generatepickupforseller = async (req, res) => {
         country : "India",
         pin_code : billingaddress.pin_code
       };
-
-
       if (!billingaddress.shiprocket_address && !billingaddress.shiprocket_picup_id) {
          const shiprocketResponse = await generateSellerPickup(PickupData);
       }
@@ -519,7 +529,6 @@ exports.generatepickupforseller = async (req, res) => {
             billingaddress.shiprocket_address = billingaddress.address_name + ' - ' + seller.name;
             billingaddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
             await billingaddress.save();
-          
             res.status(200).json({
               message: 'Seller Pickup successfully',
               billingaddress: shiprocketResponse
@@ -581,11 +590,15 @@ exports.addAddress = async function (req, res, next) {
       country: "India",
       pin_code: savedAddress.pin_code
     };
-
-
-    
-      const shiprocketResponse = await generateSellerPickup(PickupData);
-
+    // const shiprocketResponse = await generateSellerPickup(PickupData);
+    let shiprocketResponse = await generateSellerPickup(PickupData).catch((err)=> {return err});
+    if(shiprocketResponse.status_code != 200){
+      return res.status(400).json({
+        status: "1",
+        message: "Address added successfully! Seller Pickup creation failed.",
+        respdata: shiprocketResponse.msg,
+      });
+    }
 
       if (shiprocketResponse) {
         savedAddress.shiprocket_address = pickupLocation;
@@ -607,6 +620,7 @@ exports.addAddress = async function (req, res, next) {
       }
    
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       status: "0",
       message: "Error occurred while adding address and processing Seller Pickup.",

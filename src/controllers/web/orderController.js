@@ -175,27 +175,19 @@ async function generateOrder(data) {
     },
     body: JSON.stringify(data)
   };
-
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
-      //console.log("body--",body)
-      //console.log("statusCode--",response.statusCode)
       if (error) {
-        //reject(error);
         reject({msg:body,status_code:response.statusCode});
       } else if (response.statusCode === 200) {
         const responseBody = JSON.parse(body);
         const token = responseBody;
-        //resolve(token);
         resolve({token_data:token,status_code:200});
       } else {
-        //reject(new Error(`Error: ${response.statusCode}`));
         reject({msg:body,status_code:response.statusCode});
       }
     });
   });
-
-
 }
 
 async function generateReturnOrder(data) {

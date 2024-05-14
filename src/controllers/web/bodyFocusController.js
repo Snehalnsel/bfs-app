@@ -627,7 +627,7 @@ exports.updateSubCatData = async function (req, res, next) {
       });
     }
 
-    res.redirect("/admin/body-focus-subcat");
+    res.redirect("/admin/subactegorylist?page=1");
   } catch (error) {
     return res.status(500).json({
       status: "0",

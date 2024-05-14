@@ -90,7 +90,6 @@ const model = mongoose.Schema({
   },
   bid_price: {
     type: Number,
-    required: true,
   },
   delivery_charges: {
     type: Number,

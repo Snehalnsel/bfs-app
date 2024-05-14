@@ -119,13 +119,9 @@ exports.signUp = async function (req, res, next) {
         respdata: error,
       });
     } else {
-     
-
       var trial_date = moment(today, "YYYY-MM-DD").add(14, "days");
       trial_date = trial_date.format("YYYY-MM-DD");
-
       const userIpAddress = req.connection.remoteAddress;
-
       Users.findOne({ $or: [{ email: req.body.email }, { phone_no: req.body.phone_no }], status: "0" }).then((user) => {
         if (!user) {
           const newUser = Users({
@@ -149,11 +145,9 @@ exports.signUp = async function (req, res, next) {
             image: "na",
             ip_address: userIpAddress, 
           });
-
           newUser
           .save()
           .then(async (user) => {
-
             let smsData = {
               textId: "test",
               toMobile: "91" + user.phone_no,
@@ -170,12 +164,9 @@ exports.signUp = async function (req, res, next) {
               send_status: 'send',
             });
             await historyData.save();
-
             const loginHtmlPath = 'views/webpages/welcome.html';;
             let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
-
             loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
-
             const mailData = {
               from: "Bid For Sale! <" + smtpUser + ">",
               to: user.email,
@@ -184,13 +175,10 @@ exports.signUp = async function (req, res, next) {
               text: "order placed",
               html: loginHtmlContent
             };
-      
             transporter.sendMail(mailData, function (err, info) {
               // if (err) console.log("err", err);
               // else console.log("info", info);
             });
-      
-
             Iptrnsaction.create({
               user_id: user._id,
               Purpose: "Registration",
@@ -440,7 +428,6 @@ exports.getLogin = async function (req, res, next) {
                 goal: user.goal,
                 hear_from: user.hear_from,
               };
-
               Users.findOneAndUpdate(
                 { _id: user._id },
                 { $set: { token: generateToken(userToken), last_login: dateTime } },

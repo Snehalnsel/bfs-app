@@ -571,13 +571,10 @@ exports.addAddress = async function (req, res, next) {
       flag: req.body.flag,
       created_dtime: dateTime,
     });
-
     const savedAddress = await newAddress.save();
-
     const user = await Users.findById(req.body.user_id);
     const randomSuffix = Math.floor(Math.random() * 1000); 
     const pickupLocation = savedAddress.address_name + ' - ' + user.name + ' - ' + randomSuffix;
-
     const PickupData = {
       pickup_location: pickupLocation,
       name: user.name,
@@ -599,12 +596,10 @@ exports.addAddress = async function (req, res, next) {
         respdata: shiprocketResponse.msg,
       });
     }
-
       if (shiprocketResponse) {
         savedAddress.shiprocket_address = pickupLocation;
         savedAddress.shiprocket_picup_id = shiprocketResponse.pickup_id;
         await savedAddress.save();
-
         return res.status(200).json({
           status: "1",
           message: "Address added successfully! Seller Pickup also created.",
@@ -618,7 +613,6 @@ exports.addAddress = async function (req, res, next) {
           respdata: savedAddress,
         });
       }
-   
   } catch (error) {
     console.log(error);
     return res.status(500).json({

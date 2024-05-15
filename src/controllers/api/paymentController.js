@@ -366,7 +366,6 @@ exports.getStatus = async function (req, res, next) {
             };
           }
         });
-       // console.log("response-56565--",response)
         let updateData = {};
         if (response.data.success) {
             if (response.data.code === "PAYMENT_SUCCESS") {
@@ -377,11 +376,6 @@ exports.getStatus = async function (req, res, next) {
         } else {
           updateData.checkstatus_status = "failure";
         }
-        // if(typeof temporder.pay_response.code != "undefined" && temporder.pay_response.code == "PAYMENT_INITIATED") {
-        //   updateData.checkstatus_status = "success";
-        // } else {
-        //   updateData.checkstatus_status = "failure";
-        // }
         await Demoorder.findOneAndUpdate(
           { _id: tempId },
           { $set: updateData },

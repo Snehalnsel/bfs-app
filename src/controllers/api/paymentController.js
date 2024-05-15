@@ -86,7 +86,6 @@ exports.getPaymentData = async function (req, res, next) {
       amount = parseFloat(temporder.booking_amount);
     }
    // amount = temporder.booking_amount !== 0 ? temporder.booking_amount : temporder.total_price;
-
     let userId = temporder.user_id;
     let merchantTransactionId = uniqid();
     let normalPayLoad = {
@@ -161,25 +160,19 @@ exports.getPaymentData = async function (req, res, next) {
     });
   }
 };
-
 exports.getStatus_back = async function (req, res, next) {
   try {
     const tempId = req.query.temp;
-
     const temporder = await Demoorder.findById(tempId);
-
     const merchantTransactionId = temporder.merchant_transactionid;
-
     if (merchantTransactionId) {
       let statusUrl = `${PHONE_PE_HOST_URL}/pg/v1/status/${MERCHANT_ID}/` +
         merchantTransactionId;
-
       let string = `/pg/v1/status/${MERCHANT_ID}/` +
         merchantTransactionId +
         SALT_KEY;
       let sha256_val = sha256(string);
       let xVerifyChecksum = sha256_val + "###" + SALT_INDEX;
-
       try {
         const response = await axios.get(statusUrl, {
           headers: {
@@ -210,13 +203,11 @@ exports.getStatus_back = async function (req, res, next) {
         } else {
           updateData.checkstatus_status = "failure";
         }
-
         await Demoorder.findOneAndUpdate(
           { _id: tempId },
           { $set: updateData },
           { new: true }
         );
-
         if(updateData.checkstatus_status == "success") {
           const now = new Date();
           const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0'); 
@@ -226,7 +217,6 @@ exports.getStatus_back = async function (req, res, next) {
           let discount = '0';
           let pickup_status = '0';
           let delivery_status = '0';          
-          
           const lastOrderIndex = await getLastOrderIndex();
           const nextIncrementingPart = lastOrderIndex + 1;
           const orderCode = `BFSORD${currentMonth}${currentYear}-${nextIncrementingPart}`;
@@ -254,9 +244,7 @@ exports.getStatus_back = async function (req, res, next) {
             remaining_amount: temporder.remaining_amount || '',
             added_dtime: new Date().toISOString(),
           });
-
           const savedOrder = await order.save();
-
           if(savedOrder)
           {
             const updatedProduct = await Userproduct.findOneAndUpdate(
@@ -264,18 +252,12 @@ exports.getStatus_back = async function (req, res, next) {
               { $set: { flag: 1 } }, 
               { new: true }
             );
-
       const user = await Users.findById(savedOrder.user_id);
-
       const product = await Userproduct.findById(savedOrder.product_id);
-
       const address = await AddressBook.findById(savedOrder.billing_address_id);
-
       const billingaddress = address.street_name + ', ' + address.address1 + ', ' + address.landmark + ', ' + address.city_name + ', ' + address.state_name + ', ' + address.pin_code;
-
       const loginHtmlPath = 'views/webpages/order-confirmed.html';
       let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
-
       loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
       loginHtmlContent = loginHtmlContent.replace('{{ordernumber}}', orderCode);
       loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
@@ -283,7 +265,6 @@ exports.getStatus_back = async function (req, res, next) {
       loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
       loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.price);
       loginHtmlContent = loginHtmlContent.replace('{{shippingaddress}}', billingaddress);
-    
       const mailData = {
         from: "Bid For Sale! <" + smtpUser + ">",
         to: user.email,
@@ -292,7 +273,6 @@ exports.getStatus_back = async function (req, res, next) {
         text: "order placed",
         html: loginHtmlContent
       };
-
       transporter.sendMail(mailData, function (err, info) {
         // if (err) console.log("err", err);
         // else console.log("info", info);
@@ -353,7 +333,6 @@ exports.getStatus_back = async function (req, res, next) {
     });
   }
 };
-
 exports.getStatus = async function (req, res, next) {
   try {
     const tempId = req.query.temp;
@@ -409,8 +388,6 @@ exports.getStatus = async function (req, res, next) {
         // } else {
         //   updateData.checkstatus_status = "failure";
         // }
-
-
         await Demoorder.findOneAndUpdate(
           { _id: tempId },
           { $set: updateData },

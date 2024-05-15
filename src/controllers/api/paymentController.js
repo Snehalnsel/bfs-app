@@ -672,8 +672,8 @@ exports.getStatus = async function (req, res, next) {
 
 exports.checkPaymentData = async function (req, res, next) {
   try {
-    const tempId = req.query.temp;
-    const status = req.query.status;
+    const tempId = req.body.temp;
+    const status = req.body.status;
     const temporder = await Demoorder.findById(tempId);
 
     if (status === "success") {
@@ -685,7 +685,6 @@ exports.checkPaymentData = async function (req, res, next) {
       let discount = '0';
       let pickup_status = '0';
       let delivery_status = '0';
-
       const lastOrderIndex = await getLastOrderIndex();
       const nextIncrementingPart = lastOrderIndex + 1;
       const orderCode = `BFSORD${currentMonth}${currentYear}-${nextIncrementingPart}`;
@@ -777,7 +776,6 @@ exports.checkPaymentData = async function (req, res, next) {
           text: "order placed",
           html: loginHtmlContent1
         };
-  
         transporter.sendMail(mailData1, function (err, info) {
           // if (err) console.log("err", err);
           // else console.log("info", info);
@@ -825,7 +823,7 @@ exports.checkPaymentData = async function (req, res, next) {
           }
           const cartDetailsCount = await CartDetail.countDocuments({ cart_id: savedOrder.cart_id });
           const existingCart = await Cart.findById(temporder.cart_id);
-          if (cartDetailsCount === 0) {
+          if (cartDetailsCount === 0 && existingCart) {
             await existingCart.remove();
           }
         }
@@ -844,6 +842,7 @@ exports.checkPaymentData = async function (req, res, next) {
       });
     }
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the dashboard.",

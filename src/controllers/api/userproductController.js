@@ -36,12 +36,10 @@ const upload = multer({ dest: 'public/images/' });
 exports.getSizeList = async function (req, res, next) {
   try {
     const { category_id, brand_id } = req.body;
-
     const sizes = await Productsize.find({
       category_id: category_id, 
       brand_id: brand_id,     
     }).populate('size_id');    
-
     if (!sizes || sizes.length === 0) {
       return res.status(404).json({
         status: "0",
@@ -49,13 +47,11 @@ exports.getSizeList = async function (req, res, next) {
         respdata: {},
       });
     }
-
     const sizeInfo = sizes.map((size) => ({
       size_id: size.size_id._id,
       name: size.size_id.name,
       added_dtime: size.size_id.added_dtime,
     }));
-
     res.status(200).json({ status: "1", size_list: sizeInfo });
   } catch (error) {
     res.status(500).json({
@@ -65,12 +61,9 @@ exports.getSizeList = async function (req, res, next) {
     });
   }
 };
-
-
 exports.getSizeData = async function (req, res, next) {
   try {
     const productsize = await Size.find();
-
     if (!productsize || productsize.length === 0) {
       return res.status(404).json({
         status: "0",
@@ -78,7 +71,6 @@ exports.getSizeData = async function (req, res, next) {
         respdata: {},
       });
     }
-
     res.status(200).json({ status: "1", productSize: productsize });
   } catch (error) {
     res.status(500).json({
@@ -88,11 +80,9 @@ exports.getSizeData = async function (req, res, next) {
     });
   }
 };
-
 exports.getBrandData = async function (req, res, next) {
   try {
     const productbrand = await Brand.find();
-
     if (!productbrand || productbrand.length === 0) {
       return res.status(404).json({
         status: "0",
@@ -100,7 +90,6 @@ exports.getBrandData = async function (req, res, next) {
         respdata: {},
       });
     }
-
     res.status(200).json({ status: "1", productBrand: productbrand });
   } catch (error) {
     res.status(500).json({
@@ -110,12 +99,9 @@ exports.getBrandData = async function (req, res, next) {
     });
   }
 };
-
-
 exports.getGenderdData = async function (req, res, next) {
   try {
     genderList = await Gender.find();
-
     if (!genderList || genderList.length === 0) {
       return res.status(404).json({
         status: "0",
@@ -123,7 +109,6 @@ exports.getGenderdData = async function (req, res, next) {
         respdata: {},
       });
     }
-
     res.status(200).json({ status: "1", genderList: genderList });
   } catch (error) {
     res.status(500).json({
@@ -133,11 +118,9 @@ exports.getGenderdData = async function (req, res, next) {
     });
   }
 };
-
 exports.getColorData = async function (req, res, next) {
   try {
     colorList = await Color.find();
-
     if (!colorList || colorList.length === 0) {
       return res.status(404).json({
         status: "0",
@@ -145,7 +128,6 @@ exports.getColorData = async function (req, res, next) {
         respdata: {},
       });
     }
-
     res.status(200).json({ status: "1", colorList: colorList });
   } catch (error) {
     res.status(500).json({
@@ -164,10 +146,8 @@ exports.getColorData = async function (req, res, next) {
 //       respdata: errors.array(),
 //     });
 //   }
-
 //  try {
 //     const existingProduct = await Userproduct.findOne({ name: req.body.name });
-
 //     if (existingProduct) {
 //       return res.status(404).json({
 //         status: "0",
@@ -175,7 +155,6 @@ exports.getColorData = async function (req, res, next) {
 //         respdata: {},
 //       });
 //     }
-
 //     const newProduct = new Userproduct({
 //       category_id: req.body.category_id,
 //       user_id: req.body.user_id,
@@ -190,20 +169,16 @@ exports.getColorData = async function (req, res, next) {
 //       percentage:  req.body.percentage,
 //       added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"), 
 //     });
-
 //     const savedProductdata = await newProduct.save();
 //     const requrl = url.format({
 //       protocol: req.protocol,
 //       host: req.get("host"),
 //     });
-
 //     const imageUrls = [];
 //     if (req.files && req.files.length > 0) {
 //       const imageDetails = [];
-    
 //       req.files.forEach(async (file) => {
 //         const imageUrl = requrl + "/public/images/" + file.filename;
-    
 //         const productimageDetail = new Productimage({
 //           product_id: savedProductdata._id,
 //           category_id: req.body.category_id,
@@ -212,10 +187,8 @@ exports.getColorData = async function (req, res, next) {
 //           image: imageUrl,
 //           added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
 //         });
-    
 //         const savedImage = productimageDetail.save();
 //       });
-    
 //       res.status(200).json({
 //         status: "1",
 //         status: "1",
@@ -223,7 +196,6 @@ exports.getColorData = async function (req, res, next) {
 //         respdata: savedProductdata
 //       });
 //     } 
- 
 //    } catch (error) {
 //     res.status(500).json({
 //       status: "0",
@@ -232,11 +204,9 @@ exports.getColorData = async function (req, res, next) {
 //     });
 //   }
 // };
-
 exports.getProductconditionList = async function (req, res, next) {
   try {
     const productConditions = await Productcondition.find();
-
     if (!productConditions || productConditions.length === 0) {
       return res.status(404).json({
         status: "0",
@@ -253,7 +223,6 @@ exports.getProductconditionList = async function (req, res, next) {
     });
   }
 };
-
 exports.addData = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -263,10 +232,8 @@ exports.addData = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   try {
     // const existingProduct = await Userproduct.findOne({ name: req.body.name });
-
     // if (existingProduct) {
     //   return res.status(404).json({
     //     status: "0",
@@ -274,38 +241,28 @@ exports.addData = async function (req, res, next) {
     //     respdata: {},
     //   });
     // }
-
     // let brand_id = req.body.brand_id;
     // let size_id = req.body.size_id;
-
     // if (!brand_id || !size_id) {
-     
     //   if (!brand_id) {
-       
     //     const newBrand = new Brand({
     //       name: req.body.brand_name,
     //       category_id :req.body.category_id,
     //       status: 0,
     //       added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
     //     });
-    
     //     const savedBrand = await newBrand.save();
-    
     //     brand_id = savedBrand._id;
     //   }
-
     //   if (!size_id) {
-       
     //     const newSize = Size({
     //       name: req.body.size_name,
     //       added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"), 
     //     });
-  
     //     const savedSize = await newSize.save();
     //     size_id = savedSize._id;
     //   }
     // }
-
     const newProduct = new Userproduct({
       //category_id: req.body.category_id,
       user_id: req.body.user_id,
@@ -327,7 +284,6 @@ exports.addData = async function (req, res, next) {
       breath: req.body.breath || 0,
       added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"), 
     });
-
     const savedProductdata = await newProduct.save();
     const requrl = url.format({
       protocol: req.protocol,
@@ -336,11 +292,9 @@ exports.addData = async function (req, res, next) {
     const imageUrls = [];
     if (req.files && req.files.length > 0) {
       const imageDetails = [];
-
       req.files.forEach(async (file) => {
         //const imageUrl = requrl + "/public/images/" + file.filename;
         const imageUrl = file.filename;
-
         if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){
           await CompressImage("./public/images/"+image,"./public/compress_images/");
         }
@@ -355,7 +309,6 @@ exports.addData = async function (req, res, next) {
             }
           });
         }
-
         const productimageDetail = new Productimage({
           product_id: savedProductdata._id,
           //category_id: req.body.category_id,
@@ -364,10 +317,8 @@ exports.addData = async function (req, res, next) {
           image: imageUrl,
           added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
         });
-
         const savedImage = productimageDetail.save();
       });
-
       res.status(200).json({
         status: "1",
         status: "1",
@@ -375,7 +326,6 @@ exports.addData = async function (req, res, next) {
         respdata: savedProductdata
       });
     }
-
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -384,8 +334,6 @@ exports.addData = async function (req, res, next) {
     });
   }
 };
-
-
 exports.getProductData = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -395,9 +343,7 @@ exports.getProductData = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   try {
-
   const page = req.body.page ? parseInt(req.body.page) : 1;
   const limit = req.body.limit ? parseInt(req.body.limit) : 10;
   const bankDetails = await Bankdetails.findOne({ user_id: req.body.user_id });
@@ -473,8 +419,7 @@ exports.getProductData = async function (req, res, next) {
         itemsPerPage: limit,
         respdata: formattedUserProducts,
       });
-    }
-    
+    }    
   } catch (error) {
     return res.status(500).json({
       status: "0",
@@ -483,7 +428,6 @@ exports.getProductData = async function (req, res, next) {
     });
   }
 };
-
 exports.getProductDataById = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -493,9 +437,7 @@ exports.getProductDataById = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   try {
-
     const page = req.body.page ? parseInt(req.body.page) : 1; // Default page is 1
     const limit = req.body.limit ? parseInt(req.body.limit) : 10; // Default limit is 10
     // let query = {};     
@@ -503,21 +445,16 @@ exports.getProductDataById = async function (req, res, next) {
       approval_status: 1, 
       flag : 0
     };
-
     if (req.body.category_id) {
       query.category_id = req.body.category_id;
     }
-
     if (req.body.brand_id) {
       query.brand_id = req.body.brand_id;
     }
-
     if (req.body.size_id) {
       query.size_id = req.body.size_id;
     }
-
     const count = await Userproduct.countDocuments(query);
-    
     const userproducts = await Userproduct.find(query)
       .populate('brand_id', 'name') 
       .populate('category_id', 'name') 
@@ -526,9 +463,6 @@ exports.getProductDataById = async function (req, res, next) {
       .skip((page - 1) * limit) // Skip records based on page number and limit
       .limit(limit)
       .exec();
-
-   
-
     if (!userproducts || userproducts.length === 0) {
       return res.status(404).json({
         status: "0",
@@ -538,12 +472,8 @@ exports.getProductDataById = async function (req, res, next) {
     }
     const formattedUserProducts = [];
     for (const userproduct of userproducts) {
-      
-     
       const productImages = await Productimage.find({ product_id: userproduct._id });
-
       const productCondition = await Productcondition.findById(userproducts.status);
-
       const formattedUserProduct = {
         _id: userproduct._id,
         name: userproduct.name,
@@ -572,12 +502,9 @@ exports.getProductDataById = async function (req, res, next) {
         __v: userproduct.__v,
         product_images: productImages,
       };
-
       formattedUserProducts.push(formattedUserProduct);
     }
-
     const totalPages = Math.ceil(count / limit); // Calculate total pages
-
     res.status(200).json({
       status: "1",
       message: "Found!",
@@ -595,8 +522,6 @@ exports.getProductDataById = async function (req, res, next) {
     });
   }
 };
-
-
 exports.getDetailsById = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -606,22 +531,17 @@ exports.getDetailsById = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   try {
     let query = {}; 
-
     if (req.body.product_id) {
       query._id = req.body.product_id; 
-    }
-    
+    } 
     const userproducts = await Userproduct.findById(query)
       .populate('brand_id', 'name') 
       .populate('category_id', 'name') 
       .populate('user_id', 'name')
       .populate('size_id', 'name')
       .exec();
-
-    
     if (!userproducts) {
       return res.status(404).json({
         status: "0",
@@ -629,14 +549,10 @@ exports.getDetailsById = async function (req, res, next) {
         respdata: [],
       });
     }
-
     userproducts.hitCount = (userproducts.hitCount || 0) + 1;
-
     await userproducts.save();
-
     const productImages = await Productimage.find({ product_id: userproducts._id });
-
-    // const formattedUserProduct = {
+// const formattedUserProduct = {
     //   _id: userproducts._id,
     //   name: userproducts.name,
     //   description: userproducts.description,
@@ -656,7 +572,6 @@ exports.getDetailsById = async function (req, res, next) {
     //   __v: userproducts.__v,
     //   product_images: productImages, 
     // };
-
     const productCondition = await Productcondition.findById(userproducts.status);
     const formattedUserProduct = {
       _id: userproducts._id,
@@ -689,8 +604,6 @@ exports.getDetailsById = async function (req, res, next) {
       __v: userproducts.__v,
       product_images: productImages,
     };
-    
-
     res.status(200).json({
       status: "1",
       message: "Found!",
@@ -704,13 +617,10 @@ exports.getDetailsById = async function (req, res, next) {
     });
   }
 };
-
 exports.getProduct = async function (req, res, next) {
   try {
     const productId = req.body.product_id; 
-
     const product = await Userproduct.findById(productId);
-
     if (!product) {
       return res.status(404).json({
         status: "0",
@@ -718,14 +628,11 @@ exports.getProduct = async function (req, res, next) {
         respdata: {},
       });
     }
-
     const productImages = await Productimage.find({ product_id: productId });
-
     const productDetails = {
       ...product.toObject(), 
       images: productImages,
     };
-
     res.status(200).json({
       status: "1",
       message: "Product details fetched successfully!",
@@ -739,8 +646,6 @@ exports.getProduct = async function (req, res, next) {
     });
   }
 };
-
-
 exports.updateProduct = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -750,7 +655,6 @@ exports.updateProduct = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   try {
     const productId = req.body.product_id;
     const existingProduct = await Userproduct.findById(productId);
@@ -761,7 +665,6 @@ exports.updateProduct = async function (req, res, next) {
         respdata: {},
       });
     }
-
     existingProduct.category_id = req.body.category_id || existingProduct.category_id;
     existingProduct.user_id = req.body.user_id || existingProduct.user_id;
     if(req.body.brand)
@@ -772,7 +675,6 @@ exports.updateProduct = async function (req, res, next) {
     {
       existingProduct.size = ((req.body.size || existingProduct.size) ?? null);
     }
-    
     existingProduct.brand_id = ((req.body.brand_id || existingProduct.brand_id) ?? null);
     existingProduct.size_id = ((req.body.size_id || existingProduct.size_id) ?? null);
     existingProduct.name = req.body.name || existingProduct.name;
@@ -781,7 +683,6 @@ exports.updateProduct = async function (req, res, next) {
     existingProduct.price = req.body.price || existingProduct.price;
     existingProduct.offer_price = req.body.offerprice || existingProduct.offer_price;
     existingProduct.percentage = req.body.percentage || existingProduct.percentage;
-
     const newProduct = new Userproduct({
       category_id: req.body.category_id,
       user_id: req.body.user_id,
@@ -798,22 +699,17 @@ exports.updateProduct = async function (req, res, next) {
       original_packaging:  req.body.original_packaging,
       added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"), 
     });
-
     existingProduct.updated_dtime = moment().format("YYYY-MM-DD HH:mm:ss");
-
     if (req.files && req.files.length > 0) {
-    
       await Productimage.deleteMany({ product_id: existingProduct._id });
-
       const imageUrls = [];
       const requrl = url.format({
         protocol: req.protocol,
         host: req.get("host"),
       });
-
       for (const file of req.files) {
-        const imageUrl = requrl + "/public/images/" + file.filename;
-
+        //const imageUrl = requrl + "/public/images/" + file.filename;
+        const imageUrl = file.filename;
         const productImageDetail = new Productimage({
           product_id: existingProduct._id,
           category_id: existingProduct.category_id,
@@ -822,21 +718,16 @@ exports.updateProduct = async function (req, res, next) {
           image: imageUrl,
           added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
         });
-
         const savedImage = await productImageDetail.save();
       }
     }
-
     const updatedProduct = await existingProduct.save();
-
     // Fetch image details for the updated product
     const productImages = await Productimage.find({ product_id: updatedProduct._id });
-
     const productDetails = {
       ...updatedProduct.toObject(),
       images: productImages,
     };
-
     res.status(200).json({
       status: "1",
       message: "Product updated!",

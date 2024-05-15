@@ -572,9 +572,6 @@ exports.editSubCatData = async function (req, res, next) {
     });
   }
 };
-
-
-
 exports.updateSubCatData = async function (req, res, next) {
   try {
     const errors = validationResult(req);
@@ -587,9 +584,7 @@ exports.updateSubCatData = async function (req, res, next) {
         isAdminLoggedIn:isAdminLoggedIn
       });
     }
-
     const category = await Category.findOne({ _id: req.body.id });
-
     if (!category) {
       return res.status(404).json({
         status: "0",
@@ -598,26 +593,23 @@ exports.updateSubCatData = async function (req, res, next) {
         isAdminLoggedIn:isAdminLoggedIn
       });
     }
-
     const updData = {
       name: req.body.name || category.name,
       description: req.body.description || category.description,
       parent_id: req.body.parent_id || category.parent_id,
       status: req.body.status || category.status,
     };
-
     if (req.file) {
       const requrl = req.protocol + '://' + req.get('host');
-      const imagePath = requrl + '/public/images/' + req.file.filename;
+     // const imagePath = requrl + '/public/images/' + req.file.filename;
+      const imagePath = req.file.filename;
       updData.image = imagePath;
     }
-
     const updatedCategory = await Category.findByIdAndUpdate(
       req.body.id,
       updData,
       { new: true, runValidators: true }
     );
-
     if (!updatedCategory) {
       return res.status(404).json({
         status: "0",
@@ -626,7 +618,6 @@ exports.updateSubCatData = async function (req, res, next) {
         isAdminLoggedIn:isAdminLoggedIn
       });
     }
-
     res.redirect("/admin/subactegorylist?page=1");
   } catch (error) {
     return res.status(500).json({
@@ -637,8 +628,6 @@ exports.updateSubCatData = async function (req, res, next) {
     });
   }
 };
-
-
 exports.updateStatusData = async function (req, res, next) {
   const Id = req.params.id;
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
@@ -652,9 +641,7 @@ exports.updateStatusData = async function (req, res, next) {
           isAdminLoggedIn:isAdminLoggedIn
         });
       }
-
       category.priority_status = category.priority_status === 0 ? 1 : 0;
-
       category.save()
         .then((updatedCategory) => {
           if (!updatedCategory) {
@@ -685,11 +672,9 @@ exports.updateStatusData = async function (req, res, next) {
       });
     });
 };
-
-
 exports.statusData = async function (req, res, next) {
   const Id = req.params.id;
-  const referer = req.headers.referer; // Extracting the Referer header
+  const referer = req.headers.referer;
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   Category.findById(Id)
     .then((category) => {
@@ -713,13 +698,11 @@ exports.statusData = async function (req, res, next) {
               isAdminLoggedIn:isAdminLoggedIn
             });
           }
-         
           if (referer && referer.includes("/admin/body-focus")) {
             res.redirect("/admin/body-focus");
           } else if (referer && referer.includes("/admin/body-focus-subcat")) {
             res.redirect("/admin/body-focus-subcat");
           } else {
-            
             res.redirect("/admin/body-focus");
           }
         })

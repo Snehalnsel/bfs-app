@@ -72,7 +72,7 @@ router.post(
   [
     check("email", "Email length should be 10 to 30 characters!")
       .isEmail()
-      .isLength({ min: 10, max: 30 }),
+      .isLength({ min: 10, max: 50 }),
     check("password", "Password length should be 8 to 10 characters!").isLength(
       {
         min: 8
@@ -1429,7 +1429,7 @@ router.get("/payment-shippingkit-status",
 ShippingkitpaymentController.getShippingKitStatus
 );
 
-router.get("/checkapp-payment",cors(),
+router.post("/checkapp-payment",cors(),
 PaymentController.checkPaymentData
 );
 

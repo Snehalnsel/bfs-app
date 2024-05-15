@@ -668,6 +668,8 @@ exports.getStatus = async function (req, res, next) {
 };
 
 
+
+
 exports.checkPaymentData = async function (req, res, next) {
   try {
     const tempId = req.query.temp;

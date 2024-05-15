@@ -377,7 +377,7 @@ exports.getStatus = async function (req, res, next) {
           headers: {
             "Content-Type": "application/json",
             "X-VERIFY": xVerifyChecksum,
-            "X-MERCHANT-ID": merchantTransactionId,
+            "X-MERCHANT-ID": MERCHANT_ID,
             accept: "application/json",
           },
         }).then(async (res)=>{
@@ -393,19 +393,16 @@ exports.getStatus = async function (req, res, next) {
             };
           }
         });
-        // let updateData = {
-        //   checkstatus_response: response.data,
-        //   //checkstatus_status: response.data.code === "PAYMENT_SUCCESS" ? "success" : "failure",
-        // };
+       // console.log("response-56565--",response)
         let updateData = {};
-        if (typeof response.data.code !== "undefined") {
-          if (response.data.code === "PAYMENT_SUCCESS" && (response.data.code !== "PAYMENT_DECLINED" || response.data.code !== "TIMED_OUT")) {
-            if (typeof temporder.pay_response.code !== "undefined" && temporder.pay_response.code === "PAYMENT_INITIATED") {
+        if (response.data.success) {
+            if (response.data.code === "PAYMENT_SUCCESS") {
               updateData.checkstatus_status = "success";
             } else {
               updateData.checkstatus_status = "failure";
             }
-          }
+        } else {
+          updateData.checkstatus_status = "failure";
         }
         // if(typeof temporder.pay_response.code != "undefined" && temporder.pay_response.code == "PAYMENT_INITIATED") {
         //   updateData.checkstatus_status = "success";

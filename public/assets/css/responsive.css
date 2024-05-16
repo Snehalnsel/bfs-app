@@ -746,6 +746,13 @@ button.accordion-button {
     padding: 0px 8px;    
 }
 
+.bids-tab-mobile{
+    display: block;
+}
+.deskstop-bidbox{
+    display: none;
+}
+
 /*.dashboard-sidbar {
         width: 100%;
         left: -100%;
@@ -759,6 +766,8 @@ button.accordion-button {
 
 
 }
+
+
 
 
 

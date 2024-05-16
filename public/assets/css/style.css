@@ -4822,3 +4822,39 @@ button.grey-btn {
 .filter-footer {
     display: none;
 }
+
+.bids-tab-mobile .bids-chatbox {
+    background: none;
+    box-shadow: none !important;
+}
+
+.bids-tab-mobile .bids-productbox.bids-tabbox {
+    border: none;
+    height: auto;
+    width: 100%;
+}
+
+.bids-tab-mobile .tabs-wrapper ul.nav.nav-tabs {
+    border: none;
+    margin-bottom: 0px;
+    width: 100%;
+    display: flex;
+}
+
+.tabs-wrapper {
+    width: 100%;
+}
+
+.bids-tab-mobile .tabs-wrapper .bs-group {
+    height: auto;
+}
+
+.bids-tab-mobile .tabs-wrapper .bs-group .br-details {
+    border-bottom: 0px;
+    border-radius: 0px;
+    box-shadow: none;
+}
+
+.bids-tab-mobile{
+    display: none;
+}

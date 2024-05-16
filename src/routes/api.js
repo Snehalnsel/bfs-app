@@ -753,8 +753,7 @@ router.post(
   "/get-brandlist",
   auth.isAuthorized,
  [],
-  BrandController.getBrandList
-);
+  BrandController.getBrandList);
 router.post("/add-addressbook",auth.isAuthorized,[],OrderController.addAddress);
 router.post(
   "/useraddressbooklist",

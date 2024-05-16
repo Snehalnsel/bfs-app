@@ -3984,14 +3984,10 @@ exports.getBestDealProductsweb = async function (req, res) {
         maxvalue: typeof maxOfferPrice != "undefined" ? maxOfferPrice : "0",
         minvalue: typeof minOfferPrice != "undefined" ? minOfferPrice : "0",
       });
-
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error' });
-
   }
-
 };
-
 exports.getBestDealProductswebNew = async function (page, req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -4014,7 +4010,6 @@ exports.getBestDealProductswebNew = async function (page, req, res, next) {
     } 
     let id = getUrl;
     const filterGenderId = (typeof req.query.catid != 'undefined' && req.query.catid != "") ? req.query.catid : '';
-   
     const pageno = page || 1;
     const pageSize = 16;
     const sortid = req.params.sortid || 0;
@@ -4024,10 +4019,8 @@ exports.getBestDealProductswebNew = async function (page, req, res, next) {
     const filterproductCount = formattedUserProducts.length;
     const totalPages = data.totalPages;
     const currentPage = data.currentPage;
-
     let appSettings = await Appsettings.findOne();
     let percentageFilter = parseInt(appSettings.best_deal);
-    
     result = await Userproduct.aggregate([
       //{ "$match": { "percentage": { "$gte": percentageFilter } } },  
       // {
@@ -4045,9 +4038,7 @@ exports.getBestDealProductswebNew = async function (page, req, res, next) {
         }
       }
     ]);
-
-    let product = []
-
+    let product = [];
     if (id === "whatshot") {
       product = await Userproduct.find({
         approval_status: 1,
@@ -4065,18 +4056,14 @@ exports.getBestDealProductswebNew = async function (page, req, res, next) {
         flag: 0
       });
     }
-      
-    
     brandIds = product.map(product => product.brand_id).filter(Boolean);
     sizeIds = product.map(product => product.size_set_id).filter(Boolean);
     statusIds = product.map(product => product.status).filter(Boolean);
     genderIds = product.map(product => product.gender_id).filter(Boolean);
-
     brandList = await Brand.find({ _id: { $in: brandIds } });
     sizeList = await Size.find({ _id: { $in: sizeIds } });
     conditionList = await Productcondition.find({ _id: { $in: statusIds } });
     genderList = await Gender.find({ _id: { $in: genderIds } });
-
     res.render("webpages/allhomeproductNew", {
       title: "Product Sub Categories",
       message: "Welcome to the Product Sub Categories!",
@@ -4109,9 +4096,7 @@ exports.getBestDealProductswebNew = async function (page, req, res, next) {
     };
   }
 };
-
 exports.userPlacedOrder = async function (req, res) {
-
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     let user_id = req.body.data.user_id;
@@ -4245,7 +4230,6 @@ exports.userPlacedOrder = async function (req, res) {
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
-
 exports.Demoorder_backup = async function (req, res) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -4331,7 +4315,6 @@ exports.Demoorder_backup = async function (req, res) {
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
-
 exports.Demoorder = async function (req, res) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -4447,7 +4430,6 @@ exports.Demoorder = async function (req, res) {
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
-
 // exports.demoorder = async function (req, res) {
 //   try {
 //     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -4507,8 +4489,6 @@ exports.Demoorder = async function (req, res) {
 //     return res.status(500).json({ message: 'Internal server error' });
 //   }
 // };
-
-
 exports.Demoorderold = async function (req, res) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -4560,10 +4540,7 @@ exports.Demoorderold = async function (req, res) {
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
-
-
 exports.forgotPassword = async function (req, res, next) {
-
   try {
     const userId = (typeof req.session.user != "undefined") ? req.session.user.userId : ""
     var cartCount = (userId != "") ? await Cart.countDocuments({ user_id: mongoose.Types.ObjectId(userId) }) : 0;
@@ -4585,7 +4562,6 @@ exports.forgotPassword = async function (req, res, next) {
   }
 
 };
-
 // exports.sendotp = async function (req, res, next) {
 //   const errors = validationResult(req);
 //   if (!errors.isEmpty()) {
@@ -4693,8 +4669,6 @@ exports.forgotPassword = async function (req, res, next) {
 //     });
 //   }
 // };
-
-
 exports.sendotp = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -4897,7 +4871,6 @@ exports.sendotp = async function (req, res, next) {
     }
   });
 };
-
 exports.changePassword = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -5048,7 +5021,6 @@ exports.changePassword = async function (req, res, next) {
     }
   });
 };
-
 exports.reasonlistdata = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -5065,8 +5037,6 @@ exports.reasonlistdata = async function (req, res, next) {
     res.status(500).json({ message: err.message });
   }
 };
-
-
 exports.genderwomenlistdata = async function (req, res, next) {
   try {
     const genderId = "65c5dd7c949c7a8b6173f1a9";
@@ -5092,7 +5062,6 @@ exports.genderwomenlistdata = async function (req, res, next) {
     });
   }
 };
-
 exports.gendermenlistdata = async function (req, res, next) {
   try {
     const genderId = "65c5df544f66e281a6393737";
@@ -5118,8 +5087,6 @@ exports.gendermenlistdata = async function (req, res, next) {
     });
   }
 };
-
-
 exports.genderkidlistdata = async function (req, res, next) {
   try {
     const genderId = "65c5df684f66e281a639373a";
@@ -5145,7 +5112,6 @@ exports.genderkidlistdata = async function (req, res, next) {
     });
   }
 };
-
 exports.otherlistdata = async function (req, res, next) {
   try {
     const genderId = "65c5e0db8e59ce8c9788301c";
@@ -5162,6 +5128,24 @@ exports.otherlistdata = async function (req, res, next) {
       message: 'Categories fetched successfully.',
       categories: categoryList,
       filterGenderId: genderId,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: '0',
+      message: 'An error occurred while fetching categories by gender_id.',
+      error: error.message,
+    });
+  }
+};
+exports.shippingamountdata = async function (req, res, next) {
+  try {
+    product_id = req.body.product_id;
+    let userProducts = await Userproduct.findById(product_id);
+    let shipping_data = await shippingchrgsModel.findById(userProducts.shipping_charges_id);
+    res.json({
+      status: '1',
+      message: 'Categories fetched successfully.',
+      shippingcharges_data: shipping_data
     });
   } catch (error) {
     res.status(500).json({

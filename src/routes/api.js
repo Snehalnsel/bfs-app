@@ -1449,4 +1449,8 @@ PaymentController.getStatus
 // WebsiteController.whatsappintegration
 // );
 
+router.post("/shipping-charges-amount",cors(),
+  WebsiteController.shippingamountdata
+);
+
 module.exports = router;

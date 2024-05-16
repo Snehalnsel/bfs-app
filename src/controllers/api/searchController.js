@@ -191,19 +191,15 @@ exports.searchData = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   var respDataFinal;
-
   const page = req.body.page ? parseInt(req.body.page) : 1;
   const limit = req.body.limit ? parseInt(req.body.limit) : 10;
-
   if (req.body.type == "category") {
     try {
       const count = await Category.countDocuments({
         name: new RegExp(req.body.search, "i"),
         parent_id: { $ne: '650444488501422c8bf24bdb' }
       });
-
       const categories = await Category.find({
         name: new RegExp(req.body.search, "i"),
         parent_id: { $ne: '650444488501422c8bf24bdb' }
@@ -211,7 +207,6 @@ exports.searchData = async function (req, res, next) {
         .skip((page - 1) * limit)
         .limit(limit)
         .exec();
-
       if (!categories || categories.length === 0) {
         respDataFinal = {
           status: "0",
@@ -222,9 +217,7 @@ exports.searchData = async function (req, res, next) {
         res.status(200).json({ respdata: respDataFinal });
         return;
       }
-
       const totalPages = Math.ceil(count / limit);
-
       respDataFinal = {
         status: "1",
         message: "Found!",
@@ -234,7 +227,6 @@ exports.searchData = async function (req, res, next) {
         itemsPerPage: limit,
         data: categories,
       };
-
       res.status(200).json({ respdata: respDataFinal });
     } catch (error) {
       res.status(500).json({

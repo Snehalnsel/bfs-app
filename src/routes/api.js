@@ -763,7 +763,6 @@ router.post(
   auth.isAuthorized,
   [
     check("user_id", "This is a required field!").not().isEmpty().trim().escape(),
-    check("street_name", "This is a required field!").not().isEmpty(),
     check("address_name", "This is a required field!").not().isEmpty(),
     check("address1", "This is a required field!").not().isEmpty(),
     check("city_name", "This is a required field!").not().isEmpty().trim().escape(),

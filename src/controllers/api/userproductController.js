@@ -747,9 +747,7 @@ exports.updateProduct = async function (req, res, next) {
 
 exports.updateProductBidDetails = async (req, res) => {
   const { product_id, final_price, bid_status } = req.body;
-
   try {
- 
     const updatedUserProduct = await Userproduct.findOneAndUpdate(
       { _id: product_id },
       {
@@ -758,11 +756,9 @@ exports.updateProductBidDetails = async (req, res) => {
       },
       { new: true } 
     );
-
     if (!updatedUserProduct) {
       return res.status(404).json({ message: 'Userproduct not found' });
     }
-
     return res.status(200).json({
       status: "1",
       message: "Userproduct updated successfully",
@@ -776,9 +772,7 @@ exports.updateProductBidDetails = async (req, res) => {
 exports.deleteProduct = async function (req, res, next) {
   try {
     const productId = req.body.product_id;
-    
     const product = await Userproduct.findById(productId);
-
     if (!product) {
       return res.status(404).json({
         status: "0",
@@ -786,11 +780,8 @@ exports.deleteProduct = async function (req, res, next) {
         respdata: {},
       });
     }
-
     await Productimage.deleteMany({ product_id: productId });
-
     await Userproduct.findByIdAndDelete(productId);
-
     res.status(200).json({
       status: "1",
       message: "Product and associated images deleted successfully!",
@@ -840,7 +831,7 @@ exports.shippingamountdata = async function (req, res, next) {
   } catch (error) {
     res.status(500).json({
       status: '0',
-      message: 'An error occurred while fetching shipment amount.',
+      message: 'Product details are not found.',
       error: error.message,
     });
   }

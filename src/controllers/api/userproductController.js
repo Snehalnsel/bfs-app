@@ -29,6 +29,7 @@ const Productcondition = require("../../models/api/productconditionModel");
 const Bankdetails = require("../../models/api/bankdetailsModel");
 const Gender = require("../../models/api/genderModel");
 const Color = require("../../models/api/colorModel");
+const shippingchrgsModel = require("../../models/api/shippingchrgsModel");
 const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 const multer = require("multer");
 const upload = multer({ dest: 'public/images/' }); 
@@ -804,3 +805,43 @@ exports.deleteProduct = async function (req, res, next) {
   }
 };
 
+exports.shippingamountdata = async function (req, res, next) {
+  try {
+    product_id = req.body.product_id;
+    let userProducts = await Userproduct.findById(product_id);
+    if(userProducts.shipping_charges_id)
+    {
+      let shipping_data = await shippingchrgsModel.findById(userProducts.shipping_charges_id);
+      if(shipping_data)
+      {
+        res.status(200).json({
+          status: '1',
+          message: 'Shipping Charges for the Product',
+          respdata:  shipping_data,
+        });
+      }
+      else
+      {
+        return res.status(404).json({
+          status: "0",
+          message: "Shipping Charges are not found for the product",
+          respdata: {},
+        });
+      }
+    }
+    else
+    {
+      return res.status(404).json({
+        status: "0",
+        message: "Product does not have any shipping charges yet",
+        respdata: {},
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: '0',
+      message: 'An error occurred while fetching shipment amount.',
+      error: error.message,
+    });
+  }
+};

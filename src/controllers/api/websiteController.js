@@ -3884,36 +3884,26 @@ exports.getJustSoldProductsweb = async function (req, res) {
 };
 
 exports.getBestDealProductsweb = async function (req, res) {
-
   const page = parseInt(req.query.page) || 1;
-
   const pageSize = parseInt(req.query.pageSize) || 10;
-
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const soldItemsCount = await Userproduct.countDocuments({ approval_status: 1, flag: 1 });
     const filterproductCount = soldItemsCount.length;
-
     const totalPages = Math.ceil(soldItemsCount / pageSize);
     const appSettings = await Appsettings.findOne();
-
     if (!appSettings) {
       return res.status(404).json({ message: 'App settings not found' });
     }
     const percentageFilter = parseInt(appSettings.best_deal);
-
     const count = await Userproduct.countDocuments({
       percentage: { $gte: percentageFilter },
       approval_status: 1,
       flag: 0
     });
-
     const products = await Userproduct.find({ percentage: { $gte: percentageFilter }, approval_status: 1, flag: 0 }); 
-
     let brandIds = [], sizeIds = [], statusIds = [], genderIds = [];
     let brandList = [], sizeList = [], conditionList = [], genderList = [];
-
-
     brandIds = products.map(product => product.brand_id).filter(Boolean);
     sizeIds = products.map(product => product.size_id).filter(Boolean);
     statusIds = products.map(product => product.status).filter(Boolean);
@@ -5128,24 +5118,6 @@ exports.otherlistdata = async function (req, res, next) {
       message: 'Categories fetched successfully.',
       categories: categoryList,
       filterGenderId: genderId,
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: '0',
-      message: 'An error occurred while fetching categories by gender_id.',
-      error: error.message,
-    });
-  }
-};
-exports.shippingamountdata = async function (req, res, next) {
-  try {
-    product_id = req.body.product_id;
-    let userProducts = await Userproduct.findById(product_id);
-    let shipping_data = await shippingchrgsModel.findById(userProducts.shipping_charges_id);
-    res.json({
-      status: '1',
-      message: 'Categories fetched successfully.',
-      shippingcharges_data: shipping_data
     });
   } catch (error) {
     res.status(500).json({

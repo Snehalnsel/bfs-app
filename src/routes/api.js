@@ -1450,7 +1450,7 @@ PaymentController.getStatus
 // );
 
 router.post("/shipping-charges-amount",cors(),
-  WebsiteController.shippingamountdata
+UserproductController.shippingamountdata
 );
 
 module.exports = router;

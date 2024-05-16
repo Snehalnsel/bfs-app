@@ -749,15 +749,12 @@ router.post(
 //  [],
 //   BrandController.getBrandList
 // );
-
-
 router.post(
   "/get-brandlist",
   auth.isAuthorized,
  [],
   BrandController.getBrandList
 );
-
 router.post(
   "/add-addressbook",
   auth.isAuthorized,
@@ -772,8 +769,6 @@ router.post(
   ],
   OrderController.addAddress
 );
-
-
 router.post(
   "/useraddressbooklist",
   auth.isAuthorized, 

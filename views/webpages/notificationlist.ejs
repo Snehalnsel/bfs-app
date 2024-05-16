@@ -14,11 +14,17 @@
                             <div class="bids-row wishlist-row overflow-visible <%= notification.is_read === 0 ? 'unread-notification' : '' %>" id="<%= notification._id %>">
                                 <div class="br-details">
                                     <div class="bid-info">
-                                        <a href="#" onclick="handleNotificationClick('<%= notification._id %>','<%= notification.link %>')">
+                                        <!-- <a href="#" onclick="handleNotificationClick('<%= notification._id %>','<%= notification.link %>')">
                                             <div class="bd-title">
                                                 <%= notification.title %>
                                             </div>
-                                        </a>                                        
+                                        </a>                                         -->
+
+                                        <a href="javascript:void(0)">
+                                            <div class="bd-title">
+                                                <%= notification.title %>
+                                            </div>
+                                        </a>  
                                         <div class="bd-content">
                                            <%= notification.content %>
                                         </div>

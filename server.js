@@ -344,7 +344,8 @@ io.on("connection", (socket) => {
       let notificationreqUrl = process.env.SITE_URL + "/bid-for-product/" + bidId;
       if(username == bidOldData.buyerId){
         notificationUserId = bidOldData.sellerId;
-        notificationTitle = 'A buyer has bidded on your product';
+        //notificationTitle = 'A buyer has bidded on your product';
+        notificationTitle = 'You have received a new bid on your product';
         notificationContent =  'Buyer has bidded on ' + bidProductDetails.name;
       } else {
         notificationUserId = bidOldData.buyerId;

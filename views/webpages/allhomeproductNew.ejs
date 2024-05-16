@@ -252,17 +252,12 @@
                               <div class="prd-name"><a href="/productdeatils/<%=item._id%>">
                                     <%=item.name%>
                                  </a></div>
-                              <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span>
-                                 <%=item.offer_price%>
-                              </div>
+                              <div class="prd-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%=item.offer_price%></div>
                               <div class="rtl-price"><span>Est. Retail:</span>
-                                 <%=item.price%>
-                              </div>
-                        
-                                    <div class="prd-batch">
+                                 <span><i class="fa fa-inr" aria-hidden="true"></i></span><%=item.price%>
+                              </div><div class="prd-batch">
                                        <%=item.status_name%>
                                     </div>
-               
                            </div>
                         </div>
                         <% }); %>

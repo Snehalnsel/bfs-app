@@ -72,8 +72,15 @@ $(document).ready(async function(){
                 },
             },
             upiid:{
-                required:function() {
-                    return $('#bankname').val() == '' && $('#upiscaner').val() == '';
+                depends: function() {
+                    const bankNameValue = $('#bankname').val().trim();
+                    console.log('Bank Name Value:', bankNameValue);
+                    if(bankNameValue === '')
+                        {
+                        return true;  
+                        }else{
+                            return false;
+                        }
                 },
                 maxlength:100,
                 customupiid: true,

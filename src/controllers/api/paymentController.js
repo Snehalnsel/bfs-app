@@ -48,7 +48,6 @@ const sha256 = require("sha256");
 const uniqid = require("uniqid");
 const smtpUser = "welcome@bidforsale.com";
 const nodemailer = require("nodemailer");
-
 const transporter = nodemailer.createTransport({
   port: 465,
   host: "mail.bidforsale.com",
@@ -64,16 +63,13 @@ const transporter = nodemailer.createTransport({
 // const PHONE_PE_HOST_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox";
 // const SALT_KEY = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";
 */
-
 //Live Phone Pay Key
 const MERCHANT_ID = "M22EUQY70KVBB";
 const PHONE_PE_HOST_URL = "https://api.phonepe.com/apis/hermes";
 const SALT_KEY = "6e2f6cdb-392f-4a06-b2e2-a9af19a1207c";
-
 const SALT_INDEX = 1;
 const APP_BE_URL = process.env.SITE_URL;
 //6e2f6cdb-392f-4a06-b2e2-a9af19a1207c
-
 exports.getPaymentData = async function (req, res, next) {
   try {
     const tempOrderId = req.query.temp;
@@ -135,7 +131,6 @@ exports.getPaymentData = async function (req, res, next) {
           merchant_transactionid:merchantTransactionId,
           pay_response: response.data,
         };
-
         await Demoorder.findOneAndUpdate(
           { _id: tempOrderId },
           { $set: updateData },
@@ -350,8 +345,7 @@ exports.getStatus = async function (req, res, next) {
         SALT_KEY;
       let sha256_val = sha256(string);
       let xVerifyChecksum = sha256_val + "###" + SALT_INDEX;
-      try {
-          
+      try { 
         const response = await axios.get(statusUrl, {
           headers: {
             "Content-Type": "application/json",
@@ -372,7 +366,6 @@ exports.getStatus = async function (req, res, next) {
             };
           }
         });
-       // console.log("response-56565--",response)
         let updateData = {};
         if (response.data.success) {
             if (response.data.code === "PAYMENT_SUCCESS") {
@@ -383,11 +376,6 @@ exports.getStatus = async function (req, res, next) {
         } else {
           updateData.checkstatus_status = "failure";
         }
-        // if(typeof temporder.pay_response.code != "undefined" && temporder.pay_response.code == "PAYMENT_INITIATED") {
-        //   updateData.checkstatus_status = "success";
-        // } else {
-        //   updateData.checkstatus_status = "failure";
-        // }
         await Demoorder.findOneAndUpdate(
           { _id: tempId },
           { $set: updateData },

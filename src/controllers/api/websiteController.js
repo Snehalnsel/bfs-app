@@ -1820,20 +1820,17 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
           }
         }
       ]);
-
       brandIds = userProducts.map(product => product.brand_id).filter(Boolean);
       genderIds = userProducts.map(product => product.gender_id).filter(Boolean);
       sizeIds = userProducts.map(product => product.size_id).filter(Boolean);
       statusIds = userProducts.map(product => product.status).filter(Boolean);
       colorIds = userProducts.map(product => product.color_id).filter(Boolean);
-      
       brandList = await brandModel.find({ _id: { $in: brandIds } });
       sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
       conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
       genderList = await Gender.find({ _id: { $in: genderIds } });
       colorList = await Color.find({ _id: { $in: colorIds } });
     }
-
     res.render("webpages/subcategoryproduct", {
       title: "Product Sub Categories",
       message: "Welcome to the Product Sub Categories!",

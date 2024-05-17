@@ -1394,6 +1394,7 @@ exports.myAccount = async function (req, res, next) {
     } else {
       var userData = req.session.user;
       const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId)});
+      const userdetails = await Users.findOne({ _id: userData.userId });
 
       const html = await ejs.renderFile("views/webpages/myaccount.ejs", {
         helper: helper,
@@ -1401,6 +1402,7 @@ exports.myAccount = async function (req, res, next) {
         message: "Welcome to the privacy policy page!",
         respdata: req.session.user,
         respdata1: address,
+        userdatadettails: userdetails,
         isLoggedIn: isLoggedIn,
         websiteUrl: process.env.SITE_URL,
       }, { async: true });

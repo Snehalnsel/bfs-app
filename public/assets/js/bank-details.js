@@ -3,15 +3,23 @@ jQuery.validator.addMethod("customupiid", function (value, element, params) {
     return re.test(value);
 }, "Please enter a valid upiid address.");
 
-$(document).ready(async function(){
+$(document).ready(async function () {
+
     $('#editBankDetails').validate({
         debug:false,
         errorElement:"p",
         errorClass:"errorMsgClass",
         rules:{
             bankname:{
-                //required:true,
+                required:function() {
+                    return $('#upiid').val() == '' && $('#bankname').val() == '';
+                },
                 maxlength:150
+            },
+            upiid:{
+                required:function() {
+                    return $('#bankname').val() == '' && $('#upiid').val() != '';
+                }
             },
             branch:{
                 required:{
@@ -71,20 +79,6 @@ $(document).ready(async function(){
                     }
                 },
             },
-            upiid:{
-                depends: function() {
-                    const bankNameValue = $('#bankname').val().trim();
-                    console.log('Bank Name Value:', bankNameValue);
-                    if(bankNameValue === '')
-                        {
-                        return true;  
-                        }else{
-                            return false;
-                        }
-                },
-                maxlength:100,
-                customupiid: true,
-            },
             upiscaner:{
                 required:function() {
                     return $('#bankname').val() == '' && $('#upiid').val() != '';
@@ -92,8 +86,10 @@ $(document).ready(async function(){
             },
         },
         messages:{
-            bankname:{
-                maxlength:"Please enter valid name."
+            bankname: "Either bank details or UPI ID must be entered.",
+            upiid: {
+                required: "Either bank details or UPI ID must be entered.",
+                maxlength: "Please enter a valid UPI ID (maximum 50 characters)."
             },
             branch:{
                 required:"Please enter branch name.",
@@ -122,18 +118,19 @@ $(document).ready(async function(){
             },
         },
         submitHandler: function() {
+            console.log('Submit handler is called');
             let form_data = new FormData();
             let files = $('#upiscaner')[0].files;
-			let error = '';
-			for(let count = 0; count<files.length; count++) {
-			    let name = files[count].name;
-			    let extension = name.split('.').pop().toLowerCase();
-			    if(jQuery.inArray(extension, ['jpg','jpeg','png','gif']) == -1) {
-				    error += "Invalid " + count + " Image File"
-			    } else {
-				    form_data.append("image", files[count]);
-			    }
-			}
+    		let error = '';
+    		for(let count = 0; count<files.length; count++) {
+    		    let name = files[count].name;
+    		    let extension = name.split('.').pop().toLowerCase();
+    		    if(jQuery.inArray(extension, ['jpg','jpeg','png','gif']) == -1) {
+    			    error += "Invalid " + count + " Image File"
+    		    } else {
+    			    form_data.append("image", files[count]);
+    		    }
+    		}
             form_data.append("bankname", $('#bankname').val());
             form_data.append("branchname", $('#branch').val());
             form_data.append("accountname", $('#accountname').val());
@@ -175,5 +172,5 @@ $(document).ready(async function(){
             });
         }
     });
-    
+
 });

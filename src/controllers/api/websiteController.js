@@ -2996,7 +2996,7 @@ exports.addToWishlistWeb = async function (req, res, next) {
     });
   }
 };
-exports.viewWishListByUserId = async function (req, res, next) {
+exports.viewWishListByUserId_backup = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
 
@@ -3052,6 +3052,71 @@ exports.viewWishListByUserId = async function (req, res, next) {
       });
     }
   } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering Wishlist Listing Page.",
+      error: error.message,
+    });
+  }
+};
+exports.viewWishListByUserId = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+
+    if (isLoggedIn == "") {
+      return res.redirect("/registration");
+    }
+
+    const user_id = req.session.user.userId;
+    const existingList = await Wishlist.find({ user_id: isLoggedIn })
+      .populate('user_id', 'name')
+      .exec();
+
+    if (existingList.length === 0) {
+      res.render("webpages/wishlist", {
+        title: "Wish List Page",
+        message: "Welcome to the Wish List page!",
+        respdata: [],
+        isLoggedIn: isLoggedIn,
+        itemCount: 0,
+        websiteUrl: process.env.SITE_URL,
+      });
+    } else {
+      const formattedList = await Promise.all(existingList.map(async (item) => {
+        const product = await Userproduct.findOne({ _id: item.product_id }).populate('category_id', 'name');
+        if (product) {
+          const productImages = await Productimage.find({ product_id: item.product_id }).limit(1);
+          const date = moment(item.added_dtime, 'YYYY-MM-DDTHH:mm:ssZ');
+          const addedDate = date.format('DD/MM/YYYY');
+          const category_name = product.category_id ? product.category_id.name : 'Uncategorized';
+          return {
+            _id: item._id,
+            user_id: item.user_id._id,
+            user_name: item.user_id.name,
+            product_id: item.product_id,
+            product_name: product.name,
+            product_price: product.price,
+            category_name: product.category_id ? product.category_id.name : '',
+            images: productImages[0].image,
+            status: item.status,
+            added_dtime: addedDate,
+            __v: item.__v,
+          };
+        }
+      }));
+      const filteredList = formattedList.filter(item => item !== null && item !== undefined);
+      const count = filteredList.length;
+      res.render("webpages/wishlist", {
+        title: "Wish List Page",
+        message: "Welcome to the Wish List page!",
+        respdata: filteredList,
+        isLoggedIn: isLoggedIn,
+        itemCount: filteredList.length,
+        websiteUrl: process.env.SITE_URL,
+      });
+    }
+  } catch (error) {
+    console.log(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering Wishlist Listing Page.",
@@ -3358,7 +3423,8 @@ exports.viewCartListByUserId = async function (req, res, next) {
           product_est_price: product.price,
           seller_id: product.user_id,
           category_name: product.category_id.name,
-          images: productImages.length > 0 ? productImages[0].image : null,
+          //images: productImages.length > 0 ? productImages[0].image : null,
+          images: productImages ? productImages.image : null,
           user_name: user.name,
           added_dtime: cartItem.added_dtime,
           status: cartItem.status,

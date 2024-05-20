@@ -9,7 +9,9 @@
                <span class="wishlist-count">(<%= itemCount %>)</span>
             </div>
             <div class="wishlist-group-box">
-               <% respdata.forEach(function(item , index) { %>
+               <% respdata.forEach(function(item , index) {
+                  if(item){
+                  %>
                   <div class="bids-lists cart-wrapper">
                      <div class="cart-list wishlist-list ">
 
@@ -83,7 +85,7 @@
                         </div>
                      </div>
                   </div>
-                  <% }); %>
+                  <% } }); %>
             </div>
          </div>
       </section>

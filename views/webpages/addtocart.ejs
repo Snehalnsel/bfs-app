@@ -31,7 +31,11 @@
             
              <div class="br-results cart-right-box">
                 <div class="cart-price">
-                   <p>Final Bid Price</p>
+                  <%  if(respdata.is_bid == 1){ %>
+                     <p>Final Bid Price</p>
+                   <%  } else if(respdata.is_bid == 0){ %>
+                     <p>Product Price</p>
+                   <%  } %>
                    <div class="highlight-title "><span><i class="fa fa-inr" aria-hidden="true"></i></span><%=respdata.product_price%></div>
                 </div>
                 <div class="cart-action">

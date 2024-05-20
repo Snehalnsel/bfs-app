@@ -296,11 +296,19 @@
                                                             </td>
                                                             <td>
                                                                 <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 ) { %>
-                                                    
+                                                                    <% 
+                                                                    for(let trackDataVal of value.trackDetails) { 
+                                                                        if(trackDataVal.pickup_token_number !=='0' && trackDataVal.order_status == '0'){
+                                                                    
+                                                                    %>
                                                                     <a href="/admin/orderdetails/<%= value._id %>/1"
                                                                         class="btn btn-info btn-circle btn-sm" title="Edit">
                                                                         <i class="fas fa-pencil-alt"></i>
                                                                     </a>
+                                                                    <% }
+                                                                
+                                                                } %>
+
                                                                     <% for(let trackDataVal of value.trackDetails) { 
                                                                         if(trackDataVal.order_status == '1'){
                                                                             let tarckId = trackDataVal._id; %>
@@ -345,7 +353,7 @@
                                                             <td>
                                                                 <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 1 ) { %>
                                                                     <% for(let trackDataVal of value.trackDetails) { 
-                                                                        if(trackDataVal.order_status == '1'){ %>
+                                                                        if(trackDataVal.order_status == '1' && trackDataVal.pickup_token_number !=0){ %>
 
                                                                     <a href="/admin/orderdetails/<%= value._id %>/2"
                                                                         class="btn btn-info btn-circle btn-sm" title="Edit">
@@ -398,11 +406,20 @@
                                                             <td>
                                                                 <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 ) { %>
                                                                     
-
+                                                                    <% 
+                                                                    for(let trackDataVal of value.trackDetails) { 
+                                                                        if(trackDataVal.pickup_token_number !='0' && trackDataVal.order_status == '0'){
+                                                                    
+                                                                    %>
                                                                     <a href="/admin/orderdetails/<%= value._id %>/3"
                                                                         class="btn btn-info btn-circle btn-sm" title="Edit">
                                                                         <i class="fas fa-pencil-alt"></i>
                                                                     </a>
+                                                                    <% 
+                                                                        } 
+                                                                    }
+                                                                    
+                                                                    %>
 
                                                                     <% for(let trackDataVal of value.trackDetails) { 
                                                                         if(trackDataVal.order_status == '3'){

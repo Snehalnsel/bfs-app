@@ -546,7 +546,6 @@ exports.generatepickupforseller = async (req, res) => {
 };
 
 exports.addAddress = async function (req, res, next) {
-  
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -556,7 +555,6 @@ exports.addAddress = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
-
     const newAddress = new AddressBook({
       user_id: req.body.user_id,
       street_name: req.body.street_name,

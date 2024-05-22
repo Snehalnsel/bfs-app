@@ -229,7 +229,6 @@ exports.productData = async function (req, res, next) {
 
       for (const userproduct1 of userproducts1) {
         const productImages1 = await Productimage.find({ product_id: userproduct1._id }).sort("image_order");
-
         const formattedUserProduct1 = {
           _id: userproduct1._id,
           name: userproduct1.name,

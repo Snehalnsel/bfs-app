@@ -359,7 +359,7 @@ exports.detailsData = async function (req, res, next) {
     res.status(500).json({ error: 'An error occurred' });
   }
 };
-exports.updatedetailsData = async function (req, res, next) {
+exports.updatedetailsData_backup = async function (req, res, next) {
 
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
@@ -585,6 +585,212 @@ exports.updatedetailsData = async function (req, res, next) {
 
       //   await Promise.all(imageDetails);
       // }
+      res.redirect("/admin/productlist");
+    }
+  }).catch((err) => {
+    console.log(err);
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while updating the product.",
+      respdata: {},
+      isAdminLoggedIn:isAdminLoggedIn
+    });
+  });
+};
+exports.updatedetailsData = async function (req, res, next) {
+  console.log("req body",req.body);
+
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: "0",
+      message: "Validation error!",
+      respdata: errors.array(),
+      isAdminLoggedIn:isAdminLoggedIn
+    });
+  }
+  Userproduct.findById(req.body.product_id).then(async (product) => {
+    if (!product) {
+      res.status(404).json({
+        status: "0",
+        message: "Not found!",
+        respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
+      });
+    } else {
+      var updData = {
+        name: req.body.product_name,
+        description: req.body.description,
+        category_id: req.body.subcategory_id,
+        brand_id: req.body.brand_id,
+        size_id: req.body.size_id,
+        status: req.body.status,
+        flag: req.body.flag,
+        approval_status: req.body.approval_status,
+      };
+      if (req.body.price) updData.price = req.body.price;
+      if (req.body.offer_price) updData.offer_price = req.body.offer_price;
+      if (req.body.height) updData.height = req.body.height;
+      if (req.body.weight) updData.weight = req.body.weight;
+      if (req.body.length) updData.length = req.body.length;
+      if (req.body.breath) updData.breath = req.body.breath;
+      if (req.body.gender_id) updData.gender_id = req.body.gender_id;
+      if (req.body.color_id) updData.color_id = req.body.color_id;
+      if (req.body.shipping_charges_id) updData.shipping_charges_id = req.body.shipping_charges_id;
+      const exitsProductData= await Userproduct.findOneAndUpdate({ _id: req.body.product_id }, { $set: updData }, { upsert: true });
+      let getMaxValue = await Productimage.findOne({product_id: req.body.product_id}).sort({image_order:-1});
+      let imageOrderMaxValue = 1;
+      if(typeof getMaxValue != "undefined" && getMaxValue != null && getMaxValue.length > 0 && typeof getMaxValue.image_order != "undefined") {
+        imageOrderMaxValue = getMaxValue.image_order;
+      }
+      if (req.body.remainingImages.length > 0) {
+        const remainingImages = req.body.remainingImages ? JSON.parse(req.body.remainingImages) : [];
+        const imagesArray = [];
+        for (const image of remainingImages) {
+          if (image && image.image) {
+            imagesArray.push(image.image);
+          } else {
+          }
+        }
+        if (req.files && req.files.length > 0) {
+          const allImages = imagesArray.concat(req.files.map(file => {
+            const requrl = url.format({
+              protocol: req.protocol,
+              host: req.get("host"),
+            });
+            const imageUrl = file.filename;//Changes By Palash 28-03-2024
+            //const imageUrl = requrl + "/public/images/" + file.filename;
+            // return file.filename;
+            return imageUrl;
+          }));
+          const countAllImages = allImages.length;
+          await Productimage.deleteMany({ product_id: req.body.product_id });
+
+          if (allImages && allImages.length > 0) {
+            const remainingSlots = 5 - countAllImages;
+            const imagesToInsert = allImages.slice(0, Math.min(5, allImages.length));
+            let imageOrderIndex = imageOrderMaxValue;
+            //const imageDetails = imagesToInsert.map(async imageUrl => {
+            for(let imageUrl of imagesToInsert) {
+              imageOrderIndex++;
+              let extension = path.extname(imageUrl);
+              if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){ 
+                await CompressImage("./public/images/"+imageUrl,"./public/compress_images/");
+              } else {
+                await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
+                  if (err) {
+                      // console.log("Error Found:", err);
+                  }
+                  else {
+                      // console.log("File copied successfully!");
+                  }
+                });
+              }
+              const productimageDetail = new Productimage({
+                product_id: req.body.product_id,
+                category_id: req.body.subcategory_id,
+                user_id: exitsProductData.user_id,
+                image: imageUrl,
+                image_order:  imageOrderIndex,
+                //image_order:  req.body.image_order,
+                added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
+              });
+              await productimageDetail.save();
+            }
+            //await Promise.all(imageDetails);
+          }
+        } else {
+          await Productimage.deleteMany({ product_id: req.body.product_id });
+          const imagesToUpload = imagesArray.slice(0, 5);
+          let imageOrderIndex = 0;
+          for (const image of imagesToUpload) {
+            imageOrderIndex++;
+            //let extension = path.extname(imageUrl);
+            let extension = path.extname(image); // It was not worked so changed by Palash 10-04-2024
+            if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){
+              await CompressImage("./public/images/"+image,"./public/compress_images/");
+            } else {
+              await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
+                if (err) {
+                    // console.log("Error Found:", err);
+                } else {
+                    // console.log("File copied successfully!");
+                }
+              });
+            }
+            const productimageDetail = new Productimage({
+              product_id: req.body.product_id,
+              category_id: req.body.subcategory_id,
+              user_id: exitsProductData.user_id,
+              image: image,
+              image_order:  imageOrderIndex,
+              //image_order:  req.body.image_order,
+              added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
+            });
+            console.log("productimageDetail1",productimageDetail)
+            await productimageDetail.save();
+          }
+        }
+      } else {
+        const List = await Productimage.find({ product_id: req.body.product_id }).sort("image_order");;
+        const count = await Productimage.countDocuments({ product_id: req.body.product_id });
+        const imageOrdersarray = req.body.image_order;
+        if (typeof List !== "undefined" && List.length > 0 && Array.isArray(imageOrdersarray) && List.length === imageOrdersarray.length) {
+          for (let i = 0; i < List.length; i++) {
+            let eachImage = List[i];
+            let imageorder = imageOrdersarray[i];
+            let imageDetails = {
+              image_order: imageorder,
+              update_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
+            };
+            await Productimage.findByIdAndUpdate(
+              eachImage._id,
+              imageDetails,
+              { new: true, runValidators: true }
+            );
+          }
+        } 
+        if (count !== 5 || count < 5) {
+          if (req.files && req.files.length > 0) {
+
+            const imageDetails = req.files.slice(0, 5 - count);
+            let currentImageMaxValue = 0;
+            for(let file of imageDetails) {
+              let getOrderMaxValue = await Productimage.findOne({product_id: req.body.product_id}).sort({image_order:-1});
+              if(getOrderMaxValue == null) {
+                currentImageMaxValue = 1;
+              } else {
+                currentImageMaxValue = parseInt(getOrderMaxValue.image_order) + 1;
+              }                
+                const imageUrl = file.filename;
+                let extension = path.extname(imageUrl);
+                if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){
+                  await CompressImage("./public/images/"+imageUrl,"./public/compress_images/");
+                } else {
+                  await fs.copyFile("./public/images/"+imageUrl, "./public/compress_images/"+imageUrl, (err) => {
+                    if (err) {
+                        // console.log("Error Found:", err);
+                    }
+                    else {
+                        // console.log("File copied successfully!");
+                    }
+                  });
+                }
+              const productimageDetail = new Productimage({
+                product_id: req.body.product_id,
+                category_id: req.body.subcategory_id,
+                user_id: exitsProductData.user_id,
+                image: imageUrl,
+                image_order: currentImageMaxValue,
+                added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
+              });
+              console.log("productimageDetail2",productimageDetail)
+              await productimageDetail.save();
+            }
+          }
+        }
+      }
       res.redirect("/admin/productlist");
     }
   }).catch((err) => {

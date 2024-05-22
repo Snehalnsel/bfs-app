@@ -3159,7 +3159,7 @@ exports.removeWishlistWeb = async (req, res) => {
 
 };
 
-exports.addToCart = async function (req, res, next) {
+exports.addToCart_backup = async function (req, res, next) {
   try {
     var userData = req.session.user;
     var qty = '1';
@@ -3258,6 +3258,119 @@ exports.addToCart = async function (req, res, next) {
         is_added: true
       });
     }
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the Edit Profile.",
+      error: error.message,
+    });
+  }
+};
+
+exports.addToCart = async function (req, res, next) {
+  try {
+    var userData = req.session.user;
+    var qty = '1';
+    const product_id = req.params.id;
+    const user_id = req.session.user.userId;
+    const existingCart = await Cart.findOne({ user_id: user_id, status: 0 });
+    if (existingCart) {
+      await Cart.deleteMany({ user_id: mongoose.Types.ObjectId(user_id)});
+      await CartDetail.deleteMany({ cart_id: mongoose.Types.ObjectId(existingCart._id)});
+    }
+    // if (existingCart) {
+    //   const existingCartItem = await CartDetail.findOne({
+    //     cart_id: existingCart._id
+    //   });
+
+    //   if (existingCartItem) {
+    //     existingCartItem.product_id = product_id;
+    //     existingCartItem.qty = parseInt(qty);
+    //     await existingCartItem.save();
+    //   }
+    //    else {
+
+    //     const cartDetail = new CartDetail({
+    //       cart_id: existingCart._id,
+    //       product_id,
+    //       qty,
+    //       check_status: 0,
+    //       status: 0,
+    //       added_dtime: dateTime,
+    //     });
+    //     await cartDetail.save();
+    //   }
+    //   const user = await Users.findById(user_id);
+    //   if (!user) {
+    //     return res.status(404).json({ error: 'User not found' });
+    //   }
+    //   const product = await Userproduct.findById(product_id);
+    //   if (!product) {
+    //     return res.status(404).json({ error: 'Product not found' });
+    //   }
+    //   const cartResponse = {
+    //     _id: existingCart._id,
+    //     user_id: existingCart.user_id,
+    //     status: existingCart.status,
+    //     check_status: existingCartItem.check_status,
+    //     qty: existingCartItem.qty,
+    //     user_name: user.name,
+    //     product_name: product.name,
+    //     added_dtime: existingCart.added_dtime,
+    //     __v: existingCart.__v,
+    //   };
+    //   setTimeout(() => {
+    //     removeItemAfterTime(existingCart._id);
+    //   }, 20 * 60 * 1000);
+    //   return res.status(200).json({
+    //     message: 'Item Added to Cart',
+    //     cart: cartResponse,
+    //   });
+    // }
+    //else {
+      const newCart = new Cart({
+        user_id,
+        status: 0,
+        added_dtime: dateTime,
+      });
+      const savedCart = await newCart.save();
+      const cartDetail = new CartDetail({
+        cart_id: savedCart._id,
+        product_id,
+        qty,
+        check_status: 0,
+        status: 0,
+        added_dtime: dateTime,
+      });
+      const savedata = await cartDetail.save();
+      var cartCount = await Cart.countDocuments({ user_id: savedCart.user_id });
+      const user = await Users.findById(user_id);
+      const product = await Userproduct.findById(product_id);
+      const cartResponse = {
+        _id: savedCart._id,
+        user_id: savedCart.user_id,
+        status: savedCart.status,
+        check_status: cartDetail.check_status,
+        qty: cartDetail.qty,
+        user_name: user.name,
+        product_name: product.name,
+        product_user_id: product.user_id,
+        added_dtime: savedCart.added_dtime,
+        __v: savedCart.__v,
+      };
+      const cartRemove = await Cartremove.findOne({}, { name: 1, _id: 0 });
+      const durationInSeconds = cartRemove.name;
+      const durationInMilliseconds = durationInSeconds * 60 * 1000;
+      setTimeout(() => {
+        removeItemAfterTime(savedCart._id);
+      }, durationInMilliseconds);
+      res.status(200).json({
+        cart_count: cartCount,
+        message: 'Item Added to Cart',
+        cart: cartResponse,
+        is_added: true
+      });
+   // }
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -3374,7 +3487,7 @@ exports.viewCartListByUserId_backup = async function (req, res, next) {
   }
 };
 
-exports.viewCartListByUserId = async function (req, res, next) {
+exports.viewCartListByUserId_backup2 = async function (req, res, next) {
   try {
 
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -3464,6 +3577,109 @@ exports.viewCartListByUserId = async function (req, res, next) {
     }
   }
   catch (error) {
+    console.log(error);
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering Cart List.",
+      error: error.message,
+    });
+  }
+};
+exports.viewCartListByUserId = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    if (isLoggedIn == "") {
+      return res.redirect("/registration");
+    }
+    
+    const user_id = req.session.user.userId;
+    const existingCart = await Cart.findOne({ user_id, status: 0 });
+    
+    if (!existingCart) {
+      return res.render("webpages/addtocart", {
+        title: "Cart List Page",
+        message: "Cart is empty",
+        respdata: [],
+        respdata1: [],
+        user: user_id,
+        isLoggedIn: isLoggedIn,
+        websiteUrl: process.env.SITE_URL,
+      });
+    }
+    
+    const lastAddedCartDetail = await CartDetail.findOne({ cart_id: existingCart._id, status: 0 })
+                                .sort({ createdAt: -1 })
+                                .exec();
+
+    if (!lastAddedCartDetail) {
+      return res.render("webpages/addtocart", {
+        title: "Cart List Page",
+        message: "Cart is empty",
+        respdata: [],
+        respdata1: [],
+        user: user_id,
+        isLoggedIn: isLoggedIn,
+        websiteUrl: process.env.SITE_URL,
+      });
+    }
+    
+    const user = await Users.findById(existingCart.user_id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    const product = await Userproduct.findById(lastAddedCartDetail.product_id).populate('category_id', 'name');
+    const productImages = await Productimage.findOne({ product_id: product._id }).limit(1);
+
+    let shippingChargeAmount = 0;
+    if (product) {
+      const shippingCharges = await shippingchrgsModel.findOne({ _id: product.shipping_charges_id });
+      if (shippingCharges) {
+        shippingChargeAmount = Number(shippingCharges.amount);
+      }
+    }
+    const finalData = {
+      _id: lastAddedCartDetail._id,
+      cart_id: existingCart._id,
+      quantity: lastAddedCartDetail.qty,
+      product_id: lastAddedCartDetail.product_id,
+      product_name: product.name,
+      product_est_price: product.price,
+      seller_id: product.user_id,
+      category_name: product.category_id.name,
+      images: productImages ? productImages.image : null,
+      user_name: user.name,
+      added_dtime: lastAddedCartDetail.added_dtime,
+      status: lastAddedCartDetail.status,
+      shippingChargeAmount: shippingChargeAmount
+    };
+    let product_price;
+    let is_bid;
+    if (lastAddedCartDetail.finalBidPrice) {
+      product_price = lastAddedCartDetail.finalBidPrice;
+      finalData.product_price = product_price;
+      is_bid = 1;
+      finalData.is_bid = 1;
+    } else {
+      is_bid = 0;
+      product_price = product.offer_price;
+      finalData.product_price = product_price;
+      finalData.is_bid = 0;
+    }
+
+    const gst = parseFloat((shippingChargeAmount * 28) / 100).toFixed(2);
+    const finalPrice = parseInt(product_price) + shippingChargeAmount + parseInt(gst);
+    
+    return res.render("webpages/addtocart", {
+      title: "Cart List Page",
+      message: "Welcome to the Cart List page!",
+      respdata: finalData,
+      respdata1: finalPrice,
+      user: user_id,
+      isLoggedIn: isLoggedIn,
+      websiteUrl: process.env.SITE_URL,
+    });
+  } catch (error) {
     console.log(error);
     res.status(500).json({
       status: "0",

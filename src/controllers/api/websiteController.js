@@ -1393,6 +1393,7 @@ exports.myAccount = async function (req, res, next) {
     } else {
       var userData = req.session.user;
       const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId)});
+      const userdetails = await Users.findOne({ _id: userData.userId });
 
       const html = await ejs.renderFile("views/webpages/myaccount.ejs", {
         helper: helper,
@@ -1400,6 +1401,7 @@ exports.myAccount = async function (req, res, next) {
         message: "Welcome to the privacy policy page!",
         respdata: req.session.user,
         respdata1: address,
+        userdatadettails: userdetails,
         isLoggedIn: isLoggedIn,
         websiteUrl: process.env.SITE_URL,
       }, { async: true });
@@ -1948,8 +1950,6 @@ exports.userUpdate = async function (req, res, next) {
     });
   }
 };
-
-
 exports.getbankDetails = async function (req, res, next) {
   try {
     const bankDetails = await Bankdetails.findOne({ user_id: req.body.user_id });
@@ -3038,17 +3038,19 @@ exports.viewWishListByUserId = async function (req, res, next) {
           };
         }
       }));
-      const count = formattedList.length;
+      const filteredList = formattedList.filter(item => item !== null && item !== undefined);
+      const count = filteredList.length;
       res.render("webpages/wishlist", {
         title: "Wish List Page",
         message: "Welcome to the Wish List page!",
-        respdata: formattedList,
+        respdata: filteredList,
         isLoggedIn: isLoggedIn,
-        itemCount: formattedList.length,
+        itemCount: filteredList.length,
         websiteUrl: process.env.SITE_URL,
       });
     }
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering Wishlist Listing Page.",
@@ -3099,54 +3101,59 @@ exports.addToCart = async function (req, res, next) {
     const user_id = req.session.user.userId;
     const existingCart = await Cart.findOne({ user_id: user_id, status: 0 });
     if (existingCart) {
-      const existingCartItem = await CartDetail.findOne({
-        cart_id: existingCart._id
-      });
-
-      if (existingCartItem) {
-        existingCartItem.product_id = product_id;
-        existingCartItem.qty = parseInt(qty);
-        await existingCartItem.save();
-      } else {
-
-        const cartDetail = new CartDetail({
-          cart_id: existingCart._id,
-          product_id,
-          qty,
-          check_status: 0,
-          status: 0,
-          added_dtime: dateTime,
-        });
-        await cartDetail.save();
-      }
-      const user = await Users.findById(user_id);
-      if (!user) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-      const product = await Userproduct.findById(product_id);
-      if (!product) {
-        return res.status(404).json({ error: 'Product not found' });
-      }
-      const cartResponse = {
-        _id: existingCart._id,
-        user_id: existingCart.user_id,
-        status: existingCart.status,
-        check_status: existingCartItem.check_status,
-        qty: existingCartItem.qty,
-        user_name: user.name,
-        product_name: product.name,
-        added_dtime: existingCart.added_dtime,
-        __v: existingCart.__v,
-      };
-      setTimeout(() => {
-        removeItemAfterTime(existingCart._id);
-      }, 20 * 60 * 1000);
-      return res.status(200).json({
-        message: 'Item Added to Cart',
-        cart: cartResponse,
-      });
+      await Cart.deleteMany({ user_id: mongoose.Types.ObjectId(user_id)});
+      await CartDetail.deleteMany({ cart_id: mongoose.Types.ObjectId(existingCart._id)});
     }
-    else {
+    // if (existingCart) {
+    //   const existingCartItem = await CartDetail.findOne({
+    //     cart_id: existingCart._id
+    //   });
+
+    //   if (existingCartItem) {
+    //     existingCartItem.product_id = product_id;
+    //     existingCartItem.qty = parseInt(qty);
+    //     await existingCartItem.save();
+    //   }
+    //    else {
+
+    //     const cartDetail = new CartDetail({
+    //       cart_id: existingCart._id,
+    //       product_id,
+    //       qty,
+    //       check_status: 0,
+    //       status: 0,
+    //       added_dtime: dateTime,
+    //     });
+    //     await cartDetail.save();
+    //   }
+    //   const user = await Users.findById(user_id);
+    //   if (!user) {
+    //     return res.status(404).json({ error: 'User not found' });
+    //   }
+    //   const product = await Userproduct.findById(product_id);
+    //   if (!product) {
+    //     return res.status(404).json({ error: 'Product not found' });
+    //   }
+    //   const cartResponse = {
+    //     _id: existingCart._id,
+    //     user_id: existingCart.user_id,
+    //     status: existingCart.status,
+    //     check_status: existingCartItem.check_status,
+    //     qty: existingCartItem.qty,
+    //     user_name: user.name,
+    //     product_name: product.name,
+    //     added_dtime: existingCart.added_dtime,
+    //     __v: existingCart.__v,
+    //   };
+    //   setTimeout(() => {
+    //     removeItemAfterTime(existingCart._id);
+    //   }, 20 * 60 * 1000);
+    //   return res.status(200).json({
+    //     message: 'Item Added to Cart',
+    //     cart: cartResponse,
+    //   });
+    // }
+    //else {
       const newCart = new Cart({
         user_id,
         status: 0,
@@ -3189,7 +3196,7 @@ exports.addToCart = async function (req, res, next) {
         cart: cartResponse,
         is_added: true
       });
-    }
+   // }
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -3209,7 +3216,7 @@ const removeItemAfterTime = async (cartId) => {
   } catch (error) {
   }
 };
-exports.viewCartListByUserId = async function (req, res, next) {
+exports.viewCartListByUserId_backup = async function (req, res, next) {
   try {
 
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -3230,61 +3237,64 @@ exports.viewCartListByUserId = async function (req, res, next) {
       });
     }
     else {
-      const cartList = await CartDetail.find({ cart_id: existingCart._id, status: 0 })
-        .populate({
-          path: 'product_id',
-          model: Userproduct,
-          select: 'name shipping_charges_id images',
-        })
-        .exec();
+      // const cartList = await CartDetail.findOne({ cart_id: existingCart._id, status: 0 }).exec();
+      const cartList = await CartDetail.findOne({ cart_id: existingCart._id, status: 0 })
+                                .sort({ createdAt: -1 }) 
+                                .exec();
+
+      console.log(cartList);
       const user = await Users.findById(existingCart.user_id);
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
-     
       const formattedCartList = await Promise.all(cartList.map(async (cartItem) => {
-        const product = await Userproduct.findOne({ _id: cartItem.product_id._id }).populate('category_id', 'name');
-        const productImages = await Productimage.find({ product_id: cartItem.product_id._id }).limit(1);
+       const product = await Userproduct.findById(cartItem.product_id).populate('category_id', 'name');
+        const productImages = await Productimage.findOne({ product_id: product._id }).limit(1);
+        console.log(productImages.image);
         let shippingChargeAmount = 0;
-        if(cartList.length > 0){
-          let shippingCharges = await shippingchrgsModel.findOne({_id: cartList[0].product_id.shipping_charges_id})
+        if(cartItem.length > 0){
+          let shippingCharges = await shippingchrgsModel.findOne({_id: product.shipping_charges_id})
           if(shippingCharges){
             shippingChargeAmount = Number(shippingCharges.amount);
           }
         }
-        
         const finalData = {
           _id: cartItem._id,
           cart_id: existingCart._id,
           quantity: cartItem.qty,
-          product_id: cartItem.product_id._id,
-          product_name: cartItem.product_id.name,
+          product_id: cartItem.product_id,
+          product_name: product.name,
           // product_price: product.offer_price,
           product_est_price: product.price,
           seller_id: product.user_id,
           category_name: product.category_id.name,
-          images: productImages.length > 0 ? productImages[0].image : null,
+          images: productImages ? productImages.image : null,
           user_name: user.name,
           added_dtime: cartItem.added_dtime,
           status: cartItem.status,
           shippingChargeAmount: shippingChargeAmount
         };
-        
         let product_price;
+        let is_bid;
         if(cartItem.finalBidPrice)
         {
           product_price = cartItem.finalBidPrice;
           finalData.product_price = product_price;
+          is_bid = 1;
+          finalData.is_bid = 1;
         }
         else
         {
+          is_bid = 0;
           product_price = product.offer_price;
           finalData.product_price = product_price;
+          finalData.is_bid = 0;
         }
         
         //const gst = parseFloat((product_price * 28) / 100).toFixed(2);
         const gst = parseFloat((shippingChargeAmount * 28) / 100).toFixed(2);
         const finalPrice = parseInt(product_price) + shippingChargeAmount + parseInt(gst);
+        console.log("finalprice",finalData);
         res.render("webpages/addtocart", {
           title: "Cart List Page",
           message: "Welcome to the Cart List page!",
@@ -3298,6 +3308,7 @@ exports.viewCartListByUserId = async function (req, res, next) {
     }
   }
   catch (error) {
+    console.log(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering Cart List.",
@@ -3305,6 +3316,111 @@ exports.viewCartListByUserId = async function (req, res, next) {
     });
   }
 };
+
+exports.viewCartListByUserId = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    if (isLoggedIn == "") {
+      return res.redirect("/registration");
+    }
+    
+    const user_id = req.session.user.userId;
+    const existingCart = await Cart.findOne({ user_id, status: 0 });
+    
+    if (!existingCart) {
+      return res.render("webpages/addtocart", {
+        title: "Cart List Page",
+        message: "Cart is empty",
+        respdata: [],
+        respdata1: [],
+        user: user_id,
+        isLoggedIn: isLoggedIn,
+        websiteUrl: process.env.SITE_URL,
+      });
+    }
+    
+    const lastAddedCartDetail = await CartDetail.findOne({ cart_id: existingCart._id, status: 0 })
+                                .sort({ createdAt: -1 })
+                                .exec();
+
+    if (!lastAddedCartDetail) {
+      return res.render("webpages/addtocart", {
+        title: "Cart List Page",
+        message: "Cart is empty",
+        respdata: [],
+        respdata1: [],
+        user: user_id,
+        isLoggedIn: isLoggedIn,
+        websiteUrl: process.env.SITE_URL,
+      });
+    }
+    
+    const user = await Users.findById(existingCart.user_id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    const product = await Userproduct.findById(lastAddedCartDetail.product_id).populate('category_id', 'name');
+    const productImages = await Productimage.findOne({ product_id: product._id }).limit(1);
+
+    let shippingChargeAmount = 0;
+    if (product) {
+      const shippingCharges = await shippingchrgsModel.findOne({ _id: product.shipping_charges_id });
+      if (shippingCharges) {
+        shippingChargeAmount = Number(shippingCharges.amount);
+      }
+    }
+    const finalData = {
+      _id: lastAddedCartDetail._id,
+      cart_id: existingCart._id,
+      quantity: lastAddedCartDetail.qty,
+      product_id: lastAddedCartDetail.product_id,
+      product_name: product.name,
+      product_est_price: product.price,
+      seller_id: product.user_id,
+      category_name: product.category_id.name,
+      images: productImages ? productImages.image : null,
+      user_name: user.name,
+      added_dtime: lastAddedCartDetail.added_dtime,
+      status: lastAddedCartDetail.status,
+      shippingChargeAmount: shippingChargeAmount
+    };
+    let product_price;
+    let is_bid;
+    if (lastAddedCartDetail.finalBidPrice) {
+      product_price = lastAddedCartDetail.finalBidPrice;
+      finalData.product_price = product_price;
+      is_bid = 1;
+      finalData.is_bid = 1;
+    } else {
+      is_bid = 0;
+      product_price = product.offer_price;
+      finalData.product_price = product_price;
+      finalData.is_bid = 0;
+    }
+
+    const gst = parseFloat((shippingChargeAmount * 28) / 100).toFixed(2);
+    const finalPrice = parseInt(product_price) + shippingChargeAmount + parseInt(gst);
+    
+    return res.render("webpages/addtocart", {
+      title: "Cart List Page",
+      message: "Welcome to the Cart List page!",
+      respdata: finalData,
+      respdata1: finalPrice,
+      user: user_id,
+      isLoggedIn: isLoggedIn,
+      websiteUrl: process.env.SITE_URL,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering Cart List.",
+      error: error.message,
+    });
+  }
+};
+
 exports.deleteCart = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -3419,7 +3535,7 @@ exports.checkoutWeb = async function (req, res, next) {
       // const addressUserList = await addressBook.find({user_id: user_id });
       const addressUserList = await addressBook.find({
         user_id: user_id,
-        default_status: 0
+        deleted_status: 0
       });
       const user = await Users.findById(existingCart.user_id);
       if (!user) {
@@ -3466,13 +3582,13 @@ exports.checkoutWeb = async function (req, res, next) {
         // const requestUrl =  req.headers.referer;
         const requestUrl = '/web-my-order';
 
-        await insertNotification(
-          'Order Placed Successfully from Website',
-          `You have placed an order for ${cartItem.product_id.name}`,//Added By Palash Samanta
-          user_id,
-          requestUrl,
-          new Date()
-        );
+        // await insertNotification(
+        //   'Order Placed Successfully from Website',
+        //   `You have placed an order for ${cartItem.product_id.name}`,//Added By Palash Samanta
+        //   user_id,
+        //   requestUrl,
+        //   new Date()
+        // );
         // const product_price = finalData.product_price;
         //const gst = parseFloat((product_price * 28) / 100).toFixed(2);
         const gst = parseFloat((shippingChargeAmount * 28) / 100).toFixed(2);
@@ -4779,11 +4895,9 @@ exports.sendotp = async function (req, res, next) {
                         send_status: 'send',
                       });
                       await historyData.save();
-
                       const message = "Password changed successfully! Your account at Bid For Sale is now updated. If you didn't make this change, please contact support immediately. Thank you!";
                       const to_number = "91" + user.phone_no;
                       let response = await send_message({ type: 'text', message, to_number });
-            
                       //SEND WHATSAPP
                       const receiverMobileNo = "91" + user.phone_no;
                       const root = create({ version: '1.0', encoding: "ISO-8859-1" })

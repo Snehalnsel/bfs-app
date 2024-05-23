@@ -295,7 +295,6 @@ exports.getfilterData = function (page, searchType, searchValue,req, res, next) 
   });
 };
 exports.detailsData = async function (req, res, next) {
-
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   var pageName = "Product Details";
   var pageTitle = req.app.locals.siteName + " - " + pageName;
@@ -356,10 +355,12 @@ exports.detailsData = async function (req, res, next) {
       //requrl:requrl
     });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: 'An error occurred' });
   }
 };
 exports.updatedetailsData = async function (req, res, next) {
+  console.log("req body",req.body);
 
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
@@ -489,22 +490,20 @@ exports.updatedetailsData = async function (req, res, next) {
               //image_order:  req.body.image_order,
               added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
             });
+            console.log("productimageDetail1",productimageDetail)
             await productimageDetail.save();
           }
         }
       } else {
-        const List = await Productimage.find({ product_id: req.body.product_id });
+        const List = await Productimage.find({ product_id: req.body.product_id }).sort("image_order");;
         const count = await Productimage.countDocuments({ product_id: req.body.product_id });
-        if(typeof List != "undefined" && List.length > 0) {
-          let imageOrderIndex = -1;
-          for(let eachImage of List) {
-            imageOrderIndex++;
+        const imageOrdersarray = req.body.image_order;
+        if (typeof List !== "undefined" && List.length > 0 && Array.isArray(imageOrdersarray) && List.length === imageOrdersarray.length) {
+          for (let i = 0; i < List.length; i++) {
+            let eachImage = List[i];
+            let imageorder = imageOrdersarray[i];
             let imageDetails = {
-              //product_id: req.body.product_id,
-              // category_id: req.body.subcategory_id,
-              // user_id: exitsProductData.user_id,
-              // image: imageUrl,
-              image_order: req.body.image_order[imageOrderIndex],
+              image_order: imageorder,
               update_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
             };
             await Productimage.findByIdAndUpdate(
@@ -512,15 +511,11 @@ exports.updatedetailsData = async function (req, res, next) {
               imageDetails,
               { new: true, runValidators: true }
             );
-            //let insertDetail = new Productimage(imageDetails);
-            //await insertDetail.fin();
           }
-        }
+        } 
         if (count !== 5 || count < 5) {
           if (req.files && req.files.length > 0) {
-            //let imageOrderIndex = (imageOrderMaxValue != 1) ? imageOrderMaxValue : 0;
 
-            //const imageDetails = req.files.slice(0, 5 - count).map(async (file) => {
             const imageDetails = req.files.slice(0, 5 - count);
             let currentImageMaxValue = 0;
             for(let file of imageDetails) {
@@ -529,12 +524,7 @@ exports.updatedetailsData = async function (req, res, next) {
                 currentImageMaxValue = 1;
               } else {
                 currentImageMaxValue = parseInt(getOrderMaxValue.image_order) + 1;
-              }
-              // const requrl = url.format({
-              //   protocol: req.protocol,
-              //   host: req.get("host"),
-              // });
-                
+              }                
                 const imageUrl = file.filename;
                 let extension = path.extname(imageUrl);
                 if(typeof extension != "undefined" && extension != "webp" && extension != "WEBP"){
@@ -555,36 +545,14 @@ exports.updatedetailsData = async function (req, res, next) {
                 user_id: exitsProductData.user_id,
                 image: imageUrl,
                 image_order: currentImageMaxValue,
-                //image_order: req.body.image_order[imageOrderIndex],
                 added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
               });
+              console.log("productimageDetail2",productimageDetail)
               await productimageDetail.save();
             }
-            //await Promise.all(imageDetails);
           }
         }
       }
-      // if (req.files && req.files.length > 0) {
-      //   const imageDetails = req.files.map((file) => {
-      //     const requrl = url.format({
-      //       protocol: req.protocol,
-      //       host: req.get("host"),
-      //     });
-      //     const imageUrl = requrl + "/public/images/" + file.filename;
-
-      //     const productimageDetail = new Productimage({
-      //       product_id: req.body.product_id,
-      //       category_id: req.body.subcategory_id,
-      //       user_id: req.body.user_id,
-      //       image: imageUrl,
-      //       added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
-      //     });
-
-      //     return productimageDetail.save();
-      //   });
-
-      //   await Promise.all(imageDetails);
-      // }
       res.redirect("/admin/productlist");
     }
   }).catch((err) => {
@@ -598,7 +566,6 @@ exports.updatedetailsData = async function (req, res, next) {
   });
 };
 exports.updateStatusData = async function (req, res, next) {
-
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const Id = req.params.id;
   Userproduct.findById(Id)
@@ -612,7 +579,6 @@ exports.updateStatusData = async function (req, res, next) {
         });
       }
       product.flag = product.flag === 0 ? 1 : 0;
-
       product.save()
         .then((updatedProduct) => {
           if (!updatedProduct) {
@@ -643,7 +609,6 @@ exports.updateStatusData = async function (req, res, next) {
       });
     });
 };
-
 
 exports.deleteData = async function (req, res, next) {
   try {

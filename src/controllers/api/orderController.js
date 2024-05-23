@@ -759,8 +759,6 @@ exports.checkout = async (req, res) => {
     res.status(500).json({ error: 'An error occurred while placing the order' });
   }
 };
-
-
 exports.updateOrderById = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -770,12 +768,9 @@ exports.updateOrderById = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   try {
     const orderId = req.body.order_id;
-
     const existingOrder = await Order.findById(orderId);
-
     if (!existingOrder) {
       return res.status(404).json({
         status: "0",
@@ -783,7 +778,6 @@ exports.updateOrderById = async function (req, res, next) {
         respdata: {},
       });
     }
-    
     existingOrder.user_id = req.body.user_id || existingOrder.user_id;
     existingOrder.seller_id = req.body.seller_id || existingOrder.seller_id;
     existingOrder.cart_id = req.body.cart_id || existingOrder.cart_id;
@@ -797,20 +791,15 @@ exports.updateOrderById = async function (req, res, next) {
     existingOrder.discount = req.body.discount || existingOrder.discount;
     existingOrder.pickup_status = req.body.pickup_status || existingOrder.pickup_status;
     existingOrder.delivery_status = req.body.delivery_status || existingOrder.delivery_status;
-
     existingOrder.updated_dtime = new Date().toISOString();
-
     const updatedOrder = await existingOrder.save();
-
     if(updatedOrder)
     {
       const seller = await Users.findById(updatedOrder.seller_id);
       const user = await Users.findById(updatedOrder.user_id);
       const billingaddress = await AddressBook.findById(updatedOrder.billing_address_id);
       const selleraddress = await AddressBook.findById(updatedOrder.shipping_address_id);
-
       const orderIdAsString = orderId;
-
       const orderData = {
         order_id: orderIdAsString, 
         order_date: new Date().toISOString(), 
@@ -860,22 +849,15 @@ exports.updateOrderById = async function (req, res, next) {
         height: 0.5, 
         weight: 0.5,
       };
-
         const shiprocketResponse = await updateOrder(orderData);
-
           if (shiprocketResponse) {
-            
             const payment_status = '0';
-            
-            
             updatedOrder.shiprocket_payment_status = payment_status; 
             updatedOrder.shiprocket_order_id = shiprocketResponse.order_id;
             updatedOrder.shiprocket_shipment_id = shiprocketResponse.shipment_id;
             updatedOrder.shiprocket_status_code = shiprocketResponse.status_code;
-        
             await updatedOrder.save();
           }
-
           res.status(200).json({
             status: "1",
             message: "Order updated!",
@@ -896,22 +878,19 @@ exports.getOrderListByUser = async (req, res) => {
   try {
     let  user_id  = typeof req.body.user_id != "undefined"  ? req.body.user_id : req.session.user.userId;
     const orders = await Order.find({ user_id: user_id }).populate('seller_id', 'name').populate('user_id', 'name');
-   
     if (!orders || orders.length === 0) {
       return res.status(404).json({ message: 'No orders found for this seller' });
     }
     const ordersWithProductDetails = [];
     for (const order of orders) {
-      var currentDate = moment().format();
-       let startTime = moment(order.added_dtime).format();
-       currentDate = moment(currentDate);
-       startTime = moment(startTime);
+      var currentDate = moment();
+      let startTime = moment(order.added_dtime);
       let timeDiff = currentDate.diff(startTime, 'hours');
       let isActionShow = 0;
-      if(timeDiff < 24){
+      if (timeDiff > 24) {
         isActionShow = 1;
       }
-      //console.log('isActionShow--',isActionShow,'timeDiff--',timeDiff)
+      console.log('isActionShow--', isActionShow, 'timeDiff--', timeDiff);
       const orderCreationTime = moment(order.added_dtime); 
       const isOrderWithin24Hours = moment(new Date().toISOString()).diff(orderCreationTime, 'hours') < 24;
       const is_deletedtime = isOrderWithin24Hours ? 0 : 1;
@@ -951,15 +930,13 @@ exports.getOrderListByUser = async (req, res) => {
       orders: ordersWithProductDetails,
     });
   } catch (error) {
-    return;
     res.status(500).json({ error: 'An error occurred while fetching orders' });
   }
 };
 
 exports.getOrdersBySeller = async (req, res) => {
   try {
-  
-    let  seller_id  = typeof req.body.user_id != "undefined"  ? req.body.user_id : req.session.user.userId;
+    let  seller_id  = typeof req.body.seller_id != "undefined"  ? req.body.seller_id : req.session.user.userId;
     const orders = await Order.find({ seller_id }).populate('seller_id', 'name').populate('user_id', 'name');
     if (!orders || orders.length === 0) {
       return res.status(404).json({ message: 'No orders found for this seller' });
@@ -1007,6 +984,7 @@ exports.getOrdersBySeller = async (req, res) => {
       orders: ordersWithProductDetails,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: 'An error occurred while fetching orders' });
   }
 };
@@ -1468,15 +1446,12 @@ exports.updateDeliveryaddressByOrderId = async function (req, res, next) {
 };
 
 exports.returnOrderforapp = async function (req, res) {
-
   try{
       let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-
       const order_id = req.body.orderid;
       const return_reason = req.body.reasonid;
       const existingOrder = await Order.findById(order_id);
       let status = 0;
-
       if(!existingOrder)
       {
         return res.status(200).json({
@@ -1490,7 +1465,6 @@ exports.returnOrderforapp = async function (req, res) {
        added_dtime: new Date().toISOString(),
      });
      const savedOrder = await returnorder.save();
- 
      if (savedOrder) {
        await Iptrnsaction.create({
          user_id: req.session.user.userId, 
@@ -1499,7 +1473,6 @@ exports.returnOrderforapp = async function (req, res) {
          created_dtime: new Date(),
        });
        await Order.updateOne({ _id: order_id }, { is_return: 1 });
-
        let smsData = {
         textId: "test",
         toMobile: "91" +user.phone_no,
@@ -1516,11 +1489,9 @@ exports.returnOrderforapp = async function (req, res) {
         send_status: 'send',
       });
       await historyData.save();
-
       const user = await Users.findById(req.session.user.userId);
        const loginHtmlPath = 'views/webpages/return-order.html';
        const loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
-
        const mailData = {
         from: "Bid For Sale! <" + smtpUser + ">",
         to: user.email,
@@ -1529,17 +1500,14 @@ exports.returnOrderforapp = async function (req, res) {
         text: "return order",
         html: loginHtmlContent
       };
-
       transporter.sendMail(mailData, function (err, info) {
         // if (err) console.log(err);
         // else console.log(info);
       });
-
        res.status(200).json({
         status: "1",
         message: "Order return successfully!"
       });
-      
      }
   } catch (error) {
    return res.status(500).json({ message: 'Internal server error' });

@@ -45,6 +45,7 @@ const updateBidData = require("./src/models/fireDbServices/updateBidData");
 const updateBidOfferData = require("./src/models/fireDbServices/updateBidOfferData");
 const getBidData = require("./src/models/fireDbServices/getBidData");
 
+
 const UserModel = require("./src/models/api/userModel");
 const Cart = require('./src/models/api/cartModel');
 const CartDetail = require('./src/models/api/cartdetailsModel');
@@ -174,7 +175,6 @@ const checkFileType = function (file, cb) {
     cb("Error: You can Only Upload Images!!");
   }
 };
-
 
 // file location of private key
 var privateKey = fs.readFileSync( 'ssl/private3.key' );
@@ -344,8 +344,10 @@ io.on("connection", (socket) => {
       let notificationreqUrl = process.env.SITE_URL + "/bid-for-product/" + bidId;
       if(username == bidOldData.buyerId){
         notificationUserId = bidOldData.sellerId;
-        notificationTitle = 'A buyer has bidded on your product';
-        notificationContent =  'Buyer has bidded on ' + bidProductDetails.name;
+        // notificationTitle = 'A buyer has bidded on your product';
+        notificationTitle = 'You have received a new bid on your product';
+        //notificationContent =  'Buyer has bidded on ' + bidProductDetails.name;
+        notificationContent =  'A potential buyer has placed a bid on your' + bidProductDetails.name;
       } else {
         notificationUserId = bidOldData.buyerId;
         notificationTitle = 'The seller has replied on your bid';
@@ -386,7 +388,7 @@ io.on("connection", (socket) => {
         status: 0,
         userId: queryData.userId,
         sellerMessage: (username == bidOldData.sellerId) ? " Have Accepted Buyer's Offer.": "Buyer Has Accepted Your Offer.",
-        buyerMessage: (username == bidOldData.buyerId) ? " Have Accepted Seller's Offer.": " Has Accpeted Your Offer."
+        buyerMessage: (username == bidOldData.buyerId) ? " Have Accepted Seller's Offer.": " Has Accpeted Your Offer......!! Please click on Accept button to add the product to the cart."
       };
       let updateData = {
         //buyerId:queryData.userId,
@@ -401,11 +403,48 @@ io.on("connection", (socket) => {
         currentOffer: currentOffer,
         sellerId:(bidOldData.sellerId != "") ? bidOldData.sellerId : "",
       }; 
+      let notificationUserId = '';
+      let notificationTitle = '';
+      let notificationContent = '';
+      let notificationreqUrl = process.env.SITE_URL + "/bid-for-product/" + bidId;
+      let bidProductId = bidOldData.productId;
+      let bidProductDetails = await Userproduct.findOne({_id:bidProductId});
+        if((updateData.acceptedByBuyer == true) ){
+          notificationUserId = bidOldData.sellerId;
+          notificationTitle = 'A buyer has accepted the bid on your product';
+          notificationContent =  'Buyer has accepted bid on ' + bidProductDetails.name;
+          await insertNotification(
+            notificationTitle,
+            notificationContent,
+            notificationUserId,
+            notificationreqUrl,
+            new Date()
+          );
+          console.log("seller")
+        } 
+        if((updateData.acceptedBySeller == true)){
+          notificationUserId = bidOldData.buyerId;
+          notificationTitle = 'The seller has accepted your offer';
+          notificationContent =  'The seller has accepted your response on ' + bidProductDetails.name;
+          await insertNotification(
+            notificationTitle,
+            notificationContent,
+            notificationUserId,
+            notificationreqUrl,
+            new Date()
+          );
+          console.log("buyer")
+        }
       //Write code for both side acceptation
       if(((bidOldData.acceptedByBuyer == true) && (updateData.acceptedBySeller == true)) || ((bidOldData.acceptedBySeller == true) && (updateData.acceptedByBuyer == true))) {
-        //Item added to the cart
         let user_id = bidOldData.buyerId;
         let product_id = bidOldData.productId;
+        await Cart.deleteMany({ user_id: mongoose.Types.ObjectId(user_id)});
+        const existingCartDetail = await Cart.findOne({ user_id});
+        if (existingCartDetail) {
+          console.log('Cart with the same user_id and product_id already exists. No new cart created.');
+          return;
+        }
         let finalBidPrice = bidOldData.currentOffer.price;
         let qty = 1;
         const newCart = new Cart({
@@ -429,11 +468,11 @@ io.on("connection", (socket) => {
         currentOffer.sellerMessage = "Item Added to Buyer's Cart!";
         await updateBidData(updateData,bidId);
         await insertBidOfferData(currentOffer,currentOffer.id);
-      } else {
+        socket.emit("cartUpadte", "1");
+      }else {
         await updateBidData(updateData,bidId);
         await insertBidOfferData(currentOffer,currentOffer.id);
       }
-        
         //let currUserDetails = await UserModel.findOne({_id:username});
         //io.to(socket.id).emit("message", formatMessage(currUserDetails.name, " Has Accepted the latest bid",username, roomName));
       //}
@@ -514,6 +553,8 @@ module.exports = serv;
  
 //Palash Samanta
 //Snigdho Upadhyay
+
+
 
 
 

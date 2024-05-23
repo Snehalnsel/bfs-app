@@ -14,17 +14,17 @@
                             <div class="bids-row wishlist-row overflow-visible <%= notification.is_read === 0 ? 'unread-notification' : '' %>" id="<%= notification._id %>">
                                 <div class="br-details">
                                     <div class="bid-info">
-                                        <!-- <a href="#" onclick="handleNotificationClick('<%= notification._id %>','<%= notification.link %>')">
+                                        <a href="#" onclick="handleNotificationClick('<%= notification._id %>','<%= notification.link %>')">
                                             <div class="bd-title">
                                                 <%= notification.title %>
                                             </div>
-                                        </a>                                         -->
-
+                                        </a>                                        
+<!-- 
                                         <a href="javascript:void(0)">
                                             <div class="bd-title">
                                                 <%= notification.title %>
                                             </div>
-                                        </a>  
+                                        </a>   -->
                                         <div class="bd-content">
                                            <%= notification.content %>
                                         </div>
@@ -63,6 +63,7 @@
     const websiteUrl = '<%= websiteUrl %>'; 
  
     async function handleNotificationClick(notificationId,link) {
+
         await fetch('/markNotificationAsRead', {
             method: 'POST',
             headers: {
@@ -74,7 +75,7 @@
         .then(async response => {
             let data = await response.json();
             if (data.notification == true) {
-                window.location.href = websiteUrl + link; 
+                window.location.href =  link; 
             } else {
                 console.error('Failed to mark notification as read');
             }

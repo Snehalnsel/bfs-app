@@ -4858,3 +4858,10 @@ button.grey-btn {
 .bids-tab-mobile{
     display: none;
 }
+
+
+.bids-tab-mobile .chatbid-box {
+    width: 100%;
+    background: #fbfbfb;
+    border: solid 1px #eee;
+}

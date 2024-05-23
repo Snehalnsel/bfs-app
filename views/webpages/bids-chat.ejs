@@ -221,10 +221,10 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
    });
 
-   socket.on('cartUpadte', async (message) => {
+ socket.on('cartUpadte', async (message) => {
       getHeaderData();
    });
-
+   
    // Message submit
    chatForm.addEventListener('submit', (e) => {
       e.preventDefault();

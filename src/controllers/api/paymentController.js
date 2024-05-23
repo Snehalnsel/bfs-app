@@ -377,7 +377,7 @@ exports.getStatus = async function (req, res, next) {
         } else {
           updateData.checkstatus_status = "failure";
         }
-        updateData.checkstatus_status = "success";
+        
         await Demoorder.findOneAndUpdate(
           { _id: tempId },
           { $set: updateData },
@@ -540,9 +540,8 @@ exports.getStatus = async function (req, res, next) {
       }
     
       const address = await AddressBook.findById(savedOrder.shipping_address_id);
-
-      const billingaddress =  address.address1 + ', ' + address.landmark + ', ' + address.city_name + ', ' + address.state_name + ', ' + address.pin_code;
-
+      
+      const billingaddress =  address.address1 + ', '+ address.street_name + ', ' + address.landmark + ', ' + address.city_name + ', ' + address.state_name + ', ' + address.pin_code;
       //buyer mail,sms,whatsapp
       const loginHtmlPath = 'views/webpages/order-confirmed.html';
       let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
@@ -551,7 +550,12 @@ exports.getStatus = async function (req, res, next) {
       loginHtmlContent = loginHtmlContent.replace('{{ordernumber}}', orderCode);
       loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
       loginHtmlContent = loginHtmlContent.replace('{{productimages}}', productimage.image);
-      loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.offer_price);
+      //loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.offer_price);
+      let rpDataByer = `<td style="text-align: right; padding-bottom: 30px;"> Original Price <br/> ₹ ${product.offer_price} </td>`;
+      if(temporder.is_bid_price){
+        rpDataByer = `<td style="text-align: right; padding-bottom: 30px;"> Original Price <br/> ₹ ${product.offer_price} <br/>  Accepted Price <br/> ₹ ${temporder.original_product_price} </td>`;
+      }
+      loginHtmlContent = loginHtmlContent.replace('{{PRODUCTDATA}}', rpDataByer);
       loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
       loginHtmlContent = loginHtmlContent.replace('{{billingaddress}}', billingaddress);
       const mailDataforbuyer = {
@@ -570,8 +574,16 @@ exports.getStatus = async function (req, res, next) {
       loginHtmlContentforseller = loginHtmlContentforseller.replace('{{ordernumber}}', orderCode);
       loginHtmlContentforseller = loginHtmlContentforseller.replace('{{productname}}', product.name);
       loginHtmlContentforseller = loginHtmlContentforseller.replace('{{productimages}}', productimage.image);
-      loginHtmlContentforseller = loginHtmlContentforseller.replace('{{productprice}}', product.offer_price);
-      loginHtmlContentforseller = loginHtmlContentforseller.replace('{{totalprice}}', product.offer_price);
+      //loginHtmlContentforseller = loginHtmlContentforseller.replace('{{productprice}}', product.offer_price);
+      loginHtmlContentforseller = loginHtmlContentforseller.replace('{{totalprice}}', temporder.original_product_price);
+
+      let rpData = `<td style="text-align: right; padding-bottom: 30px;"> Original Price <br/> ₹ ${product.offer_price} </td>`;
+      if(temporder.is_bid_price){
+        rpData = `<td style="text-align: right; padding-bottom: 30px;"> Original Price <br/> ₹ ${product.offer_price} <br/>  Accepted Price <br/> ₹ ${temporder.original_product_price} </td>`;
+      }
+      loginHtmlContentforseller = loginHtmlContentforseller.replace('{{PRODUCTDATA}}', rpData);
+      //loginHtmlContentforseller = loginHtmlContentforseller.replace('{{bidPrice}}', temporder.original_product_price);
+
       loginHtmlContentforseller = loginHtmlContentforseller.replace('{{buyername}}', user.name);
  
       const mailDataforseller = {

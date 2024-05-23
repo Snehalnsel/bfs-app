@@ -230,9 +230,11 @@ exports.bidExistReccord = async (req, res, next) => {
         let notificationContent = '';
         let notificationreqUrl = process.env.SITE_URL + "/bid-for-product/" + bidId;
         notificationUserId = productDetails.user_id;
-        // notificationTitle = 'A buyer has bidded on your product';
+        //notificationTitle = 'A buyer has bidded on your product';
         notificationTitle = 'You have received a new bid on your product';
-        notificationContent =  'Buyer has bidded on your ' + productDetails.name;
+        //notificationContent =  'Buyer has bidded on your ' + productDetails.name;
+        notificationContent =  'A potential buyer has placed a bid on ' + productDetails.name;
+
         await insertNotification(
           notificationTitle,
           notificationContent,
@@ -280,9 +282,10 @@ exports.bidExistReccord = async (req, res, next) => {
         let notificationContent = '';
         let notificationreqUrl = process.env.SITE_URL + "/bid-for-product/" + bidId;
         notificationUserId = productDetails.user_id;
-        // notificationTitle = 'A buyer has bidded on your product';
+        //notificationTitle = 'A buyer has bidded on your product';
         notificationTitle = 'You have received a new bid on your product';
-        notificationContent =  'Buyer has bidded on ' + productDetails.name;
+        // notificationContent =  'Buyer has bidded on ' + productDetails.name;
+        notificationContent =  'A potential buyer has placed a bid on ' + productDetails.name;
         await insertNotification(
           notificationTitle,
           notificationContent,

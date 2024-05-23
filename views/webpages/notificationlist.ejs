@@ -19,8 +19,7 @@
                                                 <%= notification.title %>
                                             </div>
                                         </a>                                        
-<!-- 
-                                        <a href="javascript:void(0)">
+                                        <!-- <a href="/bid-for-product">
                                             <div class="bd-title">
                                                 <%= notification.title %>
                                             </div>
@@ -75,7 +74,11 @@
         .then(async response => {
             let data = await response.json();
             if (data.notification == true) {
+<<<<<<< HEAD
                 window.location.href =  link; 
+=======
+                window.location.href = link; 
+>>>>>>> f5bde7f13d065738bf38a620411061db3a9a21a1
             } else {
                 console.error('Failed to mark notification as read');
             }

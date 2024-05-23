@@ -80,6 +80,12 @@ const model = mongoose.Schema({
     default: 0,
     required: true,
   },
+  is_bid_price:{
+    type: Number,
+    enum: [0,1],
+    default: 0,
+    required: true,
+  },
   pay_response: {
     type: Object,
   },

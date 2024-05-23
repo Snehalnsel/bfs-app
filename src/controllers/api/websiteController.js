@@ -2993,6 +2993,71 @@ exports.addToWishlistWeb = async function (req, res, next) {
     });
   }
 };
+exports.viewWishListByUserId_backup = async function (req, res, next) {
+  try {
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+
+    if (isLoggedIn == "") {
+      return res.redirect("/registration");
+    }
+
+    const user_id = req.session.user.userId;
+    const existingList = await Wishlist.find({ user_id: isLoggedIn })
+      .populate('user_id', 'name')
+      .exec();
+
+    if (existingList.length === 0) {
+      res.render("webpages/wishlist", {
+        title: "Wish List Page",
+        message: "Welcome to the Wish List page!",
+        respdata: [],
+        isLoggedIn: isLoggedIn,
+        itemCount: 0,
+        websiteUrl: process.env.SITE_URL,
+      });
+    } else {
+      const formattedList = await Promise.all(existingList.map(async (item) => {
+        const product = await Userproduct.findOne({ _id: item.product_id }).populate('category_id', 'name');
+        if (product) {
+          const productImages = await Productimage.find({ product_id: item.product_id }).limit(1);
+          const date = moment(item.added_dtime, 'YYYY-MM-DDTHH:mm:ssZ');
+          const addedDate = date.format('DD/MM/YYYY');
+          const category_name = product.category_id ? product.category_id.name : 'Uncategorized';
+          return {
+            _id: item._id,
+            user_id: item.user_id._id,
+            user_name: item.user_id.name,
+            product_id: item.product_id,
+            product_name: product.name,
+            product_price: product.price,
+            category_name: product.category_id ? product.category_id.name : '',
+            images: productImages[0].image,
+            status: item.status,
+            added_dtime: addedDate,
+            __v: item.__v,
+          };
+        }
+      }));
+      const filteredList = formattedList.filter(item => item !== null && item !== undefined);
+      const count = filteredList.length;
+      res.render("webpages/wishlist", {
+        title: "Wish List Page",
+        message: "Welcome to the Wish List page!",
+        respdata: filteredList,
+        isLoggedIn: isLoggedIn,
+        itemCount: filteredList.length,
+        websiteUrl: process.env.SITE_URL,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering Wishlist Listing Page.",
+      error: error.message,
+    });
+  }
+};
 exports.viewWishListByUserId = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -3091,6 +3156,119 @@ exports.removeWishlistWeb = async (req, res) => {
     });
   }
 
+};
+
+exports.addToCart_backup = async function (req, res, next) {
+  try {
+    var userData = req.session.user;
+    var qty = '1';
+    const product_id = req.params.id;
+    const user_id = req.session.user.userId;
+    const existingCart = await Cart.findOne({ user_id: user_id, status: 0 });
+    if (existingCart) {
+      await Cart.deleteMany({ user_id: mongoose.Types.ObjectId(user_id)});
+      await CartDetail.deleteMany({ cart_id: mongoose.Types.ObjectId(existingCart._id)});
+    }
+    // if (existingCart) {
+    //   const existingCartItem = await CartDetail.findOne({
+    //     cart_id: existingCart._id
+    //   });
+
+    //   if (existingCartItem) {
+    //     existingCartItem.product_id = product_id;
+    //     existingCartItem.qty = parseInt(qty);
+    //     await existingCartItem.save();
+    //   }
+    //    else {
+
+    //     const cartDetail = new CartDetail({
+    //       cart_id: existingCart._id,
+    //       product_id,
+    //       qty,
+    //       check_status: 0,
+    //       status: 0,
+    //       added_dtime: dateTime,
+    //     });
+    //     await cartDetail.save();
+    //   }
+    //   const user = await Users.findById(user_id);
+    //   if (!user) {
+    //     return res.status(404).json({ error: 'User not found' });
+    //   }
+    //   const product = await Userproduct.findById(product_id);
+    //   if (!product) {
+    //     return res.status(404).json({ error: 'Product not found' });
+    //   }
+    //   const cartResponse = {
+    //     _id: existingCart._id,
+    //     user_id: existingCart.user_id,
+    //     status: existingCart.status,
+    //     check_status: existingCartItem.check_status,
+    //     qty: existingCartItem.qty,
+    //     user_name: user.name,
+    //     product_name: product.name,
+    //     added_dtime: existingCart.added_dtime,
+    //     __v: existingCart.__v,
+    //   };
+    //   setTimeout(() => {
+    //     removeItemAfterTime(existingCart._id);
+    //   }, 20 * 60 * 1000);
+    //   return res.status(200).json({
+    //     message: 'Item Added to Cart',
+    //     cart: cartResponse,
+    //   });
+    // }
+    //else {
+      const newCart = new Cart({
+        user_id,
+        status: 0,
+        added_dtime: dateTime,
+      });
+      const savedCart = await newCart.save();
+      const cartDetail = new CartDetail({
+        cart_id: savedCart._id,
+        product_id,
+        qty,
+        check_status: 0,
+        status: 0,
+        added_dtime: dateTime,
+      });
+      const savedata = await cartDetail.save();
+      var cartCount = await Cart.countDocuments({ user_id: savedCart.user_id });
+      const user = await Users.findById(user_id);
+      const product = await Userproduct.findById(product_id);
+      const cartResponse = {
+        _id: savedCart._id,
+        user_id: savedCart.user_id,
+        status: savedCart.status,
+        check_status: cartDetail.check_status,
+        qty: cartDetail.qty,
+        user_name: user.name,
+        product_name: product.name,
+        product_user_id: product.user_id,
+        added_dtime: savedCart.added_dtime,
+        __v: savedCart.__v,
+      };
+      const cartRemove = await Cartremove.findOne({}, { name: 1, _id: 0 });
+      const durationInSeconds = cartRemove.name;
+      const durationInMilliseconds = durationInSeconds * 60 * 1000;
+      setTimeout(() => {
+        removeItemAfterTime(savedCart._id);
+      }, durationInMilliseconds);
+      res.status(200).json({
+        cart_count: cartCount,
+        message: 'Item Added to Cart',
+        cart: cartResponse,
+        is_added: true
+      });
+   // }
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the Edit Profile.",
+      error: error.message,
+    });
+  }
 };
 
 exports.addToCart = async function (req, res, next) {
@@ -3317,6 +3495,104 @@ exports.viewCartListByUserId_backup = async function (req, res, next) {
   }
 };
 
+exports.viewCartListByUserId_backup2 = async function (req, res, next) {
+  try {
+
+    let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+    if (isLoggedIn == "") {
+      return res.redirect("/registration");
+    }
+    const user_id = req.session.user.userId;
+    const existingCart = await Cart.findOne({ user_id, status: 0 });
+    if (!existingCart) {
+      res.render("webpages/addtocart", {
+        title: "Cart List Page",
+        message: "Cart is empty",
+        respdata: [],
+        respdata1: [],
+        user: user_id,
+        isLoggedIn: isLoggedIn,
+        websiteUrl: process.env.SITE_URL,
+      });
+    }
+    else {
+      const cartList = await CartDetail.find({ cart_id: existingCart._id, status: 0 }).exec();
+      console.log(cartList);
+      const user = await Users.findById(existingCart.user_id);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      const formattedCartList = await Promise.all(cartList.map(async (cartItem) => {
+        console.log(cartItem);
+        const product = await Userproduct.findById(cartItem.product_id).populate('category_id', 'name');
+        console.log(product);
+        const productImages = await Productimage.findOne({ product_id: product._id }).limit(1);
+        let shippingChargeAmount = 0;
+        if(cartItem.length > 0){
+          let shippingCharges = await shippingchrgsModel.findOne({_id: product.shipping_charges_id})
+          if(shippingCharges){
+            shippingChargeAmount = Number(shippingCharges.amount);
+          }
+        }
+        const finalData = {
+          _id: cartItem._id,
+          cart_id: existingCart._id,
+          quantity: cartItem.qty,
+          product_id: cartItem.product_id,
+          product_name: product.name,
+          // product_price: product.offer_price,
+          product_est_price: product.price,
+          seller_id: product.user_id,
+          category_name: product.category_id.name,
+          //images: productImages.length > 0 ? productImages[0].image : null,
+          images: productImages ? productImages.image : null,
+          user_name: user.name,
+          added_dtime: cartItem.added_dtime,
+          status: cartItem.status,
+          shippingChargeAmount: shippingChargeAmount
+        };
+        
+        let product_price;
+        let is_bid;
+        if(cartItem.finalBidPrice)
+        {
+          product_price = cartItem.finalBidPrice;
+          finalData.product_price = product_price;
+          is_bid = 1;
+          finalData.is_bid = 1;
+        }
+        else
+        {
+          is_bid = 0;
+          product_price = product.offer_price;
+          finalData.product_price = product_price;
+          finalData.is_bid = 0;
+        }
+        
+        //const gst = parseFloat((product_price * 28) / 100).toFixed(2);
+        const gst = parseFloat((shippingChargeAmount * 28) / 100).toFixed(2);
+        const finalPrice = parseInt(product_price) + shippingChargeAmount + parseInt(gst);
+        res.render("webpages/addtocart", {
+          title: "Cart List Page",
+          message: "Welcome to the Cart List page!",
+          respdata: finalData,
+          respdata1: finalPrice,
+          user: user_id,
+          isLoggedIn: isLoggedIn,
+          websiteUrl: process.env.SITE_URL,
+        });
+      }));
+    }
+  }
+  catch (error) {
+    console.log(error);
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering Cart List.",
+      error: error.message,
+    });
+  }
+};
 exports.viewCartListByUserId = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -3582,13 +3858,14 @@ exports.checkoutWeb = async function (req, res, next) {
         // const requestUrl =  req.headers.referer;
         const requestUrl = '/web-my-order';
 
-        // await insertNotification(
-        //   'Order Placed Successfully from Website',
-        //   `You have placed an order for ${cartItem.product_id.name}`,//Added By Palash Samanta
-        //   user_id,
-        //   requestUrl,
-        //   new Date()
-        // );
+        /*await insertNotification(
+          'Order Placed Successfully from Website',
+          `You have placed an order for ${cartItem.product_id.name}`,//Added By Palash Samanta
+          user_id,
+          requestUrl,
+          new Date()
+        );*/
+
         // const product_price = finalData.product_price;
         //const gst = parseFloat((product_price * 28) / 100).toFixed(2);
         const gst = parseFloat((shippingChargeAmount * 28) / 100).toFixed(2);
@@ -4444,9 +4721,12 @@ exports.Demoorder = async function (req, res) {
     })
     .exec();
     let product_price;
+    let isBid=0
   if(typeof cartItem.finalBidPrice != "undefined" && cartItem.finalBidPrice){
     product_price = cartItem.finalBidPrice;
+    isBid=1;
   }else{
+    isBid=0;
     product_price = product.offer_price;
   }
   let packing_handling_charge = 0;
@@ -4517,6 +4797,7 @@ exports.Demoorder = async function (req, res) {
       gst:(typeof gst != "undefined") ? gst : 0,
       taxable_value:(typeof taxable_value != "undefined") ? parseFloat(taxable_value) : 0,
       original_product_price:product_price,
+      is_bid_price:isBid,
       added_dtime: new Date().toISOString(),
     });
 

@@ -344,10 +344,10 @@ io.on("connection", (socket) => {
       let notificationreqUrl = process.env.SITE_URL + "/bid-for-product/" + bidId;
       if(username == bidOldData.buyerId){
         notificationUserId = bidOldData.sellerId;
-        // notificationTitle = 'A buyer has bidded on your product';
+        //notificationTitle = 'A buyer has bidded on your product';
         notificationTitle = 'You have received a new bid on your product';
-        //notificationContent =  'Buyer has bidded on ' + bidProductDetails.name;
-        notificationContent =  'A potential buyer has placed a bid on your' + bidProductDetails.name;
+        // notificationContent =  'Buyer has bidded on ' + bidProductDetails.name;
+        notificationContent =  'A potential buyer has placed a bid on ' + bidProductDetails.name;
       } else {
         notificationUserId = bidOldData.buyerId;
         notificationTitle = 'The seller has replied on your bid';
@@ -403,13 +403,14 @@ io.on("connection", (socket) => {
         currentOffer: currentOffer,
         sellerId:(bidOldData.sellerId != "") ? bidOldData.sellerId : "",
       }; 
+      //===Accepted notification portion======
       let notificationUserId = '';
-      let notificationTitle = '';
-      let notificationContent = '';
-      let notificationreqUrl = process.env.SITE_URL + "/bid-for-product/" + bidId;
-      let bidProductId = bidOldData.productId;
-      let bidProductDetails = await Userproduct.findOne({_id:bidProductId});
-        if((updateData.acceptedByBuyer == true) ){
+        let notificationTitle = '';
+        let notificationContent = '';
+        let notificationreqUrl = process.env.SITE_URL + "/bid-for-product/" + bidId;
+        let bidProductId = bidOldData.productId;
+        let bidProductDetails = await Userproduct.findOne({_id:bidProductId});
+        if((updateData.acceptedByBuyer == true)){
           notificationUserId = bidOldData.sellerId;
           notificationTitle = 'A buyer has accepted the bid on your product';
           notificationContent =  'Buyer has accepted bid on ' + bidProductDetails.name;
@@ -469,7 +470,7 @@ io.on("connection", (socket) => {
         await updateBidData(updateData,bidId);
         await insertBidOfferData(currentOffer,currentOffer.id);
         socket.emit("cartUpadte", "1");
-      }else {
+      } else {
         await updateBidData(updateData,bidId);
         await insertBidOfferData(currentOffer,currentOffer.id);
       }

@@ -2128,6 +2128,9 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
     }
     let stateId = req.body.state_name;
     let getState = await statesModel.findOne({_id:mongoose.Types.ObjectId(stateId)});
+    let userId = req.body.userId ? req.body.userId : req.session.user.userId;
+    await addressBook.updateMany({user_id: userId}, {default_status:0},);
+
     const newAddress = new addressBook({
       user_id: req.body.userId ? req.body.userId : req.session.user.userId,
       street_name: req.body.address2,
@@ -2142,6 +2145,7 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
       address_name: addr_name,
       flag: req.body.flag,
       created_dtime: dateTime,
+      default_status:1
     });
     const savedAddress = await newAddress.save();
     const user = await Users.findById(newAddress.user_id);
@@ -3802,7 +3806,7 @@ exports.checkoutWeb = async function (req, res, next) {
       // const addressUserList = await addressBook.find({user_id: user_id });
       const addressUserList = await addressBook.find({
         user_id: user_id,
-        default_status: 0
+        //default_status: 0
       });
       const user = await Users.findById(existingCart.user_id);
       if (!user) {
@@ -4761,7 +4765,10 @@ exports.Demoorder = async function (req, res) {
     let discount = '0';
     let pickup_status = '0';
     let delivery_status = '0';
-    let shipping_address_id = formData.addressBookId;
+    //let shipping_address_id = formData.addressBookId;
+
+    const shippingaddress = await addressBook.findOne({ user_id: user_id, default_status :1 });
+    let shipping_address_id = shippingaddress._id;
 
     const billingaddress = await addressBook.findOne({ user_id: seller_id, default_status :1 });
     if (!billingaddress) {

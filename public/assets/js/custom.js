@@ -255,3 +255,18 @@ $('.apply-filter').click(function(e){
    $('.short-sidebar').removeClass('open-sidebar');
   });
 
+
+
+$('.mobile-hamburger').click(function(e){
+  $('.sidebar-mobilemenu').addClass('open-sidebarmenu');
+  $('.mobilemenu-openoverlay').addClass('mob-active');
+});
+$('.close-sidebarmenu').click(function(e){
+  $('.sidebar-mobilemenu').removeClass('open-sidebarmenu');
+  $('.mobilemenu-openoverlay').removeClass('mob-active');
+});
+$('.mobilemenu-openoverlay').click(function(e){
+  $('.sidebar-mobilemenu').removeClass('open-sidebarmenu');
+  $('.mobilemenu-openoverlay').removeClass('mob-active');  
+});
+

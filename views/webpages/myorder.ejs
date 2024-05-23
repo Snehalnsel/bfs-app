@@ -190,7 +190,7 @@
                                        data-id=""><i class="fa fa-eye" aria-hidden="true"></i></a>
                                  </div>`;
                   if (item.delete_status == 0 && item.is_return == 0 ) {
-                     if(item.isActionShow == 1){
+                     if(item.isActionShow == 0){
                         hTml += `
                                        <div class="remove-cart ">
                                           <a href="#" class="prd-btn remove-order"
@@ -202,7 +202,7 @@
                                        <div class="remove-cart otb-hoverbox">
                                           <a href="javascript:void(0)" class="prd-btn"><i class="fa fa-trash-o"
                                                 aria-hidden="true"></i></a>
-                                                <div class="order-tooltip-box">Lorem Ipsum has been the industry's standard dummy.</div>
+                                                <div class="order-tooltip-box">You can not cancel this order after 24 hours.</div>
                                        </div>`;
                      }
 

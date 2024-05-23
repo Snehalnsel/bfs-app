@@ -83,7 +83,7 @@ exports.getPaymentData = async function (req, res, next) {
     }
    // amount = temporder.booking_amount !== 0 ? temporder.booking_amount : temporder.total_price;
     let userId = temporder.user_id;
-    let merchantTransactionId = uniqid();
+    let merchantTransactionId = uniqid(); 
     let normalPayLoad = {
       merchantId: MERCHANT_ID,
       merchantTransactionId: merchantTransactionId,
@@ -96,7 +96,7 @@ exports.getPaymentData = async function (req, res, next) {
         type: "PAY_PAGE",
       },
     };
-   
+    console.log(normalPayLoad);
     let bufferObj = Buffer.from(JSON.stringify(normalPayLoad), "utf8");
     let base64EncodedPayload = bufferObj.toString("base64");
     let string = base64EncodedPayload + "/pg/v1/pay" + SALT_KEY;
@@ -437,7 +437,7 @@ exports.getStatus = async function (req, res, next) {
             let smsData = {
               textId: "test",
                 toMobile: "91" +user.phone_no,
-                text: "Dear [Buyer Name],Your order [Order ID] has been placed successfully. Sit back and relax. We'll notify you once it's shipped.- BFS Team",
+                text: "Dear "+user.name+",Your order "+orderCode+" has been placed successfully. Sit back and relax. We'll notify you once it's shipped.- BFS Team",
               };
             let returnData;
               returnData = await sendSms(smsData);
@@ -485,7 +485,7 @@ exports.getStatus = async function (req, res, next) {
         let smsData = {
           textId: "test",
           toMobile: "91" +seller.phone_no,
-          text: "Dear "+seller.name+" ,Congratulations! Your product "+ product.name +" has been sold successfully.The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.- BFS Team",
+          text: "Dear "+seller.name+",Congratulations! Your product "+ product.name +" has been sold successfully.The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.- BFS Team",
         };
         let returnData;
         returnData = await sendSms(smsData);
@@ -557,7 +557,7 @@ exports.getStatus = async function (req, res, next) {
       }
       loginHtmlContent = loginHtmlContent.replace('{{PRODUCTDATA}}', rpDataByer);
       loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
-      loginHtmlContent = loginHtmlContent.replace('{{shippingaddress}}', billingaddress);
+      loginHtmlContent = loginHtmlContent.replace('{{billingaddress}}', billingaddress);
       const mailDataforbuyer = {
         from: "Bid For Sale! <" + smtpUser + ">",
         to: user.email,
@@ -566,10 +566,7 @@ exports.getStatus = async function (req, res, next) {
         text: "order placed",
         html: loginHtmlContent
       };
-
       transporter.sendMail(mailDataforbuyer, function (err, info) {});
-      //buyer mail,sms,whatsapp
-      //seller mail,sms,whatsapp
       const loginHtmlPathforSeller = 'views/webpages/seller-email.html';
       let loginHtmlContentforseller = fs.readFileSync(loginHtmlPathforSeller, 'utf-8');
 
@@ -588,7 +585,7 @@ exports.getStatus = async function (req, res, next) {
       //loginHtmlContentforseller = loginHtmlContentforseller.replace('{{bidPrice}}', temporder.original_product_price);
 
       loginHtmlContentforseller = loginHtmlContentforseller.replace('{{buyername}}', user.name);
-      savedOrder
+ 
       const mailDataforseller = {
         from: "Bid For Sale! <" + smtpUser + ">",
         to: seller.email,
@@ -733,7 +730,7 @@ exports.checkPaymentData = async function (req, res, next) {
         });
 
         let loginHtmlPath1 = 'views/webpages/seller.html';
-        let loginHtmlContent1 = fs.readFileSync(loginHtmlPath, 'utf-8');
+        let loginHtmlContent1 = fs.readFileSync(loginHtmlPath1, 'utf-8');
   
         loginHtmlContent1 = loginHtmlContent.replace('{{username}}', user.name);
         loginHtmlContent1 = loginHtmlContent.replace('{{sellername}}', seller.name);
@@ -772,7 +769,6 @@ exports.checkPaymentData = async function (req, res, next) {
             send_status: 'send',
           });
           await historyData.save();
-          
           let sellersmsData = {
             textId: "test",
             toMobile: "91" +seller.phone_no,
@@ -790,6 +786,15 @@ exports.checkPaymentData = async function (req, res, next) {
             send_status: 'send',
           });
           await historyData1.save();
+
+          
+          const sellermessage = "Dear "+ seller.name +",Congratulations! Your product "+ product.name +" has been sold successfully. The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.-BFS RETAIL SERVICES PRIVATE LIMITED";
+          const sellerto_number = "91" +seller.phone_no;
+          let sellerresponse = await send_message({ type: 'text', sellermessage, sellerto_number });
+
+          const buyermessage = "Order placed successfully! Congratulations! Your product  Your "+ product.name +" having Order ID "+ orderCode +"  is on its way to you. For any inquiries, feel free to reach out to us. Happy shopping!-BFS RETAIL SERVICES PRIVATE LIMITED";
+          const buyerto_number = "91" +user.phone_no;
+          let buyerresponse = await send_message({ type: 'text', buyermessage, buyerto_number });
           
         if (updatedProduct) {
           const cleanedCartId = mongoose.Types.ObjectId(temporder.cart_id);

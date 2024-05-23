@@ -45,6 +45,7 @@ const updateBidData = require("./src/models/fireDbServices/updateBidData");
 const updateBidOfferData = require("./src/models/fireDbServices/updateBidOfferData");
 const getBidData = require("./src/models/fireDbServices/getBidData");
 
+
 const UserModel = require("./src/models/api/userModel");
 const Cart = require('./src/models/api/cartModel');
 const CartDetail = require('./src/models/api/cartdetailsModel');
@@ -174,7 +175,6 @@ const checkFileType = function (file, cb) {
     cb("Error: You can Only Upload Images!!");
   }
 };
-
 
 // file location of private key
 var privateKey = fs.readFileSync( 'ssl/private3.key' );
@@ -421,6 +421,7 @@ io.on("connection", (socket) => {
             notificationreqUrl,
             new Date()
           );
+          console.log("seller")
         } 
         if((updateData.acceptedBySeller == true)){
           notificationUserId = bidOldData.buyerId;
@@ -433,14 +434,14 @@ io.on("connection", (socket) => {
             notificationreqUrl,
             new Date()
           );
+          console.log("buyer")
         }
       //Write code for both side acceptation
       if(((bidOldData.acceptedByBuyer == true) && (updateData.acceptedBySeller == true)) || ((bidOldData.acceptedBySeller == true) && (updateData.acceptedByBuyer == true))) {
-        //Item added to the cart
         let user_id = bidOldData.buyerId;
         let product_id = bidOldData.productId;
         await Cart.deleteMany({ user_id: mongoose.Types.ObjectId(user_id)});
-        const existingCartDetail = await CartDetail.findOne({ user_id, product_id });
+        const existingCartDetail = await Cart.findOne({ user_id});
         if (existingCartDetail) {
           console.log('Cart with the same user_id and product_id already exists. No new cart created.');
           return;
@@ -473,7 +474,6 @@ io.on("connection", (socket) => {
         await updateBidData(updateData,bidId);
         await insertBidOfferData(currentOffer,currentOffer.id);
       }
-        
         //let currUserDetails = await UserModel.findOne({_id:username});
         //io.to(socket.id).emit("message", formatMessage(currUserDetails.name, " Has Accepted the latest bid",username, roomName));
       //}
@@ -554,6 +554,8 @@ module.exports = serv;
  
 //Palash Samanta
 //Snigdho Upadhyay
+
+
 
 
 

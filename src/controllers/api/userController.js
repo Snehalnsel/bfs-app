@@ -470,7 +470,6 @@ exports.getProfile = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   Users.findOne({ _id: req.body.user_id }).then((user) => {
     if (!user) {
       res.status(400).json({
@@ -553,32 +552,25 @@ exports.uploadImage = async function (req, res, next) {
         respdata: {},
       });
     }
-
     const imgData = req.body.img_base64;
     const folderPath = "./public/images/";
     const filename = Date.now() + ".png";
     const filePath = path.join(folderPath, filename);
-
     // Convert base64 to buffer
     const bufferData = Buffer.from(imgData, 'base64');
-
     // Write buffer data to file
     fs.writeFileSync(filePath, bufferData);
-
     var image_url = filename;
-
     await fs.promises.copyFile(filePath, path.join("./public/compress_images/", filename));
 
     var updData = {
       image: image_url,
     };
-
     const updatedUser = await Users.findOneAndUpdate(
       { _id: req.body.user_id },
       { $set: updData },
       { upsert: true, new: true }
     );
-
     res.status(200).json({
       status: "1",
       message: "Successful!",

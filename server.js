@@ -346,7 +346,8 @@ io.on("connection", (socket) => {
         notificationUserId = bidOldData.sellerId;
         //notificationTitle = 'A buyer has bidded on your product';
         notificationTitle = 'You have received a new bid on your product';
-        notificationContent =  'Buyer has bidded on ' + bidProductDetails.name;
+        // notificationContent =  'Buyer has bidded on ' + bidProductDetails.name;
+        notificationContent =  'A potential buyer has placed a bid on ' + bidProductDetails.name;
       } else {
         notificationUserId = bidOldData.buyerId;
         notificationTitle = 'The seller has replied on your bid';

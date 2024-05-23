@@ -15,152 +15,84 @@
                <li>My Bids</li>
             </ul>
          </div>
-         <div class="deskstop-bidbox">
-               <div class="bids-chatbox dark-graybg">
-                 <div class="bids-productbox">
-                    <div class="bib-box">
-                       <h6 class="buyer-heading">Buyer</h6>
-                       <div class="bs-group">   
-                          <% if(buyerData.length > 0) {%>                           
-                             <% for(let i=0; i<buyerData.length; i++) {  %> 
-                                <%if( typeof buyerData[i].product_details !="undefined") { %>                                                   
-                                   <div class="br-details clickOnProduct" id="<%=buyerData[i].id %>">
-                                      <div class="bid-images"><img src="<%=websiteUrl %>/public/compress_images/<%=buyerData[i].product_image %>" alt="images" class="img-fluid"></div>
-                                      <div class="bid-info">
-                                         <div class="bd-title"><%=buyerData[i].product_details.name %></div>
-                                         <div class="bd-price">
-                                            <span><i class="fa fa-inr" aria-hidden="true"></i></span><%=buyerData[i].product_details.offer_price %>
-                                         </div>
-                                         <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i><%=buyerData[i].product_details.price %></div>
-                                         <div class="bidding-box">
-                                            <div class="highlight-title">Bid Price</div>
-                                            <div class="bidding-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%= buyerData[i].currentOffer.price%></div>
-                                         </div>
-                                      </div>
-                                   </div>
-                                <% } %>
-                             <% } %>
-                          <% } else { %>
-                             <p>There are no bids on your products yet.</p>
-                          <% } %>
-                       </div>
-                    </div>
-     
-                    <div class="bib-box">
-                       <h6 class="buyer-heading">Seller</h6>
-                       <div class="bs-group">      
-                          <% if(sellerData.length > 0) {%>                          
-                             <% for(let i=0; i<sellerData.length; i++) {%>                             
-                                <div class="br-details clickOnProduct" id="<%=sellerData[i].id %>">
-                                   <div class="bid-images"><img src="<%=websiteUrl %>/public/compress_images/<%=sellerData[i].product_image %>" alt="images" class="img-fluid"></div>
-                                   <div class="bid-info">
-                                      <div class="bd-title"><%=sellerData[i].product_details.name %></div>
-                                      <div class="bd-price">
-                                         <span><i class="fa fa-inr" aria-hidden="true"></i></span><%=sellerData[i].product_details.offer_price %>
-                                      </div>
-                                      <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i><%=sellerData[i].product_details.price %></div>
-                                      <div class="bidding-box">
-                                         <div class="highlight-title">Bid Price</div>
-                                         <div class="bidding-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%= sellerData[i].currentOffer.price%></div>
-                                      </div>
-                                   </div>
-                                </div>
-                             <% } %>
-                          <% } else { %>
-                             <p>There are no bids on your products yet.</p>
-                          <% } %>
-                       </div>
-                    </div>
-                 </div>
-     
-                 <div class="chatbid-box">
-                    <div class="chat-title enterProductName">Start Bid</div>
-                    <div class="chat-messages">
-                    </div>
-                    <div class="chat-input-holder">  
-                       <form id="chat-form"> 
-                          <div class="chat-field">
-                             <input id="msg" type="number"name="msg" placeholder="Enter Amount" class="chat-input sendMessageField" required autocomplete="off"/>
-                          </div>                                 
-                          <button class="btn message-send sendMessageButton">Send</button>
-                       </form>
-                    </div>
-                    <div class="action-botton-group">
-                       <ul class="resultlist">
-                          <li><a href="javascript:void(0)" class="chatbox-btn" id="reBidButton">Re Bid</a></li>
-                          <li><a href="javascript:void(0)" class="chatbox-btn" id="acceptButton">Accept</a></li>
-                          <!--<li><a href="javascript:void(0)" class="chatbox-btn black-btn" id="withdrawButton">Withdraw</a></li>-->
-                       </ul>
-                    </div>
-                 </div>
-               </div>
-             </div> 
-             <div class="bids-tab-mobile">
-               <div class="bids-chatbox">
-                  <div class="bids-productbox bids-tabbox">
-                     <div class="tabs-wrapper">
-                        <ul class="nav nav-tabs">
-                           <li><a data-toggle="tab" href="#bid-buyers-tab" class="">Buyers</a></li>
-                           <li><a data-toggle="tab" href="#bid-viewers-tab" class="active">Seller</a></li>
-                        </ul>
-                        <div class="tab-content theme-tab-content">
-                           <div id="bid-buyers-tab" class="tab-pane fade active show">
-                              <div class="bs-group">   
-                                 <% if(buyerData.length > 0) {%>                           
-                                    <% for(let i=0; i<buyerData.length; i++) {  %> 
-                                       <%if( typeof buyerData[i].product_details !="undefined") { %>                                                   
-                                          <div class="br-details clickOnProduct" id="<%=buyerData[i].id %>">
-                                             <div class="bid-images"><img src="<%=websiteUrl %>/public/compress_images/<%=buyerData[i].product_image %>" alt="images" class="img-fluid"></div>
-                                             <div class="bid-info">
-                                                <div class="bd-title"><%=buyerData[i].product_details.name %></div>
-                                                <div class="bd-price">
-                                                   <span><i class="fa fa-inr" aria-hidden="true"></i></span><%=buyerData[i].product_details.offer_price %>
-                                                </div>
-                                                <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i><%=buyerData[i].product_details.price %></div>
-                                                <div class="bidding-box">
-                                                   <div class="highlight-title">Bid Price</div>
-                                                   <div class="bidding-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%= buyerData[i].currentOffer.price%></div>
-                                                </div>
-                                             </div>
-                                          </div>
-                                       <% } %>
-                                    <% } %>
-                                 <% } else { %>
-                                    <p>There are no bids on your products yet.</p>
-                                 <% } %>
+         <div class="bids-chatbox dark-graybg">
+            <div class="bids-productbox">
+               <div class="bib-box">
+                  <h6 class="buyer-heading">Buyer</h6>
+                  <div class="bs-group">   
+                     <% if(buyerData.length > 0) {%>                           
+                        <% for(let i=0; i<buyerData.length; i++) {  %> 
+                           <%if( typeof buyerData[i].product_details !="undefined") { %>                                                   
+                              <div class="br-details clickOnProduct" id="<%=buyerData[i].id %>">
+                                 <div class="bid-images"><img src="<%=websiteUrl %>/public/compress_images/<%=buyerData[i].product_image %>" alt="images" class="img-fluid"></div>
+                                 <div class="bid-info">
+                                    <div class="bd-title"><%=buyerData[i].product_details.name %></div>
+                                    <div class="bd-price">
+                                       <span><i class="fa fa-inr" aria-hidden="true"></i></span><%=buyerData[i].product_details.offer_price %>
+                                    </div>
+                                    <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i><%=buyerData[i].product_details.price %></div>
+                                    <div class="bidding-box">
+                                       <div class="highlight-title">Bid Price</div>
+                                       <div class="bidding-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%= buyerData[i].currentOffer.price%></div>
+                                    </div>
+                                 </div>
                               </div>
-                           </div>
-                           <div id="bid-viewers-tab" class="tab-pane fade">
-                              <div class="bs-group">      
-                                 <% if(sellerData.length > 0) {%>                          
-                                    <% for(let i=0; i<sellerData.length; i++) {%>                             
-                                       <div class="br-details clickOnProduct" id="<%=sellerData[i].id %>">
-                                          <div class="bid-images"><img src="<%=websiteUrl %>/public/compress_images/<%=sellerData[i].product_image %>" alt="images" class="img-fluid"></div>
-                                          <div class="bid-info">
-                                             <div class="bd-title"><%=sellerData[i].product_details.name %></div>
-                                             <div class="bd-price">
-                                                <span><i class="fa fa-inr" aria-hidden="true"></i></span><%=sellerData[i].product_details.offer_price %>
-                                             </div>
-                                             <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i><%=sellerData[i].product_details.price %></div>
-                                             <div class="bidding-box">
-                                                <div class="highlight-title">Bid Price</div>
-                                                <div class="bidding-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%= sellerData[i].currentOffer.price%></div>
-                                             </div>
-                                          </div>
-                                       </div>
-                                    <% } %>
-                                 <% } else { %>
-                                    <p>There are no bids on your products yet.</p>
-                                 <% } %>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
+                           <% } %>
+                        <% } %>
+                     <% } else { %>
+                        <p>There are no bids on your products yet.</p>
+                     <% } %>
                   </div>
                </div>
-            </div>            
+
+               <div class="bib-box">
+                  <h6 class="buyer-heading">Seller</h6>
+                  <div class="bs-group">      
+                     <% if(sellerData.length > 0) {%>                          
+                        <% for(let i=0; i<sellerData.length; i++) {%>                             
+                           <div class="br-details clickOnProduct" id="<%=sellerData[i].id %>">
+                              <div class="bid-images"><img src="<%=websiteUrl %>/public/compress_images/<%=sellerData[i].product_image %>" alt="images" class="img-fluid"></div>
+                              <div class="bid-info">
+                                 <div class="bd-title"><%=sellerData[i].product_details.name %></div>
+                                 <div class="bd-price">
+                                    <span><i class="fa fa-inr" aria-hidden="true"></i></span><%=sellerData[i].product_details.offer_price %>
+                                 </div>
+                                 <div class="rtl-price"><span>Est. Retail:</span><i class="fa fa-inr" aria-hidden="true"></i><%=sellerData[i].product_details.price %></div>
+                                 <div class="bidding-box">
+                                    <div class="highlight-title">Bid Price</div>
+                                    <div class="bidding-price"><span><i class="fa fa-inr" aria-hidden="true"></i></span><%= sellerData[i].currentOffer.price%></div>
+                                 </div>
+                              </div>
+                           </div>
+                        <% } %>
+                     <% } else { %>
+                        <p>There are no bids on your products yet.</p>
+                     <% } %>
+                  </div>
+               </div>
+            </div>
+
+            <div class="chatbid-box">
+               <div class="chat-title enterProductName">Start Bid</div>
+               <div class="chat-messages">
+               </div>
+               <div class="chat-input-holder">  
+                  <form id="chat-form"> 
+                     <div class="chat-field">
+                        <input id="msg" type="number"name="msg" placeholder="Enter Amount" class="chat-input sendMessageField" required autocomplete="off"/>
+                     </div>                                 
+                     <button class="btn message-send sendMessageButton">Send</button>
+                  </form>
+               </div>
+               <div class="action-botton-group">
+                  <ul class="resultlist">
+                     <li><a href="javascript:void(0)" class="chatbox-btn" id="reBidButton">Re Bid</a></li>
+                     <li><a href="javascript:void(0)" class="chatbox-btn" id="acceptButton">Accept</a></li>
+                     <!--<li><a href="javascript:void(0)" class="chatbox-btn black-btn" id="withdrawButton">Withdraw</a></li>-->
+                  </ul>
+               </div>
+            </div>
          </div>
-         
       </div>
    </section>
    <input type="hidden" name="userId" id="userId" value="<%=userId%>" />  
@@ -289,9 +221,10 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
    });
 
-   socket.on('cartUpadte', async (message) => {
+ socket.on('cartUpadte', async (message) => {
       getHeaderData();
    });
+   
    // Message submit
    chatForm.addEventListener('submit', (e) => {
       e.preventDefault();

@@ -4712,9 +4712,12 @@ exports.Demoorder = async function (req, res) {
     })
     .exec();
     let product_price;
+    let isBid=0
   if(typeof cartItem.finalBidPrice != "undefined" && cartItem.finalBidPrice){
     product_price = cartItem.finalBidPrice;
+    isBid=1;
   }else{
+    isBid=0;
     product_price = product.offer_price;
   }
   let packing_handling_charge = 0;
@@ -4785,6 +4788,7 @@ exports.Demoorder = async function (req, res) {
       gst:(typeof gst != "undefined") ? gst : 0,
       taxable_value:(typeof taxable_value != "undefined") ? parseFloat(taxable_value) : 0,
       original_product_price:product_price,
+      is_bid_price:isBid,
       added_dtime: new Date().toISOString(),
     });
 

@@ -61,17 +61,19 @@
                         <td style="text-align: left;  padding-bottom: 30px;"><img src="https://bidforsale.com/public/images/{{productimages}}" width="100"></td>
                         <td style="text-align: center;  padding-bottom: 30px; padding-left: 20px;">{{productname}}</td>
                         <td style="padding-bottom: 30px; min-width: 150px">x 1</td>
-                        <td style="text-align: right; padding-bottom: 30px;">₹ {{productprice}}</td>
+                        <!-- <td style="text-align: right; padding-bottom: 30px;"> Original Price <br/> ₹ {{productprice}} <br/>  Accepted Price <br/> ₹ {{bidPrice}} </td> -->
+                        {{PRODUCTDATA}}
                     </tr>
                 </tbody>
                 <tfoot style="border-top: solid 1px #a6a6a6; border-bottom: solid 1px #a6a6a6;">
                     <tr>
                         <th colspan="2" style="text-align: left; padding-top: 20px; font-weight: 500;">Sale Price</th>
                         <th colspan="2" style="text-align: right; padding-top: 20px; font-weight: 600;">₹{{totalprice}}</th>
+                        
                     </tr>
                     <tr>
-                        <th colspan="2" style="text-align: left; padding-top: 20px; padding-bottom: 30px; font-weight: 500;">Buyer's Name:</th>
-                        <th colspan="2" style="text-align: right; padding-top: 20px; padding-bottom: 30px; font-weight: 600;">{{buyername}}</th>
+                        <!-- <th colspan="2" style="text-align: left; padding-top: 20px; padding-bottom: 30px; font-weight: 500;">Buyer's Name:</th> -->
+                        <!-- <th colspan="2" style="text-align: right; padding-top: 20px; padding-bottom: 30px; font-weight: 600;">{{buyername}}</th> -->
                     </tr>
                 </tfoot>
             </table>

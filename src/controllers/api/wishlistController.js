@@ -101,8 +101,6 @@ exports.getWishlistByUserId = async (req, res) => {
           let productImages = [];
           if (product) {
             productImages = await Productimage.find({ product_id: item.product_id }).limit(1);
-
-
             return {
               _id: item._id,
               user_id: item.user_id._id,

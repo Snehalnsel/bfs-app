@@ -156,16 +156,8 @@
 
     <section class="theme_header mobile-header hide-dekstop">
         <div class="container">
-            <div class="row">
-                <div class="col-5">
-                    <div class="buy-sell-link">
-                        <ul>
-                            <li class="active-link"><a href="/webSubCategories">Buy</a></li>
-                            <li><a href="/add-post">Sell</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-7">
+            <div class="row top-mobile-header">                
+                <div class="col-12">
                     <div class="product-icon-box">
                         <div class="pib-box">
                             <a href="/webnotificationslist">
@@ -207,49 +199,65 @@
                 <div class="col-12">
                     <div class="menu-box">
                         <nav class="navbar navbar-expand-md navbar-light nav-link">
-                            <a class="navbar-brand" href="/"><img
-                                    src="/public/assets/images/bfs-logo.png" alt="images" class="mobile-logo"></a>
-                            <button class="navbar-toggler" type="button" data-toggle="collapse"
+                            <div class="nav-row">
+                                <div class="nav-box">
+                                    <!-- <button class="navbar-toggler" type="button" data-toggle="collapse"
                                 data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                                 aria-expanded="false" aria-label="Toggle navigation">
                                 <span class="navbar-toggler-icon"></span>
-                            </button>
-                            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                                <ul class="navbar-nav">
-                                    <li class="nav-item"><a href="/">Home</a></li>                                    
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle dropdown-shownow" href="/webSubCategories" id="navbarDropdown">Categories
-                                        </a>
-                                        <div class="dropdown-menu mobile-dropdown" aria-labelledby="navbarDropdown">
-                                            <div class="row">
-                                                <div class="col-md-3">
-                                                    <ul id="men-list" class="men-list">
-                                                        <h4>Men</h4>
-                                                    </ul>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <ul id="women-list" class="women-list">
-                                                        <h4>Women</h4>
-                                                    </ul>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <ul id="kids-list" class="kids-list">
-                                                        <h4>Kids</h4>
-                                                    </ul>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <ul id="others-list" class="listing-data">
-                                                        <h4>Others</h4>
-                                                    </ul>
-                                                </div>
-                                                
-                                            </div>
-
-
-                                        </div>
-
-                                    </li>                                </ul>
+                            </button> --> 
+                            <div class="mobile-hamburger">
+                                <img src="/public/assets/images/hamburger.png" alt="menu">
                             </div>
+                            <div class="mobilemenu-openoverlay"></div>
+                            <div class="sidebar-mobilemenu">
+                                <div class="close-sidebarmenu">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                </div>
+                                <ul class="navbar-nav">
+                                    <li class="nav-item"><a href="/">Home</a></li>
+                                    <li class="nav-item"><a href="javascript:void(0)">Categories</a></li>
+                                    <li class="nav-item">
+                                        <label for="drop-1" class="toggle strong-font">Men +</label>
+                                            <input type="checkbox" id="drop-1"/>
+                                            <ul id="men-list" class="men-list"></ul>
+                                    </li>
+                                    <li class="nav-item">
+                                        <label for="drop-2" class="toggle strong-font">Women +</label>
+                                            <input type="checkbox" id="drop-2"/>
+                                            <ul id="women-list" class="women-list"></ul>
+                                    </li>
+                                    <li class="nav-item">
+                                        <label for="drop-3" class="toggle strong-font">Kids +</label>
+                                            <input type="checkbox" id="drop-3"/>
+                                            <ul id="kids-list" class="kids-list"></ul>
+                                    </li>
+                                    <li class="nav-item">
+                                        <label for="drop-4" class="toggle strong-font">Others +</label>
+                                            <input type="checkbox" id="drop-4"/>
+                                            <ul id="others-list" class="listing-data"></ul>
+                                    </li>
+
+                                </ul>
+                            </div>
+                            
+                                </div>
+                                <div class="nav-box">
+                                    <a class="navbar-brand" href="/"><img
+                                    src="/public/assets/images/bfs-logo.png" alt="images" class="mobile-logo"></a>
+                                </div>
+                                <div class="nav-box">
+                                    <div class="buy-sell-link">
+                        <ul>
+                            <li class="active-link"><a href="/webSubCategories">Buy</a></li>
+                            <li><a href="/add-post">Sell</a></li>
+                        </ul>
+                    </div>
+                                </div>
+                                
+                            </div>
+                            
+                            
 
                         </nav>
                     </div>

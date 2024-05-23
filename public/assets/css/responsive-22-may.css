@@ -189,7 +189,6 @@ img.ft-logo {
 }
 .hide-dekstop{
     display: block;
-    padding: 0px;
 }
 
 .hide-mobile{
@@ -282,10 +281,9 @@ img.mobile-logo {
     line-height: 20px;
     margin-bottom: 0px;
 }
-.icon-sidebox {
-        margin-bottom: 6px;       
-        padding: 10px 0px;
-    }
+.icon-sidebox {   
+    margin-bottom: 10px;
+}
 .sidebox-info p {
     font-size: 12px;   
     line-height: 22px;    
@@ -544,26 +542,20 @@ img.mobile-logo {
 }
 
 .mobile-header .menu-box .nav-link ul {
-        display: flex;
-        flex-direction: row;
-        width: 100%;
-    }
+    display: flex;
+    flex-direction: column;
+}
 
 .mobile-header .menu-box .nav-link ul h4 {
     font-size: 16px;
     font-weight: bold;
     margin-bottom:0px;
 }
-.mobile-header .menu-box .nav-link ul li {
-    width: 50%;
-}
 
 .mobile-header .nav-link ul li a {
-        font-size: 13px;
-        padding: 5px 0px;
-        width: 100%;
-        text-align: center;
-    }
+    font-size: 13px;
+    padding: 5px 0px;
+}
 
 .mobile-dropdown ul {
     margin-bottom: 15px;
@@ -771,250 +763,6 @@ button.accordion-button {
         background: #fff;
         z-index: 1;
     }*/
-
-    .product_Slider .slider-item {
-    padding: 0px 0px;
-}
-
-.product-box .prd-button-group a.prd-btn {
-        padding: 3px 12px;
-        font-size: 10px;
-        line-height: 17px;
-        margin: 3px;
-        width: auto;
-    }
-
-    .nav-row {
-        display: flex;
-        grid-gap: 5px;
-        width: 100%;
-        align-items: center;
-    }
-
-   .nav-row .nav-box {
-    width: 33%;
-  }
-
-  .top-mobile-header {
-    background: #232323;
-}
-
-.pib-box i {
-    color: #ffffff;
-    font-size: 16px;
-}
-
- .mobile-header .menu-box .navbar-collapse ul.navbar-nav {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-    }
-         .mobile-header .menu-box .navbar-collapse ul.navbar-nav li {
-        width: 100%;
-    }
-    .mobile-header .menu-box .navbar-collapse ul.navbar-nav li a{
-        text-align: left;
-    }
-    .banner-slider .slider-item img {
-    width: 100% !important;
-    min-height: 140px;
-}
-
-.header-bottom {
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-.pd-40 {
-    padding: 20px 0px;
-}
-.pd-40 {
-    padding: 20px 0px;
-}
-#just-sold-section .top-title {
-    border-top: 0;
-    padding-top: 0;
-}
-
-.product_Slider .slick-prev, .product_Slider .slick-next {
-    top: 30%;
-    width: 30px;
-    height: 30px;   
-}
-
-.product_Slider .slick-prev:before, .product_Slider .slick-next:before {
-    font: normal normal normal 18px / 1 FontAwesome;
-    color: #000000;
-}
-.navbar-light .navbar-toggler-icon:after, .navbar-light .navbar-toggler-icon:before{
-    height: 2px;
-}
-
-.navbar-light .navbar-toggler-icon:before{
-    width: 22px;
-    height: ;
-}
-.navbar-light .navbar-toggler-icon:after{
-   width: 28px; 
-}
-.navbar-toggler[aria-expanded="true"] .navbar-toggler-icon:after{
-    width: 22px;
-}
-.nav-box button.navbar-toggler{
-    background: none !important;
-
-}
-.navbar-light .nav-box .navbar-toggler-icon{
-  border-bottom: 2px solid #000;
-}
-.navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
-    border-color: transparent;
-}
-
-.mobile-header .menu-box .mobile-dropdown ul{
-    flex-direction: column;
-}
-
-/*.sidebar-mobilemenu {
-    position: fixed !important;
-    top: 0;
-    background: #f6f5f5;
-    left: 0;
-    width: 250px;
-    padding: 25px 15px;
-    height: 100%;
-}*/
-
-.mobile-hamburger img {
-    width: 35px;
-}
-
-/*menu css*/
-
-.toggle,
-[id^="drop"] {
-  display: none;
-}
-.toggle + h4{
-    display: none;
-  }
-
-      .toggle {
-        display: block;
-        color: #000000;
-        text-decoration: none;
-        border: none;
-        font-size: 14px;
-        margin-bottom: 0px;
-    }
-    
-    .sidebar-mobilemenu .navbar-nav [id^=drop] + ul {
-        display: none;
-    }
-
-    /* Display Dropdown when clicked on Parent Lable */
-    .sidebar-mobilemenu .navbar-nav [id^=drop]:checked + ul {
-       display: block;
-        background: #eee;
-    }
-    .sidebar-mobilemenu ul.navbar-nav{
-        display: block !important;
-    }
-
-    .sidebar-mobilemenu ul.navbar-nav li.nav-item {
-        display: block;
-        width: 100%;
-        padding: 7px 0px;
-        border-bottom: solid 1px #dbdbdb;
-   }
-
-    
-
-   .mobile-header .sidebar-mobilemenu li a{
-        font-size: 14px !important;
-        line-height: 23px;
-        font-weight: 500;
-        color: #000000;
-   }
-
-   .sidebar-mobilemenu {
-    background:#f8f8f8;
-    padding: 25px 15px;
-    position: fixed;
-    width: 250px;
-    z-index: 9;
-    height: 100%;
-    top: 0;
-    left: -250px;
-    transition: 0.5s;
-}
-.sidebar-mobilemenu.open-sidebarmenu {
-    left: 0px;
-    transition: 0.5s;
-}
-
-.close-sidebarmenu {
-    width: 30px;
-    height: 30px;
-    background: #313131;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 15px;
-    position: absolute;
-    right: 5px;
-    top: 5px;
-}
-
-.sidebar-mobilemenu .navbar-nav [id^=drop] + ul li {
-    display: block;
-        width: 100%;
-        padding: 7px 10px;
-        border-bottom: solid 1px #dbdbdb;
-}
-
-.sidebar-mobilemenu .navbar-nav [id^=drop] + ul li:last-child {
-    border-bottom: none;
-}
-
-.mobilemenu-openoverlay {
-        width: 100%;
-        height: 100%;
-        position: fixed;
-        background: #121212d6;
-        top: 0;
-        left: 0;
-        z-index: 3;
-        transition: 0.5s;
-        opacity: 0;
-        visibility: hidden;
-    }
-
-     .mobilemenu-openoverlay.mob-active {
-       width: 100%;
-       transition: 0.5s;
-        opacity: 1;
-        visibility: visible;
-    }
-    .prd-price i.fa.fa-inr {
-    font-size: 14px;
-}
-
-.dashboard-content.account-setting-blk {
-    padding: 10px 15px;
-}
-.sidbar-box .bottom-link {
-    margin-top: 0px;
-    padding: 0px 5px;
-    border: none;
-}
-.sidbar-nav a.nav-link{
-    padding: 5px;
-}
-.login_modal, .change-profile-update {
-    padding-top: 50px;
-}
 
 
 }

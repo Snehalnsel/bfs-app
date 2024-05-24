@@ -376,6 +376,7 @@
 
             $(document).on('click', '.checkbox-select', function () {
                var add_id = $('input[name=optradio]:checked').val();
+               console.log("add_id--",add_id)
                $('#userAddressId').val(add_id);
                $('.address-form-open').hide();
                $('.check-out').prop('disabled', false);

@@ -38,8 +38,8 @@ $(document).on('click', ".remove-order", async function (e) {
                         confirmButtonText: "OK",
                       });
                     // $(e.target).closest('.remove-cart').hide();
+                    window.location.reload();
                     $(e.target).closest('.remove-cart').hide().after('<p>Order canceled</p>');
-                   
                 } else {
                     Swal.fire({
                         html: data.message,
@@ -136,10 +136,6 @@ $(document).on('click', ".return-order", async function (e) {
         }
     });
 });
-
-
-
-
 
 // $(document).on('click', ".return-order", async function (e) {
 //     const orderId = $(this).data('id');

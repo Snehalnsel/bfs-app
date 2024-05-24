@@ -32,6 +32,9 @@ const Shippingkit = require("../../models/api/shippingkitModel");
 const shippingchrgsModel = require("../../models/api/shippingchrgsModel");
 const insertNotification = require("../../models/api/insertNotification");
 const Iptrnsaction = require("../../models/api/ipTransactionModel");
+const sendSms = require("../../models/thirdPartyApi/sendSms");
+const sendWhatsapp = require("../../models/thirdPartyApi/sendWhatsapp");
+const ApiCallHistory = require("../../models/thirdPartyApi/ApiCallHistory");
 const nodemailer = require("nodemailer");
 const { log } = require("console");
 // const axios = require('axios');
@@ -1136,7 +1139,7 @@ exports.cancelOrderById = async function (req, res, next) {
     const canceledOrder = await existingOrder.save();
     if (canceledOrder) {
 
-      const requestUrl =  '/web-my-order';
+      const requestUrl =  process.env.SITE_URL + "/web-my-order";
       
       await insertNotification(
         'Order Cancelled', 
@@ -1172,7 +1175,7 @@ exports.cancelOrderById = async function (req, res, next) {
         loginHtmlContent = loginHtmlContent.replace('{{ordercode}}', canceledOrder.order_code);
         loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
         loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
-        loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
+        loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', canceledOrder.total_price);
         loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.price);      
 
         const mailData = {
@@ -1183,12 +1186,10 @@ exports.cancelOrderById = async function (req, res, next) {
           text: "cancel order",
           html: loginHtmlContent
         };
-        
         transporter.sendMail(mailData, function (err, info) {
           // if (err) console.log("err", err);
           // else console.log("info", info);
         });
-
           return res.status(200).json({
             status: "1",
             message: "Order canceled successfully!",
@@ -1204,6 +1205,7 @@ exports.cancelOrderById = async function (req, res, next) {
         });
       }
   } catch (error) {
+    console.log(error)
     return res.status(500).json({
       status: "0",
       message: "Order cancellation failed!",

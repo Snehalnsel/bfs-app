@@ -403,39 +403,39 @@ io.on("connection", (socket) => {
         currentOffer: currentOffer,
         sellerId:(bidOldData.sellerId != "") ? bidOldData.sellerId : "",
       }; 
-      //===Accepted notification portion======
-      let notificationUserId = '';
-        let notificationTitle = '';
-        let notificationContent = '';
-        let notificationreqUrl = process.env.SITE_URL + "/bid-for-product/" + bidId;
-        let bidProductId = bidOldData.productId;
-        let bidProductDetails = await Userproduct.findOne({_id:bidProductId});
-        if((updateData.acceptedByBuyer == true)){
-          notificationUserId = bidOldData.sellerId;
-          notificationTitle = 'A buyer has accepted the bid on your product';
-          notificationContent =  'Buyer has accepted bid on ' + bidProductDetails.name;
-          await insertNotification(
-            notificationTitle,
-            notificationContent,
-            notificationUserId,
-            notificationreqUrl,
-            new Date()
-          );
-          console.log("seller")
-        } 
-        if((updateData.acceptedBySeller == true)){
-          notificationUserId = bidOldData.buyerId;
-          notificationTitle = 'The seller has accepted your offer';
-          notificationContent =  'The seller has accepted your response on ' + bidProductDetails.name;
-          await insertNotification(
-            notificationTitle,
-            notificationContent,
-            notificationUserId,
-            notificationreqUrl,
-            new Date()
-          );
-          console.log("buyer")
-        }
+     //===Accepted notification portion======
+		let notificationUserId = '';
+    let notificationTitle = '';
+    let notificationContent = '';
+    let notificationreqUrl = process.env.SITE_URL + "/bid-for-product/" + bidId;
+    let bidProductId = bidOldData.productId;
+    let bidProductDetails = await Userproduct.findOne({_id:bidProductId});
+    //if((updateData.acceptedByBuyer == true)){
+    if((username == bidOldData.buyerId)){
+      notificationUserId = bidOldData.sellerId;
+      notificationTitle = 'A buyer has accepted the bid on your product';
+      notificationContent =  'Buyer has accepted bid on ' + bidProductDetails.name;
+      await insertNotification(
+        notificationTitle,
+        notificationContent,
+        notificationUserId,
+        notificationreqUrl,
+        new Date()
+      );
+    } 
+    //if((updateData.acceptedBySeller == true)){
+    if((username == bidOldData.sellerId)){
+      notificationUserId = bidOldData.buyerId;
+      notificationTitle = 'The seller has accepted your offer';
+      notificationContent =  'The seller has accepted your response on ' + bidProductDetails.name;
+      await insertNotification(
+        notificationTitle,
+        notificationContent,
+        notificationUserId,
+        notificationreqUrl,
+        new Date()
+      );
+    }
       //Write code for both side acceptation
       if(((bidOldData.acceptedByBuyer == true) && (updateData.acceptedBySeller == true)) || ((bidOldData.acceptedBySeller == true) && (updateData.acceptedByBuyer == true))) {
         let user_id = bidOldData.buyerId;

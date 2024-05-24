@@ -370,7 +370,7 @@
                   success: function (response) {
                      if (response.is_shippingkit == true) {
                         const tempOrderId = response.order._id;
-                        //window.location.href = '/payshippingkit?temp=' + tempOrderId;
+                        window.location.href = '/payshippingkit?temp=' + tempOrderId;
                      }
                      else {
                         Swal.fire({

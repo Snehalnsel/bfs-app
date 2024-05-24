@@ -2969,9 +2969,7 @@ exports.addToWishlistWeb = async function (req, res, next) {
         added_dtime: new Date(),
       });
       const savedFavData = await newFavList.save();
-
       const requestUrl = process.env.SITE_URL + "/show-wishlist-details";
-
       await insertNotification(
         'Item added to the wishlist',
         `Item ${product.name} has been added to your wishlist`,
@@ -2979,7 +2977,6 @@ exports.addToWishlistWeb = async function (req, res, next) {
         requestUrl,
         new Date()
       );
-
       return res.status(200).json({
         message: 'The product has been added to your wishlist',
         success: true,
@@ -3004,12 +3001,10 @@ exports.viewWishListByUserId_backup = async function (req, res, next) {
     if (isLoggedIn == "") {
       return res.redirect("/registration");
     }
-
     const user_id = req.session.user.userId;
     const existingList = await Wishlist.find({ user_id: isLoggedIn })
       .populate('user_id', 'name')
       .exec();
-
     if (existingList.length === 0) {
       res.render("webpages/wishlist", {
         title: "Wish List Page",
@@ -5217,7 +5212,7 @@ exports.sendotp = async function (req, res, next) {
                       });  
                       const currentDate = new Date().toLocaleDateString();
                       const currentTime = new Date().toLocaleTimeString();
-
+                      console.log(currentDate, currentTime);
                       const loginHtmlPath = 'views/webpages/reset-password.html';
                       let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
                       loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
@@ -5366,9 +5361,13 @@ exports.changePassword = async function (req, res, next) {
                               let returnData;
                               returnData = await sendWhatsapp(smsData);
                             });  
+                            const currentDate = new Date().toLocaleDateString();
+                            const currentTime = new Date().toLocaleTimeString();
                             const loginHtmlPath = 'views/webpages/reset-password.html';
                             let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
                             loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+                            loginHtmlContent = loginHtmlContent.replace('{{date}}', currentDate);
+                            loginHtmlContent = loginHtmlContent.replace('{{time}}', currentTime);
                             const mailData = {
                               from: "Bid For Sale! <" + smtpUser + ">",
                               to: user.email,

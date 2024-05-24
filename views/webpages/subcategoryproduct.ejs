@@ -20,8 +20,9 @@
          </div>
          <div class="product-wrapper">
             <div class="mobile-filterview">
-               <i class="fa fa-filter" aria-hidden="true"></i> Filter Products
+               <i class="fa fa-filter" aria-hidden="true"></i>
             </div>
+            <div class="overlay-sidebar"></div>   
             <div class="short-sidebar">
                <div class="filter-header">
                   <div class="flt-title">All Filters</div>
@@ -252,7 +253,7 @@
                      endPCou = endPCou + filterproductCount;
                      if(filterproductCount){
                      %>
-                     <h5 class="show-count">Showing <%= startProduct %> to <%= endPCou %> products of <%=
+                     <h5 class="show-count"><span class="mv-br">Showing</span> <%= startProduct %> to <%= endPCou %> products of <%=
                         productCount ? productCount : 0 %>
                      </h5>
                      <% } %>

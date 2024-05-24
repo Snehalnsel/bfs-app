@@ -4715,7 +4715,11 @@ exports.Demoorder = async function (req, res) {
     taxable_value = formData.taxable_value;
     let product =await Userproduct.findById(product_id);
     let total_price = 0;
-
+    let addressBookId = formData.addressBookId;
+    //===Defalt address setup====
+    await addressBook.updateMany({user_id: user_id}, {default_status:0});
+    await addressBook.updateMany({_id: mongoose.Types.ObjectId(addressBookId)}, {default_status:1});
+   
     const existingCart = await Cart.findOne({ user_id, status: 0 });
 
     const cartItem = await CartDetail.findOne({ cart_id: existingCart._id, status: 0 })

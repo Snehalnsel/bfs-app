@@ -2969,9 +2969,7 @@ exports.addToWishlistWeb = async function (req, res, next) {
         added_dtime: new Date(),
       });
       const savedFavData = await newFavList.save();
-
       const requestUrl = process.env.SITE_URL + "/show-wishlist-details";
-
       await insertNotification(
         'Item added to the wishlist',
         `Item ${product.name} has been added to your wishlist`,
@@ -2979,7 +2977,6 @@ exports.addToWishlistWeb = async function (req, res, next) {
         requestUrl,
         new Date()
       );
-
       return res.status(200).json({
         message: 'The product has been added to your wishlist',
         success: true,
@@ -3004,12 +3001,10 @@ exports.viewWishListByUserId_backup = async function (req, res, next) {
     if (isLoggedIn == "") {
       return res.redirect("/registration");
     }
-
     const user_id = req.session.user.userId;
     const existingList = await Wishlist.find({ user_id: isLoggedIn })
       .populate('user_id', 'name')
       .exec();
-
     if (existingList.length === 0) {
       res.render("webpages/wishlist", {
         title: "Wish List Page",
@@ -3065,16 +3060,13 @@ exports.viewWishListByUserId_backup = async function (req, res, next) {
 exports.viewWishListByUserId = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-
     if (isLoggedIn == "") {
       return res.redirect("/registration");
     }
-
     const user_id = req.session.user.userId;
     const existingList = await Wishlist.find({ user_id: isLoggedIn })
       .populate('user_id', 'name')
       .exec();
-
     if (existingList.length === 0) {
       res.render("webpages/wishlist", {
         title: "Wish List Page",

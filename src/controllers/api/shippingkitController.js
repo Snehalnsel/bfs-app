@@ -846,7 +846,7 @@ exports.addShipmentDataWeb = async (req, res) => {
     let productshippingkit = productDetails[0].shipping_charges_id;
     let shippingcharges = await shippingchrgsModel.findOne({ _id: productshippingkit });
     //let price = shippingcharges.amount;
-    const price = 1;
+    const price = 350;
     const gst = (price * 28) / 100;
     const final_price = price + gst;
     const track = await Ordertracking.findOne({ order_id: order_id,status :0 }).exec();

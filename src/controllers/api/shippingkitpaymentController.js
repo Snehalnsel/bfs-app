@@ -175,44 +175,6 @@ exports.getShippingKitStatus = async function (req, res, next) {
       let sha256_val = sha256(string);
       let xVerifyChecksum = sha256_val + "###" + SALT_INDEX;
       try {
-        /* const response = await axios.get(statusUrl, {
-          headers: {
-            "Content-Type": "application/json",
-            "X-VERIFY": xVerifyChecksum,
-            "X-MERCHANT-ID": MERCHANT_ID,
-            accept: "application/json",
-          },
-        }).then(async (res)=>{
-          if(typeof res.data.code != "undefined") {
-            return {
-              code:res.data.code,
-              data:res.data
-            };
-          } else {
-            return {
-              code:"failure",
-              data:res.data
-            };
-          }
-        });
-        let updateData = {};
-        if (response.data.success) {
-            if (response.data.code === "PAYMENT_SUCCESS") {
-              updateData.checkstatus_status = "success";
-            } else {
-              updateData.checkstatus_status = "failure";
-            }
-        } else {
-          updateData.checkstatus_status = "failure";
-        }
-        */
-        // let updateData = {};
-        // if(typeof temporder.pay_response.code != "undefined" && temporder.pay_response.code == "PAYMENT_INITIATED") {
-        //   updateData.checkstatus_status = "success";
-        // } else {
-        //   updateData.checkstatus_status = "failure";
-        // }
-
         const response = await axios.get(statusUrl, {
           headers: {
             "Content-Type": "application/json",
@@ -233,6 +195,7 @@ exports.getShippingKitStatus = async function (req, res, next) {
             };
           }
         });
+    
         let updateData = {};
         if (response.data.success) {
             if (response.data.code === "PAYMENT_SUCCESS") {

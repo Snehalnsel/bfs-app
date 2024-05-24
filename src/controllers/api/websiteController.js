@@ -3060,13 +3060,16 @@ exports.viewWishListByUserId_backup = async function (req, res, next) {
 exports.viewWishListByUserId = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+
     if (isLoggedIn == "") {
       return res.redirect("/registration");
     }
+
     const user_id = req.session.user.userId;
     const existingList = await Wishlist.find({ user_id: isLoggedIn })
       .populate('user_id', 'name')
       .exec();
+
     if (existingList.length === 0) {
       res.render("webpages/wishlist", {
         title: "Wish List Page",
@@ -5209,7 +5212,7 @@ exports.sendotp = async function (req, res, next) {
                       });  
                       const currentDate = new Date().toLocaleDateString();
                       const currentTime = new Date().toLocaleTimeString();
-
+                      console.log(currentDate, currentTime);
                       const loginHtmlPath = 'views/webpages/reset-password.html';
                       let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
                       loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
@@ -5358,9 +5361,13 @@ exports.changePassword = async function (req, res, next) {
                               let returnData;
                               returnData = await sendWhatsapp(smsData);
                             });  
+                            const currentDate = new Date().toLocaleDateString();
+                            const currentTime = new Date().toLocaleTimeString();
                             const loginHtmlPath = 'views/webpages/reset-password.html';
                             let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
                             loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+                            loginHtmlContent = loginHtmlContent.replace('{{date}}', currentDate);
+                            loginHtmlContent = loginHtmlContent.replace('{{time}}', currentTime);
                             const mailData = {
                               from: "Bid For Sale! <" + smtpUser + ">",
                               to: user.email,

@@ -196,7 +196,13 @@ img.ft-logo {
   display: none;
 }
 img.mobile-logo {
-    max-width: 70px;
+    max-width:90%;
+}
+
+.nav-box a.navbar-brand {
+    text-align: center;
+        margin: 0;
+        padding-right: 10px;
 }
 
 .buy-sell-link ul li a {
@@ -798,9 +804,16 @@ button.accordion-button {
         width: 100%;
         align-items: center;
     }
+   .nav-row .nav-firstbox{
+     width: 15%;
+   }
 
-   .nav-row .nav-box {
-    width: 33%;
+   .nav-row .nav-shortbox {
+    width: 25%;
+  }
+
+  .nav-row .nav-middlebox{
+    width: 60%;
   }
 
   .top-mobile-header {

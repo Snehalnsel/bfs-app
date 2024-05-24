@@ -974,6 +974,13 @@ button.accordion-button {
     right: 5px;
     top: 5px;
 }
+.close-sidebarmenu i {
+    margin-top: -2px;
+}
+
+.bid_modal {
+    padding-top: 50px;
+}
 
 .sidebar-mobilemenu .navbar-nav [id^=drop] + ul li {
     display: block;
@@ -1131,6 +1138,12 @@ button.accordion-button {
 
 #login-password .bidNowAmountBtn {
     width: 130px;
+}
+
+.WordSection1 p {
+    color: #000000;
+    font-size: 14px;
+    line-height: 24px;
 }
 
 

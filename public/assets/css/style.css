@@ -4865,3 +4865,7 @@ button.grey-btn {
     background: #fbfbfb;
     border: solid 1px #eee;
 }
+
+.mv-logo {
+    display: none;
+}

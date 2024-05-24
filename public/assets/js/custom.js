@@ -250,9 +250,15 @@ $(document).ready(function(){
 
 $('.mobile-filterview').click(function(e){
   $('.short-sidebar').toggleClass('open-sidebar');
+   $('.overlay-sidebar').addClass('open-os');
 });
 $('.apply-filter').click(function(e){
    $('.short-sidebar').removeClass('open-sidebar');
+   $('.overlay-sidebar').removeClass('open-os');
+  });
+$('.overlay-sidebar').click(function(e){ 
+$('.short-sidebar').removeClass('open-sidebar'); 
+   $('.overlay-sidebar').removeClass('open-os');
   });
 
 
@@ -269,4 +275,5 @@ $('.mobilemenu-openoverlay').click(function(e){
   $('.sidebar-mobilemenu').removeClass('open-sidebarmenu');
   $('.mobilemenu-openoverlay').removeClass('mob-active');  
 });
+
 

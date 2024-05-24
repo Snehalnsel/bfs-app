@@ -412,7 +412,8 @@ img.mobile-logo {
     flex-wrap: wrap;
 }
 .shorting-box {    
-    margin-top: 8px;
+   justify-content: end;
+   flex-wrap: wrap;
 }
 .product-listrow .product-box {
     width: 48%;
@@ -609,14 +610,21 @@ img.mobile-logo {
 .mobile-filterview {
     display: flex;
         align-items: center;
-        width: 100%;
-        background: #eee;
+        width: 35px;
+        height: 35px;
+        justify-content: center;
+        background: #8e8e8e;
         padding: 8px !important;
         grid-gap: 5px;
-        font-size: 14px;
-        color: #5f5f5f;
+        font-size: 18px;
+        color: #ffffff;
         font-weight: 600;
         margin-bottom: 10px;
+        border-radius: 5px;
+        position: absolute;
+        right: 0px;
+        top: 0;
+        transform: translateY(-55px);
     
 }
 
@@ -626,7 +634,7 @@ img.mobile-logo {
     left: -300px;
     width: 290px;
     transition: 0.5s;
-    z-index: 1;
+    z-index: 3;
     top: 0;
     height: 100%;
 }
@@ -636,8 +644,8 @@ img.mobile-logo {
     transition: 0.5s;
 }
 
-div#theme-accordion {
-    max-height: 500px;
+.short-sidebar .theme-accordion .filter-list {
+    max-height: 200px;
     overflow: auto;
 }
 
@@ -1014,6 +1022,115 @@ button.accordion-button {
 }
 .login_modal, .change-profile-update {
     padding-top: 50px;
+}
+
+ .mv-center {
+        text-align: center;
+        border-bottom: solid 1px #c3c3c3;
+        padding-bottom: 15px;
+ }
+
+.mbm-15 {
+    margin-bottom: 15px;
+}
+
+.footer-wrapper .app-box {
+    margin-bottom: 15px;
+}
+
+.filter-shorting .product-result h5 {    
+    font-size: 13px;
+}
+
+.filter-shorting .product-result {
+    width: 50%;
+}
+.shorting-box {
+    width: 50%;
+}
+.mv-br{
+    display: block;
+}
+
+.short-label {
+    display: block;
+    width: 100%;
+    text-align: right;
+    font-size: 12px;
+    margin-right: 0px;
+}
+
+.filter-shorting .short-dropdown select {    
+    font-size: 12px;   
+    padding: 5px 8px;
+    min-width: 110px;    
+    line-height: 20px;  
+    border-right: 0px !important;  
+}
+
+.breadcum-product{
+    margin-bottom: 10px;
+}
+.product-wrapper .main_product-wrapper{
+    padding: 0;
+}
+.filter-shorting {
+    padding-right: 0;
+}
+
+.product-wrapper{
+    position: relative;
+}
+
+.footer-wrapper {
+    padding: 25px 0px;    
+}
+
+.overlay-sidebar {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        background: #121212d6;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        transition: 0.5s;
+        opacity: 0;
+        visibility: hidden;
+    }
+
+     .overlay-sidebar.open-os {
+       width: 100%;
+       transition: 0.5s;
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .account-setting-blk .edit-link.shortedit-btn {
+    margin-right: 0px;
+}
+
+.change-profile-update .inner-formbox .profile-chnage-box {
+    padding: 15px;
+}
+
+.mv-logo {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.mv-logo img.lmv-logo {
+    max-width: 120px;
+}
+
+.bid_modal {
+    padding-right: 0px !important;
+}
+
+#login-password .bidNowAmountBtn {
+    width: 130px;
 }
 
 

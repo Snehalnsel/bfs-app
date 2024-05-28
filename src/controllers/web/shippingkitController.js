@@ -366,9 +366,7 @@ exports.getShipmentKit = function (req, res, next) {
     }
   });
 };
-
 exports.getHublist = async function (req, res, next) {
-
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const pageName = "Select Hub List";
   const pageTitle = req.app.locals.siteName + " - " + pageName;
@@ -404,7 +402,6 @@ exports.getHublist = async function (req, res, next) {
     res.status(500).json({ error: 'An error occurred while fetching data' });
   }
 };
-
 async function generateLabel(shipment_id) {
   token = await generateToken(email, shipPassword);
   if (!token) {
@@ -531,7 +528,6 @@ async function generateCouriresServiceability(pickup_postcode, delivery_postcode
 }
 
 exports.updateData = async function (req, res, next) {
-
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -566,7 +562,6 @@ exports.updateData = async function (req, res, next) {
     });
   }
 };
-
 exports.getShipmentList = function (req, res, next) {
 
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
@@ -634,11 +629,8 @@ exports.getShipmentList = function (req, res, next) {
     }
   });
 };
-
-
 exports.deleteData = async function (req, res, next) {
   try {
-
     let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

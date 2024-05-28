@@ -835,8 +835,6 @@ exports.getParticularShipmentDetails = async function (req, res, next) {
     });
   }
 };
-
-
 exports.addShipmentDataWeb = async (req, res) => {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -853,7 +851,7 @@ exports.addShipmentDataWeb = async (req, res) => {
     if (track == null) {
       return res.status(200).json({
         status: "0",
-        message: 'Order Delivery Partner Not chosse yet',
+        message: 'Order Delivery Partner Not choose yet',
         is_shippingkit: false,
       });
     }
@@ -861,7 +859,6 @@ exports.addShipmentDataWeb = async (req, res) => {
       .populate('seller_id', 'name phone_no email')
       .populate('billing_address_id')
       .populate('hub_address_id');
-    console.log(hubaddress);
     if (!hubaddress) {
       res.status(200).json({
         status: "0",

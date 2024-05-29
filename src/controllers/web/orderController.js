@@ -2849,7 +2849,8 @@ exports.downloadOrderPDF = function (req, res, next) {
       res.status(500).json({ error: 'An error occurred' });
     } else {
       try {
-          const loginHtmlPath = 'views/webpages/invoice1.html';
+          //const loginHtmlPath = 'views/webpages/invoice1.html';
+          const loginHtmlPath = 'views/webpages/seller_to_BFS.html';
           const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
 
         const orderDate = new Date(orderList[0].added_dtime);
@@ -2857,21 +2858,16 @@ exports.downloadOrderPDF = function (req, res, next) {
         
         const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate });
         //  const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
-
           const browser = await puppeteer.launch();
           const page = await browser.newPage();
-
           await page.setContent(renderedHtml);
-
           const pdfBuffer = await page.pdf({ format: 'A4' });
-
           res.setHeader('Content-Type', 'application/pdf');
           res.setHeader('Content-Disposition', 'attachment; filename=InvoiceSellerToBFS.pdf');
-
           res.send(pdfBuffer);
           await browser.close();
       } catch (err) {
-        //console.error('Error generating PDF:', err);
+        console.error('Error generating PDF:', err);
         return res.render("pages/error-msg", {
           errorMsg: "An error occurred while generating PDF!"
         });
@@ -3419,18 +3415,14 @@ exports.sentOrderPDFInWhatsapp = async function (req, res, next) {
 
         const loginHtmlPath = 'views/webpages/invoice1.html';
         const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
-
         const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
-
         const options = { format: 'Letter' };
-
         pdf.create(renderedHtml, options).toStream(async (err, stream) => {
           // if (err) {
           //   return res.status(500).send('An error occurred while generating PDF');
           // }
           const order_invoice = stream;
           const to_number = "91" + orderList[0].user[0].phone_no;
-
           // let response = await send_message({ type: 'media', order_invoice, to_number });
           let response = await send_message({ type: 'media', message: 'https://file-examples-com.github.io/uploads/2017/02/file-sample_100kB.doc', to_number: to_number }).then((res) => {
           });

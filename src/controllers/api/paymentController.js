@@ -75,15 +75,14 @@ exports.getPaymentData = async function (req, res, next) {
     const tempOrderId = req.query.temp;
     const temporder = await Demoorder.findById(tempOrderId);
     let amount;
-    if(temporder.booking_amount == 0) {
-      amount= parseFloat(temporder.total_price);
-    } else
-    {
+    if (temporder.booking_amount == 0) {
+      amount = parseFloat(temporder.total_price);
+    } else {
       amount = parseFloat(temporder.booking_amount);
     }
-   // amount = temporder.booking_amount !== 0 ? temporder.booking_amount : temporder.total_price;
+    // amount = temporder.booking_amount !== 0 ? temporder.booking_amount : temporder.total_price;
     let userId = temporder.user_id;
-    let merchantTransactionId = uniqid(); 
+    let merchantTransactionId = uniqid();
     let normalPayLoad = {
       merchantId: MERCHANT_ID,
       merchantTransactionId: merchantTransactionId,
@@ -112,7 +111,7 @@ exports.getPaymentData = async function (req, res, next) {
             "X-VERIFY": xVerifyChecksum,
             accept: "application/json",
           },
-          data:{
+          data: {
             merchantId: MERCHANT_ID,
             merchantTransactionId: merchantTransactionId,
             merchantUserId: userId,
@@ -129,7 +128,7 @@ exports.getPaymentData = async function (req, res, next) {
       .then(async function (response) {
         //console.log("Response for paymenteeeee:", response.data);return false;
         const updateData = {
-          merchant_transactionid:merchantTransactionId,
+          merchant_transactionid: merchantTransactionId,
           pay_response: response.data,
         };
         await Demoorder.findOneAndUpdate(
@@ -177,16 +176,16 @@ exports.getStatus_back = async function (req, res, next) {
             "X-MERCHANT-ID": merchantTransactionId,
             accept: "application/json",
           },
-        }).then(async (res)=>{
-          if(typeof res.data.code != "undefined") {
+        }).then(async (res) => {
+          if (typeof res.data.code != "undefined") {
             return {
-              code:res.data.code,
-              data:res.data
+              code: res.data.code,
+              data: res.data
             };
           } else {
             return {
-              code:"failure",
-              data:res.data
+              code: "failure",
+              data: res.data
             };
           }
         });
@@ -194,7 +193,7 @@ exports.getStatus_back = async function (req, res, next) {
           checkstatus_response: response.data,
           //checkstatus_status: response.data.code === "PAYMENT_SUCCESS" ? "success" : "failure",
         };
-        if(typeof response.data.code != "undefined" && response.data.code == "PAYMENT_SUCCESS") {
+        if (typeof response.data.code != "undefined" && response.data.code == "PAYMENT_SUCCESS") {
           updateData.checkstatus_status = "success";
         } else {
           updateData.checkstatus_status = "failure";
@@ -204,15 +203,15 @@ exports.getStatus_back = async function (req, res, next) {
           { $set: updateData },
           { new: true }
         );
-        if(updateData.checkstatus_status == "success") {
+        if (updateData.checkstatus_status == "success") {
           const now = new Date();
-          const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0'); 
+          const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0');
           const currentYear = now.getFullYear().toString();
           let order_status = '0';
           let delivery_charges = '0';
           let discount = '0';
           let pickup_status = '0';
-          let delivery_status = '0';          
+          let delivery_status = '0';
           const lastOrderIndex = await getLastOrderIndex();
           const nextIncrementingPart = lastOrderIndex + 1;
           const orderCode = `BFSORD${currentMonth}${currentYear}-${nextIncrementingPart}`;
@@ -226,72 +225,70 @@ exports.getStatus_back = async function (req, res, next) {
             billing_address_id: temporder.billing_address_id,
             shipping_address_id: temporder.shipping_address_id,
             total_price: temporder.total_price,
-            booking_amount : temporder.booking_amount || 0,
-            packing_handling_charge : temporder.packing_handling_charge || 0, 
+            booking_amount: temporder.booking_amount || 0,
+            packing_handling_charge: temporder.packing_handling_charge || 0,
             payment_method: temporder.payment_method,
             order_status: order_status,
             gst: temporder.gst || '',
-            taxable_value : temporder.taxable_value || '',
+            taxable_value: temporder.taxable_value || '',
             delivery_charges: delivery_charges,
             discount: discount,
             pickup_status: pickup_status,
             delivery_status: delivery_status,
-            pay_now: temporder.pay_now || '', 
+            pay_now: temporder.pay_now || '',
             remaining_amount: temporder.remaining_amount || '',
             added_dtime: new Date().toISOString(),
           });
           const savedOrder = await order.save();
-          if(savedOrder)
-          {
+          if (savedOrder) {
             const updatedProduct = await Userproduct.findOneAndUpdate(
-              { _id: temporder.product_id }, 
-              { $set: { flag: 1 } }, 
+              { _id: temporder.product_id },
+              { $set: { flag: 1 } },
               { new: true }
             );
-      const user = await Users.findById(savedOrder.user_id);
-      const product = await Userproduct.findById(savedOrder.product_id);
-      const address = await AddressBook.findById(savedOrder.billing_address_id);
-      const billingaddress = address.street_name + ', ' + address.address1 + ', ' + address.landmark + ', ' + address.city_name + ', ' + address.state_name + ', ' + address.pin_code;
-      const loginHtmlPath = 'views/webpages/order-confirmed.html';
-      let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
-      loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
-      loginHtmlContent = loginHtmlContent.replace('{{ordernumber}}', orderCode);
-      loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
-      loginHtmlContent = loginHtmlContent.replace('{{productimages}}', orderCode);
-      loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
-      loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.price);
-      loginHtmlContent = loginHtmlContent.replace('{{shippingaddress}}', billingaddress);
-      const mailData = {
-        from: "Bid For Sale! <" + smtpUser + ">",
-        to: user.email,
-        subject: "Order Placed - Bid For Sale!",
-        name: "Bid For Sale!",
-        text: "order placed",
-        html: loginHtmlContent
-      };
-      transporter.sendMail(mailData, function (err, info) {
-        // if (err) console.log("err", err);
-        // else console.log("info", info);
-      });
-         let smsData = {
-          textId: "test",
-          toMobile: "91" +user.phone_no,
-          text: "Order placed successfully! Thank you for shopping with Bid For Sale. Your "+ product.name +" having Order ID "+ orderCode +"  is on its way to you. For any inquiries, feel free to reach out to us. Happy shopping!-BFS RETAIL SERVICES PRIVATE LIMITED",
-        };
-        let returnData;
-        returnData = await sendSms(smsData);
-        const historyData = new ApiCallHistory({
-          userId: user._id,
-          called_for: "Order Placed",
-          api_link: process.env.SITE_URL,
-          api_param: smsData,
-          api_response: returnData,
-          send_status: 'send',
-        });
-        await historyData.save();
-            if(updatedProduct)
-            {
-              const cleanedCartId =  mongoose.Types.ObjectId(temporder.cart_id); 
+            const user = await Users.findById(savedOrder.user_id);
+            const product = await Userproduct.findById(savedOrder.product_id);
+            const address = await AddressBook.findById(savedOrder.billing_address_id);
+            const billingaddress = address.street_name + ', ' + address.address1 + ', ' + address.landmark + ', ' + address.city_name + ', ' + address.state_name + ', ' + address.pin_code;
+            const loginHtmlPath = 'views/webpages/order-confirmed.html';
+            let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+            loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+            loginHtmlContent = loginHtmlContent.replace('{{ordernumber}}', orderCode);
+            loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
+            loginHtmlContent = loginHtmlContent.replace('{{productimages}}', orderCode);
+            loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
+            loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.price);
+            loginHtmlContent = loginHtmlContent.replace('{{shippingaddress}}', billingaddress);
+            const mailData = {
+              from: "Bid For Sale! <" + smtpUser + ">",
+              to: user.email,
+              subject: "Order Placed - Bid For Sale!",
+              name: "Bid For Sale!",
+              text: "order placed",
+              html: loginHtmlContent
+            };
+            transporter.sendMail(mailData, function (err, info) {
+              // if (err) console.log("err", err);
+              // else console.log("info", info);
+            });
+            let smsData = {
+              textId: "test",
+              toMobile: "91" + user.phone_no,
+              text: "Order placed successfully! Thank you for shopping with Bid For Sale. Your " + product.name + " having Order ID " + orderCode + "  is on its way to you. For any inquiries, feel free to reach out to us. Happy shopping!-BFS RETAIL SERVICES PRIVATE LIMITED",
+            };
+            let returnData;
+            returnData = await sendSms(smsData);
+            const historyData = new ApiCallHistory({
+              userId: user._id,
+              called_for: "Order Placed",
+              api_link: process.env.SITE_URL,
+              api_param: smsData,
+              api_response: returnData,
+              send_status: 'send',
+            });
+            await historyData.save();
+            if (updatedProduct) {
+              const cleanedCartId = mongoose.Types.ObjectId(temporder.cart_id);
               const cartDetail = await CartDetail.findOne({ cart_id: cleanedCartId });
               if (cartDetail) {
                 await cartDetail.remove();
@@ -301,14 +298,14 @@ exports.getStatus_back = async function (req, res, next) {
               if (cartDetailsCount === 0) {
                 await existingCart.remove();
               }
-            } 
+            }
           }
           res.redirect('/message?message=success');
         } else {
           res.redirect('/message?message=failure');
         }
       } catch (error) {
-        console.log("Error for payment error status:",error);
+        console.log("Error for payment error status:", error);
         res.redirect('/message?message=failure');
         /*res.status(500).json({
           status: '0',
@@ -321,7 +318,7 @@ exports.getStatus_back = async function (req, res, next) {
       res.redirect('/message?message=failure');
     }
   } catch (error) {
-    console.log("Error for payment error status console:",error);
+    console.log("Error for payment error status console:", error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the dashboard.",
@@ -338,7 +335,7 @@ exports.getStatus = async function (req, res, next) {
     const merchantTransactionId = temporder.merchant_transactionid;
     if (merchantTransactionId) {
 
-     let statusUrl = `${PHONE_PE_HOST_URL}/pg/v1/status/${MERCHANT_ID}/` +
+      let statusUrl = `${PHONE_PE_HOST_URL}/pg/v1/status/${MERCHANT_ID}/` +
         merchantTransactionId;
 
       let string = `/pg/v1/status/${MERCHANT_ID}/` +
@@ -346,7 +343,7 @@ exports.getStatus = async function (req, res, next) {
         SALT_KEY;
       let sha256_val = sha256(string);
       let xVerifyChecksum = sha256_val + "###" + SALT_INDEX;
-      try { 
+      try {
         const response = await axios.get(statusUrl, {
           headers: {
             "Content-Type": "application/json",
@@ -354,44 +351,44 @@ exports.getStatus = async function (req, res, next) {
             "X-MERCHANT-ID": MERCHANT_ID,
             accept: "application/json",
           },
-        }).then(async (res)=>{
-          if(typeof res.data.code != "undefined") {
+        }).then(async (res) => {
+          if (typeof res.data.code != "undefined") {
             return {
-              code:res.data.code,
-              data:res.data
+              code: res.data.code,
+              data: res.data
             };
           } else {
             return {
-              code:"failure",
-              data:res.data
+              code: "failure",
+              data: res.data
             };
           }
         });
         let updateData = {};
         if (response.data.success) {
-            if (response.data.code === "PAYMENT_SUCCESS") {
-              updateData.checkstatus_status = "success";
-            } else {
-              updateData.checkstatus_status = "failure";
-            }
+          if (response.data.code === "PAYMENT_SUCCESS") {
+            updateData.checkstatus_status = "success";
+          } else {
+            updateData.checkstatus_status = "failure";
+          }
         } else {
           updateData.checkstatus_status = "failure";
         }
-        
+
         await Demoorder.findOneAndUpdate(
           { _id: tempId },
           { $set: updateData },
           { new: true }
         );
-         if(updateData.checkstatus_status == "success") {
+        if (updateData.checkstatus_status == "success") {
           const now = new Date();
-          const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0'); 
+          const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0');
           const currentYear = now.getFullYear().toString();
           let order_status = '0';
           let delivery_charges = '0';
           let discount = '0';
           let pickup_status = '0';
-          let delivery_status = '0';          
+          let delivery_status = '0';
           const lastOrderIndex = await getLastOrderIndex();
           const nextIncrementingPart = lastOrderIndex + 1;
           const orderCode = `BFSORD${currentMonth}${currentYear}-${nextIncrementingPart}`;
@@ -405,41 +402,39 @@ exports.getStatus = async function (req, res, next) {
             billing_address_id: temporder.billing_address_id,
             shipping_address_id: temporder.shipping_address_id,
             total_price: temporder.total_price,
-            booking_amount : temporder.booking_amount || 0,
-            packing_handling_charge : temporder.packing_handling_charge || 0, 
+            booking_amount: temporder.booking_amount || 0,
+            packing_handling_charge: temporder.packing_handling_charge || 0,
             payment_method: temporder.payment_method,
             order_status: order_status,
             gst: temporder.gst || '',
-            taxable_value : temporder.taxable_value || '',
+            taxable_value: temporder.taxable_value || '',
             delivery_charges: delivery_charges,
             discount: discount,
             pickup_status: pickup_status,
             delivery_status: delivery_status,
-            pay_now: temporder.pay_now || '', 
+            pay_now: temporder.pay_now || '',
             remaining_amount: temporder.remaining_amount || '',
-            bid_price: (typeof temporder.bid_price != "undefined") ? temporder.bid_price:0 ,
-            original_product_price: (typeof temporder.original_product_price != "undefined") ? temporder.original_product_price:0 ,
+            bid_price: (typeof temporder.bid_price != "undefined") ? temporder.bid_price : 0,
+            original_product_price: (typeof temporder.original_product_price != "undefined") ? temporder.original_product_price : 0,
             added_dtime: new Date().toISOString(),
           });
           const savedOrder = await order.save();
-          if(savedOrder)
-          {
+          if (savedOrder) {
             const updatedProduct = await Userproduct.findOneAndUpdate(
-              { _id: temporder.product_id }, 
-              { $set: { flag: 1 } }, 
+              { _id: temporder.product_id },
+              { $set: { flag: 1 } },
               { new: true }
             );
-      const product = await Userproduct.findById(savedOrder.product_id);
-      const productimage = await Productimage.findOne({ product_id: savedOrder.product_id });      
-      const user = await Users.findById(savedOrder.user_id);
-      if(user)
-        {
-            let smsData = {
-              textId: "test",
-                toMobile: "91" +user.phone_no,
-                text: "Dear "+user.name+",Your order "+orderCode+" has been placed successfully. Sit back and relax. We'll notify you once it's shipped.- BFS Team",
+            const product = await Userproduct.findById(savedOrder.product_id);
+            const productimage = await Productimage.findOne({ product_id: savedOrder.product_id });
+            const user = await Users.findById(savedOrder.user_id);
+            if (user) {
+              let smsData = {
+                textId: "test",
+                toMobile: "91" + user.phone_no,
+                text: "Dear " + user.name + ",Your order " + orderCode + " has been placed successfully. Sit back and relax. We'll notify you once it's shipped.- BFS Team",
               };
-            let returnData;
+              let returnData;
               returnData = await sendSms(smsData);
               const historyData = new ApiCallHistory({
                 userId: user._id,
@@ -451,155 +446,153 @@ exports.getStatus = async function (req, res, next) {
               });
               await historyData.save();
 
-          let message = "Dear "+user.name+", Your order "+orderCode+" has been placed successfully. Sit back and relax. We'll notify you once it's shipped.- BFS Team";
-          let to_number = "91" + user.phone_no;
-          let response = await send_message({ type: 'text', message, to_number });
+              let message = "Dear " + user.name + ", Your order " + orderCode + " has been placed successfully. Sit back and relax. We'll notify you once it's shipped.- BFS Team";
+              let to_number = "91" + user.phone_no;
+              let response = await send_message({ type: 'text', message, to_number });
 
-          //SEND WHATSAPP
-          let receiverMobileNo = "91" + user.phone_no;
-          let root = create({ version: '1.0', encoding: "ISO-8859-1" })
-            .ele('MESSAGE', { VER: '1.2' })
-            .ele('USER', { USERNAME: process.env.WP_SMS_USER_NAME, PASSWORD: process.env.WP_PASSWORD })
-            .ele('SMS', { UDH: "0", CODING: "1", TEXT: "Hi", PROPERTY: "0", ID: "1", TEMPLATE: "bfstest" })
-            .ele('ADDRESS', { FROM: process.env.WP_SMS_SENDER_MOBILE, TO: receiverMobileNo, SEQ: "1" })
-          //.up()
-          //.up();
+              //SEND WHATSAPP
+              let receiverMobileNo = "91" + user.phone_no;
+              let root = create({ version: '1.0', encoding: "ISO-8859-1" })
+                .ele('MESSAGE', { VER: '1.2' })
+                .ele('USER', { USERNAME: process.env.WP_SMS_USER_NAME, PASSWORD: process.env.WP_PASSWORD })
+                .ele('SMS', { UDH: "0", CODING: "1", TEXT: "Hi", PROPERTY: "0", ID: "1", TEMPLATE: "bfstest" })
+                .ele('ADDRESS', { FROM: process.env.WP_SMS_SENDER_MOBILE, TO: receiverMobileNo, SEQ: "1" })
+              //.up()
+              //.up();
 
-            // convert the XML tree to string
-            let xml = root.end({ prettyPrint: true });
-            await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
-              if (err) {
-                // return {
-                //   status:false,
-                //   data:err
-                // };
-              }
-              let smsData = xml;
+              // convert the XML tree to string
+              let xml = root.end({ prettyPrint: true });
+              await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
+                if (err) {
+                  // return {
+                  //   status:false,
+                  //   data:err
+                  // };
+                }
+                let smsData = xml;
+                let returnData;
+                returnData = await sendWhatsapp(smsData);
+              });
+            }
+            const seller = await Users.findById(savedOrder.seller_id);
+            if (seller) {
+              let smsData = {
+                textId: "test",
+                toMobile: "91" + seller.phone_no,
+                text: "Dear " + seller.name + ",Congratulations! Your product " + product.name + " has been sold successfully.The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.- BFS Team",
+              };
               let returnData;
-              returnData = await sendWhatsapp(smsData);
-          });
-        }
-      const seller = await Users.findById(savedOrder.seller_id);
-      if(seller)
-      {
-        let smsData = {
-          textId: "test",
-          toMobile: "91" +seller.phone_no,
-          text: "Dear "+seller.name+",Congratulations! Your product "+ product.name +" has been sold successfully.The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.- BFS Team",
-        };
-        let returnData;
-        returnData = await sendSms(smsData);
-        const historyDataforseller = new ApiCallHistory({
-          userId: seller._id,
-          called_for: "Order Placed of Seller Product",
-          api_link: process.env.SITE_URL,
-          api_param: smsData,
-          api_response: returnData,
-          send_status: 'send',
-        });
-        await historyDataforseller.save();
+              returnData = await sendSms(smsData);
+              const historyDataforseller = new ApiCallHistory({
+                userId: seller._id,
+                called_for: "Order Placed of Seller Product",
+                api_link: process.env.SITE_URL,
+                api_param: smsData,
+                api_response: returnData,
+                send_status: 'send',
+              });
+              await historyDataforseller.save();
 
-        let message = "Dear "+seller.name+",Congratulations! Your product "+ product.name +" has been sold successfully.The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.- BFS Team";
-        let to_number = "91" + seller.phone_no;
-        let response = await send_message({ type: 'text', message, to_number });
+              let message = "Dear " + seller.name + ",Congratulations! Your product " + product.name + " has been sold successfully.The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.- BFS Team";
+              let to_number = "91" + seller.phone_no;
+              let response = await send_message({ type: 'text', message, to_number });
 
-        //SEND WHATSAPP
-        const receiverMobileNo = "91" + seller.phone_no;
-        const root = create({ version: '1.0', encoding: "ISO-8859-1" })
-          .ele('MESSAGE', { VER: '1.2' })
-          .ele('USER', { USERNAME: process.env.WP_SMS_USER_NAME, PASSWORD: process.env.WP_PASSWORD })
-          .ele('SMS', { UDH: "0", CODING: "1", TEXT: "Hi", PROPERTY: "0", ID: "1", TEMPLATE: "bfstest" })
-          .ele('ADDRESS', { FROM: process.env.WP_SMS_SENDER_MOBILE, TO: receiverMobileNo, SEQ: "1" })
-        //.up()
-        //.up();
+              //SEND WHATSAPP
+              const receiverMobileNo = "91" + seller.phone_no;
+              const root = create({ version: '1.0', encoding: "ISO-8859-1" })
+                .ele('MESSAGE', { VER: '1.2' })
+                .ele('USER', { USERNAME: process.env.WP_SMS_USER_NAME, PASSWORD: process.env.WP_PASSWORD })
+                .ele('SMS', { UDH: "0", CODING: "1", TEXT: "Hi", PROPERTY: "0", ID: "1", TEMPLATE: "bfstest" })
+                .ele('ADDRESS', { FROM: process.env.WP_SMS_SENDER_MOBILE, TO: receiverMobileNo, SEQ: "1" })
+              //.up()
+              //.up();
 
-        // convert the XML tree to string
-        const xml = root.end({ prettyPrint: true });
-        await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
-          if (err) {
-            // return {
-            //   status:false,
-            //   data:err
-            // };
-          }
-          //let obj = JSON.parse(data);
-          //let randNumber = Math.floor((Math.random() * 1000000) + 1);
-          let smsData = xml;
-          let returnData;
-          returnData = await sendWhatsapp(smsData);
-          const historyData = await new ApiCallHistory({
-            userId: mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"),
-            called_for: "whatsapp",
-            api_link: process.env.SITE_URL,
-            api_param: smsData,
-            api_response: returnData,
-            send_status: 'send',
-          });
-          await historyData.save();
-        });
-      }
-    
-      const address = await AddressBook.findById(savedOrder.shipping_address_id);
-      
-      const billingaddress =  address.address1 + ', '+ address.street_name + ', ' + address.landmark + ', ' + address.city_name + ', ' + address.state_name + ', ' + address.pin_code;
-      //buyer mail,sms,whatsapp
-      const loginHtmlPath = 'views/webpages/order-confirmed.html';
-      let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+              // convert the XML tree to string
+              const xml = root.end({ prettyPrint: true });
+              await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
+                if (err) {
+                  // return {
+                  //   status:false,
+                  //   data:err
+                  // };
+                }
+                //let obj = JSON.parse(data);
+                //let randNumber = Math.floor((Math.random() * 1000000) + 1);
+                let smsData = xml;
+                let returnData;
+                returnData = await sendWhatsapp(smsData);
+                const historyData = await new ApiCallHistory({
+                  userId: mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"),
+                  called_for: "whatsapp",
+                  api_link: process.env.SITE_URL,
+                  api_param: smsData,
+                  api_response: returnData,
+                  send_status: 'send',
+                });
+                await historyData.save();
+              });
+            }
 
-      loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
-      loginHtmlContent = loginHtmlContent.replace('{{ordernumber}}', orderCode);
-      loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
-      loginHtmlContent = loginHtmlContent.replace('{{productimages}}', productimage.image);
-      //loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.offer_price);
-      let rpDataByer = `<td style="text-align: right; padding-bottom: 30px;"> Original Price <br/> ₹ ${product.offer_price} </td>`;
-      if(temporder.is_bid_price){
-        rpDataByer = `<td style="text-align: right; padding-bottom: 30px;"> Original Price <br/> ₹ ${product.offer_price} <br/>  Accepted Price <br/> ₹ ${temporder.original_product_price} </td>`;
-      }
-      loginHtmlContent = loginHtmlContent.replace('{{PRODUCTDATA}}', rpDataByer);
-      loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
-      loginHtmlContent = loginHtmlContent.replace('{{billingaddress}}', billingaddress);
-      const mailDataforbuyer = {
-        from: "Bid For Sale! <" + smtpUser + ">",
-        to: user.email,
-        subject: "Order Placed - Bid For Sale!",
-        name: "Bid For Sale!",
-        text: "order placed",
-        html: loginHtmlContent
-      };
-      transporter.sendMail(mailDataforbuyer, function (err, info) {});
-      const loginHtmlPathforSeller = 'views/webpages/seller-email.html';
-      let loginHtmlContentforseller = fs.readFileSync(loginHtmlPathforSeller, 'utf-8');
+            const address = await AddressBook.findById(savedOrder.shipping_address_id);
 
-      loginHtmlContentforseller = loginHtmlContentforseller.replace('{{sellername}}', seller.name);
-      loginHtmlContentforseller = loginHtmlContentforseller.replace('{{ordernumber}}', orderCode);
-      loginHtmlContentforseller = loginHtmlContentforseller.replace('{{productname}}', product.name);
-      loginHtmlContentforseller = loginHtmlContentforseller.replace('{{productimages}}', productimage.image);
-      //loginHtmlContentforseller = loginHtmlContentforseller.replace('{{productprice}}', product.offer_price);
-      loginHtmlContentforseller = loginHtmlContentforseller.replace('{{totalprice}}', temporder.original_product_price);
+            const billingaddress = address.address1 + ', ' + address.street_name + ', ' + address.landmark + ', ' + address.city_name + ', ' + address.state_name + ', ' + address.pin_code;
+            //buyer mail,sms,whatsapp
+            const loginHtmlPath = 'views/webpages/order-confirmed.html';
+            let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
 
-      let rpData = `<td style="text-align: right; padding-bottom: 30px;"> Original Price <br/> ₹ ${product.offer_price} </td>`;
-      if(temporder.is_bid_price){
-        rpData = `<td style="text-align: right; padding-bottom: 30px;"> Original Price <br/> ₹ ${product.offer_price} <br/>  Accepted Price <br/> ₹ ${temporder.original_product_price} </td>`;
-      }
-      loginHtmlContentforseller = loginHtmlContentforseller.replace('{{PRODUCTDATA}}', rpData);
-      //loginHtmlContentforseller = loginHtmlContentforseller.replace('{{bidPrice}}', temporder.original_product_price);
+            loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+            loginHtmlContent = loginHtmlContent.replace('{{ordernumber}}', orderCode);
+            loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
+            loginHtmlContent = loginHtmlContent.replace('{{productimages}}', productimage.image);
+            //loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.offer_price);
+            let rpDataByer = `<td style="text-align: right; padding-bottom: 30px;"> Original Price <br/> ₹ ${product.offer_price} </td>`;
+            if (temporder.is_bid_price) {
+              rpDataByer = `<td style="text-align: right; padding-bottom: 30px;"> Original Price <br/> ₹ ${product.offer_price} <br/>  Accepted Price <br/> ₹ ${temporder.original_product_price} </td>`;
+            }
+            loginHtmlContent = loginHtmlContent.replace('{{PRODUCTDATA}}', rpDataByer);
+            loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
+            loginHtmlContent = loginHtmlContent.replace('{{billingaddress}}', billingaddress);
+            const mailDataforbuyer = {
+              from: "Bid For Sale! <" + smtpUser + ">",
+              to: user.email,
+              subject: "Order Placed - Bid For Sale!",
+              name: "Bid For Sale!",
+              text: "order placed",
+              html: loginHtmlContent
+            };
+            transporter.sendMail(mailDataforbuyer, function (err, info) { });
+            const loginHtmlPathforSeller = 'views/webpages/seller-email.html';
+            let loginHtmlContentforseller = fs.readFileSync(loginHtmlPathforSeller, 'utf-8');
 
-      loginHtmlContentforseller = loginHtmlContentforseller.replace('{{buyername}}', user.name);
- 
-      const mailDataforseller = {
-        from: "Bid For Sale! <" + smtpUser + ">",
-        to: seller.email,
-        subject: "Order Confirmation - Bid For Sale!",
-        name: "Bid For Sale!",
-        text: "order placed",
-        html: loginHtmlContentforseller
-      };
+            loginHtmlContentforseller = loginHtmlContentforseller.replace('{{sellername}}', seller.name);
+            loginHtmlContentforseller = loginHtmlContentforseller.replace('{{ordernumber}}', orderCode);
+            loginHtmlContentforseller = loginHtmlContentforseller.replace('{{productname}}', product.name);
+            loginHtmlContentforseller = loginHtmlContentforseller.replace('{{productimages}}', productimage.image);
+            //loginHtmlContentforseller = loginHtmlContentforseller.replace('{{productprice}}', product.offer_price);
+            loginHtmlContentforseller = loginHtmlContentforseller.replace('{{totalprice}}', temporder.original_product_price);
 
-      transporter.sendMail(mailDataforseller, function (err, info) {});
-        //seller mail,sms,whatsapp
-            if(updatedProduct)
-            {
-              const cleanedCartId =  mongoose.Types.ObjectId(temporder.cart_id);
+            let rpData = `<td style="text-align: right; padding-bottom: 30px;"> Original Price <br/> ₹ ${product.offer_price} </td>`;
+            if (temporder.is_bid_price) {
+              rpData = `<td style="text-align: right; padding-bottom: 30px;"> Original Price <br/> ₹ ${product.offer_price} <br/>  Accepted Price <br/> ₹ ${temporder.original_product_price} </td>`;
+            }
+            loginHtmlContentforseller = loginHtmlContentforseller.replace('{{PRODUCTDATA}}', rpData);
+            //loginHtmlContentforseller = loginHtmlContentforseller.replace('{{bidPrice}}', temporder.original_product_price);
+
+            loginHtmlContentforseller = loginHtmlContentforseller.replace('{{buyername}}', user.name);
+
+            const mailDataforseller = {
+              from: "Bid For Sale! <" + smtpUser + ">",
+              to: seller.email,
+              subject: "Order Confirmation - Bid For Sale!",
+              name: "Bid For Sale!",
+              text: "order placed",
+              html: loginHtmlContentforseller
+            };
+
+            transporter.sendMail(mailDataforseller, function (err, info) { });
+            //seller mail,sms,whatsapp
+            if (updatedProduct) {
+              const cleanedCartId = mongoose.Types.ObjectId(temporder.cart_id);
               const cartDetail = await CartDetail.findOne({ cart_id: cleanedCartId });
               if (cartDetail) {
                 await cartDetail.remove();
@@ -609,29 +602,27 @@ exports.getStatus = async function (req, res, next) {
               if (existingCart) {
                 await existingCart.remove();
               }
-            } 
+            }
           }
-         res.redirect('/message?message=success');
+          res.redirect('/message?message=success');
         } else {
           res.redirect('/message?message=failure');
         }
       } catch (error) {
-        console.log("Error for payment error status:",error);
+        console.log("Error for payment error status:", error);
         res.redirect('/message?message=failure');
-
         // res.status(500).json({
         //   status: '0',
         //   message: 'Error in axios request.',
         //   error: error.message,
         // });
-
       }
     } else {
       //res.send("Sorry!! Error");
       res.redirect('/message?message=failure');
     }
   } catch (error) {
-    console.log("Error for payment error status console:",error);
+    console.log("Error for payment error status console:", error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the dashboard.",
@@ -639,16 +630,13 @@ exports.getStatus = async function (req, res, next) {
     });
   }
 };
-
-
-
-
 exports.checkPaymentData = async function (req, res, next) {
   try {
     const tempId = req.body.temp;
     const status = req.body.status;
+    console.log("tempId", tempId);
     const temporder = await Demoorder.findById(tempId);
-
+    console.log("temporder", temporder);
     if (status === "success") {
       const now = new Date();
       const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0');
@@ -694,28 +682,134 @@ exports.checkPaymentData = async function (req, res, next) {
           { $set: { flag: 1 } },
           { new: true }
         );
-
-        const user = await Users.findById(savedOrder.user_id);
-        const seller = await Users.findById(savedOrder.seller_id);
-
         const product = await Userproduct.findById(savedOrder.product_id);
-  
-        const address = await AddressBook.findById(savedOrder.billing_address_id);
-  
-        const billingaddress = address.street_name + ', ' + address.address1 + ', ' + address.landmark + ', ' + address.city_name + ', ' + address.state_name + ', ' + address.pin_code;
-  
+        const productimage = await Productimage.findOne({ product_id: savedOrder.product_id });
+        const user = await Users.findById(savedOrder.user_id);
+        if (user) {
+          let smsData = {
+            textId: "test",
+            toMobile: "91" + user.phone_no,
+            text: "Dear " + user.name + ",Your order " + orderCode + " has been placed successfully. Sit back and relax. We'll notify you once it's shipped.- BFS Team",
+          };
+          let returnData;
+          returnData = await sendSms(smsData);
+          const historyData = new ApiCallHistory({
+            userId: user._id,
+            called_for: "reset password",
+            api_link: process.env.SITE_URL,
+            api_param: smsData,
+            api_response: returnData,
+            send_status: 'send',
+          });
+          await historyData.save();
+
+          let message = "Dear " + user.name + ", Your order " + orderCode + " has been placed successfully. Sit back and relax. We'll notify you once it's shipped.- BFS Team";
+          let to_number = "91" + user.phone_no;
+          let response = await send_message({ type: 'text', message, to_number });
+
+          //SEND WHATSAPP
+          let receiverMobileNo = "91" + user.phone_no;
+          let root = create({ version: '1.0', encoding: "ISO-8859-1" })
+            .ele('MESSAGE', { VER: '1.2' })
+            .ele('USER', { USERNAME: process.env.WP_SMS_USER_NAME, PASSWORD: process.env.WP_PASSWORD })
+            .ele('SMS', { UDH: "0", CODING: "1", TEXT: "Hi", PROPERTY: "0", ID: "1", TEMPLATE: "bfstest" })
+            .ele('ADDRESS', { FROM: process.env.WP_SMS_SENDER_MOBILE, TO: receiverMobileNo, SEQ: "1" })
+          //.up()
+          //.up();
+
+          // convert the XML tree to string
+          let xml = root.end({ prettyPrint: true });
+          await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
+            if (err) {
+              // return {
+              //   status:false,
+              //   data:err
+              // };
+            }
+            let smsData = xml;
+            let returnData;
+            returnData = await sendWhatsapp(smsData);
+          });
+        }
+        const seller = await Users.findById(savedOrder.seller_id);
+        if (seller) {
+          let smsData = {
+            textId: "test",
+            toMobile: "91" + seller.phone_no,
+            text: "Dear " + seller.name + ",Congratulations! Your product " + product.name + " has been sold successfully.The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.- BFS Team",
+          };
+          let returnData;
+          returnData = await sendSms(smsData);
+          const historyDataforseller = new ApiCallHistory({
+            userId: seller._id,
+            called_for: "Order Placed of Seller Product",
+            api_link: process.env.SITE_URL,
+            api_param: smsData,
+            api_response: returnData,
+            send_status: 'send',
+          });
+          await historyDataforseller.save();
+
+          let message = "Dear " + seller.name + ",Congratulations! Your product " + product.name + " has been sold successfully.The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.- BFS Team";
+          let to_number = "91" + seller.phone_no;
+          let response = await send_message({ type: 'text', message, to_number });
+
+          //SEND WHATSAPP
+          const receiverMobileNo = "91" + seller.phone_no;
+          const root = create({ version: '1.0', encoding: "ISO-8859-1" })
+            .ele('MESSAGE', { VER: '1.2' })
+            .ele('USER', { USERNAME: process.env.WP_SMS_USER_NAME, PASSWORD: process.env.WP_PASSWORD })
+            .ele('SMS', { UDH: "0", CODING: "1", TEXT: "Hi", PROPERTY: "0", ID: "1", TEMPLATE: "bfstest" })
+            .ele('ADDRESS', { FROM: process.env.WP_SMS_SENDER_MOBILE, TO: receiverMobileNo, SEQ: "1" })
+          //.up()
+          //.up();
+
+          // convert the XML tree to string
+          const xml = root.end({ prettyPrint: true });
+          await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
+            if (err) {
+              // return {
+              //   status:false,
+              //   data:err
+              // };
+            }
+            //let obj = JSON.parse(data);
+            //let randNumber = Math.floor((Math.random() * 1000000) + 1);
+            let smsData = xml;
+            let returnData;
+            returnData = await sendWhatsapp(smsData);
+            const historyData = await new ApiCallHistory({
+              userId: mongoose.Types.ObjectId("650ae558f7a0625c3a4dcef6"),
+              called_for: "whatsapp",
+              api_link: process.env.SITE_URL,
+              api_param: smsData,
+              api_response: returnData,
+              send_status: 'send',
+            });
+            await historyData.save();
+          });
+        }
+
+        const address = await AddressBook.findById(savedOrder.shipping_address_id);
+
+        const billingaddress = address.address1 + ', ' + address.street_name + ', ' + address.landmark + ', ' + address.city_name + ', ' + address.state_name + ', ' + address.pin_code;
+        //buyer mail,sms,whatsapp
         const loginHtmlPath = 'views/webpages/order-confirmed.html';
         let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
-  
+
         loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
         loginHtmlContent = loginHtmlContent.replace('{{ordernumber}}', orderCode);
         loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
-        loginHtmlContent = loginHtmlContent.replace('{{productimages}}', product.image);
+        loginHtmlContent = loginHtmlContent.replace('{{productimages}}', productimage.image);
+        //loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.offer_price);
+        let rpDataByer = `<td style="text-align: right; padding-bottom: 30px;"> Original Price <br/> ₹ ${product.offer_price} </td>`;
+        if (temporder.is_bid_price) {
+          rpDataByer = `<td style="text-align: right; padding-bottom: 30px;"> Original Price <br/> ₹ ${product.offer_price} <br/>  Accepted Price <br/> ₹ ${temporder.original_product_price} </td>`;
+        }
+        loginHtmlContent = loginHtmlContent.replace('{{PRODUCTDATA}}', rpDataByer);
         loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
-        loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.price);
-        loginHtmlContent = loginHtmlContent.replace('{{shippingaddress}}', billingaddress);
-      
-        const mailData = {
+        loginHtmlContent = loginHtmlContent.replace('{{billingaddress}}', billingaddress);
+        const mailDataforbuyer = {
           from: "Bid For Sale! <" + smtpUser + ">",
           to: user.email,
           subject: "Order Placed - Bid For Sale!",
@@ -723,79 +817,36 @@ exports.checkPaymentData = async function (req, res, next) {
           text: "order placed",
           html: loginHtmlContent
         };
-  
-        transporter.sendMail(mailData, function (err, info) {
-          // if (err) console.log("err", err);
-          // else console.log("info", info);
-        });
+        transporter.sendMail(mailDataforbuyer, function (err, info) { });
+        const loginHtmlPathforSeller = 'views/webpages/seller-email.html';
+        let loginHtmlContentforseller = fs.readFileSync(loginHtmlPathforSeller, 'utf-8');
 
-        let loginHtmlPath1 = 'views/webpages/seller.html';
-        let loginHtmlContent1 = fs.readFileSync(loginHtmlPath1, 'utf-8');
-  
-        loginHtmlContent1 = loginHtmlContent.replace('{{username}}', user.name);
-        loginHtmlContent1 = loginHtmlContent.replace('{{sellername}}', seller.name);
-        loginHtmlContent1 = loginHtmlContent.replace('{{ordernumber}}', orderCode);
-        loginHtmlContent1 = loginHtmlContent.replace('{{productname}}', product.name);
-        loginHtmlContent1 = loginHtmlContent.replace('{{productimages}}', orderCode);
-        loginHtmlContent1 = loginHtmlContent.replace('{{totalprice}}', savedOrder.total_price);
-        loginHtmlContent1 = loginHtmlContent.replace('{{productprice}}', product.price);
-        loginHtmlContent1 = loginHtmlContent.replace('{{shippingaddress}}', billingaddress);
-      
-        const mailData1 = {
+        loginHtmlContentforseller = loginHtmlContentforseller.replace('{{sellername}}', seller.name);
+        loginHtmlContentforseller = loginHtmlContentforseller.replace('{{ordernumber}}', orderCode);
+        loginHtmlContentforseller = loginHtmlContentforseller.replace('{{productname}}', product.name);
+        loginHtmlContentforseller = loginHtmlContentforseller.replace('{{productimages}}', productimage.image);
+        //loginHtmlContentforseller = loginHtmlContentforseller.replace('{{productprice}}', product.offer_price);
+        loginHtmlContentforseller = loginHtmlContentforseller.replace('{{totalprice}}', temporder.original_product_price);
+
+        let rpData = `<td style="text-align: right; padding-bottom: 30px;"> Original Price <br/> ₹ ${product.offer_price} </td>`;
+        if (temporder.is_bid_price) {
+          rpData = `<td style="text-align: right; padding-bottom: 30px;"> Original Price <br/> ₹ ${product.offer_price} <br/>  Accepted Price <br/> ₹ ${temporder.original_product_price} </td>`;
+        }
+        loginHtmlContentforseller = loginHtmlContentforseller.replace('{{PRODUCTDATA}}', rpData);
+        //loginHtmlContentforseller = loginHtmlContentforseller.replace('{{bidPrice}}', temporder.original_product_price);
+
+        loginHtmlContentforseller = loginHtmlContentforseller.replace('{{buyername}}', user.name);
+
+        const mailDataforseller = {
           from: "Bid For Sale! <" + smtpUser + ">",
-          to: user.email,
-          subject: "Order Placed - Bid For Sale!",
+          to: seller.email,
+          subject: "Order Confirmation - Bid For Sale!",
           name: "Bid For Sale!",
           text: "order placed",
-          html: loginHtmlContent1
+          html: loginHtmlContentforseller
         };
-        transporter.sendMail(mailData1, function (err, info) {
-          // if (err) console.log("err", err);
-          // else console.log("info", info);
-        });
-           let smsData = {
-            textId: "test",
-            toMobile: "91" +user.phone_no,
-            text: "Order placed successfully! Congratulations! Your product  Your "+ product.name +" having Order ID "+ orderCode +"  is on its way to you. For any inquiries, feel free to reach out to us. Happy shopping!-BFS RETAIL SERVICES PRIVATE LIMITED",
-          };
-          let returnData;
-          returnData = await sendSms(smsData);
-          const historyData = new ApiCallHistory({
-            userId: user._id,
-            called_for: "Order Placed",
-            api_link: process.env.SITE_URL,
-            api_param: smsData,
-            api_response: returnData,
-            send_status: 'send',
-          });
-          await historyData.save();
-          let sellersmsData = {
-            textId: "test",
-            toMobile: "91" +seller.phone_no,
-            text: "Dear "+ seller.name +" , Congratulations! Your product "+ product.name +" has been sold successfully. The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.-BFS RETAIL SERVICES PRIVATE LIMITED",
-          };
-          let returnDataforseller;
-          returnDataforseller = await sendSms(sellersmsData);
 
-          const historyData1 = new ApiCallHistory({
-            userId: user._id,
-            called_for: "Order Placed for Seller Product",
-            api_link: process.env.SITE_URL,
-            api_param: smsData,
-            api_response: returnDataforseller,
-            send_status: 'send',
-          });
-          await historyData1.save();
-
-          
-          const sellermessage = "Dear "+ seller.name +",Congratulations! Your product "+ product.name +" has been sold successfully. The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.-BFS RETAIL SERVICES PRIVATE LIMITED";
-          const sellerto_number = "91" +seller.phone_no;
-          let sellerresponse = await send_message({ type: 'text', sellermessage, sellerto_number });
-
-          const buyermessage = "Order placed successfully! Congratulations! Your product  Your "+ product.name +" having Order ID "+ orderCode +"  is on its way to you. For any inquiries, feel free to reach out to us. Happy shopping!-BFS RETAIL SERVICES PRIVATE LIMITED";
-          const buyerto_number = "91" +user.phone_no;
-          let buyerresponse = await send_message({ type: 'text', buyermessage, buyerto_number });
-          
+        transporter.sendMail(mailDataforseller, function (err, info) { });
         if (updatedProduct) {
           const cleanedCartId = mongoose.Types.ObjectId(temporder.cart_id);
           const cartDetail = await CartDetail.findOne({ cart_id: cleanedCartId });
@@ -834,12 +885,12 @@ exports.checkPaymentData = async function (req, res, next) {
 
 async function getLastOrderIndex() {
   try {
-    
+
     const getCount = await Order.find().count();
     return `000${getCount}`
-    
+
   } catch (error) {
-    return 0; 
+    return 0;
   }
 }
 

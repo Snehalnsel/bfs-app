@@ -1247,18 +1247,14 @@ exports.cancelOrderByBuyer = async function (req, res, next) {
       //   //respdata1: orderlistId,
       //   isLoggedIn: isLoggedIn,
       // });
-  
       let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-
         res.render("webpages/myorder", {
           title: "Wish List Page",
           message: "Welcome to the Wish List page!",
           respdata: req.session.user,
           isLoggedIn: isLoggedIn,
         });
-        
       } else {
-        
         res.status(400).json({
           status: "0",
           message: "Order cancellation failed!",
@@ -1503,8 +1499,6 @@ exports.returnOrderforapp = async function (req, res) {
         html: loginHtmlContent
       };
       transporter.sendMail(mailData, function (err, info) {
-        // if (err) console.log(err);
-        // else console.log(info);
       });
        res.status(200).json({
         status: "1",

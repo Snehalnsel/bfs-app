@@ -1,0 +1,210 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Bfs retail services private limited</title>
+    <style>
+        body {
+            font-family: 'Arial', Gadget, sans-serif;
+            font-size: 15px;
+            line-height: 18px;
+        }
+        .background-highlight {
+            background: #fabf8f;
+            text-align: left;
+            border-right: solid 1px #000;
+            border-bottom: solid 1px #000;
+        }
+        .center-text {
+            text-align: center;
+        }
+        .right-text {
+            text-align: right;
+        }
+        .bold-text {
+            font-weight: bold;
+        }
+        .border {
+            border: solid 1px #000;
+        }
+        .padding-10 {
+            padding: 10px;
+        }
+        h1 {
+            font-size: 25px;
+            margin: 0;
+        }
+        h2 {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <table width="100%" border="0" cellspacing="0" cellpadding="3" class="border">
+                        <tbody>
+                            <tr>
+                                <td class="padding-10 center-text border bold-text">
+                                    <h1>Invoice</h1>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table width="100%" border="0" cellspacing="0" cellpadding="3" class="border">
+                        <tr class="background-highlight">
+                            <td width="50%" class="center-text border">&nbsp;</td>
+                            <td class="center-text border bold-text">Detail of Seller (Billed to)</td>
+                        </tr>
+                        <tr>
+                            <td width="50%" class="border"><strong>Invoice No: SB/000001/24-25</strong></td>
+                            <td class="border"><strong>Name:</strong> <%= order.seller && order.seller.length > 0 && order.seller[0].name || '' %></td>
+                        </tr>
+                        <tr>
+                            <td width="50%" class="border"><strong>Invoice date:</strong></td>
+                            <td class="border"><strong>Address:</strong> <%= order.billing_address[0].street_name %>, <%= order.billing_address[0].address1 %>,<br> <%= order.billing_address[0].landmark %>,<br> <%= order.billing_address[0].city_name %></td>
+                        </tr>
+                        <tr>
+                            <td width="50%" class="border">&nbsp;</td>
+                            <td class="border">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td width="50%" class="border"><strong>&nbsp;</strong></td>
+                            <td class="border"><strong>Contact No.</strong> <%= order.seller && order.seller.length > 0 && order.seller[0].phone_no || '' %></td>
+                        </tr>
+                        <tr>
+                            <td width="50%" class="border"><strong>State: </strong> <%= order.billing_address[0].state_name %></td>
+                            <td class="border"><strong>Email Id</strong> <%= order.seller && order.seller.length > 0 && order.seller[0].email || '' %></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="center-text border">&nbsp;</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table width="100%" border="0" cellspacing="0" cellpadding="3" class="border">
+                        <tr class="background-highlight">
+                            <td colspan="2" class="center-text border bold-text">Detail of Receiver (Billed to)</td>
+                        </tr>
+                        <tr>
+                            <td width="50%" class="border"><strong>Invoice No: SB/000001/24-25</strong></td>
+                            <td width="50%" class="border"><strong>Tel: +91- 9674173655</strong></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="border"><strong>Address: Altitude The Business Park 2, OC Ganguly Sarani Bhawanipore, 10th Floor, Kolkata -700020</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="border"><strong>GSTIN/PAN: 19AALCB9231G1ZG</strong></td>
+                            <td class="border">
+                                <table width="100%" border="0" cellspacing="0" cellpadding="3" class="border">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 30%;" class="border"><strong>Email Id </strong></td>
+                                            <td style="width: 70%;"><strong>support@bidforsale.com</strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="border"><strong>State: West Bengal</strong></td>
+                            <td class="border">
+                                <table width="100%" border="0" cellspacing="0" cellpadding="3" class="border">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 70%;" class="border"><strong>Code: WB</strong></td>
+                                            <td style="width: 30%;" class="border">&nbsp;</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="center-text border">&nbsp;</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table width="100%" border="0" cellspacing="0" cellpadding="3" class="border center-text">
+                        <tbody>
+                            <tr class="background-highlight">
+                                <td class="border bold-text">S. No</td>
+                                <td class="border bold-text">Description</td>
+                                <td class="border bold-text">UOM</td>
+                                <td class="border bold-text">Qty</td>
+                                <td class="border bold-text">Rate</td>
+                                <td class="border bold-text">Amount</td>
+                                <td class="border"><h2>Total</h2></td>
+                            </tr>
+                            <% order.product.forEach((product, index) => { %>
+                            <tr>
+                                <td class="background-highlight border"><%= index + 1 %></td>
+                                <td class="background-highlight border"><%= product.name %></td>
+                                <td class="background-highlight border right-text"></td>
+                                <td class="background-highlight border right-text">1</td>
+                                <td class="background-highlight border right-text"></td>
+                                <td class="background-highlight border right-text"><%= product.offer_price %></td>
+                                <td class="background-highlight border center-text"><%= product.offer_price %></td>
+                            </tr>
+                            <% }); %>
+                            <tr>
+                                <td colspan="2" class="background-highlight padding-10 center-text border"><h1>Total</h1></td>
+                                <td class="background-highlight right-text border">0</td>
+                                <td class="background-highlight right-text border">1</td>
+                                <td class="center-text border"></td>
+                                <td class="center-text border"></td>
+                                <td class="center-text border"><%= order.product.reduce((acc, product) => acc + product.offer_price, 0) %></td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="background-highlight center-text border"><strong>Total Invoice amount in words</strong></td>
+                                <td colspan="2" class="left-text border"><strong>Total Amount</strong></td>
+                                <td class="center-text border"><%= order.product.reduce((acc, product) => acc + product.offer_price, 0) %></td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="center-text border">&nbsp;</td>
+                                <td colspan="2" class="left-text border">&nbsp;</td>
+                                <td class="center-text border"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="background-highlight left-text border"><strong>Bank Details</strong></td>
+                                <td class="background-highlight left-text border">&nbsp;</td>
+                                <td class="background-highlight center-text border">&nbsp;</td>
+                                <td class="background-highlight center-text border"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" class="border">
+                        <tbody>
+                            <tr>
+                                <td width="57.4%" class="border">
+                                    <strong>Bank Name:<br>&nbsp;<br>&nbsp;<br>&nbsp;</strong><br>
+                                    <strong>Bank A/C:</strong><br>
+                                    <strong>Bank IFSC:</strong><br>
+                                    Certified that the particulars given above are true and correct
+                                </td>
+                                <td width="43%" class="right-text border">
+                                    <br> &nbsp; <br> &nbsp; <br>&nbsp; <br>&nbsp; <br> <br> &nbsp; <br> <strong>Authorised Signatory</strong>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

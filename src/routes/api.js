@@ -894,25 +894,11 @@ router.post(
   "/cancel-order",
   OrderController.cancelOrderById
 );
-router.post(
-  "/return-order", 
-  [],
-  OrderController.returnOrder
-);
-router.post(
-  "/returnorder", 
-  [],
-  OrderController.returnOrderforapp
-);
-router.get(
-  "/cancelorderbybuyer/:order_id",
-  OrderController.cancelOrderByBuyer
-);
-router.post(
-  "/orderlist",
-  //auth.isAuthorized, 
-  [],
-  OrderController.getOrderListByUser
+router.post("/return-order",[],OrderController.returnOrder);
+router.post("/returnorder",[],OrderController.returnOrderforapp);
+router.get("/cancelorderbybuyer/:order_id",OrderController.cancelOrderByBuyer);
+router.post("/orderlist", [],
+OrderController.getOrderListByUser
 );
 router.post(
   "/selllist",

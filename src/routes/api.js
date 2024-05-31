@@ -894,6 +894,11 @@ router.post(
   "/cancel-order",
   OrderController.cancelOrderById
 );
+
+router.post(
+  "/cancelorder",
+  OrderController.cancelOrderByIdFromApp
+);
 router.post("/return-order",[],OrderController.returnOrder);
 router.post("/returnorder",[],OrderController.returnOrderforapp);
 router.get("/cancelorderbybuyer/:order_id",OrderController.cancelOrderByBuyer);

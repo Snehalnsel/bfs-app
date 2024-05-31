@@ -1138,12 +1138,10 @@ exports.cancelOrderById = async function (req, res, next) {
     existingOrder.updated_dtime = new Date().toISOString();
     const canceledOrder = await existingOrder.save();
     if (canceledOrder) {
-
       const requestUrl =  process.env.SITE_URL + "/web-my-order";
-      
       await insertNotification(
         'Order Cancelled', 
-        `YOUR ORDER HAS BEEN CANCELED`, 
+        `YOUR ORDER HAS BEEN CANCELLED`, 
         user_id, 
         requestUrl, 
         new Date()
@@ -1214,6 +1212,126 @@ exports.cancelOrderById = async function (req, res, next) {
   }
 };
 
+
+exports.cancelOrderByIdFromApp = async function (req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: "0",
+      message: "Validation error!",
+      respdata: errors.array(),
+    });
+  }
+  try {
+    const user_id = req.body.userid;
+    const orderId = req.body.orderid;
+    const deleteby = req.body.deleteby;
+    const existingOrder = await Order.findById(orderId);
+    if (!existingOrder) {
+      return res.status(404).json({
+        status: "0",
+        message: "Order not found!",
+        respdata: {},
+        is_cancelorder: true,
+      });
+    }
+    const orderCreationTime = moment(existingOrder.createdAt);
+    const isOrderWithin24Hours = moment().diff(orderCreationTime, 'hours') < 24;
+
+    if (!isOrderWithin24Hours) {
+      existingOrder.is_deletedtime = '1';
+      existingOrder.updated_dtime = new Date().toISOString();
+      const canceledOrder = await existingOrder.save();
+      if (canceledOrder) {
+        return res.status(403).json({
+          status: "0",
+          message: "Order cannot be canceled as it has been over 24 hours since creation!",
+          respdata: {},
+          is_cancelorder: false,
+        });
+      }
+    }
+    existingOrder.delete_status = '1';
+    existingOrder.delete_by = deleteby;
+    existingOrder.updated_dtime = new Date().toISOString();
+    const canceledOrder = await existingOrder.save();
+    if (canceledOrder) {
+      const requestUrl =  process.env.SITE_URL + "/web-my-order";
+      await insertNotification(
+        'Order Cancelled', 
+        `YOUR ORDER HAS BEEN CANCELLED`, 
+        user_id, 
+        requestUrl, 
+        new Date()
+      );
+      console.log(user_id);
+      const user = await Users.findById(user_id);
+      const product = await Userproduct.findById(canceledOrder.product_id);
+        //SEND SMS
+        console.log("user",user_id);
+        if(user.phone_no != null){
+          let smsData = {
+            textId: "test",
+            toMobile: "91" +user.phone_no,
+            text: "Order cancellation request received. Your order having Order ID "+canceledOrder.order_code+" is being processed for cancellation. We'll update you shortly. Thank you for your patience.-BFS RETAIL SERVICES PRIVATE LIMITED",
+          };
+          let returnData;
+          returnData = await sendSms(smsData);
+          const historyData = new ApiCallHistory({
+            userId: user_id,
+            called_for: "cancel order",
+            api_link: process.env.SITE_URL,
+            api_param: smsData,
+            api_response: returnData,
+            send_status: 'send',
+          });
+          await historyData.save();
+        }
+        const loginHtmlPath = 'views/webpages/order-cancel.html';
+        let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
+
+        loginHtmlContent = loginHtmlContent.replace('{{ordercode}}', canceledOrder.order_code);
+        loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
+        loginHtmlContent = loginHtmlContent.replace('{{productname}}', product.name);
+        loginHtmlContent = loginHtmlContent.replace('{{totalprice}}', canceledOrder.total_price);
+        loginHtmlContent = loginHtmlContent.replace('{{productprice}}', product.price);      
+
+        const mailData = {
+          from: "Bid For Sale! <" + smtpUser + ">",
+          to: user.email,
+          subject: "Cancel Order- Bid For Sale!",
+          name: "Bid For Sale!",
+          text: "cancel order",
+          html: loginHtmlContent
+        };
+        transporter.sendMail(mailData, function (err, info) {
+          // if (err) console.log("err", err);
+          // else console.log("info", info);
+        });
+
+          return res.status(200).json({
+            status: "1",
+            message: "Order canceled successfully!",
+            respdata: canceledOrder,
+            is_cancelorder: true,
+          });
+      } else {
+        return res.status(400).json({
+          status: "0",
+          message: "Order cancellation failed!",
+          respdata: canceledOrder,
+          is_cancelorder: false,
+        });
+      }
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({
+      status: "0",
+      message: "Order cancellation failed!",
+      respdata: error,
+    });
+  }
+};
 
 exports.cancelOrderByBuyer = async function (req, res, next) {
   const errors = validationResult(req);
@@ -1465,12 +1583,14 @@ exports.returnOrderforapp = async function (req, res) {
      const savedOrder = await returnorder.save();
      if (savedOrder) {
        await Iptrnsaction.create({
-         user_id: req.session.user.userId, 
+         user_id:existingOrder.user_id, 
          purpose: "Retuen Order Placement from Web",
          ip_address: req.connection.remoteAddress, 
          created_dtime: new Date(),
        });
        await Order.updateOne({ _id: order_id }, { is_return: 1 });
+       const user = await Users.findById(existingOrder.user_id);
+
        let smsData = {
         textId: "test",
         toMobile: "91" +user.phone_no,
@@ -1487,7 +1607,6 @@ exports.returnOrderforapp = async function (req, res) {
         send_status: 'send',
       });
       await historyData.save();
-      const user = await Users.findById(req.session.user.userId);
        const loginHtmlPath = 'views/webpages/return-order.html';
        const loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
        const mailData = {
@@ -1506,6 +1625,7 @@ exports.returnOrderforapp = async function (req, res) {
       });
      }
   } catch (error) {
+    console.log("errror", error);
    return res.status(500).json({ message: 'Internal server error' });
  }
  };

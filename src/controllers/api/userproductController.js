@@ -234,6 +234,7 @@ exports.addData = async function (req, res, next) {
     });
   }
   try {
+    console.log("hellobhbjbbnn");
     // const existingProduct = await Userproduct.findOne({ name: req.body.name });
     // if (existingProduct) {
     //   return res.status(404).json({
@@ -286,6 +287,7 @@ exports.addData = async function (req, res, next) {
       added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"), 
     });
     const savedProductdata = await newProduct.save();
+
     const requrl = url.format({
       protocol: req.protocol,
       host: req.get("host"),
@@ -328,6 +330,7 @@ exports.addData = async function (req, res, next) {
       });
     }
   } catch (error) {
+    console.log(error)
     res.status(500).json({
       status: "0",
       message: "Error!",
@@ -579,7 +582,7 @@ exports.getDetailsById = async function (req, res, next) {
       name: userproducts.name,
       description: userproducts.description,
       category_id: userproducts.category_id ? userproducts.category_id._id: '', 
-      category: userproducts.category_id ? userproducts.category_id.name : userproducts.category_id || '', 
+      category: userproducts.category_id ? userproducts.category_id.name : userproducts.category || '', 
       brand: userproducts.brand_id ? userproducts.brand_id.name : userproducts.brand || '',
       brand_id: userproducts.brand_id ? userproducts.brand_id._id : '',
       user_id: userproducts.user_id ? userproducts.user_id._id : '',

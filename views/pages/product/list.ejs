@@ -72,6 +72,7 @@
                         <tr>
                           <th>Sl No</th>
                           <th>Product Images</th>
+                          <th>Product Reference Id</th>
                           <th>Product Name</th>
                           <th>Category</th>
                           <th>SubCategory</th>
@@ -113,6 +114,9 @@
 
                                               <% }); %>
 
+                              </td>
+                              <td>
+                                <%= value._id || 'Id not available' %>
                               </td>
                               <td>
                                 <%= value.name || 'Name not available' %>

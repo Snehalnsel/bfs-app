@@ -329,15 +329,11 @@ exports.getStatus_back = async function (req, res, next) {
 exports.getStatus = async function (req, res, next) {
   try {
     const tempId = req.query.temp;
-
     const temporder = await Demoorder.findById(tempId);
-
     const merchantTransactionId = temporder.merchant_transactionid;
     if (merchantTransactionId) {
-
       let statusUrl = `${PHONE_PE_HOST_URL}/pg/v1/status/${MERCHANT_ID}/` +
         merchantTransactionId;
-
       let string = `/pg/v1/status/${MERCHANT_ID}/` +
         merchantTransactionId +
         SALT_KEY;
@@ -374,7 +370,6 @@ exports.getStatus = async function (req, res, next) {
         } else {
           updateData.checkstatus_status = "failure";
         }
-
         await Demoorder.findOneAndUpdate(
           { _id: tempId },
           { $set: updateData },

@@ -1259,7 +1259,7 @@ exports.cancelOrderByIdFromApp = async function (req, res, next) {
       const requestUrl =  process.env.SITE_URL + "/web-my-order";
       await insertNotification(
         'Order Cancelled', 
-        `YOUR ORDER HAS BEEN CANCELLED`, 
+        `Your order has been cancelled.`, 
         user_id, 
         requestUrl, 
         new Date()
@@ -1590,7 +1590,6 @@ exports.returnOrderforapp = async function (req, res) {
        });
        await Order.updateOne({ _id: order_id }, { is_return: 1 });
        const user = await Users.findById(existingOrder.user_id);
-
        let smsData = {
         textId: "test",
         toMobile: "91" +user.phone_no,

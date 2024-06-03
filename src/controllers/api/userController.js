@@ -478,7 +478,6 @@ exports.getProfile = async function (req, res, next) {
         respdata: {},
       });
     } else {
-      
       user.image = req.baseUrl + "/images/" + "test.jpg";
       res.status(400).json({
         status: "1",
@@ -498,7 +497,6 @@ exports.editProfile = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   Users.findOne({ _id: req.body.user_id }).then((user) => {
     if (!user)
       res.status(404).json({

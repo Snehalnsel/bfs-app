@@ -373,11 +373,15 @@ exports.ajaxAdminLogin = async function (req, res, next) {
   });
 };*/
 exports.adminRelogin = async function (req, res, next) {
+  
   const { cookieRefreshToken } = req.body;
   let accessTokenGlobal = "";
   let refreshTokenGlobal = "";
+  console.log("test1")
   if (cookieRefreshToken != "") {
+    console.log("test2")
     let tokenDetailsData = await tokenDecode(cookieRefreshToken, process.env.REFRESH_TOKEN_PRIVATE_KEY);
+    console.log("tokenDetailsData",tokenDetailsData)
     let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
     if (!tokenDetailsData.error) {
       const email = tokenDetailsData.tokenDetails.email;
@@ -388,6 +392,7 @@ exports.adminRelogin = async function (req, res, next) {
           isAdminLoggedIn:isAdminLoggedIn
         });
       } else {
+        console.log("test3")
         Users.findOne({ email }).then(async (user) => {
           //user.save(async (err) => {
           const userToken = {

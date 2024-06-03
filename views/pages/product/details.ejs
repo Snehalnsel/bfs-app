@@ -33,27 +33,26 @@
                                         enctype="multipart/form-data">
                                         <div class="form-group row">
                                             <div class="col-sm-6 mb-3 mb-sm-0">
-                                                <input type="hidden" name="product_id" value="<%- respdata._id %>">
+                                                <input type="hidden" name="product_id" value="<%=respdata._id %>">
 
-                                                <input type="hidden" name="user_id" value="<%- respdata.user_id %>">
+                                                <input type="hidden" name="user_id" value="<%= respdata.user_id %>">
                                                 <input type="text" class="form-control form-control-user"
                                                     id="product_name" name="product_name" placeholder="Name"
-                                                    value="<%-respdata.name%>" required>
+                                                    value="<%= respdata.name%>" required>
                                             </div>
                                             <div class="col-sm-6 mb-3 mb-sm-0">
                                                 <textarea type="text" class="form-control form-control-user"
                                                     id="description" name="description" placeholder="Description"
-                                                    required><%-respdata.description%></textarea>
+                                                    required><%= respdata.description%></textarea>
                                             </div>
                                         </div>
                                         <div class="form-group row">
                                             <div class="col-sm-6 mb-3 mb-sm-0">
                                                 Product Reference Id:
                                                 <input type="text" class="form-control form-control-user"
-                                                    id="product_id" name="product_id" placeholder="Name"
+                                                    id="product_id" placeholder="Name"
                                                     value="<%respdata._id%>" required readonly>
                                             </div>
-
                                         </div>
                                         <!-- <div class="form-group row">
                                             <div class="col-sm-6 mb-3 mb-sm-0">
@@ -292,11 +291,11 @@
                                                         name="shipping_charges" placeholder="Please enter Shipping Charges value here" value="<%-respdata.shipping_charges%>"
                                                         required>
                                                 </div> -->
-                                                <!-- <div class="col-sm-6 mb-3 mb-sm-0">
+                                                <div class="col-sm-6 mb-3 mb-sm-0">
                                                     <input type="text" class="form-control form-control-user"
                                                         id="hsn_code" name="hsn_code" placeholder="Please enter product HSN Code here"
                                                         value="<%-respdata.hsn_code%>" >
-                                                </div> -->
+                                                </div>
 
                                             </div>
 

@@ -329,6 +329,7 @@ exports.detailsData = async function (req, res, next) {
       protocol: req.protocol,
       host: req.get("host"),
     });
+    console.log("product details",productdetails)
     res.render("pages/product/details", {
       status: 1,
       siteName: req.app.locals.siteName,
@@ -596,6 +597,7 @@ exports.updatedetailsData = async function (req, res, next) {
         flag: req.body.flag,
         approval_status: req.body.approval_status,
       };
+      if (req.body.hsn_code) updData.hsn_code = req.body.hsn_code;
       if (req.body.price) updData.price = req.body.price;
       if (req.body.offer_price) updData.offer_price = req.body.offer_price;
       if (req.body.height) updData.height = req.body.height;

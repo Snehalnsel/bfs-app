@@ -80,6 +80,9 @@ const model = mongoose.Schema({
     required: true, 
     default: '0',
   },
+  hsn_code: {
+    type: String, 
+  },
   status: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'mt_productcondition', 

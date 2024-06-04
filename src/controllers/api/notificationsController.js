@@ -46,7 +46,8 @@ try {
           content: req.body.content,
           user_id : req.body.user_id,
           added_dtime: dateTime,
-          data: req.body.data
+          data: req.body.data,
+          link: req.body.data,
         });
     
         const savedNotifications = await newNotifications.save();

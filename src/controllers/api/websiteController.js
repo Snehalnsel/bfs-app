@@ -4740,7 +4740,6 @@ exports.Demoorder = async function (req, res) {
       packing_handling_charge = Number(shippingCharges.amount);
     }
   }
-  
     if (payment_method == 0)
     {
       pay_now = parseFloat(product_price) * 0.10;

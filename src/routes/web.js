@@ -15,8 +15,6 @@ router.get("/", cors(), function (req, res) {
     // pathname: req.originalUrl,
   });
   req.app.locals.requrl = requrl;
-
-
   if (!req.session.admin) {
     var pageTitle = req.app.locals.siteName + " - Login";
 

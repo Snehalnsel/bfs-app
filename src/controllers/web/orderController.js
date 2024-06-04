@@ -2850,12 +2850,11 @@ exports.downloadOrderPDF = function (req, res, next) {
     } else {
       try {
           //const loginHtmlPath = 'views/webpages/invoice1.html';
-          const loginHtmlPath = 'views/webpages/seller_to_BFS.html';
-          const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
-
+        //const loginHtmlPath = 'views/webpages/seller_to_BFS.html';
+        const loginHtmlPath = 'views/webpages/new-SELLER-TO-BFS(1).html';
+        const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
         const orderDate = new Date(orderList[0].added_dtime);
         const formattedDate = `${orderDate.getDate()}-${orderDate.getMonth() + 1}-${orderDate.getFullYear()}`;
-        
         const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate });
         //  const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
           const browser = await puppeteer.launch();

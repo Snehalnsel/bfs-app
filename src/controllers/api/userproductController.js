@@ -577,6 +577,7 @@ exports.getDetailsById = async function (req, res, next) {
     //   product_images: productImages, 
     // };
     const productCondition = await Productcondition.findById(userproducts.status);
+    console.log("userproducts",userproducts)
     const formattedUserProduct = {
       _id: userproducts._id,
       name: userproducts.name,
@@ -662,6 +663,7 @@ exports.updateProduct = async function (req, res, next) {
   try {
     const productId = req.body.product_id;
     const existingProduct = await Userproduct.findById(productId);
+    console.log("existingProduct",existingProduct)
     if (!existingProduct) {
       return res.status(404).json({
         status: "0",
@@ -671,6 +673,10 @@ exports.updateProduct = async function (req, res, next) {
     }
     existingProduct.category_id = req.body.category_id || existingProduct.category_id;
     existingProduct.user_id = req.body.user_id || existingProduct.user_id;
+    if(req.body.category)
+    {
+      existingProduct.category = ((req.body.category || existingProduct.category) ?? null);
+    }
     if(req.body.brand)
     {
       existingProduct.brand = ((req.body.brand || existingProduct.brand) ?? null);

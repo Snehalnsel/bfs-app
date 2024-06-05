@@ -3,6 +3,7 @@
    <head>
       <meta charset="utf-8">
       <title>TAX INVOICE</title>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/number-to-words/1.2.4/number-to-words.min.js"></script>
    </head>
    <body>
       <div style="width:100%; max-width:1000px; margin: 0 auto; ">
@@ -24,10 +25,10 @@
                            <tr>
                               <td style="width: 50%; border-left: solid 1px #000; border-top: solid 1px #000;">
                                  <strong>Sold By</strong><br>
-                                 <strong>Name</strong> &nbsp;<br>&nbsp;<br>&nbsp;<br>
-                                 Address &nbsp;<br>&nbsp;<br>&nbsp;<br>
-                                 Contact No.:&nbsp;<br>
-                                 E-mail Id:
+                                 <strong>Name</strong><%= order.seller && order.seller.length > 0 && order.seller[0].name || '' %> &nbsp;<br>&nbsp;<br>&nbsp;<br>
+                                 Address <%= order.billing_address[0].street_name %>, <%= order.billing_address[0].address1 %>,<br> <%= order.billing_address[0].landmark %>,<br><%= order.billing_address[0].city_name %>&nbsp;<br>&nbsp;<br>&nbsp;<br>
+                                 Contact No.:<%= order.seller && order.seller.length > 0 && order.seller[0].phone_no || '' %>&nbsp;<br>
+                                 E-mail Id:<%= order.seller && order.seller.length > 0 && order.seller[0].email || '' %>
                               </td>
                               <td style="width: 50%; border-top: solid 1px #000; border-right: solid 1px #000;"><strong>Billing Address</strong><br>
                                  BFS Retail Services Private Limited<br>
@@ -40,13 +41,14 @@
                               </td>
                            </tr>
                            <tr style="margin-top: 30px;">
+                              <% order.product.forEach((product, index) => { %>
                               <td style="width: 50%; border-left: solid 1px #000;">
-                                 <h1 style="font-size:16px;">Product Ref. No.	 </h1>
-                                 <h1 style="font-size:16px;">Order Date </h1>
+                                 <h1 style="font-size:16px;">Product Ref. No.	<%= product._id %> </h1>
+                                 <h1 style="font-size:16px;">Order Date: <%= formattedDate %></h1>
                               </td>
                               <td style="width: 50%; border-right: solid 1px #000;">
                                  <h1 style="font-size:16px;">Invoice No. 	SB/000001/24-25</h1>
-                                 <h1 style="font-size:16px;">Invoice Date: </h1>
+                                 <h1 style="font-size:16px;">Invoice Date: <%= formattedDate %></h1>
                               </td>
                            </tr>
                         </tbody>
@@ -67,23 +69,24 @@
                            <tr>
                               <td style="border-right:solid 1px #000;">1</td>
                               <td style="border-right:solid 1px #000;">
-                                 <h1 style="text-align: left; font-size:16px;">Product</h1>
+                                 <h1 style="text-align: left; font-size:16px;"><%= product.name %></h1>
                               </td>
-                              <td style="border-right:solid 1px #000;">&nbsp;</td>
-                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;"><%= product.hsn_code %></td>
+                              <td style="border-right:solid 1px #000;">&nbsp;<%= product.offer_price %></td>
                               <td style="border-right:solid 1px #000;">
-                                 <h1 style="text-align: right; font-size:16px;">0.00</h1>
+                                 <h1 style="text-align: right; font-size:16px;">1</h1>
                               </td>
                            </tr>
                            <tr>
                               <td colspan="5" style="border-right:solid 1px #000; border-top:solid 1px #000; border-bottom: 1px solid #000;">
-                                 <h1 style="text-align: right; font-size:16px;"><span style="padding-right: 252px;">Total</span></h1>
+                                 <h1 style="text-align: right; font-size:16px;"><span style="padding-right: 252px;">Total</span><%= product.offer_price %></h1>
                               </td>
                            </tr>
                            <tr>
-                              <td colspan="5" style="text-align: left; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong>Rupees</strong> </td>
+                              <td colspan="5" style="text-align: left; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong>Rupees</strong><%= offerPriceWords %></td>
                            </tr>
                            </tr>
+                           <% }); %>
                         </tbody>
                      </table>
                   </td>

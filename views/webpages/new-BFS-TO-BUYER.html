@@ -33,10 +33,12 @@
                                  Gstin 19AALCB9231G1ZG	<br>	
                               </td>
                               <td style="width: 50%; border-top: solid 1px #000; border-right: solid 1px #000;"><strong>Billing / Shipping Address</strong><br>
-                                 Name &nbsp;<br>&nbsp;<br>&nbsp;<br>
-                                 Address &nbsp;<br>&nbsp;<br>&nbsp;<br>
-                                 Contact No.:&nbsp;<br>
-                                 E-mail Id:
+                                 Name &nbsp;<%= order.user && order.user.length > 0 && order.user[0].name || '' %> <br>&nbsp;<br>&nbsp;<br>
+                                 Address &nbsp; <%= order.shipping_address[0].street_name %>, <%= order.shipping_address[0].address1 %><br>
+                                 <%= order.shipping_address[0].landmark %>,<br>
+                                 <%= order.shipping_address[0].city_name %>, <%= order.shipping_address[0].state_name %><br>&nbsp;<br>&nbsp;<br>
+                                 Contact No.:<%= order.user && order.user.length > 0 && order.user[0].phone_no || '' %> &nbsp;<br>
+                                 E-mail Id:<%= order.user && order.user.length > 0 && order.user[0].email || '' %> 
                               </td>
                            </tr>
                            <tr>
@@ -44,13 +46,14 @@
                               <td style="width: 50%; border-right: solid 1px #000;">&nbsp;</td>
                            </tr>
                            <tr style="margin-top: 30px;">
+                              <% order.product.forEach(product => { %>
                               <td style="width: 50%; border-left: solid 1px #000;">
-                                 <h1 style="font-size:16px;">Product Ref. No. </h1>
-                                 <h1 style="font-size:16px;">Order Date </h1>
+                                 <h1 style="font-size:16px;">Product Ref. No.  <%= product._id %></h1>
+                                 <h1 style="font-size:16px;">Order Date  <%= formattedDate %></h1>
                               </td>
                               <td style="width: 50%; border-right: solid 1px #000;">
                                  <h1 style="font-size:16px;">Invoice No. BB/000001/24-25</h1>
-                                 <h1 style="font-size:16px;">Invoice Date: </h1>
+                                 <h1 style="font-size:16px;">Invoice Date: <%= formattedDate %></h1>
                               </td>
                            </tr>
                         </tbody>
@@ -75,16 +78,28 @@
                            <tr>
                               <td style="border-right:solid 1px #000;">1</td>
                               <td style="border-right:solid 1px #000;">
-                                 <h1 style="text-align: left; font-size:16px;">Product<br></h1>
+                                 <h1 style="text-align: left; font-size:16px;"><%= product.name %><br></h1>
                               </td>
                               <td style="border-right:solid 1px #000;">&nbsp;</td>
-                              <td style="border-right:solid 1px #000;">5000</td>
+                              <td style="border-right:solid 1px #000;"> <% if (order.payment_method == 1) { %>
+                                 <%= product.offer_price %>
+                              <% } else { %>
+                                 <%= product.offer_price  * 0.10 %>
+                              <% } %></td>
                               <td style="border-right:solid 1px #000;">1.00</td>
-                              <td style="border-right:solid 1px #000;">5000.00</td>
+                              <td style="border-right:solid 1px #000;"> <% if (order.payment_method == 1) { %>
+                                 <%= product.offer_price %>
+                              <% } else { %>
+                                 <%= product.offer_price  * 0.10 %>
+                              <% } %></td>
                               <td style="border-right:solid 1px #000;">-</td>
                               <td style="border-right:solid 1px #000;">-</td>
                               <td style="border-right:solid 1px #000;">
-                                 <h1 style="text-align: right; font-size:16px;">5000.00</h1>
+                                 <h1 style="text-align: right; font-size:16px;"> <% if (order.payment_method == 1) { %>
+                                    <%= product.offer_price %>
+                                 <% } else { %>
+                                    <%= product.offer_price  * 0.10 %>
+                                 <% } %></h1>
                               </td>
                            </tr>
                            <tr>
@@ -158,24 +173,32 @@
                                  <h1 style="text-align: right; font-size:16px;">Total Amount Without Tax</h1>
                               </td>
                               <td style="border-right:solid 1px #000; border-top: 1px solid #000; border-bottom: 1px solid #000;">
-                                 <h1 style="text-align: right; font-size:16px;">6200.00</h1>
+                                 <h1 style="text-align: right; font-size:16px;"> <% if (order.payment_method == 1) { %>
+                                    <%= product.offer_price %>
+                                 <% } else { %>
+                                    <%= product.offer_price  * 0.10 %>
+                                 <% } %></h1>
                               </td>
                            </tr>
                            <tr>
-                              <td colspan="10" style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong><span style="padding-right: 50px;">CGST</span> 168.00</strong> </td>
+                              <td colspan="10" style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong><span style="padding-right: 50px;">CGST</span>  <%= order.gst  % 2 %></strong> </td>
                            </tr>
                            <tr>
-                              <td colspan="10" style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong><span style="padding-right: 50px;">SGST</span> 168.00</strong> </td>
+                              <td colspan="10" style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong><span style="padding-right: 50px;">SGST</span>  <%= order.gst  % 2 %></strong> </td>
                            </tr>
                            <tr>
-                              <td colspan="10" style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong><span style="padding-right: 50px;">IGST</span> 168.00</strong> </td>
+                              <td colspan="10" style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong><span style="padding-right: 50px;">IGST</span> -</strong> </td>
                            </tr>
                            <tr>
                               <td colspan="8" style="border-right:solid 1px #000; border-bottom: 1px solid #000;">
                                  <h1 style="text-align: right; font-size:16px;">TOTAL</h1>
                               </td>
                               <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">
-                                 <h1 style="text-align: right; font-size:16px;">6536.00</h1>
+                                 <h1 style="text-align: right; font-size:16px;"> <% if (order.payment_method == 1) { %>
+                                    <%= order.total_price %>
+                                 <% } else { %>
+                                    <%= order.booking_amount %>
+                                 <% } %></h1>
                               </td>
                            </tr>
                            <tr>
@@ -186,6 +209,7 @@
                   </td>
                </tr>
                <tr>
+                  <% }); %>
                   <td>
                      <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-left:solid 1px #000; font-family:'Arial', Gadget, sans-serif; font-size:13px; line-height:18px; border-right: solid 1px #000;">
                         <tbody>

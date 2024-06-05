@@ -14,6 +14,7 @@ const nodemailer = require('nodemailer');
 const rp = require('request-promise-native');
 const puppeteer = require('puppeteer');
 const request = require('request');
+const numberToWords = require('number-to-words');
 const Category = require("../../models/api/categoryModel");
 const Brand = require("../../models/api/brandModel");
 const Size = require("../../models/api/sizeModel");
@@ -2849,22 +2850,23 @@ exports.downloadOrderPDF = function (req, res, next) {
       res.status(500).json({ error: 'An error occurred' });
     } else {
       try {
-          //const loginHtmlPath = 'views/webpages/invoice1.html';
+        //const loginHtmlPath = 'views/webpages/invoice1.html';
         //const loginHtmlPath = 'views/webpages/seller_to_BFS.html';
         const loginHtmlPath = 'views/webpages/new-SELLER-TO-BFS(1).html';
         const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
         const orderDate = new Date(orderList[0].added_dtime);
         const formattedDate = `${orderDate.getDate()}-${orderDate.getMonth() + 1}-${orderDate.getFullYear()}`;
-        const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate });
-        //  const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
-          const browser = await puppeteer.launch();
-          const page = await browser.newPage();
-          await page.setContent(renderedHtml);
-          const pdfBuffer = await page.pdf({ format: 'A4' });
-          res.setHeader('Content-Type', 'application/pdf');
-          res.setHeader('Content-Disposition', 'attachment; filename=InvoiceSellerToBFS.pdf');
-          res.send(pdfBuffer);
-          await browser.close();
+        const product = orderList[0].product[0]; 
+        const offerPriceWords = numberToWords.toWords(product.offer_price);
+        const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate, offerPriceWords: offerPriceWords});
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+        await page.setContent(renderedHtml);
+        const pdfBuffer = await page.pdf({ format: 'A4' });
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=InvoiceSellerToBFS.pdf');
+        res.send(pdfBuffer);
+        await browser.close();
       } catch (err) {
         console.error('Error generating PDF:', err);
         return res.render("pages/error-msg", {
@@ -2955,7 +2957,8 @@ exports.downloadOrdesecondrPDF = function (req, res, next) {
       res.status(500).json({ error: 'An error occurred' });
     } else {
       try {
-        const loginHtmlPath = 'views/webpages/invoice2.html';
+        //const loginHtmlPath = 'views/webpages/invoice2.html';
+        const loginHtmlPath = 'views/webpages/new-BFS-TO-BUYER.html';
         const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
         const orderDate = new Date(orderList[0].added_dtime);
         const formattedDate = `${orderDate.getDate()}-${orderDate.getMonth() + 1}-${orderDate.getFullYear()}`;

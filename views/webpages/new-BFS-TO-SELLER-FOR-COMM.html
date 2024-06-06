@@ -32,10 +32,10 @@
                                  Gstin 19AALCB9231G1ZG	<br>	
                               </td>
                               <td style="width: 50%; border-top: solid 1px #000; border-right: solid 1px #000;"><strong>Billing Address</strong><br>
-                                 <strong>Name</strong> &nbsp;<br>&nbsp;<br>&nbsp;<br>
-                                 Address &nbsp;<br>&nbsp;<br>&nbsp;<br>
-                                 Contact No.:&nbsp;<br>
-                                 E-mail Id:
+                                 <strong>Name</strong><%= order.seller && order.seller.length > 0 && order.seller[0].name || '' %> &nbsp;<br>&nbsp;<br>&nbsp;<br>
+                                 Address &nbsp;<%= order.billing_address[0].street_name %>, <%= order.billing_address[0].address1 %>,<br> <%= order.billing_address[0].landmark %>,<br> <%= order.billing_address[0].city_name %><br>&nbsp;<br>&nbsp;<br>
+                                 Contact No.:&nbsp;<%= order.seller && order.seller.length > 0 && order.seller[0].phone_no || '' %><br>
+                                 E-mail Id: <%= order.seller && order.seller.length > 0 && order.seller[0].email || '' %>
                               </td>
                            </tr>
                            <tr>
@@ -43,13 +43,14 @@
                               <td style="width: 50%; border-right: solid 1px #000;">&nbsp;</td>
                            </tr>
                            <tr style="margin-top: 30px;">
+                              <% order.product.forEach(product => { %>
                               <td style="width: 50%; border-left: solid 1px #000;">
-                                 <h1 style="font-size:16px;">Product Ref. No. </h1>
-                                 <h1 style="font-size:16px;">Order Date </h1>
+                                 <h1 style="font-size:16px;">Product Ref. No. <%= product._ID %></h1>
+                                 <h1 style="font-size:16px;">Order Date <%= formattedDate %></h1>
                               </td>
                               <td style="width: 50%; border-right: solid 1px #000;">
                                  <h1 style="font-size:16px;">Invoice No. BB/000001/24-25</h1>
-                                 <h1 style="font-size:16px;">Invoice Date: </h1>
+                                 <h1 style="font-size:16px;">Invoice Date: <%= formattedDate %></h1>
                               </td>
                            </tr>
                         </tbody>
@@ -80,10 +81,10 @@
                                  <h1 style="text-align: left; font-size:16px;">996211<br></h1>
                               </td>
                               <td style="border-right:solid 1px #000;">10.00%</td>
-                              <td style="border-right:solid 1px #000;">5000.00</td>
-                              <td style="border-right:solid 1px #000;">500.00</td>
+                              <td style="border-right:solid 1px #000;"> <%= product.offer_price %></td>
+                              <td style="border-right:solid 1px #000;"> <%= product.offer_price * 10% %></td>
                               <td style="border-right:solid 1px #000;">18.00%</td>
-                              <td style="border-right:solid 1px #000;">90.00</td>
+                              <td style="border-right:solid 1px #000;"><%= product.offer_price * 18% %></td>
                               <td style="border-right:solid 1px #000;">
                                  <h1 style="text-align: right; font-size:16px;">500.00</h1>
                               </td>
@@ -104,7 +105,7 @@
                                  <h1 style="text-align: right; font-size:16px;">Total Amount Without Tax</h1>
                               </td>
                               <td style="border-right:solid 1px #000; border-top: 1px solid #000; border-bottom: 1px solid #000;">
-                                 <h1 style="text-align: right; font-size:16px;">500.00</h1>
+                                 <h1 style="text-align: right; font-size:16px;"><%= product.offer_price * 10% %></h1>
                               </td>
                            </tr>
                            <tr>
@@ -118,7 +119,7 @@
                                  <h1 style="text-align: right; font-size:16px;">IGST</h1>
                               </td>
                               <td rowspan="2" style="border-right:solid 1px #000; border-bottom: 1px solid #000;">
-                                 <h1 style="text-align: right; font-size:16px;">6536.00</h1>
+                                 <h1 style="text-align: right; font-size:16px;"><%= product.offer_price %></h1>
                               </td>
                            </tr>
                            <tr>
@@ -133,6 +134,7 @@
                      </table>
                   </td>
                </tr>
+               <% }); %>
                <tr>
                   <td>
                      <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-left:solid 1px #000; font-family:'Arial', Gadget, sans-serif; font-size:13px; line-height:18px; border-right: solid 1px #000;">
@@ -145,7 +147,7 @@
                                  <p style="text-align: right;">For BFS REATIL SERVICES PRIVATE LIMITED
                                  </p>
                                  <br> 
-                                 <img src="signatory.png" alt=""><br> 
+                                 <img src="https://bidforsale.com/public/images/signature.png" alt=""><br> 
                                  <strong>Authorised Signatory</strong>
                               </td>
                            </tr>

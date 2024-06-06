@@ -3062,7 +3062,7 @@ exports.downloadsecondforBFSBC = function (req, res, next) {
     } else {
       try {
         //const loginHtmlPath = 'views/webpages/invoice2.html';
-        const loginHtmlPath = 'views/webpages/new-BFS-TO-BUYER.html';
+        const loginHtmlPath = 'views/webpages/new-BFS-TO-SELLER-FOR-COMM.html';
         const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
         const orderDate = new Date(orderList[0].added_dtime);
         const formattedDate = `${orderDate.getDate()}-${orderDate.getMonth() + 1}-${orderDate.getFullYear()}`;

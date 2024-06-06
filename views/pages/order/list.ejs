@@ -118,16 +118,16 @@
                                                                 <% } %>
                                                             </td>
                                                             <td>
-                                                                <a href="/admin/download-orderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download Invoice 1</button></a><br>
-                                                                <a href="/admin/download-orderbfspdf/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download Invoice 2</button></a><br>
+                                                                <a href="/admin/download-orderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download SBFS Invoice</button></a><br>
+                                                                <a href="/admin/download-orderbfspdf/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download BB Invoice</button></a><br>
                                                                 <button id="showOptionsBtn" class="btn btn-primary">Show Options</button>
                                                                 <div id="optionsContainer" style="display: none;">                                                                      <button id="emailOption" class="btn btn-secondary" onclick="sendViaEmail('<%= value._id %>')">Send via Email</button>
                                                                   <button id="whatsappOption" class="btn btn-secondary" onclick="sendViaWhatsApp('<%= value._id %>')">Send via WhatsApp</button>
                                                                 </div>
                                                             </td>
                                                             <td>
-                                                                <a href="/admin/download-returnorderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download Invoice 3</button></a><br>
-                                                                <a href="/admin/download-returnorderpdfseller/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download Invoice 4</button></a><br>
+                                                                <a href="/admin/download-returnorderpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download Return BBR Invoice</button></a><br>
+                                                                <a href="/admin/download-returnorderpdfseller/<%= value._id %>" target="_blank"><button class="btn btn-primary">Download Return SBR Invoice</button></a><br>
                                                             </td>
                                                             <!-- <td>
                                                                 <% if (value.productImage && value.productImage.image) { %>
@@ -151,6 +151,7 @@
                                                                 <% } %>
                                                             </td>
                                                             <td>
+                                                                <a href="/admin/download-shippingkitpdf/<%= value._id %>" target="_blank"><button class="btn btn-primary">Shipping kit Invoice</button></a><br>
                                                                 <% if (value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].shippingkit_status == 0) { %>
                                                                     <span style="color: grey;">Not Ordered Shipping Kit</span>
                                                                 <% } else if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0 && value.trackDetails[0].shippingkit_status == 1) { %>

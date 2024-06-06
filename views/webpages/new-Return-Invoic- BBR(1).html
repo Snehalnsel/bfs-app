@@ -24,10 +24,12 @@
                            <tr>
                               <td style="width: 50%; border-left: solid 1px #000; border-top: solid 1px #000;">
                                  <strong>Return By	</strong><br>
-                                 <strong>Name</strong> &nbsp;<br>&nbsp;<br>&nbsp;<br>
-                                 Address &nbsp;<br>&nbsp;<br>&nbsp;<br>
-                                 Contact No.:&nbsp;<br>
-                                 E-mail Id:
+                                 <strong>Name</strong> <%= order.user && order.user.length > 0 && order.user[0].name || '' %>&nbsp;<br>&nbsp;<br>&nbsp;<br>
+                                 Address  <%= order.shipping_address[0].street_name %>, <%= order.shipping_address[0].address1 %><br>
+                                 <%= order.shipping_address[0].landmark %>,<br>
+                                 <%= order.shipping_address[0].city_name %>, <%= order.shipping_address[0].state_name %>&nbsp;<br>&nbsp;<br>&nbsp;<br>
+                                 Contact No.: <%= order.user && order.user.length > 0 && order.user[0].phone_no || '' %>&nbsp;<br>
+                                 E-mail Id: <%= order.user && order.user.length > 0 && order.user[0].email || '' %>
                               </td>
                               <td style="width: 50%; border-top: solid 1px #000; border-right: solid 1px #000;"><strong>Billing Address</strong><br>
                                  BFS Retail Services Private Limited<br>
@@ -40,10 +42,11 @@
                               </td>
                            </tr>
                            <tr style="margin-top: 30px;">
+                              <% order.product.forEach(product => { %>
                               <td style="width: 50%; border-left: solid 1px #000;">
-                                 <h1 style="font-size:16px;">Product Ref. No.	 </h1>
-                                 <h1 style="font-size:16px;">Original Order No. 	</h1>
-                                 <h1 style="font-size:16px;">Original Order Date 	</h1>
+                                 <h1 style="font-size:16px;">Product Ref. No.	<%= product._id %> </h1>
+                                 <h1 style="font-size:16px;">Original Order No. 	<%= order.order_code %></h1>
+                                 <h1 style="font-size:16px;">Original Order Date 	<%= formattedDate %></h1>
                               </td>
                               <td style="width: 50%; border-right: solid 1px #000;">
                                  <h1 style="font-size:16px;">&nbsp;</h1>
@@ -78,7 +81,7 @@
                            <tr>
                               <td style="border-right:solid 1px #000;">1</td>
                               <td style="border-right:solid 1px #000;">
-                                 <h1 style="text-align: left; font-size:16px;">Product</h1>
+                                 <h1 style="text-align: left; font-size:16px;"><%= product.name %></h1>
                               </td>
                               <td style="border-right:solid 1px #000;">&nbsp;</td>
                               <td style="border-right:solid 1px #000;">&nbsp;</td>
@@ -115,6 +118,7 @@
                      </table>
                   </td>
                </tr>
+               <% }); %>
                <tr>
                   <td>
                      <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-left:solid 1px #000; font-family:'Arial', Gadget, sans-serif; font-size:13px; line-height:18px; border-right: solid 1px #000;">
@@ -123,6 +127,7 @@
                               <td width="60%" style="vertical-align: baseline; border-bottom:solid 1px #000;">
                                  &nbsp;
                               <td  width="40%" style="height: 80px; vertical-align: bottom; text-align: right; border-bottom:solid 1px #000;">
+                                 <img src="https://bidforsale.com/public/images/signature.png" alt="">
                                  <strong style="border: 1px solid #000; border-bottom: none; padding-left: 45px; padding-top: 15px; border-right: none;">Authorised Signatory</strong>
                               </td>
                            </tr>

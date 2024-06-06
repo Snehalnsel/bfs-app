@@ -533,6 +533,7 @@ router.get("/download-orderbfspdf/:id", cors(), OrderController.downloadOrdeseco
 // router.get("/download-orderbfspdf/:id", cors(), OrderController.downloadOrdesecondrPDF);
 router.get("/download-returnorderpdf/:id", cors(), OrderController.returninvoicebb);
 router.get("/download-returnorderpdfseller/:id", cors(), OrderController.returninvoicesbr);
+router.get("/download-shippingkitpdf/:id", cors(), OrderController.shippingkitpdf);
 router.get("/send-order-email/:id", cors(), OrderController.sentOrderPDF);
 router.get("/send-order-whatsapp/:id", cors(), OrderController.sentOrderPDFInWhatsapp);
 

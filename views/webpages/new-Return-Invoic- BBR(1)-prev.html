@@ -10,7 +10,7 @@
             <tbody>
                <tr>
                   <td>
-                     <table width="100%" border="0" cellspacing="0" cellpadding="3" style="font-family:'Arial', Gadget, sans-serif; font-size:12px; line-height:18px; margin-bottom: 10px;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="3" style="font-family:'Arial', Gadget, sans-serif; font-size:15px; line-height:18px; margin-bottom: 25px;">
                         <tbody>
                            <tr>
                               <td style="text-transform: uppercase; text-align: center; border: solid 1px #000;">
@@ -19,13 +19,13 @@
                            </tr>
                         </tbody>
                      </table>
-                     <table width="100%" border="0" cellspacing="0" cellpadding="3" style="font-family:'Arial', Gadget, sans-serif; font-size:12px; line-height:24px;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="3" style="font-family:'Arial', Gadget, sans-serif; font-size:15px; line-height:24px;">
                         <tbody>
                            <tr>
                               <td style="width: 50%; border-left: solid 1px #000; border-top: solid 1px #000;">
                                  <strong>Return By	</strong><br>
                                  <strong>Name</strong> <%= order.user && order.user.length > 0 && order.user[0].name || '' %>&nbsp;<br>&nbsp;<br>&nbsp;<br>
-                                 Address <%= order.shipping_address[0].street_name %>, <%= order.shipping_address[0].address1 %><br>
+                                 Address  <%= order.shipping_address[0].street_name %>, <%= order.shipping_address[0].address1 %><br>
                                  <%= order.shipping_address[0].landmark %>,<br>
                                  <%= order.shipping_address[0].city_name %>, <%= order.shipping_address[0].state_name %>&nbsp;<br>&nbsp;<br>&nbsp;<br>
                                  Contact No.: <%= order.user && order.user.length > 0 && order.user[0].phone_no || '' %>&nbsp;<br>
@@ -44,14 +44,14 @@
                            <tr style="margin-top: 30px;">
                               <% order.product.forEach(product => { %>
                               <td style="width: 50%; border-left: solid 1px #000;">
-                                 <h1 style="font-size:14px;">Product Ref. No.		<%= product._id %></h1>
-                                 <h1 style="font-size:14px;">Original Order No. <%= order.order_code %></h1>
-                                 <h1 style="font-size:14px;">Original Order Date <%= formattedDate %></h1>
+                                 <h1 style="font-size:16px;">Product Ref. No.	<%= product._id %> </h1>
+                                 <h1 style="font-size:16px;">Original Order No. 	<%= order.order_code %></h1>
+                                 <h1 style="font-size:16px;">Original Order Date 	<%= formattedDate %></h1>
                               </td>
                               <td style="width: 50%; border-right: solid 1px #000;">
-                                 <h1 style="font-size:14px;">&nbsp;</h1>
-                                 <h1 style="font-size:14px;">Invoice No. 	SB/000001/24-25</h1>
-                                 <h1 style="font-size:14px;">Invoice Date: <%= formattedDate %></h1>
+                                 <h1 style="font-size:16px;">&nbsp;</h1>
+                                 <h1 style="font-size:16px;">Invoice No. 	SB/000001/24-25</h1>
+                                 <h1 style="font-size:16px;">Invoice Date: </h1>
                               </td>
                            </tr>
                         </tbody>
@@ -60,7 +60,7 @@
                </tr>
                <tr>
                   <td>
-                     <table width="100%" border="0" cellspacing="0" cellpadding="3" style="text-align: center; border-left:solid 1px #000; border-top:solid 1px #000; font-family:'Arial', Gadget, sans-serif; font-size:12px; line-height:18px;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="3" style="text-align: center; border-left:solid 1px #000; border-top:solid 1px #000; font-family:'Arial', Gadget, sans-serif; font-size:15px; line-height:18px;">
                         <tbody>
                            <tr>
                               <td style="width: 15%; border-right:solid 1px #000; border-bottom:solid 1px #000;"><strong>SL NO.</strong></td>
@@ -81,13 +81,13 @@
                            <tr>
                               <td style="border-right:solid 1px #000;">1</td>
                               <td style="border-right:solid 1px #000;">
-                                 <h1 style="text-align: left; font-size:14px;">><%= product.name %></h1>
+                                 <h1 style="text-align: left; font-size:16px;"><%= product.name %></h1>
                               </td>
                               <td style="border-right:solid 1px #000;">&nbsp;</td>
                               <td style="border-right:solid 1px #000;">&nbsp;</td>
                               <td style="border-right:solid 1px #000;">&nbsp;</td>
                               <td style="border-right:solid 1px #000;">
-                                 <h1 style="text-align: right; font-size:14px;">&nbsp;</h1>
+                                 <h1 style="text-align: right; font-size:16px;">&nbsp;</h1>
                               </td>
                            </tr>
                            <tr>
@@ -101,7 +101,7 @@
                                  &nbsp;
                               </td>
                               <td style="border-right:solid 1px #000; border-top:solid 1px #000; border-bottom: 1px solid #000;">
-                                 <h1 style="text-align: right; font-size:14px;"><span style="padding-right: 252px;">&nbsp;</span></h1>
+                                 <h1 style="text-align: right; font-size:16px;"><span style="padding-right: 252px;">&nbsp;</span></h1>
                               </td>
                               <td style="border-right:solid 1px #000; border-top:solid 1px #000; border-bottom: 1px solid #000;">
                                  &nbsp;
@@ -127,6 +127,7 @@
                               <td width="60%" style="vertical-align: baseline; border-bottom:solid 1px #000;">
                                  &nbsp;
                               <td  width="40%" style="height: 80px; vertical-align: bottom; text-align: right; border-bottom:solid 1px #000;">
+                                 <img src="https://bidforsale.com/public/images/signature.png" alt="">
                                  <strong style="border: 1px solid #000; border-bottom: none; padding-left: 45px; padding-top: 15px; border-right: none;">Authorised Signatory</strong>
                               </td>
                            </tr>

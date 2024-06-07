@@ -30,6 +30,8 @@ const Bankdetails = require("../../models/api/bankdetailsModel");
 const Gender = require("../../models/api/genderModel");
 const Color = require("../../models/api/colorModel");
 const shippingchrgsModel = require("../../models/api/shippingchrgsModel");
+const insertNotification = require("../../models/api/insertNotification");
+const Notifications = require("../../models/api/notificationModel");
 const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 const multer = require("multer");
 const upload = multer({ dest: 'public/images/' }); 
@@ -413,6 +415,18 @@ exports.getProductData = async function (req, res, next) {
       formattedUserProducts.push(formattedUserProduct);
     }
     const totalPages = Math.ceil(count / limit);
+    let title = "New Product Added";
+    let admin_text = "An user has added a new product";
+    let link = "https://bidforsale.com/admin/productdetails/"+formattedUserProducts[0]._id;
+    let dateTime = moment().format("YYYY-MM-DD HH:mm:ss");
+    const notification = new Notifications({
+      title: title,
+      admin_text:admin_text,
+      link: link,
+      added_dtime: dateTime
+  });
+
+  await notification.save();
     if(formattedUserProducts)
     {
       res.status(200).json({

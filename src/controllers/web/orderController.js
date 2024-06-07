@@ -3066,14 +3066,17 @@ exports.downloadsecondforBFSBC = function (req, res, next) {
         const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
         const orderDate = new Date(orderList[0].added_dtime);
         const formattedDate = `${orderDate.getDate()}-${orderDate.getMonth() + 1}-${orderDate.getFullYear()}`;
-        const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate });
+        const product = orderList[0].product[0];
+        const totalamount = (product.offer_price * 0.10) + ((product.offer_price * 0.10)  * 0.18);
+        const offerPriceWords = numberToWords.toWords(totalamount);
+        const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate , offerPriceWords:offerPriceWords});
         // const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
         await page.setContent(renderedHtml);
         const pdfBuffer = await page.pdf({ format: 'Letter' });
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename=InvoiceBFStoBuyer.pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=InvoiceBFStoSellerForCOMM.pdf');
         res.send(pdfBuffer);
         await browser.close();
       } catch (err) {
@@ -3179,7 +3182,7 @@ exports.returninvoicebb = function (req, res, next) {
         const pdfBuffer = await page.pdf({ format: 'Letter' });
   
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename=InvoiceReturnBuyertoBfs.pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=ReturnInvoicBBR.pdf');
         res.send(pdfBuffer);
         await browser.close();
       } catch (err) {
@@ -3285,7 +3288,7 @@ exports.returninvoicesbr = function (req, res, next) {
         const pdfBuffer = await page.pdf({ format: 'Letter' });
   
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename=InvoiceBFStoSeller.pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=ReturnInvoiceSBR.pdf');
       
         res.send(pdfBuffer);
         await browser.close();

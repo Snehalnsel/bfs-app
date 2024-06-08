@@ -540,5 +540,7 @@ router.get("/send-order-whatsapp/:id", cors(), OrderController.sentOrderPDFInWha
 
 //notification
 router.get("/notificationlist", cors(), NotificationController.getData);
+router.get("/notificationcount", cors(), NotificationController.getHeaderData);
+router.post("/markNotificationAsRead",[],NotificationController.markNotificationAsRead);
 
 module.exports = router;

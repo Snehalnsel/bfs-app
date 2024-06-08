@@ -81,13 +81,17 @@
                            <tr>
                               <td style="border-right:solid 1px #000;">1</td>
                               <td style="border-right:solid 1px #000;">
-                                 <h1 style="text-align: left; font-size:14px;">><%= product.name %></h1>
+                                 <h1 style="text-align: left; font-size:14px;"><%= product.name %></h1>
                               </td>
                               <td style="border-right:solid 1px #000;">&nbsp;</td>
                               <td style="border-right:solid 1px #000;">&nbsp;</td>
                               <td style="border-right:solid 1px #000;">&nbsp;</td>
                               <td style="border-right:solid 1px #000;">
-                                 <h1 style="text-align: right; font-size:14px;">&nbsp;</h1>
+                                 <h1 style="text-align: right; font-size:14px;">&nbsp; <% if (order.payment_method == 1) { %>
+                                    <%= order.total_price %>
+                                 <% } else { %>
+                                    <%= order.booking_amount %>
+                                 <% } %></h1>
                               </td>
                            </tr>
                            <tr>
@@ -101,10 +105,14 @@
                                  &nbsp;
                               </td>
                               <td style="border-right:solid 1px #000; border-top:solid 1px #000; border-bottom: 1px solid #000;">
-                                 <h1 style="text-align: right; font-size:14px;"><span style="padding-right: 252px;">&nbsp;</span></h1>
+                                 <h1 style="text-align: right; font-size:14px;"><span style="padding-right: 252px;">&nbsp;r</span></h1>
                               </td>
                               <td style="border-right:solid 1px #000; border-top:solid 1px #000; border-bottom: 1px solid #000;">
-                                 &nbsp;
+                                 <% if (order.payment_method == 1) { %>
+                                    <%= order.total_price %>
+                                 <% } else { %>
+                                    <%= order.booking_amount %>
+                                 <% } %>&nbsp;
                               </td>
                            </tr>
                            <tr>
@@ -127,6 +135,7 @@
                               <td width="60%" style="vertical-align: baseline; border-bottom:solid 1px #000;">
                                  &nbsp;
                               <td  width="40%" style="height: 80px; vertical-align: bottom; text-align: right; border-bottom:solid 1px #000;">
+                                 <img src="https://bidforsale.com/public/images/signature.png" alt="">
                                  <strong style="border: 1px solid #000; border-bottom: none; padding-left: 45px; padding-top: 15px; border-right: none;">Authorised Signatory</strong>
                               </td>
                            </tr>

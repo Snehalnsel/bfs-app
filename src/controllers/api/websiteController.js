@@ -52,6 +52,7 @@ const Reasonlist = require("../../models/api/reasonlistModel");
 const Iptrnsaction = require("../../models/api/ipTransactionModel");
 const insertNotification = require("../../models/api/insertNotification");
 const Demoorder = require("../../models/api/demoorderModel");
+const Notifications = require("../../models/api/notificationModel");
 const smtpUser = "welcome@bidforsale.com";
 //const smtpUser = "hello@bidforsale.com";
 const nodemailer = require("nodemailer");
@@ -2709,6 +2710,20 @@ exports.addNewPost = async function (req, res, next) {
         });
         const savedImage = productimageDetail.save();
       });
+
+      let title = "New Product Added";
+      let admin_text = "An user has added a new product";
+      let link = "https://bidforsale.com/admin/productdetails/"+savedProductdata._id;
+      let dateTime = moment().format("YYYY-MM-DD HH:mm:ss");
+      const notification = new Notifications({
+        title: title,
+        admin_text:admin_text,
+        for_admin:1,
+        link: link,
+        added_dtime: dateTime
+    });
+  
+    await notification.save();
     }
     res.redirect('/my-post/'+req.session.user.userId);
   } catch (error) {

@@ -14,7 +14,6 @@ const model = mongoose.Schema({
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'users', 
-    required: true,
   },
   data: {
     type: String,
@@ -24,6 +23,11 @@ const model = mongoose.Schema({
     type: String,
   },
   is_read: {
+    type: Number,
+    enum: [0, 1],
+    default: 0,
+  },
+  for_admin: {
     type: Number,
     enum: [0, 1],
     default: 0,

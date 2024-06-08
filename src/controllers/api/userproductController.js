@@ -236,7 +236,6 @@ exports.addData = async function (req, res, next) {
     });
   }
   try {
-    console.log("hellobhbjbbnn");
     // const existingProduct = await Userproduct.findOne({ name: req.body.name });
     // if (existingProduct) {
     //   return res.status(404).json({
@@ -324,6 +323,20 @@ exports.addData = async function (req, res, next) {
         });
         const savedImage = productimageDetail.save();
       });
+
+      let title = "New Product Added";
+      let admin_text = "An user has added a new product";
+      let link = "https://bidforsale.com/admin/productdetails/"+savedProductdata._id;
+      let dateTime = moment().format("YYYY-MM-DD HH:mm:ss");
+      const notification = new Notifications({
+        title: title,
+        admin_text:admin_text,
+        for_admin:1,
+        link: link,
+        added_dtime: dateTime
+    });
+  
+    await notification.save(); 
       res.status(200).json({
         status: "1",
         status: "1",
@@ -415,18 +428,7 @@ exports.getProductData = async function (req, res, next) {
       formattedUserProducts.push(formattedUserProduct);
     }
     const totalPages = Math.ceil(count / limit);
-    let title = "New Product Added";
-    let admin_text = "An user has added a new product";
-    let link = "https://bidforsale.com/admin/productdetails/"+formattedUserProducts[0]._id;
-    let dateTime = moment().format("YYYY-MM-DD HH:mm:ss");
-    const notification = new Notifications({
-      title: title,
-      admin_text:admin_text,
-      link: link,
-      added_dtime: dateTime
-  });
 
-  await notification.save();
     if(formattedUserProducts)
     {
       res.status(200).json({
@@ -752,6 +754,7 @@ exports.updateProduct = async function (req, res, next) {
       ...updatedProduct.toObject(),
       images: productImages,
     };
+
     res.status(200).json({
       status: "1",
       message: "Product updated!",

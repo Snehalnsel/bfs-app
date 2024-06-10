@@ -5,13 +5,8 @@
       <title>TAX INVOICE</title>
    </head>
    <body>
-      <style>
-         td table tr td{
-            padding: 0 10px;
-         }
-      </style>
       <div style="width:100%; max-width:1000px; margin: 0 auto; ">
-         <table width="100%" border="0" cellspacing="0" cellpadding="3" style="font-family:'Arial', Gadget, sans-serif; font-size:12px; line-height:18px; margin-bottom: 10px;">
+         <table width="100%" border="0" cellspacing="0" cellpadding="3" style="font-family:'Arial', Gadget, sans-serif; font-size:15px; line-height:18px; margin-bottom: 25px;">
             <tbody>
                <tr>
                   <td style="text-transform: uppercase; text-align: center; border: solid 1px #000;">
@@ -24,7 +19,7 @@
             <tbody>
                <tr>
                   <td>
-                     <table width="100%" border="0" cellspacing="0" cellpadding="3" style="font-family:'Arial', Gadget, sans-serif; font-size:12px; line-height:24px;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="3" style="font-family:'Arial', Gadget, sans-serif; font-size:15px; line-height:24px;">
                         <tbody>
                            <tr>
                               <td style="width: 50%; border-left: solid 1px #000; border-top: solid 1px #000;">
@@ -38,24 +33,27 @@
                                  Gstin 19AALCB9231G1ZG	<br>	
                               </td>
                               <td style="width: 50%; border-top: solid 1px #000; border-right: solid 1px #000;"><strong>Billing / Shipping Address</strong><br>
-                                 Name &nbsp;<%= order.user && order.user.length > 0 && order.user[0].name || '' %><br>&nbsp;<br>&nbsp;<br>
+                                 Name &nbsp;<%= order.user && order.user.length > 0 && order.user[0].name || '' %> <br>&nbsp;<br>&nbsp;<br>
                                  Address &nbsp; <%= order.shipping_address[0].street_name %>, <%= order.shipping_address[0].address1 %><br>
                                  <%= order.shipping_address[0].landmark %>,<br>
                                  <%= order.shipping_address[0].city_name %>, <%= order.shipping_address[0].state_name %><br>&nbsp;<br>&nbsp;<br>
-                                 Contact No.: <%= order.user && order.user.length > 0 && order.user[0].phone_no || '' %>&nbsp;<br>
-                                 E-mail Id: <%= order.user && order.user.length > 0 && order.user[0].email || '' %>
+                                 Contact No.:<%= order.user && order.user.length > 0 && order.user[0].phone_no || '' %> &nbsp;<br>
+                                 E-mail Id:<%= order.user && order.user.length > 0 && order.user[0].email || '' %> 
                               </td>
                            </tr>
-                           
+                           <tr>
+                              <td style="width: 50%; border-left: solid 1px #000;">&nbsp;</td>
+                              <td style="width: 50%; border-right: solid 1px #000;">&nbsp;</td>
+                           </tr>
                            <tr style="margin-top: 30px;">
                               <% order.product.forEach(product => { %>
                               <td style="width: 50%; border-left: solid 1px #000;">
-                                 <h1 style="font-size:14px;">Product Ref. No. <%= product._id %></h1>
-                                 <h1 style="font-size:14px;">Order Date: <%= formattedDate %> </h1>
+                                 <h1 style="font-size:16px;">Product Ref. No.  <%= product._id %></h1>
+                                 <h1 style="font-size:16px;">Order Date  <%= formattedDate %></h1>
                               </td>
                               <td style="width: 50%; border-right: solid 1px #000;">
-                                 <h1 style="font-size:14px;">Invoice No. BB/000001/24-25</h1>
-                                 <h1 style="font-size:14px;">Invoice Date: <%= formattedDate %></h1>
+                                 <h1 style="font-size:16px;">Invoice No. BB/000001/24-25</h1>
+                                 <h1 style="font-size:16px;">Invoice Date: <%= formattedDate %></h1>
                               </td>
                            </tr>
                         </tbody>
@@ -64,7 +62,7 @@
                </tr>
                <tr>
                   <td>
-                     <table width="100%" border="0" cellspacing="0" cellpadding="3" style="text-align: center; border-left:solid 1px #000; border-top:solid 1px #000; font-family:'Arial', Gadget, sans-serif; font-size:12px; line-height:18px;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="3" style="text-align: center; border-left:solid 1px #000; border-top:solid 1px #000; font-family:'Arial', Gadget, sans-serif; font-size:15px; line-height:18px;">
                         <tbody>
                            <tr>
                               <td style="width: 10%; border-right:solid 1px #000; border-bottom:solid 1px #000;"><strong>SL NO.</strong></td>
@@ -80,33 +78,74 @@
                            <tr>
                               <td style="border-right:solid 1px #000;">1</td>
                               <td style="border-right:solid 1px #000;">
-                                 <h1 style="text-align: left; font-size:14px;"><%= product.name %><br></h1>
+                                 <h1 style="text-align: left; font-size:16px;"><%= product.name %><br></h1>
                               </td>
                               <td style="border-right:solid 1px #000;">&nbsp;</td>
-                              <td style="border-right:solid 1px #000;"><% if (order.payment_method == 1) { %>
+                              <td style="border-right:solid 1px #000;"> <% if (order.payment_method == 1) { %>
                                  <%= product.offer_price %>
                               <% } else { %>
                                  <%= product.offer_price  * 0.10 %>
                               <% } %></td>
                               <td style="border-right:solid 1px #000;">1.00</td>
-                              <td style="border-right:solid 1px #000;"><% if (order.payment_method == 1) { %>
+                              <td style="border-right:solid 1px #000;"> <% if (order.payment_method == 1) { %>
                                  <%= product.offer_price %>
                               <% } else { %>
                                  <%= product.offer_price  * 0.10 %>
                               <% } %></td>
                               <td style="border-right:solid 1px #000;">-</td>
-                              <td style="border-right:solid 1px #000;"> <%= order.taxable_value %></td>
+                              <td style="border-right:solid 1px #000;">-</td>
                               <td style="border-right:solid 1px #000;">
-                                 <h1 style="text-align: right; font-size: 14px;">
-                                    <% if (order.payment_method == 1) { %>
-                                      <%= product.offer_price + order.taxable_value %>
-                                    <% } else { %>
-                                      <%= product.offer_price * 0.10 + order.taxable_value %>
-                                    <% } %>
-                                  </h1>                                  
+                                 <h1 style="text-align: right; font-size:16px;"> <% if (order.payment_method == 1) { %>
+                                    <%= product.offer_price %>
+                                 <% } else { %>
+                                    <%= product.offer_price  * 0.10 %>
+                                 <% } %></h1>
                               </td>
                            </tr>
-                          
+                           <tr>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td align="right" style="border-right:solid 1px #000;">&nbsp;</td>
+                           </tr>
+                           <tr>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td align="right" style="border-right:solid 1px #000;">&nbsp;</td>
+                           </tr>
+                           <tr>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td align="right" style="border-right:solid 1px #000;">&nbsp;</td>
+                           </tr>
+                           <tr>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td align="right" style="border-right:solid 1px #000;">&nbsp;</td>
+                           </tr>
                            <tr>
                               <td style="border-right:solid 1px #000;">&nbsp;</td>
                               <td style="border-right:solid 1px #000;">&nbsp;</td>
@@ -131,10 +170,10 @@
                            </tr>
                            <tr>
                               <td colspan="8" style="border-right:solid 1px #000; border-top: 1px solid #000; border-bottom: 1px solid #000;">
-                                 <h1 style="text-align: right; font-size:14px;">Total Amount Without Tax</h1>
+                                 <h1 style="text-align: right; font-size:16px;">Total Amount Without Tax</h1>
                               </td>
                               <td style="border-right:solid 1px #000; border-top: 1px solid #000; border-bottom: 1px solid #000;">
-                                 <h1 style="text-align: right; font-size:14px;"><% if (order.payment_method == 1) { %>
+                                 <h1 style="text-align: right; font-size:16px;"> <% if (order.payment_method == 1) { %>
                                     <%= product.offer_price %>
                                  <% } else { %>
                                     <%= product.offer_price  * 0.10 %>
@@ -142,22 +181,20 @@
                               </td>
                            </tr>
                            <tr>
-                              <td colspan="10" style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong><span style="padding-right: 50px;">CGST</span><%= order.gst / 2.0 %>
-                              </strong> </td>
+                              <td colspan="10" style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong><span style="padding-right: 50px;">CGST</span>  <%= order.gst  % 2 %></strong> </td>
                            </tr>
                            <tr>
-                              <td colspan="10" style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong><span style="padding-right: 50px;">SGST</span><%= order.gst / 2.0 %>
-                              </strong> </td>
+                              <td colspan="10" style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong><span style="padding-right: 50px;">SGST</span>  <%= order.gst  % 2 %></strong> </td>
                            </tr>
                            <tr>
-                              <td colspan="10" style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong><span style="padding-right: 50px;">IGST</span> </strong> </td>
+                              <td colspan="10" style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong><span style="padding-right: 50px;">IGST</span> -</strong> </td>
                            </tr>
                            <tr>
                               <td colspan="8" style="border-right:solid 1px #000; border-bottom: 1px solid #000;">
-                                 <h1 style="text-align: right; font-size:14px;">TOTAL</h1>
+                                 <h1 style="text-align: right; font-size:16px;">TOTAL</h1>
                               </td>
                               <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">
-                                 <h1 style="text-align: right; font-size:14px;"><% if (order.payment_method == 1) { %>
+                                 <h1 style="text-align: right; font-size:16px;"> <% if (order.payment_method == 1) { %>
                                     <%= order.total_price %>
                                  <% } else { %>
                                     <%= order.booking_amount %>
@@ -171,8 +208,8 @@
                      </table>
                   </td>
                </tr>
-               <% }); %>
                <tr>
+                  <% }); %>
                   <td>
                      <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-left:solid 1px #000; font-family:'Arial', Gadget, sans-serif; font-size:13px; line-height:18px; border-right: solid 1px #000;">
                         <tbody>
@@ -187,7 +224,7 @@
                                  <p style="text-align: center;">Ceritified that the particulars given above are true and correct
                                  </p>
                                  <br><strong>For BFS REATIL SERVICES PRIVATE LIMITED</strong><br> 
-                                 <img src="signatory.png" alt=""><br> 
+                                 <img src="https://bidforsale.com/public/images/signature.png" alt=""><br> 
                                  <strong>Authorised Signatory</strong>
                               </td>
                            </tr>
@@ -197,7 +234,7 @@
                </tr>
                <tr>
                   <td>
-                     <table width="100%" border="0" cellspacing="0" cellpadding="4" style="font-family:'Arial', Gadget, sans-serif; font-size:12px; line-height:18px; margin-top: 25px;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="4" style="font-family:'Arial', Gadget, sans-serif; font-size:15px; line-height:18px; margin-top: 25px;">
                         <tbody>
                            <tr>
                               <td colspan="4" style="border-right:solid 1px #000; border-left:solid 1px #000; border-top: 1px solid #000;">&nbsp;</td>

@@ -30,6 +30,7 @@ const BannerController = require("../controllers/web/bannerController");
 const GenderController = require("../controllers/web/genderController");
 const ColorController = require("../controllers/web/colorController");
 const IpaddressController = require("../controllers/web/ipaddressController");
+const NotificationController = require("../controllers/web/notificationController");
 const compress_images = require("compress-images");
 
 
@@ -537,5 +538,10 @@ router.get("/download-returnorderpdfseller/:id", cors(), OrderController.returni
 router.get("/download-shippingkitpdf/:id", cors(), OrderController.shippingkitpdf);
 router.get("/send-order-email/:id", cors(), OrderController.sentOrderPDF);
 router.get("/send-order-whatsapp/:id", cors(), OrderController.sentOrderPDFInWhatsapp);
+
+//notification
+router.get("/notificationlist", cors(), NotificationController.getData);
+router.get("/notificationcount", cors(), NotificationController.getHeaderData);
+router.post("/markNotificationAsRead",[],NotificationController.markNotificationAsRead);
 
 module.exports = router;

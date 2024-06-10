@@ -5,13 +5,8 @@
       <title>TAX INVOICE</title>
    </head>
    <body>
-      <style>
-         td table tr td{
-            padding: 0 10px;
-         }
-      </style>
       <div style="width:100%; max-width:1000px; margin: 0 auto; ">
-         <table width="100%" border="0" cellspacing="0" cellpadding="3" style="font-family:'Arial', Gadget, sans-serif; font-size:12px; line-height:18px; margin-bottom: 10px;">
+         <table width="100%" border="0" cellspacing="0" cellpadding="3" style="font-family:'Arial', Gadget, sans-serif; font-size:15px; line-height:18px; margin-bottom: 25px;">
             <tbody>
                <tr>
                   <td style="text-transform: uppercase; text-align: center; border: solid 1px #000;">
@@ -24,7 +19,7 @@
             <tbody>
                <tr>
                   <td>
-                     <table width="100%" border="0" cellspacing="0" cellpadding="3" style="font-family:'Arial', Gadget, sans-serif; font-size:12px; line-height:24px;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="3" style="font-family:'Arial', Gadget, sans-serif; font-size:15px; line-height:24px;">
                         <tbody>
                            <tr>
                               <td style="width: 50%; border-left: solid 1px #000; border-top: solid 1px #000;">
@@ -34,24 +29,28 @@
                                  Kolkata, West Bengal, India,700020	<br>	
                                  Cin U46103WB2023PTC264898	<br>	
                                  Pan AALCB9231G		<br>
-                                 Gstin 19AALCB9231G1ZG	
+                                 Gstin 19AALCB9231G1ZG	<br>	
                               </td>
                               <td style="width: 50%; border-top: solid 1px #000; border-right: solid 1px #000;"><strong>Billing Address</strong><br>
-                                 <strong>Name</strong> <%= order.seller && order.seller.length > 0 && order.seller[0].name || '' %>&nbsp;<br>
-                                 Address &nbsp; <%= order.billing_address[0].street_name %>, <%= order.billing_address[0].address1 %>,<br> <%= order.billing_address[0].landmark %>,<br> <%= order.billing_address[0].city_name %><br>
-                                 Contact No.: <%= order.seller && order.seller.length > 0 && order.seller[0].phone_no || '' %><br>
+                                 <strong>Name</strong><%= order.seller && order.seller.length > 0 && order.seller[0].name || '' %> &nbsp;<br>&nbsp;<br>&nbsp;<br>
+                                 Address &nbsp;<%= order.billing_address[0].street_name %>, <%= order.billing_address[0].address1 %>,<br> <%= order.billing_address[0].landmark %>,<br> <%= order.billing_address[0].city_name %><br>&nbsp;<br>&nbsp;<br>
+                                 Contact No.:&nbsp;<%= order.seller && order.seller.length > 0 && order.seller[0].phone_no || '' %><br>
                                  E-mail Id: <%= order.seller && order.seller.length > 0 && order.seller[0].email || '' %>
                               </td>
                            </tr>
-                           <% order.product.forEach(product => { %>
+                           <tr>
+                              <td style="width: 50%; border-left: solid 1px #000;">&nbsp;</td>
+                              <td style="width: 50%; border-right: solid 1px #000;">&nbsp;</td>
+                           </tr>
                            <tr style="margin-top: 30px;">
+                              <% order.product.forEach(product => { %>
                               <td style="width: 50%; border-left: solid 1px #000;">
-                                 <h1 style="font-size:14px;">Product Ref. No. <%= product._ID %></h1>
-                                 <h1 style="font-size:14px;">Order Date <%= formattedDate %></h1>
+                                 <h1 style="font-size:16px;">Product Ref. No. <%= product._ID %></h1>
+                                 <h1 style="font-size:16px;">Order Date <%= formattedDate %></h1>
                               </td>
                               <td style="width: 50%; border-right: solid 1px #000;">
-                                 <h1 style="font-size:14px;">Invoice No. BB/000001/24-25</h1>
-                                 <h1 style="font-size:14px;">Invoice Date:<%= formattedDate %> </h1>
+                                 <h1 style="font-size:16px;">Invoice No. BB/000001/24-25</h1>
+                                 <h1 style="font-size:16px;">Invoice Date: <%= formattedDate %></h1>
                               </td>
                            </tr>
                         </tbody>
@@ -60,7 +59,7 @@
                </tr>
                <tr>
                   <td>
-                     <table width="100%" border="0" cellspacing="0" cellpadding="3" style="text-align: center; border-left:solid 1px #000; border-top:solid 1px #000; font-family:'Arial', Gadget, sans-serif; font-size:12px; line-height:18px;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="3" style="text-align: center; border-left:solid 1px #000; border-top:solid 1px #000; font-family:'Arial', Gadget, sans-serif; font-size:15px; line-height:18px;">
                         <tbody>
                            <tr>
                               <td style="width: 10%; border-right:solid 1px #000; border-bottom:solid 1px #000;"><strong>SL NO.</strong></td>
@@ -76,49 +75,56 @@
                            <tr>
                               <td style="border-right:solid 1px #000;">1</td>
                               <td style="border-right:solid 1px #000;">
-                                 <h1 style="text-align: left; font-size:14px;">Commission Charges<br></h1>
+                                 <h1 style="text-align: left; font-size:16px;">Commission Charges<br></h1>
                               </td>
                               <td style="border-right:solid 1px #000;">
-                                 <h1 style="text-align: left; font-size:14px;">996211<br></h1>
+                                 <h1 style="text-align: left; font-size:16px;">996211<br></h1>
                               </td>
                               <td style="border-right:solid 1px #000;">10.00%</td>
-                              <td style="border-right:solid 1px #000;"><%= product.offer_price %></td>
-                              <td style="border-right:solid 1px #000;"><%= product.offer_price * 0.10 %></td>
+                              <td style="border-right:solid 1px #000;"> <%= product.offer_price %></td>
+                              <td style="border-right:solid 1px #000;"> <%= product.offer_price * 0.10 %></td>
                               <td style="border-right:solid 1px #000;">18.00%</td>
                               <td style="border-right:solid 1px #000;"><%= (product.offer_price * 0.10) * 0.18 %></td>
                               <td style="border-right:solid 1px #000;">
-                                 <h1 style="text-align: right; font-size:14px;"><%= (product.offer_price * 0.10 + (product.offer_price * 0.10) * 0.18) %></h1>
+                                 <h1 style="text-align: right; font-size:16px;"><%= (product.offer_price * 0.10 + (product.offer_price * 0.10) * 0.18) %></h1>
                               </td>
                            </tr>
-                          
+                           <tr>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td align="right" style="border-right:solid 1px #000;">&nbsp;</td>
+                           </tr>
                            <tr>
                               <td colspan="8" style="border-right:solid 1px #000; border-top: 1px solid #000; border-bottom: 1px solid #000;">
-                                 <h1 style="text-align: right; font-size:14px;">Total Amount Without Tax</h1>
+                                 <h1 style="text-align: right; font-size:16px;">Total Amount Without Tax</h1>
                               </td>
                               <td style="border-right:solid 1px #000; border-top: 1px solid #000; border-bottom: 1px solid #000;">
-                                 <h1 style="text-align: right; font-size:14px;"><%= product.offer_price * 0.10 %></h1>
+                                 <h1 style="text-align: right; font-size:16px;"><%= product.offer_price * 0.10 %></h1>
                               </td>
                            </tr>
                            <tr>
-                              <td colspan="10" style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong><span style="padding-right: 50px;">CGST</span> <%= (((product.offer_price * 0.10) * 0.18)/2) %></strong> </td>
+                              <td colspan="10" style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong><span style="padding-right: 50px;">CGST</span>  <%= (((product.offer_price * 0.10) * 0.18)/2) %></strong> </td>
                            </tr>
                            <tr>
                               <td colspan="10" style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong><span style="padding-right: 50px;">SGST</span> <%= (((product.offer_price * 0.10) * 0.18)/2) %></strong> </td>
                            </tr>
                            <tr>
                               <td  colspan="8" style="border-right:solid 1px #000; border-bottom: 1px solid #000;">
-                                 <h1 style="text-align: right; font-size:14px;">IGST</h1>
+                                 <h1 style="text-align: right; font-size:16px;">IGST</h1>
                               </td>
-                              <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">
-                                 <h1 style="text-align: right; font-size:14px;"></h1>
+                              <td rowspan="2" style="border-right:solid 1px #000; border-bottom: 1px solid #000;">
+                                 <h1 style="text-align: right; font-size:16px;"><%= (product.offer_price * 0.10 + (product.offer_price * 0.10) * 0.18) %></h1>
                               </td>
                            </tr>
                            <tr>
                               <td colspan="8" style="border-right:solid 1px #000; border-bottom: 1px solid #000;">
-                                 <h1 style="text-align: right; font-size:14px;">TOTAL</h1>
-                              </td>
-                              <td style="border-right:solid 1px #000; border-bottom: 1px solid #000;">
-                                 <h1 style="text-align: right; font-size:14px;"><%= (product.offer_price * 0.10 + (product.offer_price * 0.10) * 0.18) %></h1>
+                                 <h1 style="text-align: right; font-size:16px;">TOTAL</h1>
                               </td>
                            </tr>
                            <tr>
@@ -151,7 +157,7 @@
                </tr>
                <tr>
                   <td>
-                     <table width="100%" border="0" cellspacing="0" cellpadding="4" style="font-family:'Arial', Gadget, sans-serif; font-size:12px; line-height:18px; margin-top: 25px;">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="4" style="font-family:'Arial', Gadget, sans-serif; font-size:15px; line-height:18px; margin-top: 25px;">
                         <tbody>
                            <tr>
                               <td colspan="4" style="border-right:solid 1px #000; border-left:solid 1px #000; border-top: 1px solid #000;">&nbsp;</td>

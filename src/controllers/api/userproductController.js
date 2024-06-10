@@ -30,6 +30,8 @@ const Bankdetails = require("../../models/api/bankdetailsModel");
 const Gender = require("../../models/api/genderModel");
 const Color = require("../../models/api/colorModel");
 const shippingchrgsModel = require("../../models/api/shippingchrgsModel");
+const insertNotification = require("../../models/api/insertNotification");
+const Notifications = require("../../models/api/notificationModel");
 const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 const multer = require("multer");
 const upload = multer({ dest: 'public/images/' }); 
@@ -234,7 +236,6 @@ exports.addData = async function (req, res, next) {
     });
   }
   try {
-    console.log("hellobhbjbbnn");
     // const existingProduct = await Userproduct.findOne({ name: req.body.name });
     // if (existingProduct) {
     //   return res.status(404).json({
@@ -322,6 +323,20 @@ exports.addData = async function (req, res, next) {
         });
         const savedImage = productimageDetail.save();
       });
+
+      let title = "New Product Added";
+      let admin_text = "An user has added a new product";
+      let link = "https://bidforsale.com/admin/productdetails/"+savedProductdata._id;
+      let dateTime = moment().format("YYYY-MM-DD HH:mm:ss");
+      const notification = new Notifications({
+        title: title,
+        admin_text:admin_text,
+        for_admin:1,
+        link: link,
+        added_dtime: dateTime
+    });
+  
+    await notification.save(); 
       res.status(200).json({
         status: "1",
         status: "1",
@@ -413,6 +428,7 @@ exports.getProductData = async function (req, res, next) {
       formattedUserProducts.push(formattedUserProduct);
     }
     const totalPages = Math.ceil(count / limit);
+
     if(formattedUserProducts)
     {
       res.status(200).json({
@@ -738,6 +754,7 @@ exports.updateProduct = async function (req, res, next) {
       ...updatedProduct.toObject(),
       images: productImages,
     };
+
     res.status(200).json({
       status: "1",
       message: "Product updated!",

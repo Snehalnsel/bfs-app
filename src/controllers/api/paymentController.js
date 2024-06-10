@@ -420,6 +420,21 @@ exports.getStatus = async function (req, res, next) {
               { $set: { flag: 1 } },
               { new: true }
             );
+
+          //   let title = "Order Placed Successfully";
+          //   let admin_text = "An authenticated user has been successfully placed an order and the order code is."+orderCode;
+          //   let link = "https://bidforsale.com/admin/orderlist";
+          //   let dateTime = moment().format("YYYY-MM-DD HH:mm:ss");
+          //   const notification = new Notifications({
+          //     title: title,
+          //     admin_text:admin_text,
+          //     for_admin:1,
+          //     link: link,
+          //     added_dtime: dateTime
+          // });
+        
+          await notification.save(); 
+
             const product = await Userproduct.findById(savedOrder.product_id);
             const productimage = await Productimage.findOne({ product_id: savedOrder.product_id });
             const user = await Users.findById(savedOrder.user_id);

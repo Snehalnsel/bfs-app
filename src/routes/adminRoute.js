@@ -402,6 +402,7 @@ router.get("/bid-listing", cors(), BidController.getData);
 router.get("/biddetails/:id", cors(), BidController.detailsData);
 router.post("/updatebiddetails", cors(), [check("bid_id", "This is a required field!").not().isEmpty().trim().escape(),], BidController.updatedetailsData);
 router.get("/delete-biddetails/:id", cors(), BidController.deleteData);
+router.post("/getBidDetailsAjax/", cors(), BidController.getBidDetailsAjax);
 
 //Order Management
 // router.get("/orderlist", cors(), OrderController.getOrderList);

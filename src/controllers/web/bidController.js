@@ -21,11 +21,12 @@ const { check, validationResult } = require("express-validator");
 const BidManagement = require('../../models/api/bidModel');
 const Userproduct = require("../../models/api/userproductModel");
 const Productimage = require("../../models/api/productimageModel");
-//const Users = require("../../models/api/userModel");
+const Users = require("../../models/api/userModel");
 
+const getAllProductBidList = require("../../models/fireDbServices/getAllProductBidList");
+const getProductWiseBidData = require("../../models/fireDbServices/getProductWiseBidData");
 
-
-exports.getData = function (req, res, next) {
+exports.getData_backup = function (req, res, next) {
   var pageName = "Bid Management List";
   var pageTitle = req.app.locals.siteName + " - " + pageName;
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
@@ -80,7 +81,7 @@ exports.getData = function (req, res, next) {
     },
     {
       $project: {
-        _id: 1, 
+        _id: 1,
         buyerName: '$buyer.name',
         sellerName: '$seller.name',
         productName: '$product.name',
@@ -100,9 +101,9 @@ exports.getData = function (req, res, next) {
         siteName: req.app.locals.siteName,
         pageName: pageName,
         pageTitle: pageTitle,
-        userFullName:  req.session.admin.name,
-        userImage:  req.session.admin.image_url,
-        userEmail:  req.session.admin.email,
+        userFullName: req.session.admin.name,
+        userImage: req.session.admin.image_url,
+        userEmail: req.session.admin.email,
         year: moment().format("YYYY"),
         requrl: req.app.locals.requrl,
         status: 0,
@@ -110,10 +111,281 @@ exports.getData = function (req, res, next) {
         respdata: {
           list: bidList,
         },
-        isAdminLoggedIn:isAdminLoggedIn
+        isAdminLoggedIn: isAdminLoggedIn
       });
     }
   });
+};
+
+exports.getData = async function (req, res, next) {
+  var pageName = "Bid Management List";
+  var pageTitle = req.app.locals.siteName + " - " + pageName;
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+
+  let getBidAllProduct = await getAllProductBidList();
+  let setBidProductList = [];
+  let prodictIdCheckArr = [];
+  for (let bidData of getBidAllProduct) {
+    let currentOfferData = bidData.currentOffer;
+    let setObj = {};
+    setObj.product_id = '';
+    setObj.productName = '';
+    setObj.productImage = '';
+    setObj.original_price = '';
+    setObj.status = 0;
+    setObj.chat_status = 0;
+    setObj.final_price = 0;
+
+    // setObj.buyerName = '';
+    // setObj.sellerName = '';
+    setObj.seller_price = '';
+    // setObj.buyer_price = 0;
+
+
+    let getProductId = bidData.productId;
+
+
+    let productData = await Userproduct.findById(getProductId);
+    if (productData) {
+      setObj.product_id = getProductId;
+      setObj.productName = productData.name;
+      setObj.original_price = productData.offer_price;
+    }
+    let productImageData = await Productimage.findOne({ product_id: mongoose.Types.ObjectId(getProductId) })
+    if (productImageData) {
+      setObj.productImage = `https://bidforsale.com/public/compress_images/${productImageData.image}`;
+    }
+
+    let sallerData = await Users.findById(bidData.sellerId);
+    if (sallerData) {
+      setObj.sellerName = sallerData.name;
+    }
+
+    let numberOfBuyerCount = 0;
+    let getBuyerIdArr = [];
+    if (!prodictIdCheckArr.includes(getProductId) && currentOfferData.isFromBuyer) {
+      let getBidDetails = await getProductWiseBidData({ product_id: getProductId });
+      for (let bitVal of getBidDetails) {
+        let bitValCurrentOfferData = bitVal.currentOffer;
+        if (!getBuyerIdArr.includes(bitVal.buyerId)) {
+          numberOfBuyerCount++;
+          getBuyerIdArr.push(bitVal.buyerId)
+        }
+
+        if (bitValCurrentOfferData.isFromBuyer) {
+          let buyerData = await Users.findById(bitVal.buyerId);
+          if (buyerData) {
+            setObj.buyerName = buyerData.name;
+            setObj.buyer_price = bitValCurrentOfferData.price;
+          }
+        }
+
+        if (!bitValCurrentOfferData.isFromBuyer) {
+          if (sallerData) {
+            setObj.seller_price = bitValCurrentOfferData.price;
+          }
+        }
+
+      }
+
+      setObj.no_of_bidars = numberOfBuyerCount;
+      setBidProductList.push(setObj);
+      prodictIdCheckArr.push(getProductId)
+    }
+
+  }
+
+
+  res.render("pages/bid-management/list", {
+    siteName: req.app.locals.siteName,
+    pageName: pageName,
+    pageTitle: pageTitle,
+    userFullName: req.session.admin.name,
+    userImage: req.session.admin.image_url,
+    userEmail: req.session.admin.email,
+    year: moment().format("YYYY"),
+    requrl: req.app.locals.requrl,
+    status: 0,
+    message: "Found!",
+    respdata: {
+      list: setBidProductList,
+    },
+    isAdminLoggedIn: isAdminLoggedIn
+  });
+
+};
+
+exports.getBidDetailsAjax = async function (req, res, next) {
+  let postData = req.body;
+  let getProductId = postData.product_id;
+
+  var pageName = "Bid Management List";
+  var pageTitle = req.app.locals.siteName + " - " + pageName;
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+  let productDataObj = {};
+  let setBidProductList = [];
+
+  let getBidDetails = await getProductWiseBidData({ product_id: getProductId });
+
+  if (getBidDetails.length) {
+    let productData = await Userproduct.findById(getProductId);
+    if (productData) {
+      productDataObj.product_id = getProductId;
+      productDataObj.productName = productData.name;
+      productDataObj.original_price = productData.offer_price;
+    } else {
+      return res.status(404).json({
+        status: "error",
+        message: 'Product not exist '
+      })
+    }
+    for (let bidData of getBidDetails) {
+      let setObj = {};
+      let currentOfferData = bidData.currentOffer;
+
+
+
+      if (currentOfferData.isFromBuyer) {
+        let buyerData = await Users.findById(bidData.buyerId);
+        if (buyerData) {
+          setObj.id = buyerData._id;
+          setObj.isFromBuyer = 1;
+          setObj.bid_by = 'Buyer';
+          setObj.name = buyerData.name;
+          setObj.price = currentOfferData.price;
+          setObj.associated_buyer = '';
+        }
+      } else {
+        let sallerData = await Users.findById(bidData.sellerId);
+        if (sallerData) {
+          setObj.id = sallerData._id;
+          setObj.isFromBuyer = 0;
+          setObj.bid_by = 'Seller';
+          setObj.name = sallerData.name;
+          setObj.price = currentOfferData.price;
+        }
+        let associatedBuyerData = await Users.findById(bidData.buyerId);
+        if (associatedBuyerData) {
+          setObj.associated_buyer = associatedBuyerData.name
+        }
+
+      }
+
+
+      setBidProductList.push(setObj);
+    }
+
+    return res.status(200).json({
+      status: "success",
+      product_info: productDataObj,
+      product_bid_list: setBidProductList
+    })
+
+  } else {
+    return res.status(404).json({
+      status: "error",
+      message: 'Firebase product not exist '
+    })
+  }
+
+
+
+
+  /*
+    let getBidAllProduct = await getAllProductBidList();
+    let setBidProductList = [];
+    let prodictIdCheckArr = [];
+    for (let bidData of getBidAllProduct) {
+      let currentOfferData = bidData.currentOffer;
+      let setObj = {};
+      setObj.product_id = '';
+      setObj.productName = '';
+      setObj.productImage = '';
+      setObj.original_price = '';
+      setObj.status = 0;
+      setObj.chat_status = 0;
+      setObj.final_price = 0;
+  
+      // setObj.buyerName = '';
+      // setObj.sellerName = '';
+      setObj.seller_price = '';
+      // setObj.buyer_price = 0;
+  
+  
+      let getProductId = bidData.productId;
+  
+  
+      let productData = await Userproduct.findById(getProductId);
+      if (productData) {
+        setObj.product_id = getProductId;
+        setObj.productName = productData.name;
+        setObj.original_price = productData.offer_price;
+      }
+      let productImageData = await Productimage.findOne({ product_id: mongoose.Types.ObjectId(getProductId) })
+      if (productImageData) {
+        setObj.productImage = `https://bidforsale.com/public/compress_images/${productImageData.image}`;
+      }
+  
+  
+  
+  
+      let sallerData = await Users.findById(bidData.sellerId);
+      if (sallerData) {
+        setObj.sellerName = sallerData.name;
+      }
+  
+      let numberOfBuyerCount = 0;
+      let getBuyerIdArr = [];
+      if (!prodictIdCheckArr.includes(getProductId)) {
+        let getBidDetails = await getProductWiseBidData({ product_id: getProductId });
+        for (let bitVal of getBidDetails) {
+          let bitValCurrentOfferData = bitVal.currentOffer;
+          if (!getBuyerIdArr.includes(bitVal.buyerId)) {
+            numberOfBuyerCount++;
+            getBuyerIdArr.push(bitVal.buyerId)
+          }
+  
+          if (bitValCurrentOfferData.isFromBuyer) {
+            let buyerData = await Users.findById(bitVal.buyerId);
+            if (buyerData) {
+              setObj.buyerName = buyerData.name;
+              setObj.buyer_price = bitValCurrentOfferData.price;
+            }
+          }
+  
+          if (!bitValCurrentOfferData.isFromBuyer) {
+            if (sallerData) {
+              setObj.seller_price = bitValCurrentOfferData.price;
+            }
+          }
+  
+        }
+  
+        setObj.no_of_bidars = numberOfBuyerCount;
+        setBidProductList.push(setObj);
+        prodictIdCheckArr.push(getProductId)
+      }
+  
+    }
+  
+  
+    res.render("pages/bid-management/list", {
+      siteName: req.app.locals.siteName,
+      pageName: pageName,
+      pageTitle: pageTitle,
+      userFullName: req.session.admin.name,
+      userImage: req.session.admin.image_url,
+      userEmail: req.session.admin.email,
+      year: moment().format("YYYY"),
+      requrl: req.app.locals.requrl,
+      status: 0,
+      message: "Found!",
+      respdata: {
+        list: setBidProductList,
+      },
+      isAdminLoggedIn: isAdminLoggedIn
+    });*/
+
 };
 
 exports.detailsData = function (req, res, next) {
@@ -127,8 +399,8 @@ exports.detailsData = function (req, res, next) {
   }
 
   BidManagement.findOne({ _id: bidId })
-    .populate('buyer_id', 'name') 
-    .populate('seller_id', 'name') 
+    .populate('buyer_id', 'name')
+    .populate('seller_id', 'name')
     .then((bidDetails) => {
       if (!bidDetails) {
         return res.status(404).json({ error: 'Bid not found' });
@@ -145,25 +417,26 @@ exports.detailsData = function (req, res, next) {
                 siteName: req.app.locals.siteName,
                 pageName: pageName,
                 pageTitle: pageTitle,
-                userFullName:  req.session.admin.name,
-                userImage:  req.session.admin.image_url,
-                userEmail:  req.session.admin.email,
+                userFullName: req.session.admin.name,
+                userImage: req.session.admin.image_url,
+                userEmail: req.session.admin.email,
                 year: moment().format("YYYY"),
-                requrl:  req.app.locals.requrl,
+                requrl: req.app.locals.requrl,
                 message: "",
                 respdata: {
                   bidDetails: bidDetails,
                   productDetails: productDetails,
-                  productImage: productImage, 
+                  productImage: productImage,
                 },
-                isAdminLoggedIn:isAdminLoggedIn
+                isAdminLoggedIn: isAdminLoggedIn
               });
             })
             .catch((error) => {
               res.status(500).json({ error: 'An error occurred while fetching the product image' });
             });
         })
-        .catch((error) => {;
+        .catch((error) => {
+          ;
           res.status(500).json({ error: 'An error occurred while fetching product details' });
         });
     })
@@ -180,7 +453,7 @@ exports.updatedetailsData = async function (req, res, next) {
       status: "0",
       message: "Validation error!",
       respdata: errors.array(),
-      isAdminLoggedIn:isAdminLoggedIn
+      isAdminLoggedIn: isAdminLoggedIn
     });
   }
 
@@ -192,7 +465,7 @@ exports.updatedetailsData = async function (req, res, next) {
         status: "0",
         message: "Bid not found!",
         respdata: {},
-        isAdminLoggedIn:isAdminLoggedIn
+        isAdminLoggedIn: isAdminLoggedIn
       });
     }
 
@@ -215,18 +488,18 @@ exports.updatedetailsData = async function (req, res, next) {
         status: "0",
         message: "Failed to update bid!",
         respdata: {},
-        isAdminLoggedIn:isAdminLoggedIn
+        isAdminLoggedIn: isAdminLoggedIn
       });
     }
 
-    
+
     res.redirect("/admin/bid-listing");
   } catch (error) {
     res.status(500).json({
       status: "0",
       message: "An error occurred while updating bid!",
       respdata: {},
-      isAdminLoggedIn:isAdminLoggedIn
+      isAdminLoggedIn: isAdminLoggedIn
     });
   }
 };
@@ -240,7 +513,7 @@ exports.deleteData = async function (req, res, next) {
         status: "0",
         message: "Validation error!",
         respdata: errors.array(),
-        isAdminLoggedIn:isAdminLoggedIn
+        isAdminLoggedIn: isAdminLoggedIn
       });
     }
 
@@ -250,7 +523,7 @@ exports.deleteData = async function (req, res, next) {
         status: "0",
         message: "Not found!",
         respdata: {},
-        isAdminLoggedIn:isAdminLoggedIn
+        isAdminLoggedIn: isAdminLoggedIn
       });
     }
 
@@ -259,15 +532,15 @@ exports.deleteData = async function (req, res, next) {
       { w: "majority", wtimeout: 100 }
     );
 
-   
+
     res.redirect("/admin/bid-listing");
   } catch (error) {
- 
+
     return res.status(500).json({
       status: "0",
       message: "Error occurred while deleting the category!",
       respdata: error.message,
-      isAdminLoggedIn:isAdminLoggedIn 
+      isAdminLoggedIn: isAdminLoggedIn
     });
   }
 };

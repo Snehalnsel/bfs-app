@@ -135,10 +135,10 @@
                            </td>
                            <td style="border-right:solid 1px #333333;">28%</td>
                            <td align="right" style="border-right:solid 1px #333333;">
-                              <%= order.packing_handling_charge * 0.28 %>
+                              <%= (order.packing_handling_charge * 0.28).toFixed(2) %>
                            </td>
                            <td align="right" style="border-right:solid 1px #333333;">
-                              <%= order.packing_handling_charge + order.packing_handling_charge * 0.28 %>
+                              <%= (order.packing_handling_charge + order.packing_handling_charge * 0.28).toFixed(2) %>
                            </td>
                         </tr>
                         <% if (order.cash_handling_charges != 0) { %>
@@ -206,7 +206,7 @@
                         <tr>
                            <td colspan="10"
                               style="text-align: left; border-right:solid 1px #000; border-bottom: 1px solid #000;">
-                              <strong>Rupees </strong>: &nbsp;  <%= offerPriceWords %> Only</td>
+                              <strong>Rupees </strong>: &nbsp;  <%= offerPriceWords %> only</td>
                         </tr>
                      </tbody>
                   </table>

@@ -410,11 +410,15 @@ io.on("connection", (socket) => {
     let notificationreqUrl = process.env.SITE_URL + "/bid-for-product/" + bidId;
     let bidProductId = bidOldData.productId;
     let bidProductDetails = await Userproduct.findOne({_id:bidProductId});
+    let productNameget = '';
+    if(bidProductDetails){
+      productNameget = bidProductDetails.name
+    }
     //if((updateData.acceptedByBuyer == true)){
     if((username == bidOldData.buyerId)){
       notificationUserId = bidOldData.sellerId;
       notificationTitle = 'A buyer has accepted the bid on your product';
-      notificationContent =  'Buyer has accepted bid on ' + bidProductDetails.name;
+      notificationContent =  'Buyer has accepted bid on ' + productNameget;
       await insertNotification(
         notificationTitle,
         notificationContent,
@@ -427,7 +431,7 @@ io.on("connection", (socket) => {
     if((username == bidOldData.sellerId)){
       notificationUserId = bidOldData.buyerId;
       notificationTitle = 'The seller has accepted your offer';
-      notificationContent =  'The seller has accepted your response on ' + bidProductDetails.name;
+      notificationContent =  'The seller has accepted your response on ' + productNameget;
       await insertNotification(
         notificationTitle,
         notificationContent,

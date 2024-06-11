@@ -2856,10 +2856,21 @@ exports.downloadOrderPDF = function (req, res, next) {
         const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
         const orderDate = new Date(orderList[0].added_dtime);
         const formattedDate = `${orderDate.getDate()}-${orderDate.getMonth() + 1}-${orderDate.getFullYear()}`;
-        const product = orderList[0].product[0]; 
-        let offerPriceWords = numberToWords.toWords(product.offer_price);
-        offerPriceWords = offerPriceWords.replace(/,/g, '');
-        offerPriceWords = offerPriceWords.charAt(0).toUpperCase() + offerPriceWords.slice(1);
+        const price =  orderList[0].product[0]; 
+        const [integerPart, decimalPart] = price.toString().split('.').map(Number);
+        let integerWords = numberToWords.toWords(integerPart);
+        let decimalWords = decimalPart !== undefined ? numberToWords.toWords(decimalPart) : '';
+        integerWords = integerWords.replace(/,/g, '');
+        integerWords = integerWords.charAt(0).toUpperCase() + integerWords.slice(1);
+        if (decimalWords) {
+            decimalWords = decimalWords.replace(/,/g, '');
+        }
+        let offerPriceWords;
+        if (decimalWords) {
+            offerPriceWords = `${integerWords} rupee${integerPart !== 1 ? 's' : ''} and ${decimalWords} paise`;
+        } else {
+            offerPriceWords = `${integerWords} rupee${integerPart !== 1 ? 's' : ''}`;
+        }
         const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate, offerPriceWords: offerPriceWords});
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
@@ -2965,9 +2976,20 @@ exports.downloadOrdesecondrPDF = function (req, res, next) {
         const orderDate = new Date(orderList[0].added_dtime);
         const formattedDate = `${orderDate.getDate()}-${orderDate.getMonth() + 1}-${orderDate.getFullYear()}`;
         const price = orderList[0].total_price;
-        let offerPriceWords = numberToWords.toWords(price);
-        offerPriceWords = offerPriceWords.replace(/,/g, '');
-        offerPriceWords = offerPriceWords.charAt(0).toUpperCase() + offerPriceWords.slice(1);
+        const [integerPart, decimalPart] = price.toString().split('.').map(Number);
+        let integerWords = numberToWords.toWords(integerPart);
+        let decimalWords = decimalPart !== undefined ? numberToWords.toWords(decimalPart) : '';
+        integerWords = integerWords.replace(/,/g, '');
+        integerWords = integerWords.charAt(0).toUpperCase() + integerWords.slice(1);
+        if (decimalWords) {
+            decimalWords = decimalWords.replace(/,/g, '');
+        }
+        let offerPriceWords;
+        if (decimalWords) {
+            offerPriceWords = `${integerWords} rupee${integerPart !== 1 ? 's' : ''} and ${decimalWords} paise`;
+        } else {
+            offerPriceWords = `${integerWords} rupee${integerPart !== 1 ? 's' : ''}`;
+        }
         const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate,offerPriceWords:offerPriceWords });
         // const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
         const browser = await puppeteer.launch();
@@ -3070,9 +3092,21 @@ exports.downloadsecondforBFSBC = function (req, res, next) {
         const formattedDate = `${orderDate.getDate()}-${orderDate.getMonth() + 1}-${orderDate.getFullYear()}`;
         const product = orderList[0].product[0];
         const totalamount = (product.offer_price * 0.10) + ((product.offer_price * 0.10)  * 0.18);
-        let offerPriceWords = numberToWords.toWords(totalamount);
-        offerPriceWords = offerPriceWords.replace(/,/g, '');
-        offerPriceWords = offerPriceWords.charAt(0).toUpperCase() + offerPriceWords.slice(1);
+        const price = totalamount; 
+        const [integerPart, decimalPart] = price.toString().split('.').map(Number);
+        let integerWords = numberToWords.toWords(integerPart);
+        let decimalWords = decimalPart !== undefined ? numberToWords.toWords(decimalPart) : '';
+        integerWords = integerWords.replace(/,/g, '');
+        integerWords = integerWords.charAt(0).toUpperCase() + integerWords.slice(1);
+        if (decimalWords) {
+            decimalWords = decimalWords.replace(/,/g, '');
+        }
+        let offerPriceWords;
+        if (decimalWords) {
+            offerPriceWords = `${integerWords} rupee${integerPart !== 1 ? 's' : ''} and ${decimalWords} paise`;
+        } else {
+            offerPriceWords = `${integerWords} rupee${integerPart !== 1 ? 's' : ''}`;
+        }
         const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate , offerPriceWords:offerPriceWords});
         // const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
         const browser = await puppeteer.launch();
@@ -3174,10 +3208,21 @@ exports.returninvoicebb = function (req, res, next) {
         const loginHtmlPath = 'views/webpages/new-Return-Invoic- BBR(1).html';
         const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
         const orderDate = new Date(orderList[0].added_dtime);
-        const product = orderList[0].total_price; 
-        let offerPriceWords = numberToWords.toWords(product);
-        offerPriceWords = offerPriceWords.replace(/,/g, '');
-        offerPriceWords = offerPriceWords.charAt(0).toUpperCase() + offerPriceWords.slice(1);
+        const price = orderList[0].total_price; 
+        const [integerPart, decimalPart] = price.toString().split('.').map(Number);
+        let integerWords = numberToWords.toWords(integerPart);
+        let decimalWords = decimalPart !== undefined ? numberToWords.toWords(decimalPart) : '';
+        integerWords = integerWords.replace(/,/g, '');
+        integerWords = integerWords.charAt(0).toUpperCase() + integerWords.slice(1);
+        if (decimalWords) {
+            decimalWords = decimalWords.replace(/,/g, '');
+        }
+        let offerPriceWords;
+        if (decimalWords) {
+            offerPriceWords = `${integerWords} rupee${integerPart !== 1 ? 's' : ''} and ${decimalWords} paise`;
+        } else {
+            offerPriceWords = `${integerWords} rupee${integerPart !== 1 ? 's' : ''}`;
+        }
         const formattedDate = `${orderDate.getDate()}-${orderDate.getMonth() + 1}-${orderDate.getFullYear()}`;
         const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate ,offerPriceWords:offerPriceWords});
         // const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
@@ -3282,9 +3327,21 @@ exports.returninvoicesbr = function (req, res, next) {
         const formattedDate = `${orderDate.getDate()}-${orderDate.getMonth() + 1}-${orderDate.getFullYear()}`;
         const product = orderList[0].product[0];
         const totalamount = (product.offer_price * 0.10) + ((product.offer_price * 0.10)  * 0.18);
-        let offerPriceWords = numberToWords.toWords(product.offer_price);
-        offerPriceWords = offerPriceWords.replace(/,/g, '');
-        offerPriceWords = offerPriceWords.charAt(0).toUpperCase() + offerPriceWords.slice(1);
+        let price = product.offer_price;
+        const [integerPart, decimalPart] = price.toString().split('.').map(Number);
+        let integerWords = numberToWords.toWords(integerPart);
+        let decimalWords = decimalPart !== undefined ? numberToWords.toWords(decimalPart) : '';
+        integerWords = integerWords.replace(/,/g, '');
+        integerWords = integerWords.charAt(0).toUpperCase() + integerWords.slice(1);
+        if (decimalWords) {
+            decimalWords = decimalWords.replace(/,/g, '');
+        }
+        let offerPriceWords;
+        if (decimalWords) {
+            offerPriceWords = `${integerWords} rupee${integerPart !== 1 ? 's' : ''} and ${decimalWords} paise`;
+        } else {
+            offerPriceWords = `${integerWords} rupee${integerPart !== 1 ? 's' : ''}`;
+        }
         const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate,offerPriceWords:offerPriceWords });
         // const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
         const browser = await puppeteer.launch();

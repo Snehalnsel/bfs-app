@@ -87,11 +87,7 @@
                               <td style="border-right:solid 1px #000;">&nbsp;1</td>
                               <td style="border-right:solid 1px #000;">&nbsp;<%= product.offer_price %></td>
                               <td style="border-right:solid 1px #000;">
-                                 <h1 style="text-align: right; font-size:14px;">&nbsp; <% if (order.payment_method == 1) { %>
-                                    <%= order.total_price %>
-                                 <% } else { %>
-                                    <%= order.booking_amount %>
-                                 <% } %></h1>
+                                 <h1 style="text-align: right; font-size:14px;">&nbsp; <%= product.offer_price %></h1>
                               </td>
                            </tr>
                            <tr>

@@ -3208,7 +3208,7 @@ exports.returninvoicebb = function (req, res, next) {
         const loginHtmlPath = 'views/webpages/new-Return-Invoic- BBR(1).html';
         const htmlTemplate = fs.readFileSync(loginHtmlPath, 'utf-8');
         const orderDate = new Date(orderList[0].added_dtime);
-        const price = orderList[0].total_price; 
+        const price = orderList[0].total_price;
         const [integerPart, decimalPart] = price.toString().split('.').map(Number);
         let integerWords = numberToWords.toWords(integerPart);
         let decimalWords = decimalPart !== undefined ? numberToWords.toWords(decimalPart) : '';

@@ -2972,14 +2972,11 @@ exports.downloadOrdesecondrPDF = function (req, res, next) {
         // const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
-    
         await page.setContent(renderedHtml);
         const pdfBuffer = await page.pdf({ format: 'Letter' });
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', 'attachment; filename=InvoiceBFStoBuyer.pdf');
-    
         res.send(pdfBuffer);
-
         await browser.close();
       } catch (err) {
         console.log(err);
@@ -3182,16 +3179,12 @@ exports.returninvoicebb = function (req, res, next) {
         offerPriceWords = offerPriceWords.replace(/,/g, '');
         offerPriceWords = offerPriceWords.charAt(0).toUpperCase() + offerPriceWords.slice(1);
         const formattedDate = `${orderDate.getDate()}-${orderDate.getMonth() + 1}-${orderDate.getFullYear()}`;
-        
         const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate ,offerPriceWords:offerPriceWords});
         // const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
-    
         await page.setContent(renderedHtml);
-       
         const pdfBuffer = await page.pdf({ format: 'Letter' });
-  
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', 'attachment; filename=ReturnInvoicBBR.pdf');
         res.send(pdfBuffer);
@@ -3294,17 +3287,12 @@ exports.returninvoicesbr = function (req, res, next) {
         offerPriceWords = offerPriceWords.charAt(0).toUpperCase() + offerPriceWords.slice(1);
         const renderedHtml = ejs.render(htmlTemplate,{ order: orderList[0], formattedDate: formattedDate,offerPriceWords:offerPriceWords });
         // const renderedHtml = ejs.render(htmlTemplate, { order: orderList[0] });
-        
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
-    
         await page.setContent(renderedHtml);
-       
         const pdfBuffer = await page.pdf({ format: 'Letter' });
-  
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', 'attachment; filename=ReturnInvoiceSBR.pdf');
-      
         res.send(pdfBuffer);
         await browser.close();
       } catch (err) {

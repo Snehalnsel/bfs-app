@@ -24,7 +24,7 @@
                            <tr>
                               <td style="width: 50%; border-left: solid 1px #000; border-top: solid 1px #000;">
                                  <strong>Sold By</strong><br>
-                                 <strong>Name</strong> &nbsp;<br>&nbsp;<br>&nbsp;<br>
+                                 <strong>Name</strong> <%= order.seller && order.seller.length > 0 && order.seller[0].name || '' %>&nbsp;<br>&nbsp;<br>&nbsp;<br>
                                  Address :<%= order.billing_address[0].street_name %>, <%= order.billing_address[0].address1 %>,<br> <%= order.billing_address[0].landmark %>,<br><%= order.billing_address[0].city_name %>&nbsp;<br>&nbsp;<br>&nbsp;<br>
                                  Contact No.: <%= order.seller && order.seller.length > 0 && order.seller[0].phone_no || '' %>&nbsp;<br>
                                  E-mail Id: <%= order.seller && order.seller.length > 0 && order.seller[0].email || '' %>

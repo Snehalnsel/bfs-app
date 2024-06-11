@@ -24,8 +24,8 @@
                            <tr>
                               <td style="width: 50%; border-left: solid 1px #000; border-top: solid 1px #000;">
                                  <strong>Return By	</strong><br>
-                                 <strong>Name</strong> <%= order.user && order.user.length > 0 && order.user[0].name || '' %>&nbsp;<br>&nbsp;<br>&nbsp;<br>
-                                 Address <%= order.shipping_address[0].street_name %>, <%= order.shipping_address[0].address1 %><br>
+                                 <strong>Name:</strong> <%= order.user && order.user.length > 0 && order.user[0].name || '' %>&nbsp;<br>&nbsp;<br>&nbsp;<br>
+                                 Address:&nbsp; <%= order.shipping_address[0].street_name %>, <%= order.shipping_address[0].address1 %><br>
                                  <%= order.shipping_address[0].landmark %>,<br>
                                  <%= order.shipping_address[0].city_name %>, <%= order.shipping_address[0].state_name %>&nbsp;<br>&nbsp;<br>&nbsp;<br>
                                  Contact No.: <%= order.user && order.user.length > 0 && order.user[0].phone_no || '' %>&nbsp;<br>
@@ -83,9 +83,9 @@
                               <td style="border-right:solid 1px #000;">
                                  <h1 style="text-align: left; font-size:14px;"><%= product.name %></h1>
                               </td>
-                              <td style="border-right:solid 1px #000;">&nbsp;</td>
-                              <td style="border-right:solid 1px #000;">&nbsp;</td>
-                              <td style="border-right:solid 1px #000;">&nbsp;</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;<%= product.offer_price %></td>
+                              <td style="border-right:solid 1px #000;">&nbsp;1</td>
+                              <td style="border-right:solid 1px #000;">&nbsp;<%= product.offer_price %></td>
                               <td style="border-right:solid 1px #000;">
                                  <h1 style="text-align: right; font-size:14px;">&nbsp; <% if (order.payment_method == 1) { %>
                                     <%= order.total_price %>
@@ -98,7 +98,7 @@
                             
                            </tr>
                            <tr>
-                              <td colspan="6" style="text-align: left; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong>Rupees:</strong><%= offerPriceWords %> </td>
+                              <td colspan="6" style="text-align: left; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong>Rupees:</strong>  <%= offerPriceWords %> Only</td>
                            </tr>
                            <tr>
                               <td colspan="6" style="text-align: left; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong>&nbsp;</strong> </td>
@@ -127,6 +127,7 @@
                </tr>
             </tbody>
          </table>
+         <h6>*Invoicing has been done under margin scheme of GST as per Notification No. 10/2017- Central Tax</h6>
       </div>
    </body>
 </html>

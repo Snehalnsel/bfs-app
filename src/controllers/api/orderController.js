@@ -995,28 +995,22 @@ exports.getOrdersBySeller = async (req, res) => {
 exports.getOrderDetails = async (req, res) => {
   try {
     const { order_id } = req.body;
-
     if (!order_id) {
       return res.status(400).json({ message: 'Order ID is missing in the request' });
     }
-
     const order = await Order.findById(order_id)
       .populate('seller_id', 'name')
       .populate('user_id', 'name');
-
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
-
     let productId;
     if (order.product_id) {
       productId = order.product_id.toString();
     } else {
       return res.status(404).json({ message: 'Product ID not found for this order' });
     }
-
     const productDetails = await Userproduct.findById(productId);
-
     if (!productDetails) {
       return res.status(404).json({ message: 'Product details not found' });
     }
@@ -1033,19 +1027,14 @@ exports.getOrderDetails = async (req, res) => {
     if (orderTrackStatusOne && orderTrackStatusOne.length > 0)  {
       const trackingId = orderTrackStatusOne[0].tracking_id;
       const trackDetails = await Track.findById(trackingId);
-
       if(trackDetails.shiprocket_shipment_id)
       {
-
         shiprocketResponselabel = await generateLabel(trackDetails.shiprocket_shipment_id);
-
         shiprocketResponseinvoice = await generateInvoice(trackDetails.shiprocket_order_id);
       }
-
       if (trackDetails.shiprocket_shipment_id) {
         shiprocketResponse = await generateOrderDetails(trackDetails.shiprocket_order_id);
       }
-
       if (trackDetails.shiprocket_shipment_id) {
         shiprocketResponsefortracking = await trackbyaorderid(trackDetails.shiprocket_order_id);
       }
@@ -1078,8 +1067,6 @@ exports.getOrderDetails = async (req, res) => {
         image: productImage ? productImage.image : 'No Image',
       },
     };
-
- 
     res.status(200).json({
       message: 'Order details retrieved successfully',
       order: orderDetails,
@@ -1089,7 +1076,6 @@ exports.getOrderDetails = async (req, res) => {
       shiprocketinvoice: shiprocketResponseinvoice.length > 0 ? shiprocketResponseinvoice : null,
       shippingKit: shippingKitData || null, 
     });
-
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while fetching order details' });
   }

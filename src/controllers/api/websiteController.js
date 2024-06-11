@@ -4812,6 +4812,7 @@ exports.Demoorder = async function (req, res) {
       remaining_amount: (typeof remaining_amount != "undefined") ? parseFloat(remaining_amount) : 0,
       booking_amount: (typeof booking_amount != "undefined") ? parseFloat(booking_amount) : 0,
       packing_handling_charge: (typeof packing_handling_charge != "undefined") ? parseFloat(packing_handling_charge) : 0,
+      cash_handling_charges: (typeof cash_handling_charges != "undefined") ? parseFloat(cash_handling_charges) : 0,
       status: 1,
       user_ip: ip,
       gst:(typeof gst != "undefined") ? gst : 0,

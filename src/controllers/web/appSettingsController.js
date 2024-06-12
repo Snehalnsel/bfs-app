@@ -233,8 +233,6 @@ exports.getData = async function (req, res, next) {
       }
     });
   };
-  
-
   exports.deleteData = async function (req, res, next) {
     try {
       const errors = validationResult(req);
@@ -247,7 +245,6 @@ exports.getData = async function (req, res, next) {
           isAdminLoggedIn:isAdminLoggedIn
         });
       }
-  
       const appsettings = await Appsettings.findOne({ _id: req.params.id });
       if (!appsettings) {
         return res.status(404).json({
@@ -257,16 +254,12 @@ exports.getData = async function (req, res, next) {
           isAdminLoggedIn:isAdminLoggedIn
         });
       }
-  
       await Appsettings.deleteOne(
         { _id: req.params.id },
         { w: "majority", wtimeout: 100 }
       );
-  
-     
       res.redirect("/admin/app-settings");
     } catch (error) {
-     
       return res.status(500).json({
         status: "0",
         message: "Error occurred while deleting the category!",

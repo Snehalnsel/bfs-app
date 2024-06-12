@@ -534,3 +534,18 @@ tbody.category-listtable{
     min-width: 20px;
     min-height: 20px;
 }
+
+.unread-notification {
+    background-color: #f0f0f0;
+}
+
+
+.table-responsive .wishlist-group-box .bids-lists.cart-wrapper{padding: 8px;
+    margin-bottom: 5px;}
+
+.table-responsive .wishlist-group-box .bids-lists.cart-wrapper.read-active{background: #f7f7f7;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc !important;
+}

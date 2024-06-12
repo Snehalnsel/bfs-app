@@ -44,7 +44,7 @@
                            <td style="width: 50%; border-top: solid 1px #000; border-right: solid 1px #000;">
                               <strong>Billing / Shipping Address</strong><br>
                               Name: &nbsp;<%= order.user && order.user.length> 0 && order.user[0].name || ''
-                                 %><br>&nbsp;<br>
+                                 %><br>&nbsp;<br>&nbsp;<br>
                                  Address :&nbsp; <%= order.shipping_address[0].street_name %>, <%=
                                        order.shipping_address[0].address1 %><br>
                                        <%= order.shipping_address[0].landmark %>,<br>
@@ -175,23 +175,23 @@
                            </td>
                         </tr>
                         <tr>
-                           <td colspan="8"
-                              style="text-align: right; border-bottom: 1px solid #000;">
-                              <strong>CGST</strong> </td>
-							   <td 
-                              style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;"> <strong><%= (order.gst / 2.0).toFixed(2) %></strong></td>
+                           <td colspan="10"
+                              style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;">
+                              <strong><span style="padding-right: 50px;">CGST</span>
+                                 <%= (order.gst / 2.0).toFixed(2) %>
+                              </strong> </td>
                         </tr>
                         <tr>
-                           <td colspan="8"
-                              style="text-align: right; border-bottom: 1px solid #000;"><strong>SGST</strong> </td>
-							   <td 
-                              style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong><%= (order.gst / 2.0).toFixed(2) %></strong></td>
+                           <td colspan="10"
+                              style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;">
+                              <strong><span style="padding-right: 50px;">SGST</span>
+                                       <%= (order.gst / 2.0).toFixed(2) %>
+                              </strong> </td>
                         </tr>
                         <tr>
-                           <td colspan="8"
-                              style="text-align: right; border-bottom: 1px solid #000;"><strong>IGST</strong> </td>
-							 <td 
-                              style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;">&nbsp;</td>
+                           <td colspan="10"
+                              style="text-align: right; border-right:solid 1px #000; border-bottom: 1px solid #000;">
+                              <strong><span style="padding-right: 50px;">IGST</span> </strong> </td>
                         </tr>
                         <tr>
                            <td colspan="8" style="border-right:solid 1px #000; border-bottom: 1px solid #000;">
@@ -249,8 +249,8 @@
                         <tbody>
                            <tr>
                               <td colspan="4"
-                                 style="border-right:solid 1px #000; border-left:solid 1px #000; border-top: 1px solid #000;">&nbsp;
-                                 </td>
+                                 style="border-right:solid 1px #000; border-left:solid 1px #000; border-top: 1px solid #000;">
+                                 &nbsp;</td>
                            </tr>
                            <tr>
                               <td colspan="4" style="border-right:solid 1px #000; border-left:solid 1px #000;">&nbsp;

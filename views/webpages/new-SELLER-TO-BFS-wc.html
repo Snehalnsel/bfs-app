@@ -24,7 +24,7 @@
                            <tr>
                               <td style="width: 50%; border-left: solid 1px #000; border-top: solid 1px #000;">
                                  <strong>Sold By</strong><br>
-                                 <strong>Name:</strong> <%= order.seller && order.seller.length > 0 && order.seller[0].name || '' %>&nbsp;<br>&nbsp;<br>&nbsp;<br>
+                                 <strong>Name</strong> <%= order.seller && order.seller.length > 0 && order.seller[0].name || '' %>&nbsp;<br>&nbsp;<br>&nbsp;<br>
                                  Address :<%= order.billing_address[0].street_name %>, <%= order.billing_address[0].address1 %>,<br> <%= order.billing_address[0].landmark %>,<br><%= order.billing_address[0].city_name %>&nbsp;<br>&nbsp;<br>&nbsp;<br>
                                  Contact No.: <%= order.seller && order.seller.length > 0 && order.seller[0].phone_no || '' %>&nbsp;<br>
                                  E-mail Id: <%= order.seller && order.seller.length > 0 && order.seller[0].email || '' %>
@@ -78,13 +78,12 @@
                                  <h1 style="text-align: right; font-size:12px; text-align: center;"><%= product.offer_price %></h1>
                               </td>
                            <tr>
-                              <td colspan="5" style="border-right:solid 1px #000; border-top:solid 1px #000; border-bottom: 1px solid #000; text-align: right;">
-								  <strong>Total</strong>                                
+                              <td colspan="5" style="border-right:solid 1px #000; border-top:solid 1px #000; border-bottom: 1px solid #000;">
+                                 <h1 style="text-align: right; font-size:12px;"><span style="padding-right: 252px;">Total</span><%= product.offer_price %></h1>
                               </td>
-							   <td style="border-right:solid 1px #000; border-top:solid 1px #000; border-bottom: 1px solid #000;"><strong><%= product.offer_price %></strong></td>
                            </tr>
                            <tr>
-                              <td colspan="6" style="text-align: left; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong>Rupees:</strong>&nbsp;  <%= offerPriceWords %> only</td>
+                              <td colspan="5" style="text-align: left; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong>Rupees:</strong>&nbsp;  <%= offerPriceWords %> only</td>
                            </tr>
                            </tr>
                            <% }); %>

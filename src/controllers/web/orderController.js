@@ -3439,7 +3439,7 @@ exports.shippingkitpdf = function (req, res, next) {
         const pdfBuffer = await page.pdf({ format: 'Letter' });
   
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename=InvoiceBFStoSeller.pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=InvoiceForShippingKit.pdf');
       
         res.send(pdfBuffer);
         await browser.close();

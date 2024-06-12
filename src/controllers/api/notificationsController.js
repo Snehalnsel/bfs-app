@@ -31,7 +31,6 @@ try {
       respdata: errors.array(),
     });
   }
-
   // const existingNotifications = await Notifications.findOne({ name: req.body.title });
   // if (existingNotifications) {
   //   return res.status(409).json({
@@ -41,7 +40,7 @@ try {
   //   });
   // }
   // else{
-         const newNotifications = new Notifications({
+        const newNotifications = new Notifications({
           title: req.body.title,
           content: req.body.content,
           user_id : req.body.user_id,
@@ -49,9 +48,7 @@ try {
           data: req.body.data,
           link: req.body.data,
         });
-    
         const savedNotifications = await newNotifications.save();
-    
         res.status(201).json({
           status: "1",
           message: "Notifications added successfully!",

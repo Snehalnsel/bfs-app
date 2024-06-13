@@ -185,8 +185,6 @@ exports.getData = async function (req, res, next) {
       });
     });
   };
-
-
   exports.updateData = async function (req, res, next) {
     const errors = validationResult(req);
     let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
@@ -198,7 +196,6 @@ exports.getData = async function (req, res, next) {
         isAdminLoggedIn:isAdminLoggedIn
       });
     }
-  
     Appsettings.findOne({ _id: req.body.app_id }).then((details) => {
       if (!details) {
         res.status(404).json({
@@ -209,7 +206,6 @@ exports.getData = async function (req, res, next) {
         });
       } else {
         const requrl = req.app.locals.requrl;
-  
         var updData = {
           app_ver: req.body.app_ver,
           app_name: req.body.app_name,
@@ -217,7 +213,6 @@ exports.getData = async function (req, res, next) {
           best_deal: req.body.best_deal,
           app_about: req.body.app_about,
         };
-  
         Appsettings.findOneAndUpdate(
           { _id: req.body.app_id },
           { $set: updData },

@@ -219,7 +219,7 @@ exports.getData = async function (req, res, next) {
           { upsert: true },
           function (err, doc) {
             if (err) {
-              throw err;
+              throw err; 
             } else {
               res.redirect("/admin/app-settings");
             }

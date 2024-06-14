@@ -240,15 +240,14 @@
                                                                     </a>
                                                                 <% } else { %>
                                                                     <% if(value.delete_by == 1) {%>
-                                                                        <span style="color: blue;">Canceled By Admin</span>
+                                                                        <span style="color: blue;">Cancelled By Admin</span>
                                                                     <% } else if(value.delete_by == 2) {%>
-                                                                        <span style="color: rgb(5, 15, 73);">Canceled By Seller</span>
+                                                                        <span style="color: rgb(5, 15, 73);">Cancelled By Seller</span>
                                                                     <% } else if(value.delete_by == 3){ %>   
-                                                                        <span style="color: rgb(45, 144, 226);">Canceled By Buyer</span>
+                                                                        <span style="color: rgb(45, 144, 226);">Cancelled By Buyer</span>
                                                                     <% } %>   
                                                                 <% } %>  
                                                   
-                                
                                                                 <%
                                                                 if(value.trackDetails && Array.isArray(value.trackDetails) && value.trackDetails.length > 0){
 

@@ -245,11 +245,13 @@ exports.addToCart = async (req, res) => {
         existingCartItem.qty = parseInt(qty);
         await existingCartItem.save();
       }else {
-        
+        let finalBidPrice = 0;
+        finalBidPrice = req.body.finalBidPrice ? finalBidPrice :0;
         const cartDetail = new CartDetail({
           cart_id: existingCart._id,
           product_id,
           qty,
+          finalBidPrice,
           check_status: 0,
           status: 0,
           added_dtime: dateTime,
@@ -290,9 +292,13 @@ exports.addToCart = async (req, res) => {
     } 
     else {
 
+      let finalBidPrice = 0;
+      finalBidPrice = req.body.finalBidPrice ? finalBidPrice :0;
+
       const newCart = new Cart({
         user_id,
         status: 0,
+        finalBidPrice:finalBidPrice,
         added_dtime: dateTime,
       });
 
@@ -302,6 +308,7 @@ exports.addToCart = async (req, res) => {
         cart_id: savedCart._id,
         product_id,
         qty,
+        finalBidPrice:finalBidPrice,
         check_status: 0,
         status: 0,
         added_dtime: dateTime,

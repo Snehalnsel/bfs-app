@@ -1176,7 +1176,7 @@ exports.cancelOrderById = async function (req, res, next) {
         });
           return res.status(200).json({
             status: "1",
-            message: "Order canceled successfully!",
+            message: "Order cancelled successfully!",
             respdata: canceledOrder,
             is_cancelorder: true,
           });

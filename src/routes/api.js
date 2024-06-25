@@ -727,8 +727,6 @@ router.post(
   upload.array('image', 5), 
   UserproductController.updateProduct
 );
-
-
 router.post(
   "/delete-product",
   [
@@ -868,6 +866,7 @@ router.post(
   ],
   BidController.updateBid
 );
+
 router.post(
   "/biddetails",
   auth.isAuthorized, 
@@ -876,12 +875,14 @@ router.post(
   ],
   BidController.getbiddetails
 );
+
 router.post(
   "/checkout",
   auth.isAuthorized, 
   [],
   OrderController.checkout
 );
+
 router.post(
   "/update-order",
   auth.isAuthorized, 

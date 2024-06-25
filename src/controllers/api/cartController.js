@@ -234,14 +234,20 @@ exports.addToCart = async (req, res) => {
   try {
     const { user_id, product_id, qty } = req.body;
 
+
     const existingCart = await Cart.findOne({ user_id: req.body.user_id, status: 0 });
     if (existingCart) {
+
+      let finalBidPrice = 0;
+      finalBidPrice = req.body.finalBidPrice ? req.body.finalBidPrice : finalBidPrice;
+
       const existingCartItem = await CartDetail.findOne({
         cart_id: existingCart._id
       });
 
       if (existingCartItem) {
         existingCartItem.product_id = product_id;
+        existingCartItem.finalBidPrice =finalBidPrice;
         existingCartItem.qty = parseInt(qty);
         await existingCartItem.save();
       }else {
@@ -258,7 +264,8 @@ exports.addToCart = async (req, res) => {
         });
         await cartDetail.save();
       }
-
+      existingCart.finalBidPrice =finalBidPrice;
+      await existingCart.save();
       const user = await Users.findById(user_id);
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
@@ -277,6 +284,7 @@ exports.addToCart = async (req, res) => {
         qty: existingCartItem.qty,
         user_name: user.name,
         product_name: product.name,
+        finalBidPrice: finalBidPrice,
         added_dtime: existingCart.added_dtime,
         __v: existingCart.__v,
       };
@@ -293,7 +301,7 @@ exports.addToCart = async (req, res) => {
     else {
 
       let finalBidPrice = 0;
-      finalBidPrice = req.body.finalBidPrice ? finalBidPrice :0;
+      finalBidPrice = req.body.finalBidPrice ? req.body.finalBidPrice : finalBidPrice;
 
       const newCart = new Cart({
         user_id,
@@ -323,6 +331,7 @@ exports.addToCart = async (req, res) => {
         _id: savedCart._id,
         user_id: savedCart.user_id,
         status: savedCart.status,
+        finalBidPrice: savedCart.finalBidPrice,
         check_status: cartDetail.check_status,
         qty: cartDetail.qty,
         user_name: user.name,
@@ -388,6 +397,7 @@ exports.getCartListByUserId = async (req, res) => {
           quantity: cartItem.qty,
           product_id: cartItem.product_id._id,
           product_name: cartItem.product_id.name,
+          finalBidPrice: cartItem.finalBidPrice?  cartItem.finalBidPrice : 0,
           product_price : product.offer_price,
           category_name: product.category_id.name,
           images: productImages.length > 0 ? productImages[0].image : null,

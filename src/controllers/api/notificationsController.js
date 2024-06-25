@@ -30,11 +30,12 @@ exports.addData = async function (req, res, next) {
         respdata: errors.array(),
       });
     }
+    const added_dtime = moment().format('DD-MM-YYYY HH:mm:ss');
     const newNotifications = new Notifications({
       title: req.body.title,
       content: req.body.content,
       user_id: req.body.user_id,
-      added_dtime: dateTime,
+      added_dtime: added_dtime,
       data: req.body.data,
       link: req.body.data,
     });
@@ -55,7 +56,7 @@ exports.addData = async function (req, res, next) {
 exports.listofNotification = async function (req, res, next) {
   try {
     const { user_id } = req.body;
-    const notifications = await Notifications.find({ user_id }).sort({ added_dtime: -1 });
+    const notifications = await Notifications.find({ user_id }).sort({ _id: 1 });
     if (!notifications || notifications.length === 0) {
       return res.status(404).json({
         status: "0",
@@ -72,6 +73,7 @@ exports.listofNotification = async function (req, res, next) {
     });
   }
 };
+
 exports.getNotificationById = async function (req, res, next) {
   try {
     const { notification_id } = req.body;

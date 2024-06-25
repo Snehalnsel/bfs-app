@@ -391,25 +391,19 @@
                e.preventDefault();
                $("#error-message").html("");
                let agreeCheckbox = $(".checkbox-input");
-               
                if (checkAddress == 'option2') {
                   displayErrorMessage("Please add address.");
                   return;
                }
-
                if (!agreeCheckbox.prop("checked")) {
                   displayErrorMessage("Please agree to the Terms & Conditions.");
                   return;
                }
-
-              
-
                let selectedPaymentMethod = $(".payment-method:checked").val();
                if (!selectedPaymentMethod) {
                   displayErrorMessage("Please select a payment method.");
                   return;
                }
-
                $(".check-out").css("pointer-events", "none");
                let selectedMethod = $(".payment-method:checked").val();
                if (selectedMethod == "COD") {

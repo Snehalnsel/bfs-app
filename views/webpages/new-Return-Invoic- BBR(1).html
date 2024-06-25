@@ -87,18 +87,14 @@
                               <td style="border-right:solid 1px #000;">&nbsp;1</td>
                               <td style="border-right:solid 1px #000;">&nbsp;<%= product.offer_price %></td>
                               <td style="border-right:solid 1px #000;">
-                                 <h1 style="text-align: right; font-size:14px;">&nbsp; <% if (order.payment_method == 1) { %>
-                                    <%= order.total_price %>
-                                 <% } else { %>
-                                    <%= order.booking_amount %>
-                                 <% } %></h1>
+                                 <h1 style="text-align: right; font-size:14px;">&nbsp; <%= product.offer_price %></h1>
                               </td>
                            </tr>
                            <tr>
                             
                            </tr>
                            <tr>
-                              <td colspan="6" style="text-align: left; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong>Rupees:</strong>  <%= offerPriceWords %> Only</td>
+                              <td colspan="6" style="text-align: left; border-top:solid 1px #000; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong>Rupees:</strong>  <%= offerPriceWords %> only</td>
                            </tr>
                            <tr>
                               <td colspan="6" style="text-align: left; border-right:solid 1px #000; border-bottom: 1px solid #000;"><strong>&nbsp;</strong> </td>

@@ -34,6 +34,7 @@ const insertNotification = require("../../models/api/insertNotification");
 const Notifications = require("../../models/api/notificationModel");
 const CompressImage = require("../../models/thirdPartyApi/CompressImage");
 const multer = require("multer");
+const { UserListInstance } = require("twilio/lib/rest/chat/v1/service/user");
 const upload = multer({ dest: 'public/images/' }); 
 
 exports.getSizeList = async function (req, res, next) {
@@ -315,17 +316,16 @@ exports.addData = async function (req, res, next) {
         }
         const productimageDetail = new Productimage({
           product_id: savedProductdata._id,
-          //category_id: req.body.category_id,
           user_id: req.body.user_id,
-          // brand_id: brand_id,
           image: imageUrl,
           added_dtime: moment().format("YYYY-MM-DD HH:mm:ss"),
         });
         const savedImage = productimageDetail.save();
       });
 
-      let title = "New Product Added";
-      let admin_text = "An user has added a new product";
+      let user_details = await Users.findOne({ _id: req.body.user_id });
+      let title = "New Product Added from App";
+      let admin_text = "A user " + user_details.name + " has added a new product " + savedProductdata.name;      
       let link = "https://bidforsale.com/admin/productdetails/"+savedProductdata._id;
       let dateTime = moment().format("YYYY-MM-DD HH:mm:ss");
       const notification = new Notifications({

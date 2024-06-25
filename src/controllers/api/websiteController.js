@@ -2711,8 +2711,9 @@ exports.addNewPost = async function (req, res, next) {
         const savedImage = productimageDetail.save();
       });
 
-      let title = "New Product Added";
-      let admin_text = "An user has added a new product";
+      let user_details = await Users.findOne({ _id: req.session.user.userId });
+      let title = "New Product Added From Website";
+      let admin_text = "A user " + user_details.name + " has added a new product " + savedProductdata.name;
       let link = "https://bidforsale.com/admin/productdetails/"+savedProductdata._id;
       let dateTime = moment().format("YYYY-MM-DD HH:mm:ss");
       const notification = new Notifications({

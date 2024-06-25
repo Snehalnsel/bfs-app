@@ -205,6 +205,7 @@
           html += '<th>Name</th>';
           html += '<th>Price</th>';
           html += "<th>Associated Buyer's Name </th>";
+          html += "<th>Accepted Status</th>";
           html += '</tr>';
           for (let bidVal of response.product_bid_list) {
             html += '<tr>';
@@ -212,6 +213,7 @@
             html += `<td>${bidVal.name}</td>`;
             html += `<td><i class="fa fa-inr" aria-hidden="true"></i> ${bidVal.price}</td>`;
             html += `<td>${bidVal.associated_buyer}</td>`;
+            html += `<td>${bidVal.accepted_status}</td>`;
             html += '</tr>';
           }
           html += '</table>';

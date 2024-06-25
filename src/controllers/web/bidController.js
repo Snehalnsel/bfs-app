@@ -25,6 +25,7 @@ const Users = require("../../models/api/userModel");
 
 const getAllProductBidList = require("../../models/fireDbServices/getAllProductBidList");
 const getProductWiseBidData = require("../../models/fireDbServices/getProductWiseBidData");
+const getAllOfferHistoryAdmin = require("../../models/fireDbServices/getAllOfferHistoryAdmin");
 
 exports.getData_backup = function (req, res, next) {
   var pageName = "Bid Management List";
@@ -197,6 +198,138 @@ exports.getData = async function (req, res, next) {
           }
 
         }
+
+      }
+
+      setObj.no_of_bidars = numberOfBuyerCount;
+      setBidProductList.push(setObj);
+      prodictIdCheckArr.push(getProductId)
+    }
+
+  }
+
+
+  res.render("pages/bid-management/list", {
+    siteName: req.app.locals.siteName,
+    pageName: pageName,
+    pageTitle: pageTitle,
+    userFullName: req.session.admin.name,
+    userImage: req.session.admin.image_url,
+    userEmail: req.session.admin.email,
+    year: moment().format("YYYY"),
+    requrl: req.app.locals.requrl,
+    status: 0,
+    message: "Found!",
+    respdata: {
+      list: setBidProductList,
+    },
+    isAdminLoggedIn: isAdminLoggedIn
+  });
+
+};
+
+exports.getData_new = async function (req, res, next) {
+  var pageName = "Bid Management List";
+  var pageTitle = req.app.locals.siteName + " - " + pageName;
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+
+  let getBidAllProduct = await getAllProductBidList();
+  console.log("getBidAllProduct--",getBidAllProduct); return false;
+  let setBidProductList = [];
+  let prodictIdCheckArr = [];
+  for (let bidData of getBidAllProduct) {
+    let currentOfferData = bidData.currentOffer;
+    let setObj = {};
+    setObj.product_id = '';
+    setObj.productName = '';
+    setObj.productImage = '';
+    setObj.original_price = '';
+    setObj.status = 0;
+    setObj.chat_status = 0;
+    setObj.final_price = 0;
+
+    // setObj.buyerName = '';
+    // setObj.sellerName = '';
+    setObj.seller_price = '';
+    // setObj.buyer_price = 0;
+
+
+    let getProductId = bidData.productId;
+
+
+    let productData = await Userproduct.findById(getProductId);
+    if (productData) {
+      setObj.product_id = getProductId;
+      setObj.productName = productData.name;
+      setObj.original_price = productData.offer_price;
+    }
+    let productImageData = await Productimage.findOne({ product_id: mongoose.Types.ObjectId(getProductId) })
+    if (productImageData) {
+      setObj.productImage = `https://bidforsale.com/public/compress_images/${productImageData.image}`;
+    }
+
+    let sallerData = await Users.findById(bidData.sellerId);
+    if (sallerData) {
+      setObj.sellerName = sallerData.name;
+    }
+
+    let numberOfBuyerCount = 0;
+    let getBuyerIdArr = [];
+    if (!prodictIdCheckArr.includes(getProductId)) {
+      let getBidDetails = await getProductWiseBidData({ product_id: getProductId });
+     // let getBidDetails = await getAllOfferHistoryAdmin({ bidId: bidData.id });
+      //console.log("getBidDetails--",getBidDetails); return false;
+      for (let bitVal of getBidDetails) {
+
+        let bitValCurrentOfferData = bitVal.currentOffer;
+        if (!getBuyerIdArr.includes(bitVal.buyerId)) {
+          numberOfBuyerCount++;
+          getBuyerIdArr.push(bitVal.buyerId)
+        }
+
+        if (bitValCurrentOfferData.isFromBuyer) {
+          let buyerData = await Users.findById(bitVal.buyerId);
+          if (buyerData) {
+            setObj.buyerName = buyerData.name;
+            setObj.buyer_price = bitValCurrentOfferData.price;
+          }
+        }
+
+        if (!bitValCurrentOfferData.isFromBuyer) {
+          if (sallerData) {
+            setObj.seller_price = bitValCurrentOfferData.price;
+          }
+        }
+
+        if(bitVal.acceptedBySeller && bitVal.acceptedByBuyer){
+          let buyerData = await Users.findById(bitVal.buyerId);
+          if (buyerData) {
+            setObj.buyerName = buyerData.name;
+            setObj.buyer_price = bitValCurrentOfferData.price;
+          }
+          if (sallerData) {
+            setObj.seller_price = bitValCurrentOfferData.price;
+          }
+
+        }
+
+         /* if (bitVal.isFromBuyer) {
+            let buyerData = await Users.findById(bitVal.userId);
+            if (buyerData) {
+              setObj.buyerName = buyerData.name;
+              setObj.buyer_price = bitVal.price;
+            }
+            if (!getBuyerIdArr.includes(bitVal.userId)) {
+              numberOfBuyerCount++;
+              getBuyerIdArr.push(bitVal.userId)
+            }
+          }
+
+          if (!bitVal.isFromBuyer) {
+            if (sallerData) {
+              setObj.seller_price = bitVal.price;
+            }
+          }*/
 
       }
 

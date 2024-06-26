@@ -1062,6 +1062,7 @@ exports.getOrderDetails = async (req, res) => {
       },
       selleraddress: sellerAddress ? sellerAddress : 'No Buyer Address Found',
       product: {
+        id: order.product_id,
         name: productDetails ? productDetails.name : 'Unknown Product',
         offer_price : productDetails ? productDetails.offer_price : 'Unknown Product',
         image: productImage ? productImage.image : 'No Image',

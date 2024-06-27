@@ -191,7 +191,6 @@ var server_config = {
     }
 };
 
-
 // create the HTTPS server on port 443
 var serv = https.createServer(server_config,app);
 global.io = require('socket.io')(serv,{

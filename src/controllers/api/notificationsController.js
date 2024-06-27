@@ -31,7 +31,7 @@ try {
       respdata: errors.array(),
     });
   }
-
+  const dateTimeSet = moment().tz('Asia/Kolkata').format('YYYY-MM-DD HH:mm:ss');
   // const existingNotifications = await Notifications.findOne({ name: req.body.title });
   // if (existingNotifications) {
   //   return res.status(409).json({
@@ -45,7 +45,7 @@ try {
           title: req.body.title,
           content: req.body.content,
           user_id : req.body.user_id,
-          added_dtime: dateTime,
+          added_dtime: dateTimeSet,
           data: req.body.data,
           link: req.body.data,
         });

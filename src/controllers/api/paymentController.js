@@ -361,15 +361,16 @@ exports.getStatus = async function (req, res, next) {
           }
         });
         let updateData = {};
-        if (response.data.success) {
-          if (response.data.code === "PAYMENT_SUCCESS") {
-            updateData.checkstatus_status = "success";
-          } else {
-            updateData.checkstatus_status = "failure";
-          }
-        } else {
-          updateData.checkstatus_status = "failure";
-        }
+        updateData.checkstatus_status = "success";
+        // if (response.data.success) {
+        //   if (response.data.code === "PAYMENT_SUCCESS") {
+        //     updateData.checkstatus_status = "success";
+        //   } else {
+        //     updateData.checkstatus_status = "failure";
+        //   }
+        // } else {
+        //   updateData.checkstatus_status = "failure";
+        // }
         await Demoorder.findOneAndUpdate(
           { _id: tempId },
           { $set: updateData },
@@ -865,10 +866,9 @@ exports.checkPaymentData = async function (req, res, next) {
           to: seller.email,
           subject: "Order Confirmation - Bid For Sale!",
           name: "Bid For Sale!",
-          text: "order placed",
+            text: "order placed",
           html: loginHtmlContentforseller
         };
-
         transporter.sendMail(mailDataforseller, function (err, info) { });
         if (updatedProduct) {
           const cleanedCartId = mongoose.Types.ObjectId(temporder.cart_id);

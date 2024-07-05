@@ -3614,10 +3614,8 @@ exports.viewCartListByUserId = async function (req, res, next) {
     if (isLoggedIn == "") {
       return res.redirect("/registration");
     }
-    
     const user_id = req.session.user.userId;
     const existingCart = await Cart.findOne({ user_id, status: 0 });
-    
     if (!existingCart) {
       return res.render("webpages/addtocart", {
         title: "Cart List Page",
@@ -3629,11 +3627,9 @@ exports.viewCartListByUserId = async function (req, res, next) {
         websiteUrl: process.env.SITE_URL,
       });
     }
-    
     const lastAddedCartDetail = await CartDetail.findOne({ cart_id: existingCart._id, status: 0 })
                                 .sort({ createdAt: -1 })
                                 .exec();
-
     if (!lastAddedCartDetail) {
       return res.render("webpages/addtocart", {
         title: "Cart List Page",
@@ -3645,15 +3641,12 @@ exports.viewCartListByUserId = async function (req, res, next) {
         websiteUrl: process.env.SITE_URL,
       });
     }
-    
     const user = await Users.findById(existingCart.user_id);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-    
     const product = await Userproduct.findById(lastAddedCartDetail.product_id).populate('category_id', 'name');
     const productImages = await Productimage.findOne({ product_id: product._id }).limit(1);
-
     let shippingChargeAmount = 0;
     if (product) {
       const shippingCharges = await shippingchrgsModel.findOne({ _id: product.shipping_charges_id });
@@ -3689,10 +3682,8 @@ exports.viewCartListByUserId = async function (req, res, next) {
       finalData.product_price = product_price;
       finalData.is_bid = 0;
     }
-
     const gst = parseFloat((shippingChargeAmount * 28) / 100).toFixed(2);
     const finalPrice = parseInt(product_price) + shippingChargeAmount + parseInt(gst);
-    
     return res.render("webpages/addtocart", {
       title: "Cart List Page",
       message: "Welcome to the Cart List page!",
@@ -3711,7 +3702,6 @@ exports.viewCartListByUserId = async function (req, res, next) {
     });
   }
 };
-
 exports.deleteCart = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
@@ -3726,7 +3716,6 @@ exports.deleteCart = async function (req, res, next) {
       cart_id: existingCart._id,
       status: 0,
     });
-
     if (!cartDetail) {
       return res.status(404).json({
         message: 'Product not found in cart',

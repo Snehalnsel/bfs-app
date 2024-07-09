@@ -560,7 +560,7 @@ exports.signin = async function (req, res, next) {
 
           await newUser.save();
           const ipTransaction = new Iptrnsaction({
-            user_id: newUser._id, 
+            user_id: newUser._id,
             Purpose: "Web User Registration",
             ip_address: userIpAddress,
             created_dtime: dateTime,
@@ -570,7 +570,7 @@ exports.signin = async function (req, res, next) {
           let smsData = {
             textId: "test",
             toMobile: "91" + newUser.phone_no,
-            text: "Welcome to Bid For Sale, "+newUser.name+"! Explore a world of luxury with access to top brands at exceptional value. Buy and sell pre-owned authentic luxury items globally, all while contributing to environmental conservation. Enjoy your journey with us!-BFS RETAIL SERVICES PRIVATE LIMITED",
+            text: "Welcome to Bid For Sale, " + newUser.name + "! Explore a world of luxury with access to top brands at exceptional value. Buy and sell pre-owned authentic luxury items globally, all while contributing to environmental conservation. Enjoy your journey with us!-BFS RETAIL SERVICES PRIVATE LIMITED",
           };
           let returnData;
           returnData = await sendSms(smsData);
@@ -597,12 +597,12 @@ exports.signin = async function (req, res, next) {
             text: "Welcome",
             html: loginHtmlContent
           };
-    
+
           transporter.sendMail(mailData, function (err, info) {
             // if (err) console.log("err", err);
             // else console.log("info", info);
           });
-    
+
           const message = "Welcome to the Bidding App, your gateway to exciting auctions and amazing deals! We're thrilled to have you on board and can't wait for you to start bidding on your favorite items";
           const to_number = "91" + newUser.phone_no;
           let response = await send_message({ type: 'text', message, to_number });
@@ -743,7 +743,7 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
               });
             } else {
 
-              
+
               // let smsData = {
               //   textId: "test",
               //   toMobile: "91" + user.phone_no,
@@ -760,12 +760,12 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
               //   send_status: 'send',
               // });
               // await historyData.save();
-  
+
               // const loginHtmlPath = 'views/webpages/welcome.html';;
               // const loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
-  
+
               // loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
-  
+
               // const mailData = {
               //   from: "Bid For Sale! <" + smtpUser + ">",
               //   to: user.email,
@@ -774,12 +774,12 @@ exports.ajaxGetUserLogin = async function (req, res, next) {
               //   text: "order placed",
               //   html: loginHtmlContent
               // };
-        
+
               // transporter.sendMail(mailData, function (err, info) {
               //   if (err) console.log("err", err);
               //   else console.log("info", info);
               // });
-        
+
               const userToken = {
                 userId: user._id,
                 email: user.email,
@@ -972,8 +972,8 @@ exports.userRelogin = async function (req, res, next) {
 };
 
 exports.userFilter = async function (req, res, next) {
-  let { brandList, sizeList, conditionList, priceList, genderList,colorList, optionId, productcategoryId, pageNo } = req.body;
- 
+  let { brandList, sizeList, conditionList, priceList, genderList, colorList, optionId, productcategoryId, pageNo } = req.body;
+
   if (typeof optionId != "undefined") {
     if ((optionId == 0)) {
       optionId = 1;
@@ -999,10 +999,10 @@ exports.userFilter = async function (req, res, next) {
   if (typeof sizeList != "undefined") {
     concatVar["size_id"] = { "$in": sizeList };
   }
-  if (typeof productcategoryId != "undefined" && (productcategoryId == "bestDeal" || productcategoryId == "whatshot" ||     productcategoryId == "justsold")) {
-    
+  if (typeof productcategoryId != "undefined" && (productcategoryId == "bestDeal" || productcategoryId == "whatshot" || productcategoryId == "justsold")) {
+
   }
-  else{
+  else {
     concatVar["category_id"] = { "$in": mongoose.Types.ObjectId(productcategoryId) };
   }
   if ((typeof conditionList != "undefined") && (objConditionList.length > 0)) {
@@ -1060,8 +1060,8 @@ exports.userFilter = async function (req, res, next) {
     .limit(pageSize);
   const formattedUserProducts = [];
   for (const userproduct of allProductData) {
-    const productImages = await Productimage.find({ product_id: userproduct._id }).sort( { image_order: 1} );
-      
+    const productImages = await Productimage.find({ product_id: userproduct._id }).sort({ image_order: 1 });
+
     const productCondition = await Productcondition.findById(userproduct.status);
     const formattedUserProduct = {
       _id: userproduct._id,
@@ -1110,7 +1110,7 @@ exports.userFilter = async function (req, res, next) {
 
 exports.userFilterForOthers = async function (req, res, next) {
   let { brandList, sizeList, conditionList, priceList, genderList, optionId, productcategoryId, pageNo } = req.body;
- 
+
   if (typeof optionId != "undefined") {
     if ((optionId == 0)) {
       optionId = 1;
@@ -1136,10 +1136,10 @@ exports.userFilterForOthers = async function (req, res, next) {
   if (typeof sizeList != "undefined") {
     concatVar["size_id"] = { "$in": sizeList };
   }
-  if (typeof productcategoryId != "undefined" && (productcategoryId == "bestDeal" || productcategoryId == "whatshot" ||     productcategoryId == "justsold")) {
-    
+  if (typeof productcategoryId != "undefined" && (productcategoryId == "bestDeal" || productcategoryId == "whatshot" || productcategoryId == "justsold")) {
+
   }
-  else{
+  else {
     concatVar["category_id"] = { "$in": mongoose.Types.ObjectId(productcategoryId) };
   }
   if ((typeof conditionList != "undefined") && (objConditionList.length > 0)) {
@@ -1167,7 +1167,7 @@ exports.userFilterForOthers = async function (req, res, next) {
   let totalProduct;
   let allProductData;
 
-  if (productcategoryId == "bestDeal" ) {
+  if (productcategoryId == "bestDeal") {
     const appSettings = await Appsettings.findOne();
 
     const percentageFilter = parseInt(appSettings.best_deal);
@@ -1209,7 +1209,7 @@ exports.userFilterForOthers = async function (req, res, next) {
       .skip(skip)
       .limit(pageSize);
   }
-  
+
   const formattedUserProducts = [];
   for (const userproduct of allProductData) {
     const productImages = await Productimage.find({ product_id: userproduct._id });
@@ -1393,7 +1393,7 @@ exports.myAccount = async function (req, res, next) {
       res.redirect('/registration');
     } else {
       var userData = req.session.user;
-      const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId)});
+      const address = await addressBook.find({ user_id: ObjectId(req.session.user.userId) });
       const userdetails = await Users.findOne({ _id: userData.userId });
 
       const html = await ejs.renderFile("views/webpages/myaccount.ejs", {
@@ -1460,7 +1460,7 @@ exports.bankDetails = async function (req, res, next) {
       respdata: req.session.user,
       bankDetails: (typeof bankDetails != "undefined" || bankDetails != null) ? bankDetails : [],
       isLoggedIn: isLoggedIn,
-      websiteUrl:process.env.SITE_URL,
+      websiteUrl: process.env.SITE_URL,
       userData: userData
     });
   } catch (error) {
@@ -1494,7 +1494,7 @@ exports.addAddress = async function (req, res, next) {
       respdata: add,
       respdata1: userData,
       isLoggedIn: isLoggedIn,
-      stateList:getStates,
+      stateList: getStates,
     });
   } catch (error) {
     res.status(500).json({
@@ -1641,14 +1641,14 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
         approval_status: 1,
         flag: 0
       })
-      .populate('brand_id','name _id')
-      .populate('category_id', 'name _id')
-      .populate('user_id', 'name')
-      .populate('size_id', 'name _id')
-      .populate('gender_id','_id')
-      //.sort([sortCriteria, { hitCount: -1 }])
-      .sort(sortCriteria)
-      .exec();
+        .populate('brand_id', 'name _id')
+        .populate('category_id', 'name _id')
+        .populate('user_id', 'name')
+        .populate('size_id', 'name _id')
+        .populate('gender_id', '_id')
+        //.sort([sortCriteria, { hitCount: -1 }])
+        .sort(sortCriteria)
+        .exec();
 
       count = await Userproduct.countDocuments({
         approval_status: 1,
@@ -1659,11 +1659,11 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
         approval_status: 1,
         flag: 1
       })
-      .populate('brand_id','name _id')
-      .populate('category_id', 'name _id')
-      .populate('user_id', 'name')
-      .populate('size_id', 'name _id')
-      .populate('gender_id','_id')
+        .populate('brand_id', 'name _id')
+        .populate('category_id', 'name _id')
+        .populate('user_id', 'name')
+        .populate('size_id', 'name _id')
+        .populate('gender_id', '_id')
         .sort(sortCriteria)
         .exec();
 
@@ -1681,11 +1681,11 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
         approval_status: 1,
         flag: 0
       })
-        .populate('brand_id','name _id')
+        .populate('brand_id', 'name _id')
         .populate('category_id', 'name _id')
         .populate('user_id', 'name')
         .populate('size_id', 'name _id')
-        .populate('gender_id','_id')
+        .populate('gender_id', '_id')
         .sort(sortCriteria)
         .exec();
 
@@ -1702,11 +1702,11 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
         approval_status: 1,
         flag: 0
       })
-      .populate('brand_id','name _id')
-      .populate('category_id', 'name _id')
-      .populate('user_id', 'name')
-      .populate('size_id', 'name _id')
-      .populate('gender_id','_id')
+        .populate('brand_id', 'name _id')
+        .populate('category_id', 'name _id')
+        .populate('user_id', 'name')
+        .populate('size_id', 'name _id')
+        .populate('gender_id', '_id')
         .sort(sortCriteria)
         .exec();
 
@@ -1718,7 +1718,7 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
     }
     const formattedUserProducts = [];
     for (const userproduct of userproducts) {
-      const productImages = await Productimage.find({ product_id: userproduct._id }).sort( { image_order : 1 } );
+      const productImages = await Productimage.find({ product_id: userproduct._id }).sort({ image_order: 1 });
       // const productImages = await Productimage.findOne({ 
       //   product_id: product._id,
       //   $or: [
@@ -1726,7 +1726,7 @@ async function getProductDataWithSort(id, sortid, page, pageSize) {
       //     { image_order: 0 }
       //   ]
       // });
-    
+
       const productCondition = await Productcondition.findById(userproduct.status);
       const formattedUserProduct = {
         _id: userproduct._id,
@@ -1811,7 +1811,7 @@ exports.getSubCategoriesProducts = async function (page, req, res, next) {
             category_id: mongoose.Types.ObjectId(id),
             approval_status: 1,
             flag: 0,
-            
+
           }
         },
         {
@@ -1981,7 +1981,7 @@ exports.usersBankDetailsUpdate = async function (req, res, next) {
         message: "Not found!",
         respdata: {},
       });
-    }   
+    }
     let userAllBankDetails = {
       user_id: user._id,
       accountnumber: req.body.accountnumber,
@@ -1993,19 +1993,19 @@ exports.usersBankDetailsUpdate = async function (req, res, next) {
       ifsccode: req.body.ifsccode,
       accounttype: req.body.accounttype,
       upiid: req.body.upiid,
-      upiid_scaner:"",
+      upiid_scaner: "",
       // upiid_scaner: imagePath || '',
       default_status: 1,
       //created_dtime: new Date().toISOString(),
     };
-    if(typeof req.file != "undefined" && typeof req.file.filename != "undefined") {
+    if (typeof req.file != "undefined" && typeof req.file.filename != "undefined") {
       userAllBankDetails.upiid_scaner = req.file.filename;
-    } else if(typeof userBankDetails != "undefined" && userBankDetails != null && typeof userBankDetails.upiid_scaner != "undefined") {
+    } else if (typeof userBankDetails != "undefined" && userBankDetails != null && typeof userBankDetails.upiid_scaner != "undefined") {
       userAllBankDetails.upiid_scaner = userBankDetails.upiid_scaner;
     } else {
       userAllBankDetails.upiid_scaner = "";
     }
-    if(!userBankDetails) {
+    if (!userBankDetails) {
       userAllBankDetails.created_dtime = new Date().toISOString();
       const bankDetails = new Bankdetails(userAllBankDetails);
       await bankDetails.save();
@@ -2018,14 +2018,14 @@ exports.usersBankDetailsUpdate = async function (req, res, next) {
       );
     }
     return res.json({
-      status:"success",
-      message:"Successfully updated your details."
+      status: "success",
+      message: "Successfully updated your details."
     });
     //res.redirect("/bank-details");
   } catch (error) {
     return res.json({
-      status:"error",
-      message:"Something went wrong please try later."
+      status: "error",
+      message: "Something went wrong please try later."
     });
     /*res.status(500).json({
       status: "0",
@@ -2056,11 +2056,11 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
         respdata: {},
       });
     }
-    
+
     // const imgData = req.files;
     // const uploadedFile = req.files[0];
     // const imagePath = uploadedFile.path;
-    
+
     let userAllBankDetails = {
       user_id: user._id,
       accountnumber: req.body.accountnumber,
@@ -2072,19 +2072,19 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
       ifsccode: req.body.ifsccode,
       accounttype: req.body.accounttype,
       upiid: req.body.upiid,
-      upiid_scaner:"",
+      upiid_scaner: "",
       // upiid_scaner: imagePath || '',
       default_status: 1,
       //created_dtime: new Date().toISOString(),
     };
-    if(typeof req.file != "undefined" && typeof req.file.filename != "undefined") {
+    if (typeof req.file != "undefined" && typeof req.file.filename != "undefined") {
       userAllBankDetails.upiid_scaner = req.file.filename;
-    } else if(typeof userBankDetails != "undefined" && userBankDetails != null && typeof userBankDetails.upiid_scaner != "undefined") {
+    } else if (typeof userBankDetails != "undefined" && userBankDetails != null && typeof userBankDetails.upiid_scaner != "undefined") {
       userAllBankDetails.upiid_scaner = userBankDetails.upiid_scaner;
     } else {
       userAllBankDetails.upiid_scaner = "";
     }
-    if(!userBankDetails) {
+    if (!userBankDetails) {
       userAllBankDetails.created_dtime = new Date().toISOString();
       const bankDetails = new Bankdetails(userAllBankDetails);
       await bankDetails.save();
@@ -2097,14 +2097,14 @@ exports.userBankDetailsUpdate = async function (req, res, next) {
       );
     }
     return res.json({
-      status:"success",
-      message:"Successfully updated your details."
+      status: "success",
+      message: "Successfully updated your details."
     });
     //res.redirect("/bank-details");
   } catch (error) {
     return res.json({
-      status:"error",
-      message:"Something went wrong please try later."
+      status: "error",
+      message: "Something went wrong please try later."
     });
     /*res.status(500).json({
       status: "0",
@@ -2126,9 +2126,9 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
       });
     }
     let stateId = req.body.state_name;
-    let getState = await statesModel.findOne({_id:mongoose.Types.ObjectId(stateId)});
+    let getState = await statesModel.findOne({ _id: mongoose.Types.ObjectId(stateId) });
     let userId = req.body.userId ? req.body.userId : req.session.user.userId;
-    await addressBook.updateMany({user_id: userId}, {default_status:0},);
+    await addressBook.updateMany({ user_id: userId }, { default_status: 0 },);
 
     const newAddress = new addressBook({
       user_id: req.body.userId ? req.body.userId : req.session.user.userId,
@@ -2137,14 +2137,14 @@ exports.userNewCheckOutAddressAdd = async function (req, res, next) {
       landmark: req.body.landmark,
       city_name: req.body.city_name,
       city_code: req.body.city_code,
-      state_name: getState ? getState.name:"",
+      state_name: getState ? getState.name : "",
       state_id: stateId,
       state_code: req.body.state_code,
       pin_code: req.body.pin_code,
       address_name: addr_name,
       flag: req.body.flag,
       created_dtime: dateTime,
-      default_status:1
+      default_status: 1
     });
     const savedAddress = await newAddress.save();
     const user = await Users.findById(newAddress.user_id);
@@ -2213,12 +2213,11 @@ exports.userAddressAdd = async function (req, res, next) {
         });
       }
     }
-    if(existingUserAddresses.length === 0)
-    {
+    if (existingUserAddresses.length === 0) {
       defaultStatus = 1;
     }
     let stateId = req.body.state_name;
-    let getState = await statesModel.findOne({_id:mongoose.Types.ObjectId(stateId)});
+    let getState = await statesModel.findOne({ _id: mongoose.Types.ObjectId(stateId) });
     const newAddress = new addressBook({
       user_id: req.body.userId,
       street_name: req.body.address2,
@@ -2226,13 +2225,13 @@ exports.userAddressAdd = async function (req, res, next) {
       landmark: req.body.landmark,
       city_name: req.body.city_name,
       city_code: req.body.city_code,
-      state_name: getState ? getState.name:"",
+      state_name: getState ? getState.name : "",
       state_id: stateId,
       state_code: req.body.state_code,
       pin_code: req.body.pin_code,
       address_name: addr_name,
       flag: req.body.flag,
-      default_status:defaultStatus,
+      default_status: defaultStatus,
       created_dtime: dateTime,
     });
     const savedAddress = await newAddress.save();
@@ -2330,12 +2329,7 @@ exports.updateuserAddressAdd = async function (req, res, next) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     addbook_id = req.body.addressid;
-    console.log(req.body);
-    
     const defaultStatus = req.body['check-address'] == '1' ? 1 : 0;
-
-    console.log(defaultStatus);
-    
     const addr_name = req.body.addrType;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -2359,7 +2353,7 @@ exports.updateuserAddressAdd = async function (req, res, next) {
       }
     }
     let stateId = req.body.state_name;
-    let getState = await statesModel.findOne({_id:mongoose.Types.ObjectId(stateId)});
+    let getState = await statesModel.findOne({ _id: mongoose.Types.ObjectId(stateId) });
 
     address.street_name = req.body.address2 || address.street_name;
     address.address1 = req.body.address1 || address.address1;
@@ -2367,8 +2361,8 @@ exports.updateuserAddressAdd = async function (req, res, next) {
     address.city_name = req.body.city_name || address.city_name;
     address.city_code = req.body.city_code || address.city_code;
     address.address_name = addr_name || address.address_name;
-    address.state_id= stateId || address.state_id;
-    address.state_name = getState ? getState.name: address.state_name;
+    address.state_id = stateId || address.state_id;
+    address.state_name = getState ? getState.name : address.state_name;
     address.state_code = req.body.state_code || address.state_code;
     address.pin_code = req.body.pin_code || address.pin_code;
     address.address_name = req.body.address_name || address.address_name;
@@ -2417,7 +2411,6 @@ exports.updateuserAddressAdd = async function (req, res, next) {
 
 exports.getAddressdetails = async function (req, res, next) {
   try {
-    console.log("edit page");
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     var userData = req.session.user;
     const errors = validationResult(req);
@@ -2440,20 +2433,20 @@ exports.getAddressdetails = async function (req, res, next) {
     let stateList = await statesModel.find();
 
     let stateData = "";
-    if(address.state_name){
+    if (address.state_name) {
       stateData = await statesModel.findById(address.state_id);
     }
-    
+
     res.render("webpages/update-address", {
       title: "My Account",
       message: "Address fetched successfully!",
       respdata: req.session.user,
       respdata1: userData,
       address: address,
-      stateList:stateList,
-      stateData:stateData,
+      stateList: stateList,
+      stateData: stateData,
       isLoggedIn: isLoggedIn,
-      websiteUrl:process.env.SITE_URL
+      websiteUrl: process.env.SITE_URL
     });
     // res.status(200).json({
     //   status: "1",
@@ -2510,7 +2503,7 @@ exports.deleteUserAddress = async function (req, res, next) {
       message: 'Address Deleted Successfully',
       success: true,
     });
-   // res.redirect('/my-account');
+    // res.redirect('/my-account');
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -2548,28 +2541,28 @@ exports.userWisePost = async function (req, res, next) {
     for (const userproduct of userproducts) {
       const productImages = await Productimage.find({ product_id: userproduct._id });
       if (productImages) {
-          const productCondition = await Productcondition.findById(userproduct.status);
-          const formattedUserProduct = {
-            _id: userproduct._id,
-            name: userproduct.name,
-            description: userproduct.description,
-            brand: userproduct.brand_id ? userproduct.brand_id.name : '',
-            user_id: userproduct.user_id._id,
-            user_name: userproduct.user_id.name,
-            size_id: userproduct.size_id ? userproduct.size_id.name : '',
-            price: userproduct.price,
-            offer_price: userproduct.offer_price,
-            percentage: userproduct.percentage,
-            status: userproduct.status,
-            status_name: productCondition.name,
-            flag: userproduct.flag,
-            approval_status: userproduct.approval_status,
-            original_invoice: userproduct.original_invoice,
-            original_packaging: userproduct.original_packaging,
-            added_dtime: userproduct.added_dtime,
-            __v: userproduct.__v,
-            product_images: productImages,
-          };
+        const productCondition = await Productcondition.findById(userproduct.status);
+        const formattedUserProduct = {
+          _id: userproduct._id,
+          name: userproduct.name,
+          description: userproduct.description,
+          brand: userproduct.brand_id ? userproduct.brand_id.name : '',
+          user_id: userproduct.user_id._id,
+          user_name: userproduct.user_id.name,
+          size_id: userproduct.size_id ? userproduct.size_id.name : '',
+          price: userproduct.price,
+          offer_price: userproduct.offer_price,
+          percentage: userproduct.percentage,
+          status: userproduct.status,
+          status_name: productCondition.name,
+          flag: userproduct.flag,
+          approval_status: userproduct.approval_status,
+          original_invoice: userproduct.original_invoice,
+          original_packaging: userproduct.original_packaging,
+          added_dtime: userproduct.added_dtime,
+          __v: userproduct.__v,
+          product_images: productImages,
+        };
         formattedUserProducts.push(formattedUserProduct);
       }
     }
@@ -2580,8 +2573,8 @@ exports.userWisePost = async function (req, res, next) {
         respdata: formattedUserProducts,
         userData: req.session.user,
         isLoggedIn: isLoggedIn,
-        userBankStatus:userBankStatus,
-        userAddressStatus:userAddressStatus,
+        userBankStatus: userBankStatus,
+        userAddressStatus: userAddressStatus,
         websiteUrl: process.env.SITE_URL,
       });
     }
@@ -2649,10 +2642,10 @@ exports.addNewPost = async function (req, res, next) {
     // }
     let originalInvoice = 0;
     let originalPackageing = 0;
-    if(typeof req.body.original_invoice != "undefined") {
+    if (typeof req.body.original_invoice != "undefined") {
       originalInvoice = 1;
     }
-    if(typeof req.body.original_packaging != "undefined") {
+    if (typeof req.body.original_packaging != "undefined") {
       originalPackageing = 1;
     }
     if (req.body.gender) {
@@ -2714,19 +2707,19 @@ exports.addNewPost = async function (req, res, next) {
       let user_details = await Users.findOne({ _id: req.session.user.userId });
       let title = "New Product Added From Website";
       let admin_text = "A user " + user_details.name + " has added a new product " + savedProductdata.name;
-      let link = "https://bidforsale.com/admin/productdetails/"+savedProductdata._id;
+      let link = "https://bidforsale.com/admin/productdetails/" + savedProductdata._id;
       let dateTime = moment().format("YYYY-MM-DD HH:mm:ss");
       const notification = new Notifications({
         title: title,
-        admin_text:admin_text,
-        for_admin:1,
+        admin_text: admin_text,
+        for_admin: 1,
         link: link,
         added_dtime: dateTime
-    });
-  
-    await notification.save();
+      });
+
+      await notification.save();
     }
-    res.redirect('/my-post/'+req.session.user.userId);
+    res.redirect('/my-post/' + req.session.user.userId);
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -2802,10 +2795,10 @@ exports.updatePostData = async function (req, res, next) {
   try {
     let originalInvoice = 0;
     let originalPackageing = 0;
-    if(typeof req.body.original_invoice != "undefined") {
+    if (typeof req.body.original_invoice != "undefined") {
       originalInvoice = 1;
     }
-    if(typeof req.body.original_packaging != "undefined") {
+    if (typeof req.body.original_packaging != "undefined") {
       originalPackageing = 1;
     }
     const productId = req.body.productid;
@@ -2838,12 +2831,12 @@ exports.updatePostData = async function (req, res, next) {
     existingProduct.original_packaging = originalPackageing;
     existingProduct.updated_dtime = moment().format("YYYY-MM-DD HH:mm:ss");
 
-    const  updatedProduct = await Userproduct.findByIdAndUpdate(
+    const updatedProduct = await Userproduct.findByIdAndUpdate(
       productId,
       existingProduct,
       { new: true, runValidators: true }
     );
-   
+
     const previousImages = await Productimage.find({ product_id: existingProduct._id });
     if (req.files && Object.keys(req.files).length > 0) {
       const requrl = url.format({
@@ -2862,7 +2855,7 @@ exports.updatePostData = async function (req, res, next) {
             await fs.copyFile("./public/images/" + imageUrl, "./public/compress_images/" + imageUrl, (err) => {
               if (err) {
               }
-              else { 
+              else {
               }
             });
           }
@@ -3065,7 +3058,6 @@ exports.viewWishListByUserId_backup = async function (req, res, next) {
       });
     }
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering Wishlist Listing Page.",
@@ -3130,7 +3122,6 @@ exports.viewWishListByUserId = async function (req, res, next) {
       });
     }
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering Wishlist Listing Page.",
@@ -3181,8 +3172,8 @@ exports.addToCart_backup = async function (req, res, next) {
     const user_id = req.session.user.userId;
     const existingCart = await Cart.findOne({ user_id: user_id, status: 0 });
     if (existingCart) {
-      await Cart.deleteMany({ user_id: mongoose.Types.ObjectId(user_id)});
-      await CartDetail.deleteMany({ cart_id: mongoose.Types.ObjectId(existingCart._id)});
+      await Cart.deleteMany({ user_id: mongoose.Types.ObjectId(user_id) });
+      await CartDetail.deleteMany({ cart_id: mongoose.Types.ObjectId(existingCart._id) });
     }
     // if (existingCart) {
     //   const existingCartItem = await CartDetail.findOne({
@@ -3234,49 +3225,49 @@ exports.addToCart_backup = async function (req, res, next) {
     //   });
     // }
     //else {
-      const newCart = new Cart({
-        user_id,
-        status: 0,
-        added_dtime: dateTime,
-      });
-      const savedCart = await newCart.save();
-      const cartDetail = new CartDetail({
-        cart_id: savedCart._id,
-        product_id,
-        qty,
-        check_status: 0,
-        status: 0,
-        added_dtime: dateTime,
-      });
-      const savedata = await cartDetail.save();
-      var cartCount = await Cart.countDocuments({ user_id: savedCart.user_id });
-      const user = await Users.findById(user_id);
-      const product = await Userproduct.findById(product_id);
-      const cartResponse = {
-        _id: savedCart._id,
-        user_id: savedCart.user_id,
-        status: savedCart.status,
-        check_status: cartDetail.check_status,
-        qty: cartDetail.qty,
-        user_name: user.name,
-        product_name: product.name,
-        product_user_id: product.user_id,
-        added_dtime: savedCart.added_dtime,
-        __v: savedCart.__v,
-      };
-      const cartRemove = await Cartremove.findOne({}, { name: 1, _id: 0 });
-      const durationInSeconds = cartRemove.name;
-      const durationInMilliseconds = durationInSeconds * 60 * 1000;
-      setTimeout(() => {
-        removeItemAfterTime(savedCart._id);
-      }, durationInMilliseconds);
-      res.status(200).json({
-        cart_count: cartCount,
-        message: 'Item Added to Cart',
-        cart: cartResponse,
-        is_added: true
-      });
-   // }
+    const newCart = new Cart({
+      user_id,
+      status: 0,
+      added_dtime: dateTime,
+    });
+    const savedCart = await newCart.save();
+    const cartDetail = new CartDetail({
+      cart_id: savedCart._id,
+      product_id,
+      qty,
+      check_status: 0,
+      status: 0,
+      added_dtime: dateTime,
+    });
+    const savedata = await cartDetail.save();
+    var cartCount = await Cart.countDocuments({ user_id: savedCart.user_id });
+    const user = await Users.findById(user_id);
+    const product = await Userproduct.findById(product_id);
+    const cartResponse = {
+      _id: savedCart._id,
+      user_id: savedCart.user_id,
+      status: savedCart.status,
+      check_status: cartDetail.check_status,
+      qty: cartDetail.qty,
+      user_name: user.name,
+      product_name: product.name,
+      product_user_id: product.user_id,
+      added_dtime: savedCart.added_dtime,
+      __v: savedCart.__v,
+    };
+    const cartRemove = await Cartremove.findOne({}, { name: 1, _id: 0 });
+    const durationInSeconds = cartRemove.name;
+    const durationInMilliseconds = durationInSeconds * 60 * 1000;
+    setTimeout(() => {
+      removeItemAfterTime(savedCart._id);
+    }, durationInMilliseconds);
+    res.status(200).json({
+      cart_count: cartCount,
+      message: 'Item Added to Cart',
+      cart: cartResponse,
+      is_added: true
+    });
+    // }
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -3294,8 +3285,8 @@ exports.addToCart = async function (req, res, next) {
     const user_id = req.session.user.userId;
     const existingCart = await Cart.findOne({ user_id: user_id, status: 0 });
     if (existingCart) {
-      await Cart.deleteMany({ user_id: mongoose.Types.ObjectId(user_id)});
-      await CartDetail.deleteMany({ cart_id: mongoose.Types.ObjectId(existingCart._id)});
+      await Cart.deleteMany({ user_id: mongoose.Types.ObjectId(user_id) });
+      await CartDetail.deleteMany({ cart_id: mongoose.Types.ObjectId(existingCart._id) });
     }
     // if (existingCart) {
     //   const existingCartItem = await CartDetail.findOne({
@@ -3347,49 +3338,49 @@ exports.addToCart = async function (req, res, next) {
     //   });
     // }
     //else {
-      const newCart = new Cart({
-        user_id,
-        status: 0,
-        added_dtime: dateTime,
-      });
-      const savedCart = await newCart.save();
-      const cartDetail = new CartDetail({
-        cart_id: savedCart._id,
-        product_id,
-        qty,
-        check_status: 0,
-        status: 0,
-        added_dtime: dateTime,
-      });
-      const savedata = await cartDetail.save();
-      var cartCount = await Cart.countDocuments({ user_id: savedCart.user_id });
-      const user = await Users.findById(user_id);
-      const product = await Userproduct.findById(product_id);
-      const cartResponse = {
-        _id: savedCart._id,
-        user_id: savedCart.user_id,
-        status: savedCart.status,
-        check_status: cartDetail.check_status,
-        qty: cartDetail.qty,
-        user_name: user.name,
-        product_name: product.name,
-        product_user_id: product.user_id,
-        added_dtime: savedCart.added_dtime,
-        __v: savedCart.__v,
-      };
-      const cartRemove = await Cartremove.findOne({}, { name: 1, _id: 0 });
-      const durationInSeconds = cartRemove.name;
-      const durationInMilliseconds = durationInSeconds * 60 * 1000;
-      setTimeout(() => {
-        removeItemAfterTime(savedCart._id);
-      }, durationInMilliseconds);
-      res.status(200).json({
-        cart_count: cartCount,
-        message: 'Item Added to Cart',
-        cart: cartResponse,
-        is_added: true
-      });
-   // }
+    const newCart = new Cart({
+      user_id,
+      status: 0,
+      added_dtime: dateTime,
+    });
+    const savedCart = await newCart.save();
+    const cartDetail = new CartDetail({
+      cart_id: savedCart._id,
+      product_id,
+      qty,
+      check_status: 0,
+      status: 0,
+      added_dtime: dateTime,
+    });
+    const savedata = await cartDetail.save();
+    var cartCount = await Cart.countDocuments({ user_id: savedCart.user_id });
+    const user = await Users.findById(user_id);
+    const product = await Userproduct.findById(product_id);
+    const cartResponse = {
+      _id: savedCart._id,
+      user_id: savedCart.user_id,
+      status: savedCart.status,
+      check_status: cartDetail.check_status,
+      qty: cartDetail.qty,
+      user_name: user.name,
+      product_name: product.name,
+      product_user_id: product.user_id,
+      added_dtime: savedCart.added_dtime,
+      __v: savedCart.__v,
+    };
+    const cartRemove = await Cartremove.findOne({}, { name: 1, _id: 0 });
+    const durationInSeconds = cartRemove.name;
+    const durationInMilliseconds = durationInSeconds * 60 * 1000;
+    setTimeout(() => {
+      removeItemAfterTime(savedCart._id);
+    }, durationInMilliseconds);
+    res.status(200).json({
+      cart_count: cartCount,
+      message: 'Item Added to Cart',
+      cart: cartResponse,
+      is_added: true
+    });
+    // }
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -3432,22 +3423,19 @@ exports.viewCartListByUserId_backup = async function (req, res, next) {
     else {
       // const cartList = await CartDetail.findOne({ cart_id: existingCart._id, status: 0 }).exec();
       const cartList = await CartDetail.findOne({ cart_id: existingCart._id, status: 0 })
-                                .sort({ createdAt: -1 }) 
-                                .exec();
-
-      console.log(cartList);
+        .sort({ createdAt: -1 })
+        .exec();
       const user = await Users.findById(existingCart.user_id);
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
       const formattedCartList = await Promise.all(cartList.map(async (cartItem) => {
-       const product = await Userproduct.findById(cartItem.product_id).populate('category_id', 'name');
+        const product = await Userproduct.findById(cartItem.product_id).populate('category_id', 'name');
         const productImages = await Productimage.findOne({ product_id: product._id }).limit(1);
-        console.log(productImages.image);
         let shippingChargeAmount = 0;
-        if(cartItem.length > 0){
-          let shippingCharges = await shippingchrgsModel.findOne({_id: product.shipping_charges_id})
-          if(shippingCharges){
+        if (cartItem.length > 0) {
+          let shippingCharges = await shippingchrgsModel.findOne({ _id: product.shipping_charges_id })
+          if (shippingCharges) {
             shippingChargeAmount = Number(shippingCharges.amount);
           }
         }
@@ -3469,25 +3457,22 @@ exports.viewCartListByUserId_backup = async function (req, res, next) {
         };
         let product_price;
         let is_bid;
-        if(cartItem.finalBidPrice)
-        {
+        if (cartItem.finalBidPrice) {
           product_price = cartItem.finalBidPrice;
           finalData.product_price = product_price;
           is_bid = 1;
           finalData.is_bid = 1;
         }
-        else
-        {
+        else {
           is_bid = 0;
           product_price = product.offer_price;
           finalData.product_price = product_price;
           finalData.is_bid = 0;
         }
-        
+
         //const gst = parseFloat((product_price * 28) / 100).toFixed(2);
         const gst = parseFloat((shippingChargeAmount * 28) / 100).toFixed(2);
         const finalPrice = parseInt(product_price) + shippingChargeAmount + parseInt(gst);
-        console.log("finalprice",finalData);
         res.render("webpages/addtocart", {
           title: "Cart List Page",
           message: "Welcome to the Cart List page!",
@@ -3501,7 +3486,6 @@ exports.viewCartListByUserId_backup = async function (req, res, next) {
     }
   }
   catch (error) {
-    console.log(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering Cart List.",
@@ -3532,20 +3516,17 @@ exports.viewCartListByUserId_backup2 = async function (req, res, next) {
     }
     else {
       const cartList = await CartDetail.find({ cart_id: existingCart._id, status: 0 }).exec();
-      console.log(cartList);
       const user = await Users.findById(existingCart.user_id);
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
       const formattedCartList = await Promise.all(cartList.map(async (cartItem) => {
-        console.log(cartItem);
         const product = await Userproduct.findById(cartItem.product_id).populate('category_id', 'name');
-        console.log(product);
         const productImages = await Productimage.findOne({ product_id: product._id }).limit(1);
         let shippingChargeAmount = 0;
-        if(cartItem.length > 0){
-          let shippingCharges = await shippingchrgsModel.findOne({_id: product.shipping_charges_id})
-          if(shippingCharges){
+        if (cartItem.length > 0) {
+          let shippingCharges = await shippingchrgsModel.findOne({ _id: product.shipping_charges_id })
+          if (shippingCharges) {
             shippingChargeAmount = Number(shippingCharges.amount);
           }
         }
@@ -3566,24 +3547,22 @@ exports.viewCartListByUserId_backup2 = async function (req, res, next) {
           status: cartItem.status,
           shippingChargeAmount: shippingChargeAmount
         };
-        
+
         let product_price;
         let is_bid;
-        if(cartItem.finalBidPrice)
-        {
+        if (cartItem.finalBidPrice) {
           product_price = cartItem.finalBidPrice;
           finalData.product_price = product_price;
           is_bid = 1;
           finalData.is_bid = 1;
         }
-        else
-        {
+        else {
           is_bid = 0;
           product_price = product.offer_price;
           finalData.product_price = product_price;
           finalData.is_bid = 0;
         }
-        
+
         //const gst = parseFloat((product_price * 28) / 100).toFixed(2);
         const gst = parseFloat((shippingChargeAmount * 28) / 100).toFixed(2);
         const finalPrice = parseInt(product_price) + shippingChargeAmount + parseInt(gst);
@@ -3600,7 +3579,6 @@ exports.viewCartListByUserId_backup2 = async function (req, res, next) {
     }
   }
   catch (error) {
-    console.log(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering Cart List.",
@@ -3628,8 +3606,8 @@ exports.viewCartListByUserId = async function (req, res, next) {
       });
     }
     const lastAddedCartDetail = await CartDetail.findOne({ cart_id: existingCart._id, status: 0 })
-                                .sort({ createdAt: -1 })
-                                .exec();
+      .sort({ createdAt: -1 })
+      .exec();
     if (!lastAddedCartDetail) {
       return res.render("webpages/addtocart", {
         title: "Cart List Page",
@@ -3694,7 +3672,6 @@ exports.viewCartListByUserId = async function (req, res, next) {
       websiteUrl: process.env.SITE_URL,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering Cart List.",
@@ -3825,9 +3802,9 @@ exports.checkoutWeb = async function (req, res, next) {
         const product = await Userproduct.findOne({ _id: cartItem.product_id._id }).populate('category_id', 'name');
         const productImages = await Productimage.find({ product_id: cartItem.product_id._id }).limit(1);
         let shippingChargeAmount = 0;
-        if(cartList.length > 0){
-          let shippingCharges = await shippingchrgsModel.findOne({_id: cartList[0].product_id.shipping_charges_id})
-          if(shippingCharges){
+        if (cartList.length > 0) {
+          let shippingCharges = await shippingchrgsModel.findOne({ _id: cartList[0].product_id.shipping_charges_id })
+          if (shippingCharges) {
             shippingChargeAmount = Number(shippingCharges.amount);
           }
         }
@@ -3837,7 +3814,7 @@ exports.checkoutWeb = async function (req, res, next) {
           quantity: cartItem.qty,
           product_id: cartItem.product_id._id,
           product_name: cartItem.product_id.name,
-         // product_price: product.offer_price,
+          // product_price: product.offer_price,
           product_est_price: product.price,
           seller_id: product.user_id,
           category_name: product.category_id.name,
@@ -3849,13 +3826,11 @@ exports.checkoutWeb = async function (req, res, next) {
         };
 
         let product_price;
-        if(cartItem.finalBidPrice)
-        {
+        if (cartItem.finalBidPrice) {
           product_price = cartItem.finalBidPrice;
           finalData.product_price = product_price;
         }
-        else
-        {
+        else {
           product_price = product.offer_price;
           finalData.product_price = product_price;
         }
@@ -3888,7 +3863,7 @@ exports.checkoutWeb = async function (req, res, next) {
           isLoggedIn: isLoggedIn,
           user: req.session.user,
           addressUserList: addressUserList,
-          stateList:getStates
+          stateList: getStates
         });
       }));
     }
@@ -3983,36 +3958,34 @@ exports.myOrderDetailsWeb = async (req, res) => {
       shippingkit_details = await addressBook.findById({ _id: shippingKitData.shipping_address_id });
       shipping_user_details = await Users.findById({ _id: shippingKitData.buyer_id });
     }
-    
+
     //============Order tracking portion start=====
-   
-    if(order){
+
+    if (order) {
       let getOrderId = order._id;
-      let ordertracking = await Ordertracking.findOne({order_id:getOrderId});
-      if(ordertracking){
-        let getTrackData = await Track.findOne({_id:mongoose.Types.ObjectId(ordertracking.tracking_id)});
+      let ordertracking = await Ordertracking.findOne({ order_id: getOrderId });
+      if (ordertracking) {
+        let getTrackData = await Track.findOne({ _id: mongoose.Types.ObjectId(ordertracking.tracking_id) });
 
         //=== 0=>for seller_to_hub 1=>for hub_to_buyer===
-        if(getTrackData.pickup_awb){
+        if (getTrackData.pickup_awb) {
           let getapiTrakingData = await helper.trackbyawbid(getTrackData.pickup_awb);
-          console.log("getapiTrakingData--",getapiTrakingData)
           let gettrackingData = getapiTrakingData.tracking_data.shipment_track;
-          console.log("gettrackingData--",gettrackingData)
-          let statusCheck = (getTrackData.order_status==1) ? 1:0;
+          let statusCheck = (getTrackData.order_status == 1) ? 1 : 0;
           const filterTrack = {
-            order_id:mongoose.Types.ObjectId(getOrderId),
-            tracking_id:mongoose.Types.ObjectId(ordertracking.tracking_id)
+            order_id: mongoose.Types.ObjectId(getOrderId),
+            tracking_id: mongoose.Types.ObjectId(ordertracking.tracking_id)
           };
-          
+
           const trackingdetails = await Trackingdeatis.findOne(filterTrack);
-          if(trackingdetails && trackingdetails.status== getTrackData.order_status){
-            const updateTrack = { 
+          if (trackingdetails && trackingdetails.status == getTrackData.order_status) {
+            const updateTrack = {
               track_response: getapiTrakingData,
               curent_status: gettrackingData[0].current_status,
               status_check: statusCheck,
               track_awbno: getTrackData.pickup_awb,
             };
-             await Trackingdeatis.findOneAndUpdate(filterTrack, updateTrack);
+            await Trackingdeatis.findOneAndUpdate(filterTrack, updateTrack);
           } else {
             const createTrackindData = new Trackingdeatis({
               order_id: getOrderId,
@@ -4024,13 +3997,13 @@ exports.myOrderDetailsWeb = async (req, res) => {
               status: getTrackData.order_status,
               added_dtime: dateTime,
             });
-             await createTrackindData.save();
+            await createTrackindData.save();
           }
-          
+
         }
       }
     }
-     //============Order tracking portion end=====
+    //============Order tracking portion end=====
 
     const orderDetails = {
       _id: order._id,
@@ -4082,23 +4055,16 @@ exports.myOrderDetailsWeb = async (req, res) => {
   }
 };
 exports.getWhatsHotProductsweb = async function (req, res) {
-
-  const page = parseInt(req.body.page) || 1; 
-  const pageSize = parseInt(req.body.pageSize) || 10; 
-
+  const page = parseInt(req.body.page) || 1;
+  const pageSize = parseInt(req.body.pageSize) || 10;
   try {
-
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const hotProductsCount = await Userproduct.countDocuments({ approval_status: 1, flag: 0 });
     const filterproductCount = hotProductsCount.length;
-
     const totalPages = Math.ceil(hotProductsCount / pageSize);
-
     const hotProducts = await Userproduct.find({ approval_status: 1, flag: 0 }).sort({ hitCount: -1 });
-
     let brandIds = [], sizeIds = [], statusIds = [], genderIds = [];
     let brandList = [], sizeList = [], conditionList = [], genderList = [];
-
     brandIds = hotProducts.map(product => product.brand_id).filter(Boolean);
     sizeIds = hotProducts.map(product => product.size_id).filter(Boolean);
     statusIds = hotProducts.map(product => product.status).filter(Boolean);
@@ -4107,10 +4073,8 @@ exports.getWhatsHotProductsweb = async function (req, res) {
     sizeList = await Size.find({ _id: { $in: sizeIds } });
     conditionList = await Productcondition.find({ _id: { $in: statusIds } });
     genderList = await Gender.find({ _id: { $in: genderIds } });
-
-    let maxOfferPrice = -Infinity; 
+    let maxOfferPrice = -Infinity;
     let minOfferPrice = Infinity;
-
     for (const product of hotProducts) {
       if (product.offer_price > maxOfferPrice) {
         maxOfferPrice = product.offer_price;
@@ -4120,46 +4084,29 @@ exports.getWhatsHotProductsweb = async function (req, res) {
       }
     }
     const whatsHotProducts = [];
-
     for (const product of hotProducts) {
-      const productImage = await Productimage.findOne({ 
+      const productImage = await Productimage.findOne({
         product_id: product._id,
         $or: [
           { image_order: 1 },
           { image_order: 0 }
         ]
       });
-    
       if (productImage) {
-
         const productCondition = await Productcondition.findById(product.status);
-
         whatsHotProducts.push({
-
           _id: product._id,
-
           name: product.name,
-
           price: product.price,
-
           offer_price: product.offer_price,
-
           original_packaging: product.original_packaging,
-
           original_invoice: product.original_invoice,
-
           status_name: productCondition ? productCondition._id : '',
-
           status: productCondition ? productCondition.name : '',
-
           image: productImage,
-
         });
-
       }
-
     }
-
     res.render("webpages/allhomeproduct",
       {
         title: "Product Sub Categories",
@@ -4193,11 +4140,11 @@ exports.getJustSoldProductsweb = async function (req, res) {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
     const soldItemsCount = await Userproduct.countDocuments({ approval_status: 1, flag: 1 });
     const filterproductCount = soldItemsCount.length;
-    
+
     const pageno = page || 1;
     const pageSize = 8;
     const skip = (page - 1) * pageSize;
-    
+
     const totalPages = Math.ceil(soldItemsCount / pageSize);
     let brandIds = [], sizeIds = [], statusIds = [], genderIds = [];
     let brandList = [], sizeList = [], conditionList = [], genderList = [];
@@ -4212,8 +4159,8 @@ exports.getJustSoldProductsweb = async function (req, res) {
     sizeList = await sizeModel.find({ _id: { $in: sizeIds } });
     conditionList = await productconditionModel.find({ _id: { $in: statusIds } });
     genderList = await Gender.find({ _id: { $in: genderIds } });
-    
-    let maxOfferPrice = -Infinity; 
+
+    let maxOfferPrice = -Infinity;
     let minOfferPrice = Infinity;
     for (const product of solditems) {
       if (product.offer_price > maxOfferPrice) {
@@ -4226,14 +4173,14 @@ exports.getJustSoldProductsweb = async function (req, res) {
 
     const justSoldProducts = [];
     for (const product of solditems) {
-      const productImage = await Productimage.findOne({ 
+      const productImage = await Productimage.findOne({
         product_id: product._id,
         $or: [
           { image_order: 1 },
           { image_order: 0 }
         ]
       });
-      
+
       if (productImage) {
         const productCondition = await Productcondition.findById(product.status);
         justSoldProducts.push({
@@ -4297,7 +4244,7 @@ exports.getBestDealProductsweb = async function (req, res) {
       approval_status: 1,
       flag: 0
     });
-    const products = await Userproduct.find({ percentage: { $gte: percentageFilter }, approval_status: 1, flag: 0 }); 
+    const products = await Userproduct.find({ percentage: { $gte: percentageFilter }, approval_status: 1, flag: 0 });
     let brandIds = [], sizeIds = [], statusIds = [], genderIds = [];
     let brandList = [], sizeList = [], conditionList = [], genderList = [];
     brandIds = products.map(product => product.brand_id).filter(Boolean);
@@ -4311,7 +4258,7 @@ exports.getBestDealProductsweb = async function (req, res) {
     if (!products || products.length === 0) {
       return res.status(404).json({ message: 'No products meet the percentage filter criteria' });
     }
-    let maxOfferPrice = -Infinity; 
+    let maxOfferPrice = -Infinity;
     let minOfferPrice = Infinity;
 
     for (const product of products) {
@@ -4327,15 +4274,15 @@ exports.getBestDealProductsweb = async function (req, res) {
 
     for (const product of products) {
       //const productImage = await Productimage.findOne({ product_id: product._id });
-      const productImage = await Productimage.findOne({ 
+      const productImage = await Productimage.findOne({
         product_id: product._id,
         $or: [
           { image_order: 1 },
           { image_order: 0 }
         ]
       });
-          
-      
+
+
       if (productImage) {
 
         const productCondition = await Productcondition.findById(product.status);
@@ -4364,7 +4311,7 @@ exports.getBestDealProductsweb = async function (req, res) {
         genderList: typeof genderList != "undefined" ? genderList : [],
         productCount: count,
         filterproductCount: typeof filterproductCount != "undefined" ? filterproductCount : "0",
-        websiteUrl:process.env.SITE_URL,
+        websiteUrl: process.env.SITE_URL,
         isLoggedIn: isLoggedIn,
         filter_basedon: "bestDeal",
         maxvalue: typeof maxOfferPrice != "undefined" ? maxOfferPrice : "0",
@@ -4391,9 +4338,9 @@ exports.getBestDealProductswebNew = async function (page, req, res, next) {
     getUrl = getUrl.split('/');
     getUrl = getUrl.pop();
     let getUrlNew = getUrl.split('?');
-    if(getUrlNew.length > 0){
+    if (getUrlNew.length > 0) {
       getUrl = getUrlNew[0];
-    } 
+    }
     let id = getUrl;
     const filterGenderId = (typeof req.query.catid != 'undefined' && req.query.catid != "") ? req.query.catid : '';
     const pageno = page || 1;
@@ -4459,7 +4406,7 @@ exports.getBestDealProductswebNew = async function (page, req, res, next) {
       brandList: typeof brandList != "undefined" ? brandList : [],
       sizeList: typeof sizeList != "undefined" ? sizeList : [],
       conditionList: typeof conditionList != "undefined" ? conditionList : [],
-      colorList:  [],
+      colorList: [],
       genderList: typeof genderList != "undefined" ? genderList : [],
       maxvalue: typeof result != "undefined" ? result[0].maxPrice : "0",
       minvalue: typeof result != "undefined" ? result[0].minPrice : "0",
@@ -4619,7 +4566,7 @@ exports.userPlacedOrder = async function (req, res) {
 exports.Demoorder_backup = async function (req, res) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-    let pay_now,booking_amount,remaining_amount,packing_handling_charge,taxable_value,cash_handling_charges;
+    let pay_now, booking_amount, remaining_amount, packing_handling_charge, taxable_value, cash_handling_charges;
     let formData = req.body.data;
     let user_id = formData.user_id;
     let seller_id = formData.seller_id;
@@ -4628,30 +4575,27 @@ exports.Demoorder_backup = async function (req, res) {
     let product_id = formData.product_id;
     let payment_method = formData.payment_method;
     taxable_value = formData.taxable_value;
-    let product =await Userproduct.findById(product_id);
+    let product = await Userproduct.findById(product_id);
     let total_price = 0;
-    
 
-    if (payment_method == 0)
-    {
+
+    if (payment_method == 0) {
       pay_now = parseFloat(product.offer_price) * 0.10;
-      remaining_amount = parseFloat(product.offer_price)-parseFloat(pay_now);
+      remaining_amount = parseFloat(product.offer_price) - parseFloat(pay_now);
       cash_handling_charges = parseFloat(product.offer_price) * 0.05;
     }
-    let gst =  parseFloat(taxable_value * 28) / 100;
+    let gst = parseFloat(taxable_value * 28) / 100;
     //let gst =  parseFloat(product.offer_price * 28) / 100;
-    if (payment_method == 0)
-    {
-      taxable_value =  parseFloat(packing_handling_charge) + parseFloat(cash_handling_charges);
-      booking_amount = parseFloat(pay_now)+parseFloat(taxable_value)+ parseFloat(gst);
+    if (payment_method == 0) {
+      taxable_value = parseFloat(packing_handling_charge) + parseFloat(cash_handling_charges);
+      booking_amount = parseFloat(pay_now) + parseFloat(taxable_value) + parseFloat(gst);
       total_price = parseFloat(booking_amount) + parseFloat(remaining_amount);
-      total_price = total_price.toFixed(2); 
+      total_price = total_price.toFixed(2);
     }
-    else if (payment_method == 1)
-    {
-      taxable_value =  parseFloat(packing_handling_charge);
-      total_price = parseFloat(product.offer_price) + parseFloat(gst) + parseFloat(taxable_value) ;
-      total_price = total_price.toFixed(2); 
+    else if (payment_method == 1) {
+      taxable_value = parseFloat(packing_handling_charge);
+      total_price = parseFloat(product.offer_price) + parseFloat(gst) + parseFloat(taxable_value);
+      total_price = total_price.toFixed(2);
     }
     let order_status = '0';
     let delivery_charges = '0';
@@ -4682,8 +4626,8 @@ exports.Demoorder_backup = async function (req, res) {
       packing_handling_charge: (typeof packing_handling_charge != "undefined") ? parseFloat(packing_handling_charge) : 0,
       status: 1,
       user_ip: ip,
-      gst:(typeof gst != "undefined") ? gst : 0,
-      taxable_value:(typeof taxable_value != "undefined") ? parseFloat(taxable_value) : 0,
+      gst: (typeof gst != "undefined") ? gst : 0,
+      taxable_value: (typeof taxable_value != "undefined") ? parseFloat(taxable_value) : 0,
       added_dtime: new Date().toISOString(),
     });
 
@@ -4704,7 +4648,7 @@ exports.Demoorder_backup = async function (req, res) {
 exports.Demoorder = async function (req, res) {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-    let pay_now,booking_amount,remaining_amount,taxable_value,cash_handling_charges;
+    let pay_now, booking_amount, remaining_amount, taxable_value, cash_handling_charges;
     let formData = req.body.data;
     let user_id = formData.user_id;
     let seller_id = formData.seller_id;
@@ -4713,64 +4657,61 @@ exports.Demoorder = async function (req, res) {
     let product_id = formData.product_id;
     let payment_method = formData.payment_method;
     taxable_value = formData.taxable_value;
-    let product =await Userproduct.findById(product_id);
+    let product = await Userproduct.findById(product_id);
     let total_price = 0;
     let addressBookId = formData.addressBookId;
     //===Defalt address setup====
-    await addressBook.updateMany({user_id: user_id}, {default_status:0});
-    await addressBook.updateMany({_id: mongoose.Types.ObjectId(addressBookId)}, {default_status:1});
-   
+    await addressBook.updateMany({ user_id: user_id }, { default_status: 0 });
+    await addressBook.updateMany({ _id: mongoose.Types.ObjectId(addressBookId) }, { default_status: 1 });
+
     const existingCart = await Cart.findOne({ user_id, status: 0 });
 
     const cartItem = await CartDetail.findOne({ cart_id: existingCart._id, status: 0 })
-    .populate({
-      path: 'product_id',
-      model: Userproduct
-    })
-    .exec();
+      .populate({
+        path: 'product_id',
+        model: Userproduct
+      })
+      .exec();
     let product_price;
-    let isBid=0
-  if(typeof cartItem.finalBidPrice != "undefined" && cartItem.finalBidPrice){
-    product_price = cartItem.finalBidPrice;
-    isBid=1;
-  }else{
-    isBid=0;
-    product_price = product.offer_price;
-  }
-  let packing_handling_charge = 0;
-  
-  if(cartItem){
-    let shippingCharges = await shippingchrgsModel.findOne({_id: mongoose.Types.ObjectId(product.shipping_charges_id)});
-    if(shippingCharges){
-      packing_handling_charge = Number(shippingCharges.amount);
+    let isBid = 0
+    if (typeof cartItem.finalBidPrice != "undefined" && cartItem.finalBidPrice) {
+      product_price = cartItem.finalBidPrice;
+      isBid = 1;
+    } else {
+      isBid = 0;
+      product_price = product.offer_price;
     }
-  }
-    if (payment_method == 0)
-    {
+    let packing_handling_charge = 0;
+
+    if (cartItem) {
+      let shippingCharges = await shippingchrgsModel.findOne({ _id: mongoose.Types.ObjectId(product.shipping_charges_id) });
+      if (shippingCharges) {
+        packing_handling_charge = Number(shippingCharges.amount);
+      }
+    }
+    if (payment_method == 0) {
       pay_now = parseFloat(product_price) * 0.10;
-      remaining_amount = parseFloat(product_price)-parseFloat(pay_now);
+      remaining_amount = parseFloat(product_price) - parseFloat(pay_now);
       cash_handling_charges = parseFloat(product_price) * 0.05;
     }
     taxable_value = packing_handling_charge;
-    let gst =  (taxable_value * 28) / 100;
+    let gst = (taxable_value * 28) / 100;
     //let gst =  parseFloat(product_price * 28) / 100;
-    if (payment_method == 0)
-    {
-      
-      taxable_value =  parseFloat(packing_handling_charge) + parseFloat(cash_handling_charges);
-      gst =  (taxable_value * 28) / 100;
+    if (payment_method == 0) {
+
+      taxable_value = parseFloat(packing_handling_charge) + parseFloat(cash_handling_charges);
+      gst = (taxable_value * 28) / 100;
       gst = gst.toFixed(2);
-      booking_amount = parseFloat(pay_now)+parseFloat(taxable_value)+ parseFloat(gst);
+      booking_amount = parseFloat(pay_now) + parseFloat(taxable_value) + parseFloat(gst);
       total_price = parseFloat(booking_amount) + parseFloat(remaining_amount);
-      total_price = total_price.toFixed(2); 
-      booking_amount = booking_amount.toFixed(2); 
+      total_price = total_price.toFixed(2);
+      booking_amount = booking_amount.toFixed(2);
 
     }
-    else if (payment_method == 1)
-    {
-      taxable_value =  parseFloat(packing_handling_charge);
-      total_price = parseFloat(product_price) + parseFloat(gst) + parseFloat(taxable_value) ;
-      total_price = total_price.toFixed(2); 
+    else if (payment_method == 1) {
+      taxable_value = parseFloat(packing_handling_charge);
+      total_price = parseFloat(product_price) + parseFloat(gst) + parseFloat(taxable_value);
+      total_price = total_price.toFixed(2);
     }
     let order_status = '0';
     let delivery_charges = '0';
@@ -4779,10 +4720,10 @@ exports.Demoorder = async function (req, res) {
     let delivery_status = '0';
     //let shipping_address_id = formData.addressBookId;
 
-    const shippingaddress = await addressBook.findOne({ user_id: user_id, default_status :1 });
+    const shippingaddress = await addressBook.findOne({ user_id: user_id, default_status: 1 });
     let shipping_address_id = shippingaddress._id;
 
-    const billingaddress = await addressBook.findOne({ user_id: seller_id, default_status :1 });
+    const billingaddress = await addressBook.findOne({ user_id: seller_id, default_status: 1 });
     if (!billingaddress) {
       return res.status(404).json({ message: 'Seller address not found' });
     }
@@ -4805,10 +4746,10 @@ exports.Demoorder = async function (req, res) {
       cash_handling_charges: (typeof cash_handling_charges != "undefined") ? parseFloat(cash_handling_charges) : 0,
       status: 1,
       user_ip: ip,
-      gst:(typeof gst != "undefined") ? gst : 0,
-      taxable_value:(typeof taxable_value != "undefined") ? parseFloat(taxable_value) : 0,
-      original_product_price:product_price,
-      is_bid_price:isBid,
+      gst: (typeof gst != "undefined") ? gst : 0,
+      taxable_value: (typeof taxable_value != "undefined") ? parseFloat(taxable_value) : 0,
+      original_product_price: product_price,
+      is_bid_price: isBid,
       added_dtime: new Date().toISOString(),
     });
 
@@ -4822,7 +4763,7 @@ exports.Demoorder = async function (req, res) {
         order: savedOrder
       });
     }
-    
+
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error' });
   }
@@ -4898,7 +4839,6 @@ exports.Demoorderold = async function (req, res) {
     let payment_method = formData.payment_method;
     let shipping_address_id = formData.addressBookId;
     let data = await checkoutcal.ordercalculte(product_id, user_id, payment_method);
-    console.log("data", data);
     const billingaddress = await addressBook.findOne({ user_id: seller_id });
     const billing_address_id = billingaddress._id;
     const order = new Demoorder({
@@ -4932,7 +4872,7 @@ exports.Demoorderold = async function (req, res) {
     } else {
       res.status(500).json({ message: 'Error saving order' });
     }
-    
+
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error' });
   }
@@ -5089,11 +5029,11 @@ exports.sendotp = async function (req, res, next) {
       let smsData = {
         textId: "test",
         toMobile: "91" + user.phone_no,
-        text: "Hello! Your OTP for password reset at Bid For Sale is:"+randNumber+". Please use this code to reset your password securely. If you didn't request this, kindly ignore this message. Thank you!-BFS RETAIL SERVICES PRIVATE LIMITED",
+        text: "Hello! Your OTP for password reset at Bid For Sale is:" + randNumber + ". Please use this code to reset your password securely. If you didn't request this, kindly ignore this message. Thank you!-BFS RETAIL SERVICES PRIVATE LIMITED",
       };
       let returnData;
       returnData = await sendSms(smsData);
-      
+
       const historyData = new ApiCallHistory({
         userId: user._id,
         called_for: "forget password",
@@ -5117,7 +5057,7 @@ exports.sendotp = async function (req, res, next) {
         text: "OTP",
         html: loginHtmlContent
       };
-    
+
       transporter.sendMail(mailData, function (err, info) {
         // if (err) console.log("err", err);
         //else console.log("info", info);
@@ -5173,7 +5113,7 @@ exports.sendotp = async function (req, res, next) {
 
                       let smsData = {
                         textId: "test",
-                        toMobile: "91" +user.phone_no,
+                        toMobile: "91" + user.phone_no,
                         text: "Password changed successfully! Your account at Bid For Sale is now updated. If you didn't make this change, please contact support immediately. Thank you!-BFS RETAIL SERVICES PRIVATE LIMITED",
                       };
                       let returnData;
@@ -5199,7 +5139,7 @@ exports.sendotp = async function (req, res, next) {
                         .ele('ADDRESS', { FROM: process.env.WP_SMS_SENDER_MOBILE, TO: receiverMobileNo, SEQ: "1" })
                       //.up()
                       //.up();
-            
+
                       // convert the XML tree to string
                       const xml = root.end({ prettyPrint: true });
                       await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
@@ -5214,10 +5154,9 @@ exports.sendotp = async function (req, res, next) {
                         let smsData = xml;
                         let returnData;
                         returnData = await sendWhatsapp(smsData);
-                      });  
+                      });
                       const currentDate = new Date().toLocaleDateString();
                       const currentTime = new Date().toLocaleTimeString();
-                      console.log(currentDate, currentTime);
                       const loginHtmlPath = 'views/webpages/reset-password.html';
                       let loginHtmlContent = fs.readFileSync(loginHtmlPath, 'utf-8');
                       loginHtmlContent = loginHtmlContent.replace('{{username}}', user.name);
@@ -5322,7 +5261,7 @@ exports.changePassword = async function (req, res, next) {
                           async (user) => {
                             let smsData = {
                               textId: "test",
-                              toMobile: "91" +user.phone_no,
+                              toMobile: "91" + user.phone_no,
                               text: "Password changed successfully! Your account at Bid For Sale is now updated. If you didn't make this change, please contact support immediately. Thank you!-BFS RETAIL SERVICES PRIVATE LIMITED",
                             };
                             let returnData;
@@ -5340,7 +5279,7 @@ exports.changePassword = async function (req, res, next) {
                             const message = "Password changed successfully! Your account at Bid For Sale is now updated. If you didn't make this change, please contact support immediately. Thank you!";
                             const to_number = "91" + user.phone_no;
                             let response = await send_message({ type: 'text', message, to_number });
-                  
+
                             //SEND WHATSAPP
                             const receiverMobileNo = "91" + user.phone_no;
                             const root = create({ version: '1.0', encoding: "ISO-8859-1" })
@@ -5350,7 +5289,7 @@ exports.changePassword = async function (req, res, next) {
                               .ele('ADDRESS', { FROM: process.env.WP_SMS_SENDER_MOBILE, TO: receiverMobileNo, SEQ: "1" })
                             //.up()
                             //.up();
-                  
+
                             // convert the XML tree to string
                             const xml = root.end({ prettyPrint: true });
                             await fs.readFile('./api_send_message.json', 'utf8', async function (err, data) {
@@ -5365,7 +5304,7 @@ exports.changePassword = async function (req, res, next) {
                               let smsData = xml;
                               let returnData;
                               returnData = await sendWhatsapp(smsData);
-                            });  
+                            });
                             const currentDate = new Date().toLocaleDateString();
                             const currentTime = new Date().toLocaleTimeString();
                             const loginHtmlPath = 'views/webpages/reset-password.html';
@@ -5395,7 +5334,7 @@ exports.changePassword = async function (req, res, next) {
                         );
                       }
                     }
-  
+
                   );
                 });
               } else {

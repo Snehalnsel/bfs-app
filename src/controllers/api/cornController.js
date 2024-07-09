@@ -111,13 +111,11 @@ async function trackbyawbid(pickup_awb) {
     });
   });
 }
-
 async function trackbyaorderid(order_id){
   token = await generateToken(email, shipPassword);
   if (!token) {
     return Promise.reject('Token not available. Call generateToken first.');
   }
-
   const channel_id = 12345;
   const options = {
     method: 'GET',
@@ -127,7 +125,6 @@ async function trackbyaorderid(order_id){
       'Authorization': `Bearer ${token}`
     }
   };
-
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
       if (error) {
@@ -142,7 +139,6 @@ async function trackbyaorderid(order_id){
     });
   });
 }
-
 async function trackbyshipmentid(shipment_id) {
   token = await generateToken(email, shipPassword);
   if (!token) {
@@ -157,7 +153,6 @@ async function trackbyshipmentid(shipment_id) {
       'Authorization': `Bearer ${token}`
     }
   };
-
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
       if (error) {
@@ -172,7 +167,6 @@ async function trackbyshipmentid(shipment_id) {
     });
   });
 }
-
 exports.getTrackByAWB = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -182,14 +176,9 @@ exports.getTrackByAWB = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   try {
-
     const orderId = req.body.order_id;
-
     const existingOrder = await Order.findById(orderId);
-
-
     if (!existingOrder) {
       return res.status(404).json({
         status: "0",
@@ -197,11 +186,8 @@ exports.getTrackByAWB = async function (req, res, next) {
         respdata: {},
       });
     }
-  
     pickup_awb = existingOrder.pickup_awb;
-
       const shiprocketResponse = await trackbyawbid(pickup_awb);
-
       res.status(200).json({
         status: "1",
         message: "Details fetched successfully!",
@@ -216,8 +202,6 @@ exports.getTrackByAWB = async function (req, res, next) {
     });
   }
 };
-
-
 exports.getTrackByorderid = async function (req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -227,14 +211,9 @@ exports.getTrackByorderid = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   try {
-
     const orderId = req.body.order_id;
-
     const existingOrder = await Order.findById(orderId);
-
-
     if (!existingOrder) {
       return res.status(404).json({
         status: "0",
@@ -242,10 +221,10 @@ exports.getTrackByorderid = async function (req, res, next) {
         respdata: {},
       });
     }
-  
-     order_id = existingOrder.shiprocket_order_id;
 
-      const shiprocketResponse = await trackbyaorderid(order_id);
+    let  order_id = existingOrder.shiprocket_order_id;
+
+    const shiprocketResponse = await trackbyaorderid(order_id);
 
       res.status(200).json({
         status: "1",
@@ -308,25 +287,19 @@ exports.getTrackByshipmentid = async function (req, res, next) {
 
 exports.processOrderTracking = async function (req, res, next) {
   try {
-    console.log("hello");
     const tracks = await Track.find({ is_delivered: 0, pickup_awb: { $exists: true } });
     for (const track of tracks) {
       const shiprocketResponse = await trackbyawbid(track.pickup_awb);
-
       const shipmentActivities = shiprocketResponse.tracking_data.shipment_track_activities;
       const lastActivity = shipmentActivities[shipmentActivities.length - 1];
-      
       const isDelivered = shiprocketResponse.tracking_data.shipment_track.some(shipment => shipment.current_status === "Delivered");
-      
       if ((lastActivity.status === "DLVD" && lastActivity.activity === "Delivered") || isDelivered) {
-
         track.is_delivered = 1;
         await track.save();
         let getorderid = await Ordertracking.findOne({ tracking_id: track_id });
         let orderdetails = await Order.findById(getorderid.order_id);
         orderdetails.is_delivered = 1;
         orderdetails.save();
-
         const newOrderDelivered = new deliveryorderModel({
           order_id: getorderid.order_id,
           tracking_id: track._id,
@@ -338,7 +311,6 @@ exports.processOrderTracking = async function (req, res, next) {
           added_dtime: new Date().toISOString(), 
         });
         await newOrderDelivered.save();
-
         if(newOrderDelivered)
         {
           const user = await Users.findById(orderdetails.user_id);
@@ -359,7 +331,6 @@ exports.processOrderTracking = async function (req, res, next) {
             send_status: 'send',
           });
           await historyData.save();
-
           const seller = await Users.findById(orderdetails.seller_id);
           let smsDataforseller = {
             textId: "test",
@@ -382,7 +353,6 @@ exports.processOrderTracking = async function (req, res, next) {
         console.log("Shipment is not delivered.");
         console.log("Shipment ID:", track._id, "is not delivered.");
       }
-      
     }
     res.status(200).json({ message: 'Processing completed' });
   } catch (error) {

@@ -1048,6 +1048,7 @@ exports.getOrderDetails = async (req, res) => {
     const orderDetails = {
       _id: order._id,
       total_price: order.total_price,
+      finalBidPrice : order.finalBidPrice ? order.finalBidPrice : 0,
       payment_method: order.payment_method,
       order_status: order.order_status,
       gst: order.gst,

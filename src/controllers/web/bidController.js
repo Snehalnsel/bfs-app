@@ -124,6 +124,7 @@ exports.getData = async function (req, res, next) {
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
 
   let getBidAllProduct = await getAllProductBidList();
+  //console.log("getBidAllProduct--",getBidAllProduct); return false;
   let setBidProductList = [];
   let prodictIdCheckArr = [];
   for (let bidData of getBidAllProduct) {

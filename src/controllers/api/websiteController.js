@@ -4698,7 +4698,6 @@ exports.Demoorder = async function (req, res) {
     let gst = (taxable_value * 28) / 100;
     //let gst =  parseFloat(product_price * 28) / 100;
     if (payment_method == 0) {
-
       taxable_value = parseFloat(packing_handling_charge) + parseFloat(cash_handling_charges);
       gst = (taxable_value * 28) / 100;
       gst = gst.toFixed(2);

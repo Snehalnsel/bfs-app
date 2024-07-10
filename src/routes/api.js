@@ -1186,7 +1186,6 @@ router.post("/checkapp-payment",cors(),PaymentController.checkPaymentData);
 router.post("/getshipmentvalue",cors(),OrderController.shipmentvalue);
 router.post("/demoplacedorder",WebsiteController.Demoorder);
 router.get("/payment-status",PaymentController.getStatus);
-
 // router.get("/whatsapp",
 // WebsiteController.whatsappintegration
 // );

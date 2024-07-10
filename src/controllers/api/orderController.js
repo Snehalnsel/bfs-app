@@ -1049,6 +1049,7 @@ exports.getOrderDetails = async (req, res) => {
       _id: order._id,
       total_price: order.total_price,
       finalBidPrice : order.finalBidPrice ? order.finalBidPrice : 0,
+      original_product_price: order.original_product_price ? order.original_product_price : 0,
       payment_method: order.payment_method,
       order_status: order.order_status,
       gst: order.gst,

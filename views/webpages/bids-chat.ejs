@@ -131,7 +131,8 @@
    });
    $(document).on("click","#acceptButton", async function() {
       $(".clickOnProduct").each(async function(index) {
-         if($(".clickOnProduct").hasClass("selectedProduct")){
+         //if($(".clickOnProduct").hasClass("selectedProduct")){
+         if($(this).hasClass("selectedProduct")){
             let roomName = this.id;
             socket.emit('acceptation', {username,roomName});
             //console.log(acceptBidId);

@@ -373,7 +373,6 @@ exports.ajaxAdminLogin = async function (req, res, next) {
   });
 };*/
 exports.adminRelogin = async function (req, res, next) {
-
   const { cookieRefreshToken } = req.body;
   let accessTokenGlobal = "";
   let refreshTokenGlobal = "";

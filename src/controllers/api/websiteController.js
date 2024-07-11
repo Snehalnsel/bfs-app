@@ -3661,7 +3661,7 @@ exports.viewCartListByUserId = async function (req, res, next) {
       finalData.is_bid = 0;
     }
     const gst = parseFloat((shippingChargeAmount * 28) / 100).toFixed(2);
-    const finalPrice = parseInt(product_price) + shippingChargeAmount + parseInt(gst);
+    const finalPrice = parseFloat(product_price) + parseFloat(shippingChargeAmount) + parseFloat(gst);
     return res.render("webpages/addtocart", {
       title: "Cart List Page",
       message: "Welcome to the Cart List page!",
@@ -3671,7 +3671,7 @@ exports.viewCartListByUserId = async function (req, res, next) {
       isLoggedIn: isLoggedIn,
       websiteUrl: process.env.SITE_URL,
     });
-  } catch (error) {
+  } catch(error) {
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering Cart List.",

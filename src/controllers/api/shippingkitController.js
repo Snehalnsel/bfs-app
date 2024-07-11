@@ -385,34 +385,24 @@ exports.addData = async (req, res) => {
 exports.addShipmentData = async (req, res) => {
   try {
     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
-
     const {
       order_id,
       total_price,
       payment_method,
     } = req.body;
-    
-       
     const track = await Ordertracking.findOne({ order_id: order_id, status: 1 }).exec();
-
     if (!track) {
-      return res.status(404).json({ message: 'Order Delivery Partner Not chosse yet' });
+      return res.status(404).json({ message: 'Order Delivery Partner Not chosen yet' });
     }
-
-    
     const hubaddress = await Track.findById(track.tracking_id)
       .populate('seller_id', 'name phone_no email')
       .populate('billing_address_id') 
       .populate('hub_address_id');
-    
     // return;
-
     if (!hubaddress) {
-      return res.status(404).json({ message: 'Order Delivery Partner Not chosse yet' });
+      return res.status(404).json({ message: 'Order Delivery Partner Not chosen yet' });
     }
-
     const orderCode = `BFSSHIPKIT${Date.now().toString()}`;
-
     const shippingkit = new Shippingkit({
       track_code: orderCode, 
       buyer_id : hubaddress.seller_id._id,
@@ -423,19 +413,15 @@ exports.addShipmentData = async (req, res) => {
       payment_method,
       added_dtime: new Date().toISOString(),
     });
-
     const savedOrder = await shippingkit.save();
    if(savedOrder)
     {
-
       const updatedTrack = await Track.findOneAndUpdate(
         { _id: track.tracking_id },
         { $set: { shippingkit_status: 1 } },
         { new: true }
       );
-    
       const user = await Users.findById(savedOrder.buyer_id);
-
       if(user.email)
       {
         const mailData = {
@@ -448,7 +434,6 @@ exports.addShipmentData = async (req, res) => {
             user.name +
             ", <br> <p>Congratulations your order is placed for shipping kit.please wait for some times and the delivery details you will show on the app.</p>",
         };
-  
         transporter.sendMail(mailData, function (err, info) {
           // if (err) console.log(err);
           // else console.log(info);
@@ -459,8 +444,7 @@ exports.addShipmentData = async (req, res) => {
             message: 'Order placed successfully',
             order: savedOrder,
             isLoggedIn: isLoggedIn,
-          });
-          
+          });     
     }
 
   } catch (error) {

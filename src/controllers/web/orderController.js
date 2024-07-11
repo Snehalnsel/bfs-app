@@ -108,7 +108,6 @@ async function generateCouriresList() {
       'Authorization': `Bearer ${token}`
     }
   };
-
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
       if (error) {
@@ -117,13 +116,14 @@ async function generateCouriresList() {
         const responseBody = JSON.parse(body);
         const token = responseBody;
         resolve(token);
-      } else {
+      } 
+      else if (response.statusCode != 200) {
+        resolve(body);
+      }else {
         reject(new Error(`Error: ${response.statusCode}`));
       }
     });
   });
-
-
 }
 
 async function generateAWBno(shipment_id, courier_id) {
@@ -131,7 +131,6 @@ async function generateAWBno(shipment_id, courier_id) {
   if (!token) {
     return Promise.reject('Token not available. Call generateToken first.');
   }
-
   const options = {
     method: 'POST',
     url: baseUrl + '/courier/assign/awb',
@@ -144,7 +143,6 @@ async function generateAWBno(shipment_id, courier_id) {
       courier_id
     })
   };
-
   return new Promise((resolve, reject) => {
     request(options, function (error, response, body) {
       if (error) {
@@ -586,7 +584,7 @@ exports.getOrderDetails = function (req, res, next) {
           billingAddress: billingAddress,
           shippingAddress: shippingAddress,
           hublist: hubdata,
-          shiprocketResponse: shiprocketResponse,
+          shiprocketResponse: shiprocketResponse ? shiprocketResponse : [],
           orderStatus: orderStatus
         },
         isAdminLoggedIn: isAdminLoggedIn

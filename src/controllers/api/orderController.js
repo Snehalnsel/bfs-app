@@ -1039,12 +1039,9 @@ exports.getOrderDetails = async (req, res) => {
         shiprocketResponsefortracking = await trackbyaorderid(trackDetails.shiprocket_order_id);
       }
   }
-
     const sellerAddress = await AddressBook.findOne({ user_id: order.seller_id });
     const buyerAddress = await AddressBook.findOne({ user_id: order.user_id });
-
     const shippingKitData = await Shippingkit.findOne({ order_id: order._id });
-
     const orderDetails = {
       _id: order._id,
       total_price: order.total_price,

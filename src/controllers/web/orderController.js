@@ -1196,7 +1196,6 @@ exports.deleteData = async function (req, res, next) {
         isAdminLoggedIn: isAdminLoggedIn
       });
     }
-
     const order = await Order.findOne({ _id: req.params.id });
     if (!order) {
       return res.status(404).json({
@@ -1206,20 +1205,16 @@ exports.deleteData = async function (req, res, next) {
         isAdminLoggedIn: isAdminLoggedIn
       });
     }
-
     await Order.updateOne(
       { _id: req.params.id },
-      { $set: { delete_status: 1, delete_by: 1 } },
+      { $set: { delete_status: 1, delete_by: 1 } }, 
       { w: "majority", wtimeout: 100 }
     );
-
     const productIdToUpdateFlag = order.product_id;
-
     await Userproduct.updateOne(
       { _id: productIdToUpdateFlag },
       { $set: { flag: 0 } }
     );
-
     res.redirect("/admin/orderlist");
   } catch (error) {
     return res.render("pages/error-msg", {

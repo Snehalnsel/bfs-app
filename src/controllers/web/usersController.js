@@ -516,7 +516,6 @@ exports.uploadImage = async function (req, res, next) {
       });
 
       var image_url = req.app.locals.requrl + "/public/images/" + path;
-
       var updData = {
         image: image_url,
       };

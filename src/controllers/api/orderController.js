@@ -957,8 +957,8 @@ exports.getOrdersBySeller = async (req, res) => {
       if (typeof shipdetails !="undefined" && shipdetails.length > 0) {
           shipping_details = await Track.find({ _id: shipdetails[0].tracking_id });
       }
-      let productshippingkit = productDetails[0].shipping_charges_id;
-      let shippingcharges = await shippingchrgsModel.findOne({ _id: productshippingkit });
+      //let productshippingkit = productDetails[0].shipping_charges_id;
+      //let shippingcharges = await shippingchrgsModel.findOne({ _id: productshippingkit });
       //const shippingKitData = await Shippingkit.findOne({ order_id: order._id });
       const orderDetails = {
         _id: order._id,
@@ -987,7 +987,7 @@ exports.getOrdersBySeller = async (req, res) => {
       orders: ordersWithProductDetails,
     });
   } catch (error) {
-    console.log(error);
+    console.log("error",error);
     res.status(500).json({ error: 'An error occurred while fetching orders' });
   }
 };
@@ -1014,16 +1014,12 @@ exports.getOrderDetails = async (req, res) => {
     if (!productDetails) {
       return res.status(404).json({ message: 'Product details not found' });
     }
-
     const productImage = await Productimage.findOne({ product_id: productId }).limit(1);
-
     const orderTrackStatusOne = await Ordertracking.find({ order_id, status: 1 });
-
     let shiprocketResponse = [];
     let shiprocketResponselabel = [];
     let shiprocketResponseinvoice = [];
     let shiprocketResponsefortracking = [];
-
     if (orderTrackStatusOne && orderTrackStatusOne.length > 0)  {
       const trackingId = orderTrackStatusOne[0].tracking_id;
       const trackDetails = await Track.findById(trackingId);
@@ -1077,6 +1073,7 @@ exports.getOrderDetails = async (req, res) => {
       shippingKit: shippingKitData || null, 
     });
   } catch (error) {
+    console.log("error",error)
     res.status(500).json({ error: 'An error occurred while fetching order details' });
   }
 };

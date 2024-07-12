@@ -233,18 +233,13 @@ const Cartremove = require("../../models/api/cartremoveModel");
 exports.addToCart = async (req, res) => {
   try {
     const { user_id, product_id, qty } = req.body;
-
-
     const existingCart = await Cart.findOne({ user_id: req.body.user_id, status: 0 });
     if (existingCart) {
-
       let finalBidPrice = 0;
       finalBidPrice = req.body.finalBidPrice ? req.body.finalBidPrice : finalBidPrice;
-
       const existingCartItem = await CartDetail.findOne({
         cart_id: existingCart._id
       });
-
       if (existingCartItem) {
         existingCartItem.product_id = product_id;
         existingCartItem.finalBidPrice =finalBidPrice;
@@ -270,12 +265,10 @@ exports.addToCart = async (req, res) => {
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
-
       const product = await Userproduct.findById(product_id);
       if (!product) {
         return res.status(404).json({ error: 'Product not found' });
       }
-
       const cartResponse = {
         _id: existingCart._id,
         user_id: existingCart.user_id,
@@ -288,30 +281,24 @@ exports.addToCart = async (req, res) => {
         added_dtime: existingCart.added_dtime,
         __v: existingCart.__v,
       };
-
       setTimeout(() => {
-        removeItemAfterTime(existingCart._id); // savedata._id contains the ID of the added item
+        removeItemAfterTime(existingCart._id);
       }, 20 * 60 * 1000);
-
       return res.status(200).json({
         message: 'Item added to existing cart successfully',
         cart: cartResponse,
       });
     } 
     else {
-
       let finalBidPrice = 0;
       finalBidPrice = req.body.finalBidPrice ? req.body.finalBidPrice : finalBidPrice;
-
       const newCart = new Cart({
         user_id,
         status: 0,
         finalBidPrice:finalBidPrice,
         added_dtime: dateTime,
       });
-
       const savedCart = await newCart.save();
-
       const cartDetail = new CartDetail({
         cart_id: savedCart._id,
         product_id,
@@ -321,12 +308,9 @@ exports.addToCart = async (req, res) => {
         status: 0,
         added_dtime: dateTime,
       });
-
       const savedata = await cartDetail.save();
-
       const user = await Users.findById(user_id);
       const product = await Userproduct.findById(product_id);
-
       const cartResponse = {
         _id: savedCart._id,
         user_id: savedCart.user_id,
@@ -339,17 +323,12 @@ exports.addToCart = async (req, res) => {
         added_dtime: savedCart.added_dtime,
         __v: savedCart.__v,
       };
-
       const cartRemove = await Cartremove.findOne({}, { name: 1, _id: 0 });
-
       const durationInSeconds = cartRemove.name; 
-      
       const durationInMilliseconds = durationInSeconds * 60 * 1000;
-
       setTimeout(() => {
         removeItemAfterTime(savedCart._id); 
       }, durationInMilliseconds);
-      
       res.status(200).json({
         message: 'Item added to new cart successfully',
         cart: cartResponse,

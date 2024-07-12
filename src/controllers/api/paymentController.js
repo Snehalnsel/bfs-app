@@ -442,7 +442,7 @@ exports.getStatus = async function (req, res, next) {
               let smsData = {
                 textId: "test",
                 toMobile: "91" + user.phone_no,
-                text: "Dear " + user.name + ",Your order " + orderCode + " has been placed successfully. Sit back and relax. We'll notify you once it's shipped.- BFS Team",
+                text: "Dear " + user.name + ",Your order " + orderCode + " has been placed successfully. Sit back and relax. We'll notify you once it's shipped.-  BFS RETAIL SERVICES PRIVATE LIMITED",
               };
               let returnData;
               returnData = await sendSms(smsData);
@@ -456,7 +456,7 @@ exports.getStatus = async function (req, res, next) {
               });
               await historyData.save();
 
-              let message = "Dear " + user.name + ", Your order " + orderCode + " has been placed successfully. Sit back and relax. We'll notify you once it's shipped.- BFS Team";
+              let message = "Dear " + user.name + ", Your order " + orderCode + " has been placed successfully. Sit back and relax. We'll notify you once it's shipped.-  BFS RETAIL SERVICES PRIVATE LIMITED";
               let to_number = "91" + user.phone_no;
               let response = await send_message({ type: 'text', message, to_number });
 
@@ -489,7 +489,7 @@ exports.getStatus = async function (req, res, next) {
               let smsData = {
                 textId: "test",
                 toMobile: "91" + seller.phone_no,
-                text: "Dear " + seller.name + ",Congratulations! Your product " + product.name + " has been sold successfully.The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.- BFS Team",
+                text: "Dear " + seller.name + ",Congratulations! Your product " + product.name + " has been sold successfully.The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.-  BFS RETAIL SERVICES PRIVATE LIMITED",
               };
               let returnData;
               returnData = await sendSms(smsData);
@@ -503,7 +503,7 @@ exports.getStatus = async function (req, res, next) {
               });
               await historyDataforseller.save();
 
-              let message = "Dear " + seller.name + ",Congratulations! Your product " + product.name + " has been sold successfully.The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.- BFS Team";
+              let message = "Dear " + seller.name + ",Congratulations! Your product " + product.name + " has been sold successfully.The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.-  BFS RETAIL SERVICES PRIVATE LIMITED";
               let to_number = "91" + seller.phone_no;
               let response = await send_message({ type: 'text', message, to_number });
 
@@ -713,10 +713,11 @@ exports.checkPaymentData = async function (req, res, next) {
           let smsData = {
             textId: "test",
             toMobile: "91" + user.phone_no,
-            text: "Dear " + user.name + ",Your order " + orderCode + " has been placed successfully. Sit back and relax. We'll notify you once it's shipped.- BFS Team",
+            text: "Dear " + user.name + ",Your order " + orderCode + " has been placed successfully. Sit back and relax. We'll notify you once it's shipped.-  BFS RETAIL SERVICES PRIVATE LIMITED",
           };
           let returnData;
           returnData = await sendSms(smsData);
+
           const historyData = new ApiCallHistory({
             userId: user._id,
             called_for: "reset password",
@@ -727,7 +728,7 @@ exports.checkPaymentData = async function (req, res, next) {
           });
           await historyData.save();
 
-          let message = "Dear " + user.name + ", Your order " + orderCode + " has been placed successfully. Sit back and relax. We'll notify you once it's shipped.- BFS Team";
+          let message = "Dear " + user.name + ", Your order " + orderCode + " has been placed successfully. Sit back and relax. We'll notify you once it's shipped.-  BFS RETAIL SERVICES PRIVATE LIMITED";
           let to_number = "91" + user.phone_no;
           let response = await send_message({ type: 'text', message, to_number });
 
@@ -760,7 +761,7 @@ exports.checkPaymentData = async function (req, res, next) {
           let smsData = {
             textId: "test",
             toMobile: "91" + seller.phone_no,
-            text: "Dear " + seller.name + ",Congratulations! Your product " + product.name + " has been sold successfully.The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.- BFS Team",
+            text: "Dear " + seller.name + ",Congratulations! Your product " + product.name + " has been sold successfully.The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.-  BFS RETAIL SERVICES PRIVATE LIMITED",
           };
           let returnData;
           returnData = await sendSms(smsData);
@@ -774,7 +775,7 @@ exports.checkPaymentData = async function (req, res, next) {
           });
           await historyDataforseller.save();
 
-          let message = "Dear " + seller.name + ",Congratulations! Your product " + product.name + " has been sold successfully.The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.- BFS Team";
+          let message = "Dear " + seller.name + ",Congratulations! Your product " + product.name + " has been sold successfully.The order will be picked up within the next 2 business days. Please have the product packed and ready for shipment.-  BFS RETAIL SERVICES PRIVATE LIMITED";
           let to_number = "91" + seller.phone_no;
           let response = await send_message({ type: 'text', message, to_number });
 
@@ -815,7 +816,6 @@ exports.checkPaymentData = async function (req, res, next) {
         }
 
         const address = await AddressBook.findById(savedOrder.shipping_address_id);
-
         const billingaddress = address.address1 + ', ' + address.street_name + ', ' + address.landmark + ', ' + address.city_name + ', ' + address.state_name + ', ' + address.pin_code;
         //buyer mail,sms,whatsapp
         const loginHtmlPath = 'views/webpages/order-confirmed.html';
@@ -858,9 +858,7 @@ exports.checkPaymentData = async function (req, res, next) {
         }
         loginHtmlContentforseller = loginHtmlContentforseller.replace('{{PRODUCTDATA}}', rpData);
         //loginHtmlContentforseller = loginHtmlContentforseller.replace('{{bidPrice}}', temporder.original_product_price);
-
         loginHtmlContentforseller = loginHtmlContentforseller.replace('{{buyername}}', user.name);
-
         const mailDataforseller = {
           from: "Bid For Sale! <" + smtpUser + ">",
           to: seller.email,

@@ -644,9 +644,8 @@ exports.checkPaymentData = async function (req, res, next) {
   try {
     const tempId = req.body.temp;
     const status = req.body.status;
-    console.log("tempId", tempId);
+
     const temporder = await Demoorder.findById(tempId);
-    console.log("temporder", temporder);
     if (status === "success") {
       const now = new Date();
       const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0');

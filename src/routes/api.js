@@ -1182,6 +1182,7 @@ router.get("/otherwise-list",cors(),WebsiteController.otherlistdata);
 router.get("/pay",cors(),PaymentController.getPaymentData);
 router.get("/payshippingkit",cors(),ShippingkitpaymentController.getPaymentDataforshippingkit);
 router.get("/payment-shippingkit-status",ShippingkitpaymentController.getShippingKitStatus);
+router.get("/payment-shippingkit-status-app",ShippingkitpaymentController.getShippingKitStatus_forApp);
 router.post("/checkapp-payment",cors(),PaymentController.checkPaymentData);
 router.post("/getshipmentvalue",cors(),OrderController.shipmentvalue);
 router.post("/demoplacedorder",WebsiteController.Demoorder);

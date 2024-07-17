@@ -1407,7 +1407,6 @@ exports.myAccount = async function (req, res, next) {
         websiteUrl: process.env.SITE_URL,
       }, { async: true });
       res.send(html);
-
       // res.render("webpages/myaccount", {
       //   helper: helper,
       //   //async: true,

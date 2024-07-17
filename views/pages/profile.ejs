@@ -30,7 +30,7 @@
                       <!-- Page Heading -->
                       <h1 class="h3 mb-2 text-gray-800">Profile</h1>
                       <p class="mb-4">View / edit profile details</p>
-  
+                      <p class="mb-4"><a class="collapse-item" href="/admin/change-password">Change Paassword</a></p>
                       <!-- DataTales Example -->
                       <div class="card shadow mb-4">
                           <div class="card-header py-3">
@@ -43,7 +43,6 @@
                                         <input type="text" class="form-control form-control-user" id="fullName" name="fullName"
                                             placeholder="Full Name" value="<%= userFullName %>">
                                     </div>
-
                                     <div class="col-sm-6">
                                         <input type="email" class="form-control form-control-user" id="userEmail" name="usrEmail"
                                         placeholder="Email Address" value="<%= userEmail %>" readonly>
@@ -53,16 +52,6 @@
                                     <input type="email" class="form-control form-control-user" id="exampleInputEmail"
                                         placeholder="Email Address">
                                 </div>%>
-                                <div class="form-group row">
-                                    <div class="col-sm-6 mb-3 mb-sm-0">
-                                        <input type="password" class="form-control form-control-user"
-                                            id="newPassword" name="newPassword" placeholder="Password" value=""  autocomplete="new-password">            
-                                    </div>
-                                    <%#<div class="col-sm-6">
-                                        <input type="password" class="form-control form-control-user"
-                                        id="repeatPassword" name="repeatPassword" placeholder="Repeat Password">
-                                    </div>%>
-                                </div>
                                 <input type="submit" class="btn btn-primary btn-user btn-block" id="btn_profile" name="btn_profile" value="Submit">
                             </form>
                             <hr>

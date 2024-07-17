@@ -783,12 +783,8 @@ exports.getParticularShipmentDetails = async function (req, res, next) {
   }
 
   try {
-
     const orderId = req.body.order_id;
-
     const existingOrder = await Order.findById(orderId);
-
-
     if (!existingOrder) {
       return res.status(404).json({
         status: "0",
@@ -796,9 +792,7 @@ exports.getParticularShipmentDetails = async function (req, res, next) {
         respdata: {},
       });
     }
-  
-    shipment_id = existingOrder.shiprocket_shipment_id;
-
+      shipment_id = existingOrder.shiprocket_shipment_id;
       const shiprocketResponse = await SpecificShipmentDeatils(shipment_id);
 
       if(shiprocketResponse)
@@ -869,7 +863,8 @@ exports.addShipmentDataWeb = async (req, res) => {
         message: 'Shipping Kit Order placed successfully',
         success: true,
         is_shippingkit: true,
-        order: savedOrder,
+        ordershippingkit_data: savedOrder,
+        temp_id: savedOrder._id,
         isLoggedIn: isLoggedIn,
         websiteUrl: process.env.SITE_URL,
       });

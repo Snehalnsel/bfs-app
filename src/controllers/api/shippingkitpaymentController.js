@@ -261,7 +261,6 @@ exports.getShippingKitStatus = async function (req, res, next) {
   }
 };
 
-
 exports.getShippingKitStatus_forApp = async function (req, res, next) {
   try {
     const tempId = req.body.temp;
@@ -272,7 +271,6 @@ exports.getShippingKitStatus_forApp = async function (req, res, next) {
           const now = new Date();
           const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0'); 
           const currentYear = now.getFullYear().toString();
-     
           const lastOrderIndex = await getLastOrderIndex();
           const nextIncrementingPart = lastOrderIndex + 1;
           const orderCode = `SHIPPINGKIT${currentMonth}${currentYear}-${nextIncrementingPart}`;
@@ -318,7 +316,6 @@ exports.getShippingKitStatus_forApp = async function (req, res, next) {
           message: 'Their is a an error in your oder',
         });
       }
-   
   } catch (error) {
     res.status(500).json({
       status: "0",

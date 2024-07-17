@@ -423,7 +423,6 @@
     function uploadbuttonShowhide() {
         const imageCount = productImages.length;
         const uploadButton = document.getElementById('upload-button');
-
         if (imageCount < 5) {
             uploadButton.style.display = 'block';
         } else {
@@ -440,7 +439,6 @@
             brandNameField.style.display = 'block';
         }
     }
-
     function handleSizeSelection(event) {
         const selectedValue = event.target.value;
         const sizeNameField = document.getElementById('sizeNameField');
@@ -450,7 +448,6 @@
             sizeNameField.style.display = 'block';
         }
     }
-
     function handleCategorySelection(event) {
         const selectedValue = event.target.value;
         const categoryNameField = document.getElementById('categoryNameField');

@@ -54,49 +54,47 @@
                                             </thead>
                                             <tbody>
                                                 <% if(respdata.list){ %>
-                                                    
                                                     <% respdata.list.forEach(function(value, index) { %>
                                                         <tr>
                                                             <td>
                                                                 <%= (index+1) %>
                                                             </td>
                                                             <td>
-                                                                <%= value.track_code %>
+                                                                <%= value.track_code != null ? value.track_code : " " %>
                                                             </td>
                                                             <td>
-                                                                <%= value.order_id.order_code %>
+                                                                <%= value.order_id != null && value.order_id.order_code != null ? value.order_id.order_code : " " %>
                                                             </td>
                                                             <td>
-                                                                <%= value.product_id.name%>
+                                                                <%= value.product_id != null && value.product_id.name != null ? value.product_id.name : " " %>
                                                             </td>
                                                             <td>
-                                                                <%= value.buyer_id.name %> 
-                                                                <%= value.buyer_id.phone_no %>
-                                                                <%= value.buyer_id.email %>
+                                                                <%= value.buyer_id != null && value.buyer_id.name != null ? value.buyer_id.name : " " %> 
+                                                                <%= value.buyer_id != null && value.buyer_id.phone_no != null ? value.buyer_id.phone_no : " " %>
+                                                                <%= value.buyer_id != null && value.buyer_id.email != null ? value.buyer_id.email : " " %>
                                                                 <br>
-                                                                    <%= value.shipping_address_id.street_name %>,
-                                                                    <%= value.shipping_address_id.address1 %>,
-                                                                    <%= value.shipping_address_id.landmark %>,
-                                                                    <%= value.shipping_address_id.city_name %>,
-                                                                    <%= value.shipping_address_id.state_name %>
+                                                                <%= value.shipping_address_id != null && value.shipping_address_id.street_name != null ? value.shipping_address_id.street_name : " " %>,
+                                                                <%= value.shipping_address_id != null && value.shipping_address_id.address1 != null ? value.shipping_address_id.address1 : " " %>,
+                                                                <%= value.shipping_address_id != null && value.shipping_address_id.landmark != null ? value.shipping_address_id.landmark : " " %>,
+                                                                <%= value.shipping_address_id != null && value.shipping_address_id.city_name != null ? value.shipping_address_id.city_name : " " %>,
+                                                                <%= value.shipping_address_id != null && value.shipping_address_id.state_name != null ? value.shipping_address_id.state_name : " " %>
                                                             </td>
                                                             <td>
-                                                                <%= value.hub_address_id.name %> 
-                                                                <%= value.hub_address_id.phone_no %>
-                                                                <%= value.hub_address_id.email %>
+                                                                <%= value.hub_address_id != null && value.hub_address_id.name != null ? value.hub_address_id.name : " " %> 
+                                                                <%= value.hub_address_id != null && value.hub_address_id.phone_no != null ? value.hub_address_id.phone_no : " " %>
+                                                                <%= value.hub_address_id != null && value.hub_address_id.email != null ? value.hub_address_id.email : " " %>
                                                                 <br>
-                                                                <%= value.hub_address_id.street_name %>,
-                                                                    <%= value.hub_address_id.address1 %>,
-                                                                    <%= value.hub_address_id.landmark %>,
-                                                                    <%= value.hub_address_id.city_name %>,
-                                                                    <%= value.hub_address_id.state_name %>
-                                  
+                                                                <%= value.hub_address_id != null && value.hub_address_id.street_name != null ? value.hub_address_id.street_name : " " %>,
+                                                                <%= value.hub_address_id != null && value.hub_address_id.address1 != null ? value.hub_address_id.address1 : " " %>,
+                                                                <%= value.hub_address_id != null && value.hub_address_id.landmark != null ? value.hub_address_id.landmark : " " %>,
+                                                                <%= value.hub_address_id != null && value.hub_address_id.city_name != null ? value.hub_address_id.city_name : " " %>,
+                                                                <%= value.hub_address_id != null && value.hub_address_id.state_name != null ? value.hub_address_id.state_name : " " %>
                                                             </td>
                                                             <td>
                                                                 <span style="color: #98FB98;">Online</span>
                                                             </td>
                                                             <td>
-                                                                <%= value.total_price %>
+                                                                <%= value.total_price != null ? value.total_price : " " %>
                                                             </td>
                                                         </tr>
                                                         <% }); %>

@@ -781,7 +781,6 @@ exports.getParticularShipmentDetails = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   try {
     const orderId = req.body.order_id;
     const existingOrder = await Order.findById(orderId);
@@ -794,7 +793,6 @@ exports.getParticularShipmentDetails = async function (req, res, next) {
     }
       shipment_id = existingOrder.shiprocket_shipment_id;
       const shiprocketResponse = await SpecificShipmentDeatils(shipment_id);
-
       if(shiprocketResponse)
       {
         res.status(200).json({
@@ -804,7 +802,6 @@ exports.getParticularShipmentDetails = async function (req, res, next) {
           shiprocketResponse: shiprocketResponse
         });
       }
-    
   } catch (error) {
     res.status(500).json({
       status: "0",

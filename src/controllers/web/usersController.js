@@ -579,13 +579,6 @@ exports.changePassword = async function (req, res, next) {
 };
 
 exports.updatePassword = async function (req, res, next) {
-  // return;
-  // in body {
-  //   usrEmail: 'sneha.lnsel@gmail.com',
-  //   password: '12345678',
-  //   newPassword: '12345678',
-  //   btn_profile: 'Submit'
-  // }
   var pageTitle = req.app.locals.siteName + " - Profile";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

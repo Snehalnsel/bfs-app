@@ -978,6 +978,7 @@ router.post("/markNotificationAsRead",[],NotificationsController.markNotificatio
 // generate 
 router.post("/get-shipmentkit", auth.isAuthorized,[],ShippingkitController.addShipmentData);
 router.get("/get-shipmentkitweb/:id",[],ShippingkitController.addShipmentDataWeb);
+router.get("/didnotbuyshipmentkit/:id", auth.isAuthorized,[],ShippingkitController.dontbuyshippingkit);
 // WEBSITE API'S
 router.get("/home",[],DashboardController.getData);
 router.get("/top-categoriesweb",[],DashboardController.getTopCategoriesweb);

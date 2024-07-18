@@ -902,10 +902,12 @@ exports.getOrderListByUser = async (req, res) => {
       const productId = order.product_id.toString();
       const productImage = await Productimage.find({ product_id: productId }).limit(1);
       const shipdetails = await Ordertracking.find({ order_id: order._id });
+      console.log('shipdetails',shipdetails);
       let shipping_details = {}; 
       if (typeof shipdetails !="undefined" && shipdetails.length > 0) {
           shipping_details = await Track.find({ _id: shipdetails[0].tracking_id });
       }
+      console.log('shipping_details',shipping_details);
       const orderDetails = {
         _id: order._id,
         total_price: order.total_price,
@@ -924,7 +926,8 @@ exports.getOrderListByUser = async (req, res) => {
           name: productDetails.length ? productDetails[0].name : 'Unknown Product',
           image: productImage.length ? productImage[0].image : 'No Image',
         },
-        shippingkit_status: (Object.keys(shipping_details).length > 0) ? shipping_details[0].shippingkit_status : 2, 
+        shippingkit_status: (Object.keys(shipping_details).length > 0) ? shipping_details[0].shippingkit_status : 0, 
+
       };
       ordersWithProductDetails.push(orderDetails);
     }
@@ -946,8 +949,11 @@ exports.getOrdersBySeller = async (req, res) => {
     }
     const ordersWithProductDetails = [];
     for (const order of orders) {
-      const orderCreationTime = moment(order.createdAt); 
+      console.log("order crate date",order.added_dtime)
+      const orderCreationTime = moment(order.added_dtime); 
+      console.log('orderCreationTime', orderCreationTime);
       const isOrderWithin24Hours = moment(new Date().toISOString()).diff(orderCreationTime, 'hours') < 24;
+      console.log('isOrderWithin24Hours', isOrderWithin24Hours);
       const is_deletedtime = isOrderWithin24Hours ? 0 : 1;
       const productDetails = await Userproduct.find({ _id: order.product_id });
       const productId = order.product_id.toString();
@@ -976,7 +982,8 @@ exports.getOrdersBySeller = async (req, res) => {
           name: productDetails.length ? productDetails[0].name : 'Unknown Product',
           image: productImage.length ? productImage[0].image : 'No Image',
         },
-        shippingkit_status: (Object.keys(shipping_details).length > 0) ? shipping_details[0].shippingkit_status : 2,
+        shippingkit_status: (Object.keys(shipping_details).length > 0) ? shipping_details[0].shippingkit_status : 0,
+        shippingkit_24hoursstatus: isOrderWithin24Hours ? 0 : 1,
         //shipping_charges: shippingcharges ? shippingcharges.amount : 0 
         shipping_charges: 350
       };
@@ -1045,6 +1052,7 @@ exports.getOrderDetails = async (req, res) => {
       original_product_price: order.original_product_price ? order.original_product_price : 0,
       payment_method: order.payment_method,
       order_status: order.order_status,
+      packing_handling_charge: order.packing_handling_charge,
       gst: order.gst,
       seller: {
         _id: order.seller_id._id,

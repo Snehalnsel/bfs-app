@@ -361,16 +361,16 @@ exports.getStatus = async function (req, res, next) {
           }
         });
         let updateData = {};
-        updateData.checkstatus_status = "success";
-        // if (response.data.success) {
-        //   if (response.data.code === "PAYMENT_SUCCESS") {
-        //     updateData.checkstatus_status = "success";
-        //   } else {
-        //     updateData.checkstatus_status = "failure";
-        //   }
-        // } else {
-        //   updateData.checkstatus_status = "failure";
-        // }
+        //updateData.checkstatus_status = "success";
+        if (response.data.success) {
+          if (response.data.code === "PAYMENT_SUCCESS") {
+            updateData.checkstatus_status = "success";
+          } else {
+            updateData.checkstatus_status = "failure";
+          }
+        } else {
+          updateData.checkstatus_status = "failure";
+        }
         await Demoorder.findOneAndUpdate(
           { _id: tempId },
           { $set: updateData },
@@ -442,8 +442,10 @@ exports.getStatus = async function (req, res, next) {
               let smsData = {
                 textId: "test",
                 toMobile: "91" + user.phone_no,
-                text: "Dear " + user.name + ",Your order " + orderCode + " has been placed successfully. Sit back and relax. We'll notify you once it's shipped.-  BFS RETAIL SERVICES PRIVATE LIMITED",
+                text: "Dear Buyer, Your order " + orderCode + " has been placed successfully. Sit back and relax. We'll notify you once it's shipped. - BFS RETAIL SERVICES PRIVATE LIMITED",
               };
+
+              //Dear Buyer, Your order {#var#} has been placed successfully. Sit back and relax. We'll notify you once it's shipped. - BFS RETAIL SERVICES PRIVATE LIMITED
               let returnData;
               returnData = await sendSms(smsData);
               const historyData = new ApiCallHistory({

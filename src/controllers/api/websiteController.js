@@ -4012,6 +4012,7 @@ exports.myOrderDetailsWeb = async (req, res) => {
       booking_amount: order.booking_amount,
       remaining_amount: order.remaining_amount,
       order_status: order.order_status,
+      cash_handling_charges: order.cash_handling_charges ? order.cash_handling_charges : 0,
       delete_by: order.delete_by,
       delete_status: order.delete_status,
       gst: order.gst,

@@ -902,10 +902,12 @@ exports.getOrderListByUser = async (req, res) => {
       const productId = order.product_id.toString();
       const productImage = await Productimage.find({ product_id: productId }).limit(1);
       const shipdetails = await Ordertracking.find({ order_id: order._id });
+      console.log('shipdetails',shipdetails);
       let shipping_details = {}; 
       if (typeof shipdetails !="undefined" && shipdetails.length > 0) {
           shipping_details = await Track.find({ _id: shipdetails[0].tracking_id });
       }
+      console.log('shipping_details',shipping_details);
       const orderDetails = {
         _id: order._id,
         total_price: order.total_price,
@@ -924,7 +926,8 @@ exports.getOrderListByUser = async (req, res) => {
           name: productDetails.length ? productDetails[0].name : 'Unknown Product',
           image: productImage.length ? productImage[0].image : 'No Image',
         },
-        shippingkit_status: (Object.keys(shipping_details).length > 0) ? shipping_details[0].shippingkit_status : 2, 
+        shippingkit_status: (Object.keys(shipping_details).length > 0) ? shipping_details[0].shippingkit_status : 0, 
+
       };
       ordersWithProductDetails.push(orderDetails);
     }
@@ -946,8 +949,11 @@ exports.getOrdersBySeller = async (req, res) => {
     }
     const ordersWithProductDetails = [];
     for (const order of orders) {
-      const orderCreationTime = moment(order.createdAt); 
+      console.log("order crate date",order.added_dtime)
+      const orderCreationTime = moment(order.added_dtime); 
+      console.log('orderCreationTime', orderCreationTime);
       const isOrderWithin24Hours = moment(new Date().toISOString()).diff(orderCreationTime, 'hours') < 24;
+      console.log('isOrderWithin24Hours', isOrderWithin24Hours);
       const is_deletedtime = isOrderWithin24Hours ? 0 : 1;
       const productDetails = await Userproduct.find({ _id: order.product_id });
       const productId = order.product_id.toString();
@@ -957,8 +963,8 @@ exports.getOrdersBySeller = async (req, res) => {
       if (typeof shipdetails !="undefined" && shipdetails.length > 0) {
           shipping_details = await Track.find({ _id: shipdetails[0].tracking_id });
       }
-      let productshippingkit = productDetails[0].shipping_charges_id;
-      let shippingcharges = await shippingchrgsModel.findOne({ _id: productshippingkit });
+      //let productshippingkit = productDetails[0].shipping_charges_id;
+      //let shippingcharges = await shippingchrgsModel.findOne({ _id: productshippingkit });
       //const shippingKitData = await Shippingkit.findOne({ order_id: order._id });
       const orderDetails = {
         _id: order._id,
@@ -976,7 +982,8 @@ exports.getOrdersBySeller = async (req, res) => {
           name: productDetails.length ? productDetails[0].name : 'Unknown Product',
           image: productImage.length ? productImage[0].image : 'No Image',
         },
-        shippingkit_status: (Object.keys(shipping_details).length > 0) ? shipping_details[0].shippingkit_status : 2,
+        shippingkit_status: (Object.keys(shipping_details).length > 0) ? shipping_details[0].shippingkit_status : 0,
+        shippingkit_24hoursstatus: isOrderWithin24Hours ? 0 : 1,
         //shipping_charges: shippingcharges ? shippingcharges.amount : 0 
         shipping_charges: 350
       };
@@ -987,7 +994,7 @@ exports.getOrdersBySeller = async (req, res) => {
       orders: ordersWithProductDetails,
     });
   } catch (error) {
-    console.log(error);
+    console.log("error",error);
     res.status(500).json({ error: 'An error occurred while fetching orders' });
   }
 };
@@ -1014,16 +1021,12 @@ exports.getOrderDetails = async (req, res) => {
     if (!productDetails) {
       return res.status(404).json({ message: 'Product details not found' });
     }
-
     const productImage = await Productimage.findOne({ product_id: productId }).limit(1);
-
     const orderTrackStatusOne = await Ordertracking.find({ order_id, status: 1 });
-
     let shiprocketResponse = [];
     let shiprocketResponselabel = [];
     let shiprocketResponseinvoice = [];
     let shiprocketResponsefortracking = [];
-
     if (orderTrackStatusOne && orderTrackStatusOne.length > 0)  {
       const trackingId = orderTrackStatusOne[0].tracking_id;
       const trackDetails = await Track.findById(trackingId);
@@ -1047,11 +1050,16 @@ exports.getOrderDetails = async (req, res) => {
       total_price: order.total_price,
       finalBidPrice : order.finalBidPrice ? order.finalBidPrice : 0,
       original_product_price: order.original_product_price ? order.original_product_price : 0,
+      pay_now: order.pay_now ? order.pay_now : 0,
+      booking_amount: order.booking_amount ? order.booking_amount : 0,
+      remaining_amount: order.remaining_amount ? order.remaining_amount : 0,
+      cash_handling_charges: order.cash_handling_charges ? order.cash_handling_charges : 0,
       payment_method: order.payment_method,
       order_status: order.order_status,
+      packing_handling_charge: order.packing_handling_charge,
       gst: order.gst,
       seller: {
-        _id: order.seller_id._id,
+        _id: order.seller_id._id, 
         name: order.seller_id.name,
       },
       buyeraddress: buyerAddress ? buyerAddress: 'No Buyer Address Found',
@@ -1077,6 +1085,7 @@ exports.getOrderDetails = async (req, res) => {
       shippingKit: shippingKitData || null, 
     });
   } catch (error) {
+    console.log("error",error)
     res.status(500).json({ error: 'An error occurred while fetching order details' });
   }
 };

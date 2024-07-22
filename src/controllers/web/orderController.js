@@ -560,11 +560,9 @@ exports.getOrderDetails = function (req, res, next) {
       if (!orderDetails) {
         return res.status(404).json({ error: 'Order not found' });
       }
-
       const billingAddress = await AddressBook.find({ user_id: orderDetails.seller_id._id ,deleted_status :0});
       const shippingAddress = await AddressBook.find({ user_id: orderDetails.user_id._id ,deleted_status :0 });
-      console.log("seller id",orderDetails.seller_id.email);
-      console.log("user id",orderDetails.user_id);
+
       const hubdata = await Hublist.find({ flag: 1 });
 
       const shiprocketResponse = await generateCouriresList();
@@ -591,21 +589,18 @@ exports.getOrderDetails = function (req, res, next) {
       });
     })
     .catch((error) => {
-      console.log(error);
+      console.log("error",error);
       return res.render("pages/error-msg", {
         errorMsg: error._message
       });
     });
 };
 
-
 async function generateLabel(shipment_id) {
   token = await generateToken(email, shipPassword);
   if (!token) {
     return Promise.reject('Token not available. Call generateToken first.');
   }
-
-
   const options = {
     method: 'POST',
     url: baseUrl + '/courier/generate/label',
@@ -941,13 +936,10 @@ exports.updateData = async function (req, res, next) {
       const currentMinute = now.getMinutes().toString().padStart(2, '0');
       const currentSecond = now.getSeconds().toString().padStart(2, '0');
       const currentMillisecond = now.getMilliseconds().toString().padStart(3, '0');
-
       // Generate the unique code using the current time components
       const transactionCode = `BFSTRANS${currentHour}${currentMinute}${currentSecond}${currentMillisecond}`;
-
      const billingAddress = await AddressBook.find({ user_id: orderDetails.seller_id ,default_status :1});
       const shippingAddress = await AddressBook.find({ user_id: orderDetails.user_id ,default_status :1 });
-
       let trackObj = {
         track_code: transactionCode,
         product_id: product_id,
@@ -976,13 +968,10 @@ exports.updateData = async function (req, res, next) {
         trackObj.shipping_address_id = typeof req.body.seller_address != "undefined" ? req.body.seller_address : billingAddress._id;
         trackObj.hub_address_id = req.body.hub_address;
       }
-      
       const track = new Track(trackObj);
-      
       const savedTrack = await track.save();
       if (savedTrack) {
         const track_id = savedTrack._id;
-
         const ordertracking = new Ordertracking({
           order_id: order_id,
           tracking_id: track_id,
@@ -1021,7 +1010,6 @@ exports.getShipmentList = async function (req, res, next) {
     let isAdminLoggedIn = req.session.admin ? req.session.admin.userId : "";
     var pageName = "Shipment List";
     var pageTitle = req.app.locals.siteName + " - " + pageName + " List";
-
     var orderId = req.params.id;
     const shippingKitData = await Shippingkit.findOne({ order_id: orderId })
       .populate("order_id", "order_code")
@@ -1031,7 +1019,6 @@ exports.getShipmentList = async function (req, res, next) {
       .populate("hub_address_id")
       .populate("shipping_address_id")
       .exec();
-    console.log(shippingKitData);
     res.render("pages/order/shipmentlist", {
       siteName: req.app.locals.siteName,
       pageName: pageName,
@@ -1049,7 +1036,7 @@ exports.getShipmentList = async function (req, res, next) {
       isAdminLoggedIn: isAdminLoggedIn
     });
   } catch (error) {
-    console.error("Error fetching shipping kit data with joins:", error);
+    console.log(error);
     res.status(500).json({ error: 'An error occurred' });
   }
 };
@@ -1196,7 +1183,6 @@ exports.deleteData = async function (req, res, next) {
         isAdminLoggedIn: isAdminLoggedIn
       });
     }
-
     const order = await Order.findOne({ _id: req.params.id });
     if (!order) {
       return res.status(404).json({
@@ -1206,20 +1192,16 @@ exports.deleteData = async function (req, res, next) {
         isAdminLoggedIn: isAdminLoggedIn
       });
     }
-
     await Order.updateOne(
       { _id: req.params.id },
-      { $set: { delete_status: 1, delete_by: 1 } },
+      { $set: { delete_status: 1, delete_by: 1 } }, 
       { w: "majority", wtimeout: 100 }
     );
-
     const productIdToUpdateFlag = order.product_id;
-
     await Userproduct.updateOne(
       { _id: productIdToUpdateFlag },
       { $set: { flag: 0 } }
     );
-
     res.redirect("/admin/orderlist");
   } catch (error) {
     return res.render("pages/error-msg", {
@@ -1694,7 +1676,6 @@ exports.getAWBnoById = async function (req, res, next) {
               send_status: 'send',
             });
             await historyData1.save();
-   
           }
           const shiprocketlabelResponse = await generateLabel(shipment_id);
           const order_id = existingOrder.shiprocket_order_id;
@@ -1725,19 +1706,11 @@ exports.getAWBnoById = async function (req, res, next) {
           errorMsg: shiprocketResponse.response.data.awb_assign_error
         });
       }
-
-
     }
   } catch (error) {
     return res.render("pages/error-msg", {
       errorMsg: error
     });
-    // res.status(500).json({
-    //   status: "0",
-    //   message: "Error!",
-    //   respdata: error,
-    //   isAdminLoggedIn: isAdminLoggedIn
-    // });
   }
 };
 
@@ -1772,13 +1745,7 @@ const sendEmailWithAttachment = async (receiverEmail, labelUrl, invoiceUrl) => {
   }
 };
 
-// module.exports = {
-//   sendEmailWithAttachment,
-// };
-
-
 exports.getGenerateLabel = async function (req, res, next) {
-
   let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -1789,30 +1756,19 @@ exports.getGenerateLabel = async function (req, res, next) {
       isAdminLoggedIn: isAdminLoggedIn
     });
   }
-
   try {
     const trackId = req.params.id;
     const existingOrder = await Track.findById(trackId);
-
     if (!existingOrder) {
       return res.render("pages/error-msg", {
         errorMsg: "Order not found!"
       });
-      /*return res.status(404).json({
-        status: "0",
-        message: "Order not found!",
-        respdata: {},
-        isAdminLoggedIn: isAdminLoggedIn
-      });*/
     }
-
     const shipment_id = existingOrder.shiprocket_shipment_id;
     const shiprocketResponse = await generateLabel(shipment_id);
-
     if (shiprocketResponse && shiprocketResponse.label_url) {
       const labelUrl = shiprocketResponse.label_url;
       const outputFilePath = path.join(__dirname, 'downloaded_label.pdf');
-
       const file = fs.createWriteStream(outputFilePath);
       const request = https.get(labelUrl, (response) => {
         response.pipe(file);
@@ -1823,14 +1779,7 @@ exports.getGenerateLabel = async function (req, res, next) {
                 return res.render("pages/error-msg", {
                   errorMsg: "Error downloading the file!"
                 });
-                /*return res.status(500).json({
-                  status: "0",
-                  message: "Error downloading the file!",
-                  respdata: err,
-                  isAdminLoggedIn: isAdminLoggedIn
-                });*/
               }
-              // File downloaded and response sent successfully
               fs.unlink(outputFilePath, (unlinkErr) => {
                 if (unlinkErr) {
                 }
@@ -1839,40 +1788,20 @@ exports.getGenerateLabel = async function (req, res, next) {
           });
         });
       });
-
       request.on('error', (error) => {
         return res.render("pages/error-msg", {
           errorMsg: "Error downloading the file!"
         });
-        /*return res.status(500).json({
-          status: "0",
-          message: "Error downloading the file!",
-          respdata: error,
-          isAdminLoggedIn: isAdminLoggedIn
-        });*/
       });
     } else {
-      //alert('something went wrong'+ shiprocketResponse.response);
       return res.render("pages/error-msg", {
         errorMsg: "Label URL not found!"
       });
-      /*return res.status(404).json({
-        status: "0",
-        message: "Label URL not found!",
-        respdata: shiprocketResponse,
-        isAdminLoggedIn: isAdminLoggedIn
-      });*/
     }
   } catch (error) {
     return res.render("pages/error-msg", {
       errorMsg: "something went wrong!"
     });
-    //alert('something went wrong');
-    // res.status(500).json({
-    //   status: "0",
-    //   message: "Error!",
-    //   respdata: error,
-    // });
   }
 };
 

@@ -261,6 +261,71 @@ exports.getShippingKitStatus = async function (req, res, next) {
   }
 };
 
+exports.getShippingKitStatus_forApp = async function (req, res, next) {
+  try {
+    const tempId = req.body.temp;
+    const status = req.body.status;
+    const temporder = await Demoshippingkit.findById(tempId);  
+      try {
+        if(status === "success") {
+          const now = new Date();
+          const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0'); 
+          const currentYear = now.getFullYear().toString();
+          const lastOrderIndex = await getLastOrderIndex();
+          const nextIncrementingPart = lastOrderIndex + 1;
+          const orderCode = `SHIPPINGKIT${currentMonth}${currentYear}-${nextIncrementingPart}`;
+          const shippingkit = new Shippingkit({
+            track_code: orderCode,
+            buyer_id: temporder.buyer_id,
+            product_id: temporder.product_id,
+            shipping_address_id: temporder.shipping_address_id,
+            order_id: temporder.order_id,
+            track_id: temporder.track_id,
+            price: temporder.price,
+            gst: temporder.gst,
+            total_price: temporder.total_price,
+            payment_method: 1,
+            added_dtime: new Date().toISOString(),
+          });
+          const savedOrder = await shippingkit.save();
+          if(savedOrder)
+          {
+            const updatedTrack = await Track.findOneAndUpdate(
+              { _id: temporder.track_id },
+              { $set: { shippingkit_status: 1 } },
+              { new: true }
+            );
+          }
+          res.status(200).json({
+            status: "1",
+            is_orderPlaced: 1,
+            message: 'Shipping kit order placed successfully',
+            order: savedOrder
+          });
+        } else {
+          res.status(400).json({
+            status: "0",
+            is_orderPlaced: 0,
+            message: 'Shipping kit order not placed',
+          });
+        }
+      } catch (error) {
+        res.status(400).json({
+          status: "0",
+          is_orderPlaced: 0,
+          message: 'Their is a an error in your oder',
+        });
+      }
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the dashboard.",
+      error: error.message,
+    });
+  }
+};
+
+
 async function getLastOrderIndex() {
   try {
     const getCount = await Shippingkit.find().count();

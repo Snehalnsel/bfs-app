@@ -549,3 +549,11 @@ tbody.category-listtable{
         border-radius: 5px;
         border: 1px solid #ccc !important;
 }
+
+.table-button-gap button.btn {
+    margin: 5px 0px;
+    font-size: 13px;
+    padding: 6px;
+    line-height: 20px;
+}
+

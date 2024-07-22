@@ -114,6 +114,13 @@
                      </div>
                      <div class="psi-right">
                         <a href="/edit-mypost/<%=item._id%>" class="edit-postbox"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                        <% if(item.flag != 1 && item.approval_status != 0){%>
+                        <span class="status" style="color: #006c09;">Approved</span>
+                        <% }else if(item.flag != 1 && item.approval_status != 1) {%>
+                        <span class="status" style="color: #0d8cd9;">Pending</span>
+                        <% }else if(item.flag == 1){%>
+                        <span class="status" style="color: #7e0f99;">Sold</span>
+                        <% }%>
                      </div>
                   </div>
                   <!-- <% if (item.status_name === 'Prefer Not to Say') {  %>

@@ -453,7 +453,6 @@ exports.adminRelogin = async function (req, res, next) {
 
 };
 exports.getProfile = async function (req, res, next) {
- 
 
   if (! req.session.admin) {
     res.redirect("/");
@@ -516,7 +515,6 @@ exports.uploadImage = async function (req, res, next) {
       });
 
       var image_url = req.app.locals.requrl + "/public/images/" + path;
-
       var updData = {
         image: image_url,
       };
@@ -542,6 +540,181 @@ exports.uploadImage = async function (req, res, next) {
     }
   });
 };
+
+exports.changePassword = async function (req, res, next) {
+
+  if (! req.session.admin) {
+    res.redirect("/");
+  }
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+  var pageTitle = req.app.locals.siteName + " - Profile";
+  const user_id = mongoose.Types.ObjectId( req.session.admin.userId);
+
+  Users.findOne({ _id: user_id }).then((user) => {
+    if (!user) {
+      res.status(400).json({
+        status: "0",
+        message: "User does not exist!",
+        respdata: {},
+        isAdminLoggedIn:isAdminLoggedIn
+      });
+    } else {
+      
+      user.image = req.baseUrl + "/images/" + "test.jpg";
+
+      res.render("pages/changepassword", {
+        status: 1,
+        siteName: req.app.locals.siteName,
+        pageTitle: pageTitle,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
+        year: moment().format("YYYY"),
+        requrl: req.app.locals.requrl,
+        respdata: user,
+        isAdminLoggedIn:isAdminLoggedIn
+      });
+    }
+  });
+};
+
+exports.updatePassword = async function (req, res, next) {
+  var pageTitle = req.app.locals.siteName + " - Profile";
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.render("pages/profile", {
+      siteName: req.app.locals.siteName,
+      pageTitle: pageTitle,
+      userFullName:  req.session.admin.name,
+      userImage:  req.session.admin.image_url,
+      userEmail:  req.session.admin.email,
+      year: moment().format("YYYY"),
+      requrl: req.app.locals.requrl,
+      status: 0,
+      message: "Validation error!",
+      respdata: errors.array(),
+    });
+  }
+  let isAdminLoggedIn = (typeof req.session.admin != "undefined") ? req.session.admin.userId : "";
+  const user_id = req.body.usrEmail;
+  Users.findOne({ email: user_id }).then((user) => {
+    if (!user) {
+      // console.log("not found userin body", req.body);
+      // return;
+      res.render("pages/profile", {
+        siteName: req.app.locals.siteName,
+        pageTitle: pageTitle,
+        userFullName:  req.session.admin.name,
+        userImage:  req.session.admin.image_url,
+        userEmail:  req.session.admin.email,
+        year: moment().format("YYYY"),
+        requrl: req.app.locals.requrl,
+        status: 0,
+        message: "User not found!",
+        respdata: errors.array(),
+        isAdminLoggedIn:isAdminLoggedIn
+      });
+    } else {
+      // console.log("found userin body", user);
+      // return;
+      if (!req.body.newPassword) {
+        var updData = {
+          name: req.body.fullName,
+        };
+        Users.findOneAndUpdate(
+          { email: user_id },
+          { $set: updData },
+          { upsert: true },
+          function (err, doc) {
+            if (err) {
+              throw err;
+            } else {
+              Users.findOne({ email: user_id }).then((user) => {
+                res.render("pages/profile", {
+                  siteName: req.app.locals.siteName,
+                  pageTitle: pageTitle,
+                  userFullName: user.name,
+                  userImage:  req.session.admin.image_url,
+                  userEmail: user.email,
+                  year: moment().format("YYYY"),
+                  requrl: req.app.locals.requrl,
+                  status: 0,
+                  message: "Successfully updated!",
+                  respdata: user,
+                  isAdminLoggedIn:isAdminLoggedIn
+                });
+              });
+            }
+          }
+        );
+      } else {
+        bcrypt.compare(req.body.newPassword, req.body.oldpassword, (error, match) => {
+          if (error) {
+            res.render("pages/profile", {
+              siteName: req.app.locals.siteName,
+              pageTitle: pageTitle,
+              userFullName: user.name,
+              userImage:  req.session.admin.image_url,
+              userEmail: user.email,
+              year: moment().format("YYYY"),
+              requrl: req.app.locals.requrl,
+              status: 0,
+              message: "error!",
+              respdata: error,
+              isAdminLoggedIn:isAdminLoggedIn
+            });
+          } else if (!match) {
+            bcrypt.hash(req.body.newPassword, rounds, (error, hash) => {
+              var updData = {
+                password: hash,
+              };
+              Users.findOneAndUpdate(
+                { email: user_id },
+                { $set: updData },
+                { upsert: true },
+                function (err, doc) {
+                  if (err) {
+                    throw err;
+                  } else {
+                    Users.findOne({ email: user_id }).then((user) => {
+                      res.render("pages/profile", {
+                        siteName: req.app.locals.siteName,
+                        pageTitle: pageTitle,
+                        userFullName:  req.session.admin.name,
+                        userImage:  req.session.admin.image_url,
+                        userEmail:  req.session.admin.email,
+                        year: moment().format("YYYY"),
+                        requrl: req.app.locals.requrl,
+                        status: 0,
+                        message: "Successfully updated!",
+                        respdata: user,
+                        isAdminLoggedIn:isAdminLoggedIn
+                      });
+                    });
+                  }
+                }
+              );
+            });
+          } else {
+            res.render("pages/profile", {
+              siteName: req.app.locals.siteName,
+              pageTitle: pageTitle,
+              userFullName:  req.session.admin.name,
+              userImage:  req.session.admin.image_url,
+              userEmail:  req.session.admin.email,
+              status: 0,
+              year: moment().format("YYYY"),
+              message: "New password cannot be same as your Old password!!",
+              respdata: {},
+              isAdminLoggedIn:isAdminLoggedIn
+            });
+          }
+        });
+      }
+    }
+  });
+};
+
 
 exports.signOut = async function (req, res, next) {
   //const banner = await Banner.find({ status: 1 });
@@ -780,7 +953,6 @@ exports.editProfile = async function (req, res, next) {
     }
   });
 };
-
 
 exports.countProducts = async (req, res) => {
   try {

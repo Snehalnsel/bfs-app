@@ -781,14 +781,9 @@ exports.getParticularShipmentDetails = async function (req, res, next) {
       respdata: errors.array(),
     });
   }
-
   try {
-
     const orderId = req.body.order_id;
-
     const existingOrder = await Order.findById(orderId);
-
-
     if (!existingOrder) {
       return res.status(404).json({
         status: "0",
@@ -796,11 +791,8 @@ exports.getParticularShipmentDetails = async function (req, res, next) {
         respdata: {},
       });
     }
-  
-    shipment_id = existingOrder.shiprocket_shipment_id;
-
+      shipment_id = existingOrder.shiprocket_shipment_id;
       const shiprocketResponse = await SpecificShipmentDeatils(shipment_id);
-
       if(shiprocketResponse)
       {
         res.status(200).json({
@@ -810,7 +802,6 @@ exports.getParticularShipmentDetails = async function (req, res, next) {
           shiprocketResponse: shiprocketResponse
         });
       }
-    
   } catch (error) {
     res.status(500).json({
       status: "0",
@@ -869,7 +860,8 @@ exports.addShipmentDataWeb = async (req, res) => {
         message: 'Shipping Kit Order placed successfully',
         success: true,
         is_shippingkit: true,
-        order: savedOrder,
+        ordershippingkit_data: savedOrder,
+        temp_id: savedOrder._id,
         isLoggedIn: isLoggedIn,
         websiteUrl: process.env.SITE_URL,
       });
@@ -880,6 +872,122 @@ exports.addShipmentDataWeb = async (req, res) => {
       status: "0",
       message: 'Can not Order Shipping kit',
       is_shippingkit: false,
+    });
+  }
+};
+
+// exports.addShipmentDataWeb = async (req, res) => {
+//   try {
+//     let isLoggedIn = (typeof req.session.user != "undefined") ? req.session.user.userId : "";
+//     const order_id = mongoose.Types.ObjectId(req.params.id); 
+//     const order = await Order.findById(order_id); 
+//     const productDetails = await Userproduct.find({ _id: order.product_id });
+//     let productshippingkit = productDetails[0].shipping_charges_id;
+//     let shippingcharges = await shippingchrgsModel.findOne({ _id: productshippingkit });
+//     //let price = shippingcharges.amount;
+//     const price = 350;
+//     const gst = (price * 28) / 100;
+//     const final_price = price + gst;
+//     const track = await Ordertracking.findOne({ order_id: order_id,status :0 }).exec();
+//     if (track == null) {
+//       return res.status(200).json({
+//         status: "0",
+//         message: 'Order Delivery Partner Not choose yet',
+//         is_shippingkit: false,
+//       });
+//     }
+//     const hubaddress = await Track.findById(track.tracking_id)
+//       .populate('seller_id', 'name phone_no email')
+//       .populate('billing_address_id')
+//       .populate('hub_address_id');
+//     if (!hubaddress) {
+//       res.status(200).json({
+//         status: "0",
+//         message: 'Order Delivery Partnerss Not chosse yet',
+//         is_shippingkit: false,
+//       });
+//     }
+//     const demoshippingkit = new Demoshippingkit({
+//       buyer_id: hubaddress.seller_id._id,
+//       product_id: order.product_id,
+//       shipping_address_id: hubaddress.billing_address_id._id,
+//       order_id: order_id,
+//       track_id: track.tracking_id,
+//       price: price,
+//       gst: gst,
+//       total_price: final_price,
+//       payment_method: 1,
+//       added_dtime: new Date().toISOString(),
+//     });
+//     const savedOrder = await demoshippingkit.save();
+//     if (savedOrder) {
+//       res.status(200).json({
+//         status: "1",
+//         message: 'Shipping Kit Order placed successfully',
+//         success: true,
+//         is_shippingkit: true,
+//         ordershippingkit_data: savedOrder,
+//         temp_id: savedOrder._id,
+//         isLoggedIn: isLoggedIn,
+//         websiteUrl: process.env.SITE_URL,
+//       });
+//     }
+//   } catch (error) {
+//     console.log(error)
+//     res.status(200).json({
+//       status: "0",
+//       message: 'Can not Order Shipping kit',
+//       is_shippingkit: false,
+//     });
+//   }
+// };
+
+exports.dontbuyshippingkit = async function (req, res, next) {
+  try {
+    const order_id = mongoose.Types.ObjectId(req.params.id); 
+    const order = await Order.findById(order_id); 
+      try {
+
+        const track = await Ordertracking.findOne({ order_id: order_id,status :0 }).exec();
+        if(!track) {
+          return res.status(400).json({
+            status: "0",
+            is_orderPlaced: 0,
+            message: 'PLease wait for Admin Approval of your order first',
+          });
+        }else{
+          const updatedTrack = await Track.findOneAndUpdate(
+            { _id: track.tracking_id },
+            { $set: { shippingkit_status: 2 } },
+            { new: true }
+          );
+            if(updatedTrack) {
+            res.status(200).json({
+              status: "1",
+              is_orderPlaced: 1,
+              message: 'Your request has been processed successfully',
+              order: updatedTrack
+            });
+          }else{
+            res.status(400).json({
+              status: "0",
+              is_orderPlaced: 0,
+              message: 'Their is a an error in your oder',
+            });
+          }  
+        }   
+      } catch (error) {
+        res.status(400).json({
+          status: "0",
+          is_orderPlaced: 0,
+          message: 'Their is a an error in your oder',
+        });
+      }
+  } catch (error) {
+    res.status(500).json({
+      status: "0",
+      message: "An error occurred while rendering the dashboard.",
+      error: error.message,
     });
   }
 };

@@ -4869,3 +4869,21 @@ button.grey-btn {
 .mv-logo {
     display: none;
 }
+
+/* soumy da code for my post status section */
+.user-postbox .psi-right {
+    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.user-postbox .psi-right span.status {
+    width: 100%;
+    text-align: right;
+    padding: 2px 0 0 0;
+    margin: 0;
+    font-size: 12px;
+    color: #959494;
+}

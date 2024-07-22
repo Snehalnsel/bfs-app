@@ -87,11 +87,9 @@ exports.listofNotification = async function (req, res, next) {
     });
   }
 };
-
 exports.getNotificationById = async function (req, res, next) {
   try {
     const { notification_id } = req.body;
-
     const notification = await Notifications.findById(notification_id);
     if (!notification) {
       return res.status(404).json({
@@ -100,11 +98,10 @@ exports.getNotificationById = async function (req, res, next) {
         respdata: {},
       });
     }
-
+    notification.is_read = 1;
+    await notification.save();
     res.status(200).json({ status: "1", notification_data: notification });
   } catch (error) {
-    // Handle errors
-    //console.error(error);
     res.status(500).json({
       status: "0",
       message: "Internal server error",

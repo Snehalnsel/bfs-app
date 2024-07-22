@@ -74,16 +74,13 @@ router.post(
       .isEmpty()
       .trim()
       .escape(),
-    // check(
-    //   "newPassword",
-    //   "Password length should be 8 to 10 characters"
-    // ).isLength({
-    //   min: 8,
-    //   max: 10,
-    // }),
   ],
   UsersController.editProfile
 );
+
+router.get("/change-password", cors(), UsersController.changePassword);
+router.post("/update-password",cors(), UsersController.updatePassword);
+
 router.post("/admin-relogin",cors(),
 UsersController.adminRelogin
 );
@@ -427,17 +424,10 @@ router.get("/generateinvoice/:id", cors(), OrderController.getGenerateInvoice);
 router.get("/check-Couriresserviceability/:id", cors(), OrderController.getCourierServiceability);
 router.get("/check-schedule/:id", cors(), OrderController.getList);
 router.get("/schedule-pickup/:id", cors(), OrderController.getShipmentPickup);
-
-
 //Product Condition
 router.get("/productcondition", cors(), ProductconditionController.getData);
 router.get("/add-productcondition", cors(), ProductconditionController.addData);
-router.post(
-  "/create-productcondition",
-  cors(),
-  [],
-  ProductconditionController.createData
-);
+router.post("/create-productcondition",cors(),[],ProductconditionController.createData);
 router.get("/productcondition-status-change/:id", cors(), ProductconditionController.updateStatusData);
 router.get("/edit-productcondition/:id", cors(), ProductconditionController.editData);
 router.post("/updateproductcondition", cors(), [], ProductconditionController.updateData);
@@ -500,12 +490,7 @@ router.post("/update-carttime", cors(), CartremoveController.updateData);
 //Banner
 router.get("/banner-list", cors(), BannerController.getData);
 router.get("/add-banner", cors(), BannerController.addData);
-router.post(
-  "/create-banner",
-  cors(),
-  upload.single('image'),
-  BannerController.createData
-);
+router.post("/create-banner",cors(),upload.single('image'),BannerController.createData);
 router.get("/banner/:id", cors(), BannerController.editData);
 router.post("/update-banner", cors(), upload.single('image'), BannerController.updateData);
 router.get("/delete-banner/:id", cors(), BannerController.deleteData);
@@ -515,7 +500,6 @@ router.get("/genderlist", cors(), GenderController.getData);
 router.get("/add-gender", cors(), GenderController.addData);
 router.post("/create-gender",GenderController.createData);
 router.get("/delete-gender/:id", cors(), GenderController.deleteData);
-
 //Color
 router.get("/colorlist", cors(), ColorController.getData);
 router.get("/add-color", cors(), ColorController.addData);
@@ -523,10 +507,8 @@ router.post("/create-color",ColorController.createData);
 router.get("/edit-color/:id", cors(), ColorController.editData);
 router.post("/upload-color",ColorController.updateData);
 router.get("/delete-color/:id", cors(), ColorController.deleteData);
-
 //IP Address LIST
 router.get("/iplist", cors(), IpaddressController.getList);
-
 //download product excel
 router.get("/download-product-excel", cors(), ProductController.downloadProductExcel);
 router.get("/download-order-excel", cors(), OrderController.downloadOrderExcel);

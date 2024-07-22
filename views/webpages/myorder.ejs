@@ -205,8 +205,6 @@
                                                 <div class="order-tooltip-box">You can not cancel this order after 24 hours.</div>
                                        </div>`;
                      }
-
-                     
                   }
                   else if (item.delete_status == 1) {
                      if (item.delete_by == 1) {
@@ -255,7 +253,6 @@
       </div>`;
                   $("#buyers-tab").append(hTml);
                });
-
             }
             async function sellerList() {
 
@@ -337,7 +334,6 @@
                   $("#viewers-tab").append(hTml);
                });
             }
-            
             $(document).on('click', '.buy-shipping-kit', function () {
                var orderId = $(this).data('orderid');
                var shippingCharges = parseFloat($('input[name="shipping_charges"]').val()); 
@@ -356,20 +352,9 @@
                $.ajax({
                   url: '/get-shipmentkitweb/' + orderId.trim(),
                   method: 'GET',
-                  // success: function (data) {
-                  //    if (data.success) {
-                  //       Swal.fire({
-                  //          html: data.message,
-                  //          confirmButtonText: "OK",
-                  //          customClass: { confirmButton: 'alert-box-button' }
-                  //       });
-                  //       $("#" + orderId).siblings("p").text("Shipping kit has already been bought");
-                  //       $("#" + orderId).hide();
-                  //       $("#short-modal").modal('hide'); 
-                  //    } 
                   success: function (response) {
                      if (response.is_shippingkit == true) {
-                        const tempOrderId = response.order._id;
+                        const tempOrderId = response.ordershippingkit_data._id;
                         window.location.href = '/payshippingkit?temp=' + tempOrderId;
                      }
                      else {

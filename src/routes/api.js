@@ -978,6 +978,7 @@ router.post("/markNotificationAsRead",[],NotificationsController.markNotificatio
 // generate 
 router.post("/get-shipmentkit", auth.isAuthorized,[],ShippingkitController.addShipmentData);
 router.get("/get-shipmentkitweb/:id",[],ShippingkitController.addShipmentDataWeb);
+router.get("/didnotbuyshipmentkit/:id", auth.isAuthorized,[],ShippingkitController.dontbuyshippingkit);
 // WEBSITE API'S
 router.get("/home",[],DashboardController.getData);
 router.get("/top-categoriesweb",[],DashboardController.getTopCategoriesweb);
@@ -1182,6 +1183,7 @@ router.get("/otherwise-list",cors(),WebsiteController.otherlistdata);
 router.get("/pay",cors(),PaymentController.getPaymentData);
 router.get("/payshippingkit",cors(),ShippingkitpaymentController.getPaymentDataforshippingkit);
 router.get("/payment-shippingkit-status",ShippingkitpaymentController.getShippingKitStatus);
+router.post("/payment-shippingkit-status-app",ShippingkitpaymentController.getShippingKitStatus_forApp);
 router.post("/checkapp-payment",cors(),PaymentController.checkPaymentData);
 router.post("/getshipmentvalue",cors(),OrderController.shipmentvalue);
 router.post("/demoplacedorder",WebsiteController.Demoorder);

@@ -95,7 +95,6 @@ exports.getPaymentData = async function (req, res, next) {
         type: "PAY_PAGE",
       },
     };
-    console.log(normalPayLoad);
     let bufferObj = Buffer.from(JSON.stringify(normalPayLoad), "utf8");
     let base64EncodedPayload = bufferObj.toString("base64");
     let string = base64EncodedPayload + "/pg/v1/pay" + SALT_KEY;
@@ -126,7 +125,6 @@ exports.getPaymentData = async function (req, res, next) {
         },
       )
       .then(async function (response) {
-        //console.log("Response for paymenteeeee:", response.data);return false;
         const updateData = {
           merchant_transactionid: merchantTransactionId,
           pay_response: response.data,
@@ -139,7 +137,6 @@ exports.getPaymentData = async function (req, res, next) {
         res.redirect(response.data.data.instrumentResponse.redirectInfo.url);
       })
       .catch(function (error) {
-        //console.log("Error for payment:",error);return false;
         res.status(500).json({
           status: "0",
           message: "An error occurred during payment.",
@@ -147,7 +144,6 @@ exports.getPaymentData = async function (req, res, next) {
         });
       });
   } catch (error) {
-    //console.log("Error for payment error:");return false;
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the dashboard.",
@@ -305,7 +301,6 @@ exports.getStatus_back = async function (req, res, next) {
           res.redirect('/message?message=failure');
         }
       } catch (error) {
-        console.log("Error for payment error status:", error);
         res.redirect('/message?message=failure');
         /*res.status(500).json({
           status: '0',
@@ -318,7 +313,6 @@ exports.getStatus_back = async function (req, res, next) {
       res.redirect('/message?message=failure');
     }
   } catch (error) {
-    console.log("Error for payment error status console:", error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the dashboard.",
@@ -444,7 +438,6 @@ exports.getStatus = async function (req, res, next) {
                 toMobile: "91" + user.phone_no,
                 text: "Dear Buyer, Your order " + orderCode + " has been placed successfully. Sit back and relax. We'll notify you once it's shipped. - BFS RETAIL SERVICES PRIVATE LIMITED",
               };
-
               //Dear Buyer, Your order {#var#} has been placed successfully. Sit back and relax. We'll notify you once it's shipped. - BFS RETAIL SERVICES PRIVATE LIMITED
               let returnData;
               returnData = await sendSms(smsData);
@@ -589,9 +582,7 @@ exports.getStatus = async function (req, res, next) {
             }
             loginHtmlContentforseller = loginHtmlContentforseller.replace('{{PRODUCTDATA}}', rpData);
             //loginHtmlContentforseller = loginHtmlContentforseller.replace('{{bidPrice}}', temporder.original_product_price);
-
             loginHtmlContentforseller = loginHtmlContentforseller.replace('{{buyername}}', user.name);
-
             const mailDataforseller = {
               from: "Bid For Sale! <" + smtpUser + ">",
               to: seller.email,
@@ -600,7 +591,6 @@ exports.getStatus = async function (req, res, next) {
               text: "order placed",
               html: loginHtmlContentforseller
             };
-
             transporter.sendMail(mailDataforseller, function (err, info) { });
             //seller mail,sms,whatsapp
             if (updatedProduct) {
@@ -621,7 +611,6 @@ exports.getStatus = async function (req, res, next) {
           res.redirect('/message?message=failure');
         }
       } catch (error) {
-        console.log("Error for payment error status:", error);
         res.redirect('/message?message=failure');
         // res.status(500).json({
         //   status: '0',
@@ -634,7 +623,6 @@ exports.getStatus = async function (req, res, next) {
       res.redirect('/message?message=failure');
     }
   } catch (error) {
-    console.log("Error for payment error status console:", error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the dashboard.",
@@ -896,7 +884,6 @@ exports.checkPaymentData = async function (req, res, next) {
       });
     }
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       status: "0",
       message: "An error occurred while rendering the dashboard.",

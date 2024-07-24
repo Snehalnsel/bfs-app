@@ -837,7 +837,7 @@ exports.addShipmentDataWeb = async (req, res) => {
     if (!hubaddress) {
       res.status(200).json({
         status: "0",
-        message: 'Order Delivery Partnerss Not chosse yet',
+        message: 'Order Delivery Partnerss Not chosen yet',
         is_shippingkit: false,
       });
     }
@@ -903,7 +903,7 @@ exports.addShipmentDataWeb = async (req, res) => {
 //     if (!hubaddress) {
 //       res.status(200).json({
 //         status: "0",
-//         message: 'Order Delivery Partnerss Not chosse yet',
+//         message: 'Order Delivery Partnerss Not chosen yet',
 //         is_shippingkit: false,
 //       });
 //     }

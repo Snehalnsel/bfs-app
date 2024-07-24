@@ -1122,7 +1122,7 @@ exports.cancelOrderById = async function (req, res, next) {
       if (canceledOrder) {
         return res.status(403).json({
           status: "0",
-          message: "Order cannot be canceled as it has been over 24 hours since creation!",
+          message: "Order cannot be cancelled as it has been over 24 hours since creation!",
           respdata: {},
           is_cancelorder: false,
         });
@@ -1240,7 +1240,7 @@ exports.cancelOrderByIdFromApp = async function (req, res, next) {
       if (canceledOrder) {
         return res.status(403).json({
           status: "0",
-          message: "Order cannot be canceled as it has been over 24 hours since creation!",
+          message: "Order cannot be cancelled as it has been over 24 hours since creation!",
           respdata: {},
           is_cancelorder: false,
         });
@@ -1306,7 +1306,7 @@ exports.cancelOrderByIdFromApp = async function (req, res, next) {
 
           return res.status(200).json({
             status: "1",
-            message: "Order canceled successfully!",
+            message: "Order cancelled successfully!",
             respdata: canceledOrder,
             is_cancelorder: true,
           });

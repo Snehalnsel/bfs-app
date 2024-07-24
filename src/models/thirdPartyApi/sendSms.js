@@ -17,6 +17,7 @@ const sendSms = async (reqData) => {
             };
         });
     } catch (error) {
+        console.log(error)
         return {
             status:false,
             //data:response,

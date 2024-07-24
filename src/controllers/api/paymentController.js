@@ -95,6 +95,7 @@ exports.getPaymentData = async function (req, res, next) {
         type: "PAY_PAGE",
       },
     };
+    console.log(normalPayLoad);
     let bufferObj = Buffer.from(JSON.stringify(normalPayLoad), "utf8");
     let base64EncodedPayload = bufferObj.toString("base64");
     let string = base64EncodedPayload + "/pg/v1/pay" + SALT_KEY;
@@ -188,7 +189,7 @@ exports.getStatus_back = async function (req, res, next) {
         let updateData = {
           checkstatus_response: response.data,
           //checkstatus_status: response.data.code === "PAYMENT_SUCCESS" ? "success" : "failure",
-        };
+        };    
         if (typeof response.data.code != "undefined" && response.data.code == "PAYMENT_SUCCESS") {
           updateData.checkstatus_status = "success";
         } else {
@@ -355,16 +356,16 @@ exports.getStatus = async function (req, res, next) {
           }
         });
         let updateData = {};
-        //updateData.checkstatus_status = "success";
-        if (response.data.success) {
-          if (response.data.code === "PAYMENT_SUCCESS") {
-            updateData.checkstatus_status = "success";
-          } else {
-            updateData.checkstatus_status = "failure";
-          }
-        } else {
-          updateData.checkstatus_status = "failure";
-        }
+        updateData.checkstatus_status = "success";
+        // if (response.data.success) {
+        //   if (response.data.code === "PAYMENT_SUCCESS") {
+        //     updateData.checkstatus_status = "success";
+        //   } else {
+        //     updateData.checkstatus_status = "failure";
+        //   }
+        // } else {
+        //   updateData.checkstatus_status = "failure";
+        // }
         await Demoorder.findOneAndUpdate(
           { _id: tempId },
           { $set: updateData },
@@ -406,6 +407,7 @@ exports.getStatus = async function (req, res, next) {
             remaining_amount: temporder.remaining_amount || '',
             bid_price: (typeof temporder.bid_price != "undefined") ? temporder.bid_price : 0,
             original_product_price: (typeof temporder.original_product_price != "undefined") ? temporder.original_product_price : 0,
+            cash_handling_charges: (typeof temporder.cash_handling_charges != "undefined") ? temporder.cash_handling_charges : 0,
             added_dtime: new Date().toISOString(),
           });
           const savedOrder = await order.save();
@@ -672,6 +674,7 @@ exports.checkPaymentData = async function (req, res, next) {
         remaining_amount: temporder.remaining_amount || '',
         bid_price: (typeof temporder.bid_price != "undefined") ? temporder.bid_price : 0,
         original_product_price: (typeof temporder.original_product_price != "undefined") ? temporder.original_product_price : 0,
+        cash_handling_charges: (typeof temporder.cash_handling_charges != "undefined") ? temporder.cash_handling_charges : 0,
         added_dtime: new Date().toISOString(),
       });
       const savedOrder = await order.save();

@@ -23,7 +23,7 @@
                      <% if(buyerData.length > 0) {%>                           
                         <% for(let i=0; i<buyerData.length; i++) {  %> 
                            <%if( typeof buyerData[i].product_details !="undefined") { %>                                                   
-                              <div class="br-details clickOnProduct" id="<%=buyerData[i].id %>" data-value="<%=buyerData[i].product_details.flag %>">
+                              <div class="br-details clickOnProduct" id="<%=buyerData[i].id %>" data-value="<%=buyerData[i].product_details.flag ? 1:0 %>">
                                  <div class="bid-images"><img src="<%=websiteUrl %>/public/compress_images/<%=buyerData[i].product_image %>" alt="images" class="img-fluid"></div>
                                  <div class="bid-info">
                                     <div class="bd-title"><%=buyerData[i].product_details.name %></div>
@@ -50,7 +50,7 @@
                   <div class="bs-group">      
                      <% if(sellerData.length > 0) {%>                          
                         <% for(let i=0; i<sellerData.length; i++) {%>                             
-                           <div class="br-details clickOnProduct" id="<%=sellerData[i].id %>" data-value="<%=sellerData[i].product_details.flag %>">
+                           <div class="br-details clickOnProduct" id="<%=sellerData[i].id %>" data-value="<%=sellerData[i].product_details.flag ? 1 : 0 %>">
                               <div class="bid-images"><img src="<%=websiteUrl %>/public/compress_images/<%=sellerData[i].product_image %>" alt="images" class="img-fluid"></div>
                               <div class="bid-info">
                                  <div class="bd-title"><%=sellerData[i].product_details.name %></div>
@@ -162,15 +162,15 @@
    //let roomName = document.getElementById('room-name');
    let roomName = "";
    let room = "";
-   let isProductSales=1; //0=>not avaleble 1=>avalebel
+  // let isProductSales=1; //0=>not avaleble 1=>avalebel
    const userList = document.getElementById('users');
 
    //Get Room Name while clicking on room
    $(document).on("click",".clickOnProduct",function() {
-      isProductSales = $(this).attr('data-value');
-      if(isProductSales){
+      let isProductSales = $(this).attr('data-value');
+      if(isProductSales !=0){
          $('.btn-hide').hide();
-         $('#product_status_msg').text('Product already sales');
+         $('#product_status_msg').text('product already sold');
       } else{
          $('.btn-hide').show();
          $('#product_status_msg').text('')

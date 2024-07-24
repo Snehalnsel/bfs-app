@@ -23,7 +23,7 @@
                      <% if(buyerData.length > 0) {%>                           
                         <% for(let i=0; i<buyerData.length; i++) {  %> 
                            <%if( typeof buyerData[i].product_details !="undefined") { %>                                                   
-                              <div class="br-details clickOnProduct" id="<%=buyerData[i].id %>">
+                              <div class="br-details clickOnProduct" id="<%=buyerData[i].id %>" data-value="<%=buyerData[i].product_details.flag %>">
                                  <div class="bid-images"><img src="<%=websiteUrl %>/public/compress_images/<%=buyerData[i].product_image %>" alt="images" class="img-fluid"></div>
                                  <div class="bid-info">
                                     <div class="bd-title"><%=buyerData[i].product_details.name %></div>
@@ -50,7 +50,7 @@
                   <div class="bs-group">      
                      <% if(sellerData.length > 0) {%>                          
                         <% for(let i=0; i<sellerData.length; i++) {%>                             
-                           <div class="br-details clickOnProduct" id="<%=sellerData[i].id %>">
+                           <div class="br-details clickOnProduct" id="<%=sellerData[i].id %>" data-value="<%=sellerData[i].product_details.flag %>">
                               <div class="bid-images"><img src="<%=websiteUrl %>/public/compress_images/<%=sellerData[i].product_image %>" alt="images" class="img-fluid"></div>
                               <div class="bid-info">
                                  <div class="bd-title"><%=sellerData[i].product_details.name %></div>
@@ -86,8 +86,9 @@
                </div>
                <div class="action-botton-group">
                   <ul class="resultlist">
-                     <li><a href="javascript:void(0)" class="chatbox-btn" id="reBidButton">Re Bid</a></li>
-                     <li><a href="javascript:void(0)" class="chatbox-btn" id="acceptButton">Accept</a></li>
+                     <p id="product_status_msg" style="color: red;"></p>
+                     <li><a href="javascript:void(0)" class="chatbox-btn btn-hide" id="reBidButton">Re Bid</a></li>
+                     <li><a href="javascript:void(0)" class="chatbox-btn btn-hide" id="acceptButton">Accept</a></li>
                      <!--<li><a href="javascript:void(0)" class="chatbox-btn black-btn" id="withdrawButton">Withdraw</a></li>-->
                   </ul>
                </div>
@@ -161,12 +162,22 @@
    //let roomName = document.getElementById('room-name');
    let roomName = "";
    let room = "";
+   let isProductSales=1; //0=>not avaleble 1=>avalebel
    const userList = document.getElementById('users');
 
    //Get Room Name while clicking on room
    $(document).on("click",".clickOnProduct",function() {
+      isProductSales = $(this).attr('data-value');
+      if(isProductSales){
+         $('.btn-hide').hide();
+         $('#product_status_msg').text('Product already sales');
+      } else{
+         $('.btn-hide').show();
+         $('#product_status_msg').text('')
+      }
       roomName = $(this).attr('id');
       let productName = $(this).children(".bid-info").children(".bd-title").html();
+      
       $(".enterProductName").html(productName);
 
       $('.chat-messages').empty();

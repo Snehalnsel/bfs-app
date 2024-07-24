@@ -109,13 +109,23 @@
                         </div>
 
                         <div class="product-icon-box">
-                            <div class="pib-box">
-                                <a href="/webnotificationslist">
-                                    <i class="fa fa-bell-o" aria-hidden="true"></i>
-                                    <div class="top-count" id="notificationCount">0</div>
-                                </a>
 
-                            </div>
+                            
+                            <%if(isLoggedIn=="" ) { %> 
+                                <div class="pib-box">
+                                    <a href="javascript:void(0)"  data-toggle="modal" data-target="#login_modal">
+                                        <i class="fa fa-bell-o" aria-hidden="true"></i>
+                                        <div class="top-count">0</div>
+                                    </a>
+                                </div>
+                            <% } else { %>
+                                <div class="pib-box">
+                                    <a href="/webnotificationslist">
+                                        <i class="fa fa-bell-o" aria-hidden="true"></i>
+                                        <div class="top-count" id="notificationCount">0</div>
+                                    </a>
+                                </div>
+                            <% } %>
 
                             <div class="pib-box">
                                 <a href="/show-wishlist-details">
@@ -159,13 +169,22 @@
             <div class="row top-mobile-header">                
                 <div class="col-12">
                     <div class="product-icon-box">
-                        <div class="pib-box">
-                            <a href="/webnotificationslist">
-                                <i class="fa fa-bell-o" aria-hidden="true"></i>
-                                <div class="top-count" id="notificationCountmobile">0</div>
-                            </a>
-
-                        </div>
+                        <%if(isLoggedIn=="" ) { %> 
+                            <div class="pib-box">
+                                <a href="javascript:void(0)"  data-toggle="modal" data-target="#login_modal">
+                                    <i class="fa fa-bell-o" aria-hidden="true"></i>
+                                    <div class="top-count" id="notificationCountmobile">0</div>
+                                </a>
+                            </div>
+                        <% } else { %>
+                            <div class="pib-box">
+                                <a href="/webnotificationslist">
+                                    <i class="fa fa-bell-o" aria-hidden="true"></i>
+                                    <div class="top-count" id="notificationCountmobile">0</div>
+                                </a>
+                            </div>
+                        <% } %>
+                        
 
                         <div class="pib-box">
                             <a href="/show-wishlist-details">

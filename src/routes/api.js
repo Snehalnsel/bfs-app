@@ -109,9 +109,9 @@ router.post(
   [
     check('email', 'Invalid email').optional().isEmail(),
     check('phone_no', 'Invalid phone number').optional().isMobilePhone(),
-    check("password", "Password length should be 8 to 10 characters").isLength({
+    check("password", "Password length should be 8 to 15 characters").isLength({
       min: 8,
-      max: 10,
+      max: 15,
     }),
     check("deviceid", "This is a required field!").not().isEmpty().trim().escape(),
     check("devicename", "This is a required field!").not().isEmpty().trim().escape(),

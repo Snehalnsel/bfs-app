@@ -88,7 +88,7 @@
                            <td style="width: 10%; border-right:solid 1px #000; border-bottom:solid 1px #000;">
                               <strong>HSN</strong></td>
                            <td style="width: 10%; border-right:solid 1px #000; border-bottom:solid 1px #000;">
-                              <strong>Unit Price </strong></td>
+                              <strong>Product Price </strong></td>
                            <td style="width: 10%; border-right:solid 1px #000; border-bottom:solid 1px #000;">
                               <strong>Qty</strong></td>
                            <td style="width: 10%; border-right:solid 1px #000; border-bottom:solid 1px #000;">
@@ -109,17 +109,17 @@
                            </td>
                            <td style="border-right:solid 1px #000;">&nbsp;</td>
                            <td style="border-right:solid 1px #000;">
-                                 <%= product.offer_price %>
+                              <%= order.original_product_price ? order.original_product_price : product.offer_price %>
                            </td>
                            <td style="border-right:solid 1px #000;">1.00</td>
                            <td style="border-right:solid 1px #000;">
-                                 <%= product.offer_price %>
+                              <%= order.original_product_price ? order.original_product_price : product.offer_price %>
                            </td>
                            <td style="border-right:solid 1px #000;">-</td>
                            <td style="border-right:solid 1px #000;">-</td>
                            <td style="border-right:solid 1px #000;">
                               <h1 style="text-align: right; font-size: 14px;">
-                                 <%= product.offer_price %>
+                                 <%= order.original_product_price ? order.original_product_price : product.offer_price %>
                               </h1>
                            </td>
                         </tr>
@@ -170,7 +170,11 @@
                            <td
                               style="border-right:solid 1px #000; border-top: 1px solid #000; border-bottom: 1px solid #000;">
                               <h1 style="text-align: right; font-size:14px;">
+                                 <% if (order.original_product_price !=null && !isNaN(order.original_product_price)) { %>
+                                    <%= order.original_product_price + order.taxable_value %>
+                                 <% }else{ %>
                                        <%= product.offer_price + order.taxable_value %>
+                                 <% } %>      
                               </h1>
                            </td>
                         </tr>
